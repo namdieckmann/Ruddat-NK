@@ -1,0 +1,50 @@
+﻿<Window x:Class="Ruddat_NK.WndStammObjTeile"   
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Verwaltung Mietflächen" Height="683.5" Width="1057" WindowStartupLocation="CenterScreen">
+    <Grid Margin="0,0,14,0">
+        <DataGrid x:Name="dgrStCmp" Margin="10,20,0,37" CanUserAddRows="False" IsReadOnly="True" CanUserDeleteRows="False" AutoGenerateColumns="False" ToolTip ="Firmen" HorizontalContentAlignment="Stretch" ColumnWidth="*" HorizontalAlignment="Left" Width="200" SelectionChanged="dgrStCmp_SelectionChanged">
+            <DataGrid.Columns>
+                <DataGridTextColumn x:Name="name"  Header="Name" 
+                            Binding="{Binding name}"/>
+            </DataGrid.Columns>
+        </DataGrid>
+        <DataGrid x:Name="dgrStObj" Margin="215,20,20,0" IsReadOnly="True" AutoGenerateColumns="False" ToolTip ="Objekte" HorizontalContentAlignment="Stretch" SelectionChanged="dgrStObj_SelectionChanged" VerticalContentAlignment="Stretch" VerticalAlignment="Top" Height="289">
+            <DataGrid.Columns>
+                <DataGridTextColumn x:Name="bez"  Header="Bezeichnung" 
+                            Binding="{Binding bez}"/>
+                <DataGridTextColumn x:Name="nr"  Header="Objekt Nr." 
+                            Binding="{Binding nr_obj}"/>
+                <DataGridTextColumn x:Name="kst"  Header="Kostenstelle" 
+                            Binding="{Binding kst}"/>
+                <DataGridTextColumn x:Name="flg"  Header="Fläche (m²)" 
+                            Binding="{Binding flaeche_gesamt, StringFormat={}{0:N}, ConverterCulture=de-DE}"/>
+            </DataGrid.Columns>
+        </DataGrid>
+        <DataGrid x:Name="dgrObjTeil" Margin="215,314,20,37" CanUserAddRows="False" CanUserDeleteRows="False" AutoGenerateColumns="False" ToolTip ="Adressen" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" CellEditEnding="dgrObjTeil_CellEditEnding" SelectionChanged="dgrObjTeil_SelectionChanged">
+            <DataGrid.Columns>
+                <DataGridTextColumn x:Name="teilbez"  Header="Bezeichnung" 
+                            Binding="{Binding bez}"/>
+                <DataGridTextColumn x:Name="geschoss"  Header="Geschoss" 
+                            Binding="{Binding geschoss}"/>
+                <DataGridTextColumn x:Name="lage"  Header="Lage" 
+                            Binding="{Binding lage}"/>
+                <DataGridTextColumn x:Name="flaeche"  Header="Fläche Anteil" 
+                            Binding="{Binding flaeche_anteil, StringFormat={}{0:N}, ConverterCulture=de-DE}"/>
+                <DataGridTextColumn x:Name="prz"  Header="Prozent Anteil" 
+                            Binding="{Binding prozent_anteil}"/>
+                <DataGridCheckBoxColumn x:Name="anz" Header="Personen Anteil" 
+                            Binding="{Binding personen_anteil_flag}"/>
+                <DataGridTextColumn x:Name="nrobj"  Header="Nr. Mietfläche" 
+                            Binding="{Binding nr_obj_teil}"/>                
+                <DataGridTextColumn x:Name="ksst"  Header="Kostenst. Mietfläche" 
+                            Binding="{Binding kst}"/>
+            </DataGrid.Columns>
+        </DataGrid>
+        <Button x:Name="btnSave" Content="Speichern" Margin="0,0,20,10" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="134" RenderTransformOrigin="0.538,0.909" Click="btnSave_Click" />
+        <Button x:Name="btnAdd" Content="Zufügen" HorizontalAlignment="Right" Margin="0,0,159,10" VerticalAlignment="Bottom" Width="75" Click="btnAdd_Click"  />
+        <Button x:Name="btnDel" Content="Löschen" HorizontalAlignment="Right" Margin="0,0,239,10" VerticalAlignment="Bottom" Width="75" Click="btnDel_Click"  />
+    </Grid>
+</Window>
+
+

@@ -1,0 +1,68 @@
+﻿<Window x:Class="Ruddat_NK.WndStammObjekte"   
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Verwaltung Objekte" Height="683.5" Width="1057" WindowStartupLocation="CenterScreen">
+    <Grid Margin="0,0,14,0">
+        <DataGrid x:Name="dgrStCmp" Margin="10,20,0,37" CanUserAddRows="False" IsReadOnly="True" CanUserDeleteRows="False" AutoGenerateColumns="False" ToolTip ="Firmen" HorizontalContentAlignment="Stretch" ColumnWidth="*" HorizontalAlignment="Left" Width="200" SelectionChanged="dgrStCmp_SelectionChanged">
+            <DataGrid.Columns>
+                <DataGridTextColumn x:Name="name"  Header="Name" 
+                            Binding="{Binding name}"/>
+            </DataGrid.Columns>
+        </DataGrid>
+        <DataGrid x:Name="dgrStObj" Margin="215,20,20,0" CanUserAddRows="False" CanUserDeleteRows="False" AutoGenerateColumns="False" ToolTip ="Objekte" HorizontalContentAlignment="Stretch" CellEditEnding="dgrStObj_CellEditEnding" SelectionChanged="dgrStObj_SelectionChanged" VerticalContentAlignment="Stretch" VerticalAlignment="Top" Height="261">
+            <DataGrid.Columns>
+                <DataGridTextColumn x:Name="bez"  Header="Bezeichnung" 
+                            Binding="{Binding bez}"/>
+                <DataGridTextColumn x:Name="nr"  Header="Objekt Nr." 
+                            Binding="{Binding nr_obj}"/>
+                <DataGridTextColumn x:Name="kst"  Header="Kostenstelle" 
+                            Binding="{Binding kst}"/>
+                <DataGridTextColumn x:Name="flg"  Header="Fläche (m²)" 
+                            Binding="{Binding flaeche_gesamt, StringFormat={}{0:N}, ConverterCulture=de-DE}"/>
+                <DataGridTextColumn x:Name="dummy" Header=" "/>
+            </DataGrid.Columns>
+        </DataGrid>
+        <DataGrid x:Name="dgrAdr" Margin="215,314,20,37" CanUserAddRows="False" CanUserDeleteRows="False" AutoGenerateColumns="False" ToolTip ="Adressen" HorizontalContentAlignment="Stretch" SelectionChanged="dgrAdr_SelectionChanged" CellEditEnding="dgrAdr_CellEditEnding" VerticalContentAlignment="Stretch">
+            <DataGrid.Columns>
+                <DataGridTextColumn x:Name="firma"  Header="Firma" 
+                            Binding="{Binding firma}"/>
+                <DataGridTextColumn x:Name="anr"  Header="Anrede" 
+                            Binding="{Binding anrede}"/>
+                <DataGridTextColumn x:Name="vorn"  Header="Vorname" 
+                            Binding="{Binding vorname}"/>
+                <DataGridTextColumn x:Name="nam"  Header="Name" 
+                            Binding="{Binding name}"/>
+                <DataGridTextColumn x:Name="adr"  Header="Adresse" 
+                            Binding="{Binding adresse}"/>
+                <DataGridTextColumn x:Name="plz" Header="Plz" 
+                            Binding="{Binding plz}"/>
+                <DataGridTextColumn x:Name="ort"  Header="Ort" 
+                            Binding="{Binding ort}"/>
+                <DataGridTextColumn x:Name="land"  Header="Land" 
+                            Binding="{Binding land}"/>
+                <DataGridTextColumn x:Name="tel"  Header="Tel." 
+                            Binding="{Binding tel}"/>
+                <DataGridTextColumn x:Name="mob"  Header="Mobil" 
+                            Binding="{Binding mobil}"/>
+                <DataGridTextColumn x:Name="mail"  Header="Mail" 
+                            Binding="{Binding mail}"/>
+                <DataGridTextColumn x:Name="homep"  Header="Homepage" 
+                            Binding="{Binding homepage}"/>
+
+                <DataGridComboBoxColumn x:Name="adressenart" Header="Art Adresse"
+                        DisplayMemberPath="bez"
+                        SelectedValuePath="id_art_adresse"
+                        SelectedValueBinding="{Binding id_art_adresse}" />
+
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <Button x:Name="btnSave" Content="Speichern" Margin="0,286,20,0" HorizontalAlignment="Right" VerticalAlignment="Top" Width="134" RenderTransformOrigin="0.538,0.909" Click="btnSave_Click"/>
+        <Button x:Name="btnAdd" Content="Zufügen" HorizontalAlignment="Right" Margin="0,286,159,0" VerticalAlignment="Top" Width="75" Click="btnAdd_Click" />
+        <Button x:Name="btnDel" Content="Löschen" HorizontalAlignment="Right" Margin="0,286,239,0" VerticalAlignment="Top" Width="75" Click="btnDel_Click" />
+        <Button x:Name="btnAdrSave" Content="Speichern" Margin="0,0,20,10" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="134" RenderTransformOrigin="0.538,0.909" Click="btnAdrSave_Click"/>
+        <Button x:Name="btnAdrAdd" Content="Zufügen" HorizontalAlignment="Right" Margin="0,0,159,10" VerticalAlignment="Bottom" Width="75" Click="btnAdrAdd_Click" />
+        <Button x:Name="btnAdrDel" Content="Löschen" HorizontalAlignment="Right" Margin="0,0,239,10" VerticalAlignment="Bottom" Width="75" Click="btnAdrDel_Click" />
+    </Grid>
+</Window>
+

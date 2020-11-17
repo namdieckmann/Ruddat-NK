@@ -1,0 +1,55 @@
+﻿<Window x:Class="Ruddat_NK.WndCompanies"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Firmen / Gesellschaften" Height="683.5" Width="1057" WindowStartupLocation="CenterScreen">
+    <Grid>
+        <DataGrid x:Name="dgrCmp" Margin="10,10,684,36" CanUserAddRows="False" CanUserDeleteRows="False" AutoGenerateColumns="False" ToolTip ="Firmen" HorizontalContentAlignment="Stretch" ColumnWidth="*" SelectionChanged="dgrCmp_SelectionChanged" CellEditEnding="dgrCmp_CellEditEnding" HorizontalAlignment="Left">
+            <DataGrid.Columns>
+                <DataGridTextColumn x:Name="name"  Header="Name" 
+                            Binding="{Binding name}"/>
+                <DataGridTextColumn x:Name="bez" Header="Beschreibung" 
+                            Binding="{Binding bez}"/>
+            </DataGrid.Columns>
+        </DataGrid>
+        <DataGrid x:Name="dgrAdr" Margin="0,10,0,36" CanUserAddRows="False" CanUserDeleteRows="False" AutoGenerateColumns="False" ToolTip ="Adressen" HorizontalContentAlignment="Stretch" SelectionChanged="dgrAdr_SelectionChanged" CellEditEnding="dgrAdr_CellEditEnding" HorizontalAlignment="Right" Width="679">
+            <DataGrid.Columns>
+                <DataGridTextColumn x:Name="firma"  Header="Firma" 
+                            Binding="{Binding firma}"/>
+                <DataGridTextColumn x:Name="anr"  Header="Anrede" 
+                            Binding="{Binding anrede}"/>
+                <DataGridTextColumn x:Name="vorn"  Header="Vorname" 
+                            Binding="{Binding vorname}"/>
+                <DataGridTextColumn x:Name="nam"  Header="Name" 
+                            Binding="{Binding name}"/>
+                <DataGridTextColumn x:Name="adr"  Header="Adresse" 
+                            Binding="{Binding adresse}"/>
+                <DataGridTextColumn x:Name="plz" Header="Plz" 
+                            Binding="{Binding plz}"/>
+                <DataGridTextColumn x:Name="ort"  Header="Ort" 
+                            Binding="{Binding ort}"/>
+                <DataGridTextColumn x:Name="land"  Header="Land" 
+                            Binding="{Binding land}"/>
+                <DataGridTextColumn x:Name="tel"  Header="Tel." 
+                            Binding="{Binding tel}"/>
+                <DataGridTextColumn x:Name="mob"  Header="Mobil" 
+                            Binding="{Binding mobil}"/>
+                <DataGridTextColumn x:Name="mail"  Header="Mail" 
+                            Binding="{Binding mail}"/>
+                <DataGridTextColumn x:Name="homep"  Header="Homepage" 
+                            Binding="{Binding homepage}"/>
+
+                <DataGridComboBoxColumn x:Name="adressenart" Header="Art Adresse"
+                        DisplayMemberPath="bez"
+                        SelectedValuePath="id_art_adresse"
+                        SelectedValueBinding="{Binding id_art_adresse}" />
+
+            </DataGrid.Columns>
+        </DataGrid>
+        <Button x:Name="btnSave" Content="Speichern" Margin="0,0,684,9" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="134" RenderTransformOrigin="0.538,0.909" Click="btnSave_Click"/>
+        <Button x:Name="btnAdd" Content="Zufügen" HorizontalAlignment="Right" Margin="0,0,823,9" VerticalAlignment="Bottom" Width="75" Click="btnAdd_Click" />
+        <Button x:Name="btnDel" Content="Löschen" HorizontalAlignment="Right" Margin="0,0,903,9" VerticalAlignment="Bottom" Width="75" Click="btnDel_Click" />
+        <Button x:Name="btnAdrSave" Content="Speichern" Margin="0,0,10,10" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="134" RenderTransformOrigin="0.538,0.909" Click="btnAdrSave_Click"/>
+        <Button x:Name="btnAdrAdd" Content="Zufügen" HorizontalAlignment="Right" Margin="0,0,149,10" VerticalAlignment="Bottom" Width="75" Click="btnAdrAdd_Click" />
+        <Button x:Name="btnAdrDel" Content="Löschen" HorizontalAlignment="Right" Margin="0,0,229,10" VerticalAlignment="Bottom" Width="75" Click="btnAdrDel_Click" />
+    </Grid>
+</Window>

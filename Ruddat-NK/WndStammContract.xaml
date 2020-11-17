@@ -1,0 +1,89 @@
+﻿<Window x:Class="Ruddat_NK.WndStammContract"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xml:lang="de-DE"
+        Title="Verwaltung Verträge" Height="683.5" Width="1057" WindowStartupLocation="CenterScreen">
+
+    <Window.Resources>
+        <Style x:Key="NameCellStyle" TargetType="DataGridCell">
+            <Setter Property="HorizontalAlignment" Value="Right" />
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="0,0,14,0">
+        <DataGrid x:Name="dgrStCmp" Margin="10,16,0,0" CanUserAddRows="False" IsReadOnly="True" CanUserDeleteRows="False" AutoGenerateColumns="False" ToolTip ="Firmen" HorizontalContentAlignment="Stretch" ColumnWidth="*" HorizontalAlignment="Left" Width="200"  VerticalAlignment="Top" Height="134" SelectionChanged="dgrStCmp_SelectionChanged">
+            <DataGrid.Columns>
+                <DataGridTextColumn x:Name="name"  Header="Firma Name" 
+                            Binding="{Binding name}"/>
+            </DataGrid.Columns>
+        </DataGrid>
+        <DataGrid x:Name="dgrStObj" Margin="10,159,0,0" IsReadOnly="True" AutoGenerateColumns="False" ToolTip ="Objekte" HorizontalAlignment="Left" Width="200" VerticalAlignment="Top" Height="213" HorizontalContentAlignment="Stretch" SelectionChanged="dgrStObj_SelectionChanged" >
+            <DataGrid.Columns>
+                <DataGridTextColumn x:Name="bez1"  Header="Objekt Bezeichnung" 
+                            Binding="{Binding objbez}"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <DataGrid x:Name="dgrObjTeil" Margin="10,377,0,0" CanUserAddRows="False" IsReadOnly="True" CanUserDeleteRows="False" AutoGenerateColumns="False" ToolTip ="Mietflächen" HorizontalAlignment="Left" Height="237" Width="200" VerticalAlignment="Top" HorizontalContentAlignment="Center" SelectionChanged="dgrObjTeil_SelectionChanged">
+            <DataGrid.Columns>
+                <DataGridTextColumn x:Name="objteil"  Header="Bez. Mietfläche" 
+                            Binding="{Binding objteilbez}"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <DataGrid x:Name="dgrStContract" Margin="215,16,20,41" CanUserAddRows="False" CanUserDeleteRows="False" AutoGenerateColumns="False" ToolTip ="Alle Verträge zeigen mit Doppelklick" HorizontalContentAlignment="Stretch" CellEditEnding="dgrStContract_CellEditEnding" SelectionChanged="dgrStContract_SelectionChanged" >
+            <DataGrid.Columns>
+                <DataGridComboBoxColumn x:Name="mieter" Header="Verträge Mieter"
+                        DisplayMemberPath="bez"
+                        SelectedValuePath="id_mieter"
+                        SelectedValueBinding="{Binding id_mieter}" />
+
+                <!--<DataGridTemplateColumn Header="VertragsBeginn">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding datum_von, StringFormat ={}{0:dd.MM.yyyy}}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                    <DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+                            <DatePicker SelectedDate="{Binding datum_von}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellEditingTemplate>
+                </DataGridTemplateColumn>-->
+
+                <DataGridTextColumn Header="VertragsBeginn"
+                                    Binding="{Binding datum_von, StringFormat ={}{0:dd.MM.yyyy}}"/>
+
+                <!--<DataGridTemplateColumn Header="VertragsEnde">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding datum_bis, StringFormat ={}{0:dd.MM.yyyy}}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                    <DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+                            <DatePicker SelectedDate="{Binding datum_bis}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellEditingTemplate>
+                </DataGridTemplateColumn>-->
+
+                <DataGridTextColumn Header="VertragsEnde"
+                                    Binding="{Binding datum_bis, StringFormat ={}{0:dd.MM.yyyy}}"/>                
+
+                <DataGridCheckBoxColumn Header="Vertrag Aktiv" 
+                            Binding="{Binding vertrag_aktiv}"/>
+                <DataGridTextColumn x:Name="personen"  Header="Anzahl Personen" 
+                            Binding="{Binding anzahl_personen}"/>
+                <DataGridTextColumn x:Name="bemerkung"  Header="Bemerkung" 
+                            Binding="{Binding bemerkung}"/>
+
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <Button x:Name="btnSave" Content="Speichern" Margin="0,0,20,10" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="134" RenderTransformOrigin="0.538,0.909" Click="btnSave_Click"/>
+        <Button x:Name="btnAdd" Content="Zufügen" HorizontalAlignment="Right" Margin="0,0,159,10" VerticalAlignment="Bottom" Width="75" Click="btnAdd_Click" />
+        <Button x:Name="btnDel" Content="Löschen" HorizontalAlignment="Right" Margin="0,0,239,10" VerticalAlignment="Bottom" Width="75" Click="btnDel_Click" />
+    </Grid>
+</Window>
+    
+    

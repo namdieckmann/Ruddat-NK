@@ -1,0 +1,23 @@
+﻿<Window x:Class="Ruddat_NK.WndZlgTrace"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Nicht zugeordnete Vorrauszahlungen" Height="469.6" Width="792">
+    <Grid>
+        <DataGrid x:Name="dgrZlg" Margin="10,10,0,10" CanUserAddRows="False" CanUserDeleteRows="False" AutoGenerateColumns="False" ToolTip ="Vorrauszahlungen" HorizontalContentAlignment="Stretch" ColumnWidth="*" HorizontalAlignment="Left" Width="766">
+            <DataGrid.Columns>
+                <DataGridTextColumn x:Name="datum"  Header="Datum" 
+                            Binding="{Binding datum, StringFormat ={}{0:dd.MM.yyyy}}"/>
+                <DataGridTextColumn x:Name="netto" Header="NK Betrag" 
+                            Binding="{Binding netto, StringFormat ={}{0:c},ConverterCulture=de-DE}"/>
+                <DataGridTextColumn x:Name="bez" Header="Kostenstelleninfo" 
+                            Binding="{Binding bez}"/>                
+                <DataGridTextColumn x:Name="objekt" Header="Objekt" 
+                            Binding="{Binding objekt}"/>
+                <DataGridTextColumn x:Name="tobjekt" Header="Mietfläche" 
+                            Binding="{Binding tobjekt}"/>
+                <DataGridTextColumn x:Name="mieter" Header="Mieter" 
+                            Binding="{Binding mieter}"/>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</Window>

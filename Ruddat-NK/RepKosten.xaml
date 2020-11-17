@@ -1,0 +1,9 @@
+﻿<Window
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:Viewer="clr-namespace:SAPBusinessObjects.WPF.Viewer;assembly=SAPBusinessObjects.WPF.Viewer" x:Class="Ruddat_NK.RepKosten"
+        Title="RepKosten" Height="399" Width="960">
+    
+    
+    <Viewer:CrystalReportsViewer x:Name="rpKosten"  HorizontalAlignment="Left" Height="371.5" VerticalAlignment="Top" Width="955"/>
+</Window>

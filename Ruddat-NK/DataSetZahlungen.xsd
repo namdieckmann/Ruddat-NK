@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="DataSetZahlungen" targetNamespace="http://tempuri.org/DataSetZahlungen.xsd" xmlns:mstns="http://tempuri.org/DataSetZahlungen.xsd" xmlns="http://tempuri.org/DataSetZahlungen.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections />
+        <Tables />
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="DataSetZahlungen" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:EnableTableAdapterManager="true" msprop:Generator_DataSetName="DataSetZahlungen" msprop:Generator_UserDSName="DataSetZahlungen">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="DataTable1" msprop:Generator_TableClassName="DataTable1DataTable" msprop:Generator_TableVarName="tableDataTable1" msprop:Generator_TablePropName="DataTable1" msprop:Generator_RowDeletingName="DataTable1RowDeleting" msprop:Generator_RowChangingName="DataTable1RowChanging" msprop:Generator_RowEvHandlerName="DataTable1RowChangeEventHandler" msprop:Generator_RowDeletedName="DataTable1RowDeleted" msprop:Generator_UserTableName="DataTable1" msprop:Generator_RowChangedName="DataTable1RowChanged" msprop:Generator_RowEvArgName="DataTable1RowChangeEvent" msprop:Generator_RowClassName="DataTable1Row">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="objbez" msprop:Generator_ColumnVarNameInTable="columnobjbez" msprop:Generator_ColumnPropNameInRow="objbez" msprop:Generator_ColumnPropNameInTable="objbezColumn" msprop:Generator_UserColumnName="objbez" type="xs:string" minOccurs="0" />
+              <xs:element name="obtbez" msprop:Generator_ColumnVarNameInTable="columnobtbez" msprop:Generator_ColumnPropNameInRow="obtbez" msprop:Generator_ColumnPropNameInTable="obtbezColumn" msprop:Generator_UserColumnName="obtbez" type="xs:string" minOccurs="0" />
+              <xs:element name="mbez" msprop:Generator_ColumnVarNameInTable="columnmbez" msprop:Generator_ColumnPropNameInRow="mbez" msprop:Generator_ColumnPropNameInTable="mbezColumn" msprop:Generator_UserColumnName="mbez" type="xs:string" minOccurs="0" />
+              <xs:element name="von" msprop:Generator_ColumnVarNameInTable="columnvon" msprop:Generator_ColumnPropNameInRow="von" msprop:Generator_ColumnPropNameInTable="vonColumn" msprop:Generator_UserColumnName="von" type="xs:dateTime" minOccurs="0" />
+              <xs:element name="bis" msprop:Generator_ColumnVarNameInTable="columnbis" msprop:Generator_ColumnPropNameInRow="bis" msprop:Generator_ColumnPropNameInTable="bisColumn" msprop:Generator_UserColumnName="bis" type="xs:dateTime" minOccurs="0" />
+              <xs:element name="netto" msprop:Generator_ColumnVarNameInTable="columnnetto" msprop:Generator_ColumnPropNameInRow="netto" msprop:Generator_ColumnPropNameInTable="nettoColumn" msprop:Generator_UserColumnName="netto" type="xs:decimal" minOccurs="0" />
+              <xs:element name="brutto" msprop:Generator_ColumnVarNameInTable="columnbrutto" msprop:Generator_ColumnPropNameInRow="brutto" msprop:Generator_ColumnPropNameInTable="bruttoColumn" msprop:Generator_UserColumnName="brutto" type="xs:decimal" minOccurs="0" />
+              <xs:element name="snetto" msprop:Generator_ColumnVarNameInTable="columnsnetto" msprop:Generator_ColumnPropNameInRow="snetto" msprop:Generator_ColumnPropNameInTable="snettoColumn" msprop:Generator_UserColumnName="snetto" type="xs:decimal" minOccurs="0" />
+              <xs:element name="sbrutto" msprop:Generator_ColumnVarNameInTable="columnsbrutto" msprop:Generator_ColumnPropNameInRow="sbrutto" msprop:Generator_ColumnPropNameInTable="sbruttoColumn" msprop:Generator_UserColumnName="sbrutto" type="xs:decimal" minOccurs="0" />
+              <xs:element name="kbez" msprop:Generator_ColumnVarNameInTable="columnkbez" msprop:Generator_ColumnPropNameInRow="kbez" msprop:Generator_ColumnPropNameInTable="kbezColumn" msprop:Generator_UserColumnName="kbez" type="xs:string" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
