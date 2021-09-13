@@ -1,25 +1,12 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Data.SqlClient;
 using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Xml;
+using MySql.Data.MySqlClient;
 
 namespace Ruddat_NK
 {
@@ -34,6 +21,7 @@ namespace Ruddat_NK
         // Global
         string gsPath = "";                 // DataPath des xml
         String gsConnectString;
+        String gsMySqlConnectionString;
         String gsItemHeader = "";           // Gewähltes Item aus dem Treeview
         int giFiliale = 0;                  // Angewählte Firma (Aus xml Konfig, den letzten Wert holen)
         int giObjekt = 0;                   // Objekt global
@@ -47,7 +35,8 @@ namespace Ruddat_NK
         int giFlagTimeline = 0;             // Flag TimeLinebearbeitung
         int giIndex = 0;                    // Index > Objekt, Teil oder Mieter 1,2,3
         int giMwstSatz = 99;                // Mwst Satz ! Null > 0 gibs ja
-        int giMwstSatzZl = 99;              // Mwst Satz Zählerstand ! Null > 0 gibs ja
+        int giMwstSatzZl = 99;              // Für Zähler
+        int giDb = 2;                       // Datenbank 1 = MsqSql 2= Mysql
         DateTime gdtZahlung = DateTime.MinValue; // Zahlungsdatum aus Datepicker DataGrid Zahlungen
 
         // Daten
@@ -77,6 +66,19 @@ namespace Ruddat_NK
         SqlDataAdapter sdLeerstand;
         SqlDataAdapter sdZlWert;
         SqlDataAdapter sdZlNummer;
+        MySqlDataAdapter mysda;
+        MySqlDataAdapter mysdb;
+        MySqlDataAdapter mysdc;
+        MySqlDataAdapter mysdd;
+        MySqlDataAdapter mysde;
+        MySqlDataAdapter mysdf;
+        MySqlDataAdapter mysdg;
+        MySqlDataAdapter mysdZlg;
+        MySqlDataAdapter mysdVert;
+        MySqlDataAdapter mysdAbrInfo;
+        MySqlDataAdapter mysdLeerstand;
+        MySqlDataAdapter mysdZlWert;
+        MySqlDataAdapter mysdZlNummer;
 
         // Datenübergabe an WndChooseSet
         public delegate void delPassData(int giTimelineId);
@@ -129,7 +131,7 @@ namespace Ruddat_NK
 
             // Daten für Treeview holen
             lsSql = getSqlSelect(2, giFiliale, "", "", DateTime.Today, DateTime.Today);
-            liRows = fetchData(lsSql, 2);
+            liRows = fetchData(lsSql, 2);                                                       // Todo fetchdata ist um Mysql erweitert > Funktionieren alle Sql-Statements? 
 
             int liYear = DateTime.Now.Year - 1;
             string dt = (liYear.ToString()) + "-01-01";
@@ -152,6 +154,7 @@ namespace Ruddat_NK
         private int DbConnect(string p)
         {
             string SqlConnectionString = "";
+            string MySqlConnectionString = "";
             String PDataPath = p + "\\Ruddat\\Nebenkosten\\";
             String PDataPathFile = "";
             String Server, DbName, Trust, Timeout;
@@ -233,13 +236,17 @@ namespace Ruddat_NK
             // Für Testzwewcke Firma lokale Db
             // SqlConnectionString = "Data Source=(LocalDB)\\v11.0;AttachDbFilename=C:\\Users\\Ulf Dieckmann\\AppData\\Local\\Ruddat\\Nebenkosten\\rdnk.mdf;Integrated Security=True;Connect Timeout=5";
             // Für Testzwecke Notebook lokale Db
-            SqlConnectionString = "Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=C:\\Users\\udiec\\AppData\\Local\\Ruddat\\Nebenkosten\\rdnk.mdf;Integrated Security=True;Connect Timeout=5";
+         //   SqlConnectionString = "Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=C:\\Users\\udiec\\AppData\\Local\\Ruddat\\Nebenkosten\\rdnk.mdf;Integrated Security=True;Connect Timeout=5";
             // Für Testzwecke Server Firma
             // SqlConnectionString = "Data Source=(LocalDB)\\v11.0;AttachDbFilename=G:\\Software\\Ruddat-Nebenkosten\\DbOne\\rdnk.mdf;Integrated Security=True;Connect Timeout=20";
-            MessageBox.Show("Lokale Datenbank wird verwendet", "Achtung ", MessageBoxButton.OK);
+            // MySql Testverbindung
+            MySqlConnectionString = @"server=localhost;userid=rdnk;password=r1d8n9k4!;database=dbo";
+
+            MessageBox.Show("Lokale Datenbank MySql wird verwendet", "Achtung! ", MessageBoxButton.OK );
 
             //Globaler ConnectString
             gsConnectString = SqlConnectionString;
+            gsMySqlConnectionString = MySqlConnectionString;
 
             return (1);
         }
@@ -1557,260 +1564,505 @@ namespace Ruddat_NK
             string lsObjektBez = "", lsObjektTeilBez = "";
             string lsObjektBezS = "";
 
-            SqlConnection connect;
-            connect = new SqlConnection(gsConnectString);
-
-            try
+            switch (giDb)
             {
+                case 1:             // MsSql
 
-                // Pass both strings to a new SqlCommand object.
-                SqlCommand command = new SqlCommand(psSql, connect);
-
-                // Db open
-                connect.Open();
-
-                // MessageBox.Show("Connect Datenbank O.K.",
-                //         "DbConnect O.K.");
-
-                // Daten für Filiale holen
-                if (piArt == 1)
-                {
-                    tableThree = new DataTable();   // Filialen
-                    sdc = new SqlDataAdapter(command);
-                    sdc.Fill(tableThree);
-                    lbFiliale.ItemsSource = tableThree.DefaultView; 
-                }
-
-                // Daten für Objekte und Teilobjekte holen ab ins Treeview
-                // Für aktive Verträge
-                if (piArt == 2)
-                {
-                    tableFour = new DataTable();    // Objekte Teilobjekte
-                    sdd = new SqlDataAdapter(command);
-                    sdd.Fill(tableFour);
-
-                    if (tableFour.Rows.Count > 0)
+                    try
                     {
-                        int i = 0;
-                        tvMain.Items.Clear();
+                        SqlConnection connect;
+                        connect = new SqlConnection(gsConnectString);
+                        // Pass both strings to a new SqlCommand object.
+                        SqlCommand command = new SqlCommand(psSql, connect);
+                        // Db open
+                        connect.Open();
 
-                        //  Eine Schleife durch die Tabelle, um das Treview zu befüllen
-                        foreach (DataRow dr in tableFour.Rows)
+                        // Daten für Filiale holen
+                        if (piArt == 1)
                         {
-                            lsObjektBez = tableFour.Rows[i].ItemArray.GetValue(4).ToString().Trim() + ":" + tableFour.Rows[i].ItemArray.GetValue(0).ToString().Trim();
-                            lsObjektTeilBez = tableFour.Rows[i].ItemArray.GetValue(1).ToString();
-
-                            TreeViewItem root = new TreeViewItem();
-                            root.Header = lsObjektBez;
-
-                            // Nur, wenn ein neues Objekt und Teilobjekt in der Liste steht
-                            if (lsObjektBez != lsObjektBezS )
-                            {
-                                tvMain.Items.Add(root);
-                                lsObjektBezS = lsObjektBez;
-                            }
-
-                            PopulateTree(i, root, tableFour);
-
-                            i++;
+                            tableThree = new DataTable();   // Filialen
+                            sdc = new SqlDataAdapter(command);
+                            sdc.Fill(tableThree);
+                            lbFiliale.ItemsSource = tableThree.DefaultView;
                         }
+
+                        // Daten für Objekte und Teilobjekte holen ab ins Treeview
+                        // Für aktive Verträge
+                        if (piArt == 2)
+                        {
+                            tableFour = new DataTable();    // Objekte Teilobjekte
+                            sdd = new SqlDataAdapter(command);
+                            sdd.Fill(tableFour);
+
+                            if (tableFour.Rows.Count > 0)
+                            {
+                                int i = 0;
+                                tvMain.Items.Clear();
+
+                                //  Eine Schleife durch die Tabelle, um das Treview zu befüllen
+                                foreach (DataRow dr in tableFour.Rows)
+                                {
+                                    lsObjektBez = tableFour.Rows[i].ItemArray.GetValue(4).ToString().Trim() + ":" + tableFour.Rows[i].ItemArray.GetValue(0).ToString().Trim();
+                                    lsObjektTeilBez = tableFour.Rows[i].ItemArray.GetValue(1).ToString();
+
+                                    TreeViewItem root = new TreeViewItem();
+                                    root.Header = lsObjektBez;
+
+                                    // Nur, wenn ein neues Objekt und Teilobjekt in der Liste steht
+                                    if (lsObjektBez != lsObjektBezS)
+                                    {
+                                        tvMain.Items.Add(root);
+                                        lsObjektBezS = lsObjektBez;
+                                    }
+
+                                    PopulateTree(i, root, tableFour);
+
+                                    i++;
+                                }
+                            }
+                            else
+                            {
+                                tvMain.Items.Clear();
+                            }
+                        }
+
+
+
+                        // Die Id aus Objekt holen
+                        if (piArt == 3)
+                        {
+                            tableFour = new DataTable();    // Objekte Teilobjekte
+                            sdd = new SqlDataAdapter(command);
+                            sdd.Fill(tableFour);
+                            if (tableFour.Rows.Count > 0)
+                            {
+                                liRows = Convert.ToInt16(tableFour.Rows[0].ItemArray.GetValue(5).ToString());
+                            }
+                        }
+
+                        // Die Id aus Teilobjekt holen
+                        if (piArt == 4)
+                        {
+                            tableFour = new DataTable();    // Objekte Teilobjekte
+                            sdd = new SqlDataAdapter(command);
+                            sdd.Fill(tableFour);
+                            if (tableFour.Rows.Count > 0)
+                            {
+                                liRows = Convert.ToInt16(tableFour.Rows[0].ItemArray.GetValue(6).ToString());
+                            }
+                        }
+
+                        // Die Id aus Mieter holen
+                        if (piArt == 5)
+                        {
+                            tableFour = new DataTable();    // Objekte Teilobjekte
+                            sdd = new SqlDataAdapter(command);
+                            sdd.Fill(tableFour);
+                            if (tableFour.Rows.Count > 0)
+                            {
+                                liRows = Convert.ToInt16(tableFour.Rows[0].ItemArray.GetValue(7).ToString());
+                            }
+                        }
+
+                        // DataGrid Timline Summen
+                        if (piArt == 8)
+                        {
+                            tableSeven = new DataTable();   // Timeline Summen 
+                            sdg = new SqlDataAdapter(command);
+                            sdg.Fill(tableSeven);
+                            DgrCost.ItemsSource = tableSeven.DefaultView;
+                            liRows = DgrCost.Items.Count;
+                        }
+
+                        // Datagrid für Rechnungen
+                        if (piArt == 9)
+                        {
+                            tableOne = new DataTable();     // Rechnungen
+                            sda = new SqlDataAdapter(command);
+                            sda.Fill(tableOne);
+                            DgrRechnungen.ItemsSource = tableOne.DefaultView;
+                            liRows = DgrRechnungen.Items.Count;
+                        }
+
+                        // ListBox Filiale befüllen
+                        if (piArt == 10)
+                        {
+                            sdc = new SqlDataAdapter(command);
+                            sdc.Fill(tableThree);
+                            lbFiliale.ItemsSource = tableThree.DefaultView;
+                        }
+
+                        // Combobox Kostenart in Rechnungen
+                        if (piArt == 11)
+                        {
+                            tableFive = new DataTable();    // Kostenart
+                            sde = new SqlDataAdapter(command);
+                            sde.Fill(tableFive);
+                            kostenart.ItemsSource = tableFive.DefaultView;
+                        }
+
+                        // Combobox mwst in Rechnungen
+                        if (piArt == 12)
+                        {
+                            tableSix = new DataTable();     // mwst
+                            sdf = new SqlDataAdapter(command);
+                            sdf.Fill(tableSix);
+                            mwst.ItemsSource = tableSix.DefaultView;                // Rechnungen
+                        }
+
+                        // DataGrid Timline Detail
+                        if (piArt == 13)
+                        {
+                            tableTwo = new DataTable();     // Timeline
+                            sdb = new SqlDataAdapter(command);
+                            sdb.Fill(tableTwo);
+                            DgrCostDetail.ItemsSource = tableTwo.DefaultView;
+                            liRows = DgrCostDetail.Items.Count;
+                        }
+
+                        // DataGrid Zahlungen
+                        if (piArt == 14)
+                        {
+                            tableZlg = new DataTable();     // Zahlungen
+                            sdZlg = new SqlDataAdapter(command);
+                            sdZlg.Fill(tableZlg);
+                            DgrZahlungen.ItemsSource = tableZlg.DefaultView;
+                            liRows = DgrZahlungen.Items.Count;
+                        }
+
+                        // DataGrid Leerstand Detail
+                        if (piArt == 19)
+                        {
+                            tableLeerstand = new DataTable();     // Timeline
+                            sdLeerstand = new SqlDataAdapter(command);
+                            sdLeerstand.Fill(tableLeerstand);
+                            DgrLeerDetail.ItemsSource = tableLeerstand.DefaultView;
+                            liRows = DgrLeerDetail.Items.Count;
+                        }
+
+                        // Combobox Kostenart in Zahlungen
+                        if (piArt == 15)
+                        {
+                            tableFive = new DataTable();    // Kostenart
+                            sde = new SqlDataAdapter(command);
+                            sde.Fill(tableFive);
+                            kostenartZlg.ItemsSource = tableFive.DefaultView;
+                        }
+
+                        // Combobox Verteilung in Rechnungen und Zähler
+                        if (piArt == 16)
+                        {
+                            tableVert = new DataTable();    // Verteilung Rechnungen
+                            sdVert = new SqlDataAdapter(command);
+                            sdVert.Fill(tableVert);
+                            kostenvert.ItemsSource = tableVert.DefaultView;
+                            kostenvertZl.ItemsSource = tableVert.DefaultView;
+                        }
+
+
+                        // Tabelle Infos für Abrechnung
+                        if (piArt == 17)
+                        {
+                            tableAbrInfo = new DataTable();    // Abrechnung
+                            sdAbrInfo = new SqlDataAdapter(command);
+                            sdAbrInfo.Fill(tableAbrInfo);
+                        }
+
+                        // Tabelle Leerstände
+                        if (piArt == 18)
+                        {
+                            tableLeerstand = new DataTable();    // Leerstand
+                            sdLeerstand = new SqlDataAdapter(command);
+                            sdLeerstand.Fill(tableLeerstand);
+                            DgrLeer.ItemsSource = tableLeerstand.DefaultView;
+                            liRows = DgrLeer.Items.Count;
+                        }
+
+                        // Tabelle Zählerwerte
+                        if (piArt == 21)
+                        {
+                            tableZlWert = new DataTable();    // Zählerwert
+                            sdZlWert = new SqlDataAdapter(command);
+                            sdZlWert.Fill(tableZlWert);
+                            DgrCounters.ItemsSource = tableZlWert.DefaultView;
+                            liRows = DgrCounters.Items.Count;
+                        }
+
+                        // Combobox Zählernummern
+                        if (piArt == 22)
+                        {
+                            tableZlNummer = new DataTable();    // Kostenart
+                            sdZlNummer = new SqlDataAdapter(command);
+                            sdZlNummer.Fill(tableZlNummer);
+                            zlNummer.ItemsSource = tableZlNummer.DefaultView;
+                            zleh.ItemsSource = tableZlNummer.DefaultView;
+                            zlmw.ItemsSource = tableZlNummer.DefaultView;
+                        }
+
+                        // db close
+                        connect.Close();
                     }
-                    else
+                    catch (SqlException ex)
                     {
-                        tvMain.Items.Clear();
+                        for (int i = 0; i < ex.Errors.Count; i++)
+                        {
+                            MessageBox.Show("Index #" + i + "\n" +
+                                "Error: " + ex.Errors[i].ToString() + "\n", "Achtung");
+                        }
+                        Console.ReadLine();
+
+                        // Die Anwendung anhalten 
+                        MessageBox.Show("Verarbeitungsfehler ERROR fetchdata main 0001\n piArt = " + piArt.ToString(),
+                                 "Achtung");
+
+                        throw;
                     }
-                }
 
+                    break;
+                case 2:                                     // MySql
 
-
-                // Die Id aus Objekt holen
-                if (piArt == 3)
-                {
-                    tableFour = new DataTable();    // Objekte Teilobjekte
-                    sdd = new SqlDataAdapter(command);
-                    sdd.Fill(tableFour);
-                    if (tableFour.Rows.Count > 0)
+                    try
                     {
-                        liRows = Convert.ToInt16(tableFour.Rows[0].ItemArray.GetValue(5).ToString());                        
-                    }
-                }
+                        MySqlConnection con;
+                        con = new MySqlConnection(gsMySqlConnectionString);
 
-                // Die Id aus Teilobjekt holen
-                if (piArt == 4)
-                {
-                    tableFour = new DataTable();    // Objekte Teilobjekte
-                    sdd = new SqlDataAdapter(command);
-                    sdd.Fill(tableFour);
-                    if (tableFour.Rows.Count > 0)
+                        MySqlCommand com = new MySqlCommand(psSql, con);
+
+                        // Daten für Filiale holen
+                        if (piArt == 1)
+                        {
+                            tableThree = new DataTable();   // Filialen
+                            mysdc = new MySqlDataAdapter(com);
+                            mysdc.Fill(tableThree);
+                            lbFiliale.ItemsSource = tableThree.DefaultView;
+                        }
+
+                        // Daten für Objekte und Teilobjekte holen ab ins Treeview
+                        // Für aktive Verträge
+                        if (piArt == 2)
+                        {
+                            tableFour = new DataTable();    // Objekte Teilobjekte
+                            mysdd = new MySqlDataAdapter(com);
+                            mysdd.Fill(tableFour);
+
+                            if (tableFour.Rows.Count > 0)
+                            {
+                                int i = 0;
+                                tvMain.Items.Clear();
+
+                                //  Eine Schleife durch die Tabelle, um das Treview zu befüllen
+                                foreach (DataRow dr in tableFour.Rows)
+                                {
+                                    lsObjektBez = tableFour.Rows[i].ItemArray.GetValue(4).ToString().Trim() + ":" + tableFour.Rows[i].ItemArray.GetValue(0).ToString().Trim();
+                                    lsObjektTeilBez = tableFour.Rows[i].ItemArray.GetValue(1).ToString();
+
+                                    TreeViewItem root = new TreeViewItem();
+                                    root.Header = lsObjektBez;
+
+                                    // Nur, wenn ein neues Objekt und Teilobjekt in der Liste steht
+                                    if (lsObjektBez != lsObjektBezS)
+                                    {
+                                        tvMain.Items.Add(root);
+                                        lsObjektBezS = lsObjektBez;
+                                    }
+
+                                    PopulateTree(i, root, tableFour);
+
+                                    i++;
+                                }
+                            }
+                            else
+                            {
+                                tvMain.Items.Clear();
+                            }
+                        }
+
+                        // Die Id aus Objekt holen
+                        if (piArt == 3)
+                        {
+                            tableFour = new DataTable();    // Objekte Teilobjekte
+                            mysdd = new MySqlDataAdapter(com);
+                            mysdd.Fill(tableFour);
+                            if (tableFour.Rows.Count > 0)
+                            {
+                                liRows = Convert.ToInt16(tableFour.Rows[0].ItemArray.GetValue(5).ToString());
+                            }
+                        }
+
+                        // Die Id aus Teilobjekt holen
+                        if (piArt == 4)
+                        {
+                            tableFour = new DataTable();    // Objekte Teilobjekte
+                            mysdd = new MySqlDataAdapter(com);
+                            mysdd.Fill(tableFour);
+                            if (tableFour.Rows.Count > 0)
+                            {
+                                liRows = Convert.ToInt16(tableFour.Rows[0].ItemArray.GetValue(6).ToString());
+                            }
+                        }
+
+                        // Die Id aus Mieter holen
+                        if (piArt == 5)
+                        {
+                            tableFour = new DataTable();    // Objekte Teilobjekte
+                            mysdd = new MySqlDataAdapter(com);
+                            mysdd.Fill(tableFour);
+                            if (tableFour.Rows.Count > 0)
+                            {
+                                liRows = Convert.ToInt16(tableFour.Rows[0].ItemArray.GetValue(7).ToString());
+                            }
+                        }
+
+                        // DataGrid Timline Summen
+                        if (piArt == 8)
+                        {
+                            tableSeven = new DataTable();   // Timeline Summen 
+                            mysdg = new MySqlDataAdapter(com);
+                            mysdg.Fill(tableSeven);
+                            DgrCost.ItemsSource = tableSeven.DefaultView;
+                            liRows = DgrCost.Items.Count;
+                        }
+
+                        // Datagrid für Rechnungen
+                        if (piArt == 9)
+                        {
+                            tableOne = new DataTable();     // Rechnungen
+                            mysda = new MySqlDataAdapter(com);
+                            mysda.Fill(tableOne);
+                            DgrRechnungen.ItemsSource = tableOne.DefaultView;
+                            liRows = DgrRechnungen.Items.Count;
+                        }
+
+                        // ListBox Filiale befüllen
+                        if (piArt == 10)
+                        {
+                            mysdc = new MySqlDataAdapter(com);
+                            mysdc.Fill(tableThree);
+                            lbFiliale.ItemsSource = tableThree.DefaultView;
+                        }
+
+                        // Combobox Kostenart in Rechnungen
+                        if (piArt == 11)
+                        {
+                            tableFive = new DataTable();    // Kostenart
+                            mysde = new MySqlDataAdapter(com);
+                            mysde.Fill(tableFive);
+                            kostenart.ItemsSource = tableFive.DefaultView;
+                        }
+
+                        // Combobox mwst in Rechnungen
+                        if (piArt == 12)
+                        {
+                            tableSix = new DataTable();     // mwst
+                            mysdf = new MySqlDataAdapter(com);
+                            mysdf.Fill(tableSix);
+                            mwst.ItemsSource = tableSix.DefaultView;                // Rechnungen
+                        }
+
+                        // DataGrid Timline Detail
+                        if (piArt == 13)
+                        {
+                            tableTwo = new DataTable();     // Timeline
+                            mysdb = new MySqlDataAdapter(com);
+                            mysdb.Fill(tableTwo);
+                            DgrCostDetail.ItemsSource = tableTwo.DefaultView;
+                            liRows = DgrCostDetail.Items.Count;
+                        }
+
+                        // DataGrid Zahlungen
+                        if (piArt == 14)
+                        {
+                            tableZlg = new DataTable();     // Zahlungen
+                            mysdZlg = new MySqlDataAdapter(com);
+                            mysdZlg.Fill(tableZlg);
+                            DgrZahlungen.ItemsSource = tableZlg.DefaultView;
+                            liRows = DgrZahlungen.Items.Count;
+                        }
+
+                        // DataGrid Leerstand Detail
+                        if (piArt == 19)
+                        {
+                            tableLeerstand = new DataTable();     // Timeline
+                            mysdLeerstand = new MySqlDataAdapter(com);
+                            mysdLeerstand.Fill(tableLeerstand);
+                            DgrLeerDetail.ItemsSource = tableLeerstand.DefaultView;
+                            liRows = DgrLeerDetail.Items.Count;
+                        }
+
+                        // Combobox Kostenart in Zahlungen
+                        if (piArt == 15)
+                        {
+                            tableFive = new DataTable();    // Kostenart
+                            mysde = new MySqlDataAdapter(com);
+                            mysde.Fill(tableFive);
+                            kostenartZlg.ItemsSource = tableFive.DefaultView;
+                        }
+
+                        // Combobox Verteilung in Rechnungen und Zähler
+                        if (piArt == 16)
+                        {
+                            tableVert = new DataTable();    // Verteilung Rechnungen
+                            mysdVert = new MySqlDataAdapter(com);
+                            mysdVert.Fill(tableVert);
+                            kostenvert.ItemsSource = tableVert.DefaultView;
+                            kostenvertZl.ItemsSource = tableVert.DefaultView;
+                        }
+
+
+                        // Tabelle Infos für Abrechnung
+                        if (piArt == 17)
+                        {
+                            tableAbrInfo = new DataTable();    // Abrechnung
+                            mysdAbrInfo = new MySqlDataAdapter(com);
+                            mysdAbrInfo.Fill(tableAbrInfo);
+                        }
+
+                        // Tabelle Leerstände
+                        if (piArt == 18)
+                        {
+                            tableLeerstand = new DataTable();    // Leerstand
+                            mysdLeerstand = new MySqlDataAdapter(com);
+                            mysdLeerstand.Fill(tableLeerstand);
+                            DgrLeer.ItemsSource = tableLeerstand.DefaultView;
+                            liRows = DgrLeer.Items.Count;
+                        }
+
+                        // Tabelle Zählerwerte
+                        if (piArt == 21)
+                        {
+                            tableZlWert = new DataTable();    // Zählerwert
+                            mysdZlWert = new MySqlDataAdapter(com);
+                            mysdZlWert.Fill(tableZlWert);
+                            DgrCounters.ItemsSource = tableZlWert.DefaultView;
+                            liRows = DgrCounters.Items.Count;
+                        }
+
+                        // Combobox Zählernummern
+                        if (piArt == 22)
+                        {
+                            tableZlNummer = new DataTable();    // Kostenart
+                            mysdZlNummer = new MySqlDataAdapter(com);
+                            mysdZlNummer.Fill(tableZlNummer);
+                            zlNummer.ItemsSource = tableZlNummer.DefaultView;
+                            zleh.ItemsSource = tableZlNummer.DefaultView;
+                            zlmw.ItemsSource = tableZlNummer.DefaultView;
+                        }
+
+                        // db close
+                        con.Close();
+                    }
+                    catch (MySqlException myex)
                     {
-                        liRows = Convert.ToInt16(tableFour.Rows[0].ItemArray.GetValue(6).ToString());
+                        // Die Anwendung anhalten 
+                        MessageBox.Show("Verarbeitungsfehler ERROR fetchdata main 0001\n piArt = " + piArt.ToString(),
+                                 "Achtung");
+                        throw;
                     }
-                }
-
-                // Die Id aus Mieter holen
-                if (piArt == 5)
-                {
-                    tableFour = new DataTable();    // Objekte Teilobjekte
-                    sdd = new SqlDataAdapter(command);
-                    sdd.Fill(tableFour);
-                    if (tableFour.Rows.Count > 0)
-                    {
-                        liRows = Convert.ToInt16(tableFour.Rows[0].ItemArray.GetValue(7).ToString());                        
-                    }
-                }
-
-                // DataGrid Timline Summen
-                if (piArt == 8)
-                {
-                    tableSeven = new DataTable();   // Timeline Summen 
-                    sdg = new SqlDataAdapter(command);
-                    sdg.Fill(tableSeven);
-                    DgrCost.ItemsSource = tableSeven.DefaultView;
-                    liRows = DgrCost.Items.Count;
-                }
-
-                // Datagrid für Rechnungen
-                if (piArt == 9)
-                {
-                    tableOne = new DataTable();     // Rechnungen
-                    sda = new SqlDataAdapter(command);
-                    sda.Fill(tableOne);
-                    DgrRechnungen.ItemsSource = tableOne.DefaultView;
-                    liRows = DgrRechnungen.Items.Count;
-                }
-
-                // ListBox Filiale befüllen
-                if (piArt == 10)
-                {
-                    sdc = new SqlDataAdapter(command);
-                    sdc.Fill(tableThree);
-                    lbFiliale.ItemsSource = tableThree.DefaultView;
-                }
-
-                // Combobox Kostenart in Rechnungen
-                if (piArt == 11)
-                {
-                    tableFive = new DataTable();    // Kostenart
-                    sde = new SqlDataAdapter(command);
-                    sde.Fill(tableFive);
-                    kostenart.ItemsSource = tableFive.DefaultView;
-                }
-
-                // Combobox mwst in Rechnungen
-                if (piArt == 12)
-                {
-                    tableSix = new DataTable();     // mwst
-                    sdf = new SqlDataAdapter(command);
-                    sdf.Fill(tableSix);
-                    mwst.ItemsSource = tableSix.DefaultView;                // Rechnungen
-                }
-
-                // DataGrid Timline Detail
-                if (piArt == 13)
-                {
-                    tableTwo = new DataTable();     // Timeline
-                    sdb = new SqlDataAdapter(command);
-                    sdb.Fill(tableTwo);
-                    DgrCostDetail.ItemsSource = tableTwo.DefaultView;
-                    liRows = DgrCostDetail.Items.Count;
-                }
-
-                // DataGrid Zahlungen
-                if (piArt == 14)
-                {
-                    tableZlg = new DataTable();     // Zahlungen
-                    sdZlg = new SqlDataAdapter(command);
-                    sdZlg.Fill(tableZlg);
-                    DgrZahlungen.ItemsSource = tableZlg.DefaultView;
-                    liRows = DgrZahlungen.Items.Count;
-                }
-
-                // DataGrid Leerstand Detail
-                if (piArt == 19)
-                {
-                    tableLeerstand = new DataTable();     // Timeline
-                    sdLeerstand = new SqlDataAdapter(command);
-                    sdLeerstand.Fill(tableLeerstand);
-                    DgrLeerDetail.ItemsSource = tableLeerstand.DefaultView;
-                    liRows = DgrLeerDetail.Items.Count;
-                }
-
-                // Combobox Kostenart in Zahlungen
-                if (piArt == 15)
-                {
-                    tableFive = new DataTable();    // Kostenart
-                    sde = new SqlDataAdapter(command);
-                    sde.Fill(tableFive);
-                    kostenartZlg.ItemsSource = tableFive.DefaultView;
-                }
-
-                // Combobox Verteilung in Rechnungen und Zähler
-                if (piArt == 16)
-                {
-                    tableVert = new DataTable();    // Verteilung Rechnungen
-                    sdVert = new SqlDataAdapter(command);
-                    sdVert.Fill(tableVert);
-                    kostenvert.ItemsSource = tableVert.DefaultView;
-                    kostenvertZl.ItemsSource = tableVert.DefaultView;
-                }
-
-
-                // Tabelle Infos für Abrechnung
-                if (piArt == 17)
-                {
-                    tableAbrInfo = new DataTable();    // Abrechnung
-                    sdAbrInfo = new SqlDataAdapter(command);
-                    sdAbrInfo.Fill(tableAbrInfo);
-                }
-
-                // Tabelle Leerstände
-                if (piArt == 18)
-                {
-                    tableLeerstand = new DataTable();    // Leerstand
-                    sdLeerstand = new SqlDataAdapter(command);
-                    sdLeerstand.Fill(tableLeerstand);
-                    DgrLeer.ItemsSource = tableLeerstand.DefaultView;
-                    liRows = DgrLeer.Items.Count;
-                }
-
-                // Tabelle Zählerwerte
-                if (piArt == 21)
-                {
-                    tableZlWert = new DataTable();    // Zählerwert
-                    sdZlWert = new SqlDataAdapter(command);
-                    sdZlWert.Fill(tableZlWert);
-                    DgrCounters.ItemsSource = tableZlWert.DefaultView;
-                    liRows = DgrCounters.Items.Count;
-                }
-
-                // Combobox Zählernummern
-                if (piArt == 22)
-                {
-                    tableZlNummer = new DataTable();    // Kostenart
-                    sdZlNummer = new SqlDataAdapter(command);
-                    sdZlNummer.Fill(tableZlNummer);
-                    zlNummer.ItemsSource = tableZlNummer.DefaultView;
-                    zleh.ItemsSource = tableZlNummer.DefaultView;
-                    zlmw.ItemsSource = tableZlNummer.DefaultView;
-                }
-
-                // db close
-                connect.Close();
+                    break;
+                default:
+                    break;
             }
-            catch(SqlException ex)
-            {
 
-                for (int i = 0; i < ex.Errors.Count; i++)
-                {
-                    MessageBox.Show("Index #" + i + "\n" +
-                        "Error: " + ex.Errors[i].ToString() + "\n","Achtung");
-                }
-                Console.ReadLine();
-
-                // Die Anwendung anhalten 
-                // MessageBox.Show("Verarbeitungsfehler ERROR fetchdata main 0001\n piArt = " + piArt.ToString(),
-                //         "Achtung");
-            }
             return (liRows);     // oder Ausnahmsweise die gefundene ID bei art 3-5
         }
 

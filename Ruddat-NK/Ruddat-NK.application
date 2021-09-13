@@ -11,17 +11,17 @@
     <deploymentProvider codebase="file://server1/Datenablage/Software/Ruddat-Nebenkosten/Ruddat-NK.application" />
   </deployment>
   <compatibleFrameworks xmlns="urn:schemas-microsoft-com:clickonce.v2">
-    <framework targetVersion="4.5" profile="Full" supportedRuntime="4.0.30319" />
+    <framework targetVersion="4.6" profile="Full" supportedRuntime="4.0.30319" />
   </compatibleFrameworks>
   <dependency>
-    <dependentAssembly dependencyType="install" codebase="Ruddat-NK.exe.manifest" size="5387">
+    <dependentAssembly dependencyType="install" codebase="Ruddat-NK.exe.manifest" size="14364">
       <assemblyIdentity name="Ruddat-NK.exe" version="1.0.1.112" publicKeyToken="0000000000000000" language="neutral" processorArchitecture="x86" type="win32" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>jWliVWoyAORbwLYMpGsV1jl8DOa2kRgrMvxmsv6Ag94=</dsig:DigestValue>
+        <dsig:DigestValue>oOoANr3TjW54vj1aSEqqYsQ9tbIvAY30pRNHv+fWDc0=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
