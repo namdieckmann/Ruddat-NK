@@ -21,7 +21,6 @@ namespace Ruddat_NK
         // Global
         string gsPath = "";                 // DataPath des xml
         String gsConnectString;
-        String gsMySqlConnectionString;
         String gsItemHeader = "";           // Gewähltes Item aus dem Treeview
         int giFiliale = 0;                  // Angewählte Firma (Aus xml Konfig, den letzten Wert holen)
         int giObjekt = 0;                   // Objekt global
@@ -36,7 +35,7 @@ namespace Ruddat_NK
         int giIndex = 0;                    // Index > Objekt, Teil oder Mieter 1,2,3
         int giMwstSatz = 99;                // Mwst Satz ! Null > 0 gibs ja
         int giMwstSatzZl = 99;              // Für Zähler
-        int giDb = 2;                       // Datenbank 1 = MsqSql 2= Mysql
+        int giDb = 1;                       // Datenbank 1 = MsqSql 2= Mysql
         DateTime gdtZahlung = DateTime.MinValue; // Zahlungsdatum aus Datepicker DataGrid Zahlungen
 
         // Daten
@@ -233,20 +232,42 @@ namespace Ruddat_NK
                 }
             }
 
-            // Für Testzwewcke Firma lokale Db
-            // SqlConnectionString = "Data Source=(LocalDB)\\v11.0;AttachDbFilename=C:\\Users\\Ulf Dieckmann\\AppData\\Local\\Ruddat\\Nebenkosten\\rdnk.mdf;Integrated Security=True;Connect Timeout=5";
-            // Für Testzwecke Notebook lokale Db
-         //   SqlConnectionString = "Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=C:\\Users\\udiec\\AppData\\Local\\Ruddat\\Nebenkosten\\rdnk.mdf;Integrated Security=True;Connect Timeout=5";
-            // Für Testzwecke Server Firma
-            // SqlConnectionString = "Data Source=(LocalDB)\\v11.0;AttachDbFilename=G:\\Software\\Ruddat-Nebenkosten\\DbOne\\rdnk.mdf;Integrated Security=True;Connect Timeout=20";
-            // MySql Testverbindung
-            MySqlConnectionString = @"server=localhost;userid=rdnk;password=r1d8n9k4!;database=dbo";
+            switch (giDb)
+            {
+                case 1:
+                    // Für Testzwewcke Firma lokale Db
+                    // SqlConnectionString = "Data Source=(LocalDB)\\v11.0;AttachDbFilename=C:\\Users\\Ulf Dieckmann\\AppData\\Local\\Ruddat\\Nebenkosten\\rdnk.mdf;Integrated Security=True;Connect Timeout=5";
+                    // Für Testzwecke Notebook lokale Db
+                    SqlConnectionString = "Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=C:\\Users\\udiec\\AppData\\Local\\Ruddat\\Nebenkosten\\rdnk.mdf;Integrated Security=True;Connect Timeout=5";
+                    // Für Testzwecke Server Firma
+                    // SqlConnectionString = "Data Source=(LocalDB)\\v11.0;AttachDbFilename=G:\\Software\\Ruddat-Nebenkosten\\DbOne\\rdnk.mdf;Integrated Security=True;Connect Timeout=20";
+                    MessageBox.Show("Lokale Datenbank MsSql Express wird verwendet", "Achtung! ", MessageBoxButton.OK);
+                    break;
+                case 2:
+                    // MySql Testverbindung
+                    MySqlConnectionString = @"server=localhost;userid=rdnk;password=r1d8n9k4!;database=dbo";
+                    MessageBox.Show("Lokale Datenbank MySql wird verwendet", "Achtung! ", MessageBoxButton.OK);
+                    break;
+                default:
+                    break;
+            }
 
-            MessageBox.Show("Lokale Datenbank MySql wird verwendet", "Achtung! ", MessageBoxButton.OK );
+
 
             //Globaler ConnectString
-            gsConnectString = SqlConnectionString;
-            gsMySqlConnectionString = MySqlConnectionString;
+            switch (giDb)
+            {
+                case 1:
+                    gsConnectString = SqlConnectionString;
+                    break;
+                case 2:
+                    gsConnectString = MySqlConnectionString;
+                    break;
+                default:
+                    break;
+            }
+
+
 
             return (1);
         }
@@ -1824,7 +1845,7 @@ namespace Ruddat_NK
                     try
                     {
                         MySqlConnection con;
-                        con = new MySqlConnection(gsMySqlConnectionString);
+                        con = new MySqlConnection(gsConnectString);
 
                         MySqlCommand com = new MySqlCommand(psSql, con);
 
