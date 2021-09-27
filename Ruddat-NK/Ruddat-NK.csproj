@@ -187,6 +187,7 @@
       <DependentUpon>DataSetZahlungen.xsd</DependentUpon>
     </Compile>
     <Compile Include="RdFunctions.cs" />
+    <Compile Include="RdQueries.cs" />
     <Compile Include="WndAboutBox1.cs">
       <SubType>Form</SubType>
     </Compile>

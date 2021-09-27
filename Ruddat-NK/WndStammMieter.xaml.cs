@@ -719,7 +719,7 @@ namespace Ruddat_NK
             //        // SqlSelect erstellen > alle Mieter werden gezeigt
             //        lsSql = getSql("mieter", 2, liId);
             //        // Daten holen
-            //        liRows = fetchData(lsSql, 2);
+            //        liRows = FetchData(lsSql, 2);
             //    }
             //}
         }

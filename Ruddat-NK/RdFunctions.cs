@@ -68,6 +68,8 @@ namespace Ruddat_NK
         static string gsConnectString = "";
         static string lsSql = "";
 
+        // Todo Timeline für 2.te Datenbank erweitern und testen. Sind Datumseinträge enthalten?
+
         // Neue Id für Timeline ermitteln
         public static int getTimelineId(string asConnectString, int asArt)
         {
@@ -3222,7 +3224,7 @@ namespace Ruddat_NK
 
                             //// TeilobjektSummen holen
                             //lsSql = getSql(15, liIdRechnung, "", "");
-                            //liOk = Timeline.fetchData(lsSql, "", 15, asConnect);
+                            //liOk = Timeline.FetchData(lsSql, "", 15, asConnect);
 
                             //if (tableConSumObjT.Rows.Count > 0)
                             //{

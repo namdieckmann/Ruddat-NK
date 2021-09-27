@@ -77,7 +77,7 @@ namespace Ruddat_NK
             //// SqlSelect AdressArten
             //lsSql = getSql("ada", 4, 0);
             //// Daten Firmen holen
-            //liRows = fetchData(lsSql, 4);
+            //liRows = FetchData(lsSql, 4);
 
         }
 

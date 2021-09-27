@@ -464,7 +464,7 @@ namespace Ruddat_NK
                     //// Die Combobox einschränken (nur Mieter des Teilobjektes)
                     //lsSql = getSql("mieter", 51, liIdObj);
                     //// Daten Firmen holen
-                    //liRows = fetchData(lsSql, 5);
+                    //liRows = FetchData(lsSql, 5);
 
                     DataRow dr = tableContract.NewRow();
                     // Vorgaben eintragen, hier Objekt ID
@@ -499,7 +499,7 @@ namespace Ruddat_NK
         //    // SqlSelect Verträge
         //    lsSql = getSql("contract", 2, 0);
         //    // Daten Verträge holen
-        //    liRows = fetchData(lsSql, 2);
+        //    liRows = FetchData(lsSql, 2);
         //}
     }
 }
