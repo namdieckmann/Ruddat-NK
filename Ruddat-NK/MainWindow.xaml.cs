@@ -407,6 +407,7 @@ namespace Ruddat_NK
                         // ListBox Filiale befüllen
                         if (piArt == 10)
                         {
+                            tableThree = new DataTable();
                             sdc = new SqlDataAdapter(command);
                             sdc.Fill(tableThree);
                             lbFiliale.ItemsSource = tableThree.DefaultView;
@@ -658,6 +659,7 @@ namespace Ruddat_NK
                         // ListBox Filiale befüllen
                         if (piArt == 10)
                         {
+                            tableThree = new DataTable();
                             mysdc = new MySqlDataAdapter(com);
                             mysdc.Fill(tableThree);
                             lbFiliale.ItemsSource = tableThree.DefaultView;
