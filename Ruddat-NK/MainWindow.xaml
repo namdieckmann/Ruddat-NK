@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:Ruddat_NK"
         xml:lang="de-DE"
-        Title="Ruddat Nebenkosten" Height="1000" Width="1600" WindowState="Maximized">
+        Title="Ruddat Nebenkosten" Height="1000" Width="1600" WindowState="Maximized" Loaded="Window_Loaded">
 
     <Window.Resources>
         <Style x:Key="NameCellStyle" TargetType="DataGridCell">
