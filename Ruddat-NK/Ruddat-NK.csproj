@@ -186,7 +186,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>DataSetZahlungen.xsd</DependentUpon>
     </Compile>
-    <Compile Include="RdFetchData.cs" />
     <Compile Include="RdFunctions.cs" />
     <Compile Include="RdQueries.cs" />
     <Compile Include="WndAboutBox1.cs">
