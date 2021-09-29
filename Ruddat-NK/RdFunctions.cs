@@ -1,26 +1,9 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Data.SqlClient;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Xml;
-using System.Globalization;
-
+using MySql.Data.MySqlClient;
 
 namespace Ruddat_NK
 {
@@ -69,7 +52,7 @@ namespace Ruddat_NK
         static string lsSql = "";
 
         // Todo Timeline für 2.te Datenbank erweitern und testen. Sind Datumseinträge enthalten?
-        // Todo fetchdata stumpf verdoppeln 
+        // Todo fetchdata erstmal stumpf verdoppeln 
 
         // Neue Id für Timeline ermitteln
         public static int getTimelineId(string asConnectString, int asArt)
