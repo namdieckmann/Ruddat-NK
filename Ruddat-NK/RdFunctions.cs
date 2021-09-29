@@ -69,6 +69,7 @@ namespace Ruddat_NK
         static string lsSql = "";
 
         // Todo Timeline für 2.te Datenbank erweitern und testen. Sind Datumseinträge enthalten?
+        // Todo fetchdata stumpf verdoppeln 
 
         // Neue Id für Timeline ermitteln
         public static int getTimelineId(string asConnectString, int asArt)
