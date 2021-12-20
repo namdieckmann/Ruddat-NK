@@ -18,6 +18,8 @@ namespace Ruddat_NK
             String lsWhereAdd3 = "";
             String lsWhereAdd4 = "";
             String lsWhereAddTime = "";
+            String lsField = "";
+            String lsFieldTwo = "";
             String lsAnd = " Where ";
             String lsOrder = "";
             String lsGroup = "";
@@ -28,7 +30,7 @@ namespace Ruddat_NK
             string lsEnd = (liYear.ToString()) + "-12-31";
             DateTime ldtStart = DateTime.Parse(lsStart);                 // Jahresanfang VorJahr
             DateTime ldtEnd = DateTime.Parse(lsEnd);
-
+            int liOne = 0;                                          // Ein oder 2 Zeitangaben
             int liIdObjTeil = 0;
             int liIdObj = 0;
 
@@ -166,29 +168,10 @@ namespace Ruddat_NK
                         default:
                             break;
                     }
-
-                    // Nur StartDatum         22.2.2016 Endedatum auf "<" geändert
-                    if ((adtWtStart > DateTime.MinValue) && (adtWtEnd == DateTime.MinValue))
-                    {
-                        ldtAdd = adtWtStart.AddDays(1);
-                        // TODO Mysql hier RdQueriesTime einbauen!
-                        lsWhereAdd2 = lsAnd + " timeline.dt_monat >= Convert(DateTime," + "\'" + adtWtStart + "',104) "
-                                        + "And timeline.dt_monat <= Convert(DateTime," + "\'" + ldtAdd + "',104)";
-                    }
-
-                    // Start und EndeDatum       22.2.2016 Endedatum auf "<" geändert
-                    if ((adtWtStart > DateTime.MinValue) && (adtWtEnd > DateTime.MinValue))
-                    {
-                        lsWhereAdd2 = lsAnd + " timeline.dt_monat >= Convert(DateTime," + "\'" + adtWtStart + "',104) "
-                        + "And timeline.dt_monat <= Convert(DateTime," + "\'" + adtWtEnd + "',104)";
-                    }
-                    // Wurde kein Datum gewählt, aktuelles Jahr zeigen
-                    else
-                    {
-                        lsWhereAdd2 = lsAnd + " timeline.dt_monat >= Convert(DateTime," + "\'" + ldtStart + "',104) "
-                            + "And timeline.dt_monat <= Convert(DateTime," + "\'" + ldtEnd + "',104)";
-                    }
-
+                    // Rückgabe des ZeitQueries für TimeLine
+                    lsField = "timeline.dt_monat";
+                    liOne = 2;
+                    lsWhereAdd2 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsField, lsAnd, liOne, aiDb);
                     lsSql = lsSql + lsWhereAdd2;
                     lsSql = lsSql + lsGroup + lsOrder;
                 }
@@ -202,26 +185,11 @@ namespace Ruddat_NK
             if (piArt == 8)
             {
                 lsAnd = " And ";
-                // Nur StartDatum         22.2.2016 Endedatum auf "<" geändert
-                if ((adtWtStart > DateTime.MinValue) && (adtWtEnd == DateTime.MinValue))
-                {
-                    ldtAdd = adtWtStart.AddDays(1);
-                    lsWhereAdd2 = lsAnd + " rechnungen.datum_von >= Convert(DateTime," + "\'" + adtWtStart + "',104) ";
-                    //        + "And rechnungen.datum_bis <= Convert(DateTime," + "\'" + ldtAdd + "',104)";
-                }
 
-                // Start und EndeDatum       22.2.2016 Endedatum auf "<" geändert
-                if ((adtWtStart > DateTime.MinValue) && (adtWtEnd > DateTime.MinValue))
-                {
-                    lsWhereAdd2 = lsAnd + " rechnungen.datum_von >= Convert(DateTime," + "\'" + adtWtStart + "',104) ";
-                    // + "And rechnungen.datum_bis <= Convert(DateTime," + "\'" + adtWtEnd + "',104)";
-                }
-                // Wurde kein Datum gewählt, aktuelles Jahr zeigen
-                else
-                {
-                    lsWhereAdd2 = lsAnd + " rechnungen.datum_von >= Convert(DateTime," + "\'" + ldtStart + "',104) ";
-                    //  + "And rechnungen.datum_bis <= Convert(DateTime," + "\'" + ldtEnd + "',104)";
-                }
+                // Rückgabe des ZeitQueries für Rechnungen
+                lsField = "rechnungen.datum_von";
+                liOne = 1;
+                lsWhereAdd2 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsField, lsAnd, liOne, aiDb);
 
                 lsSql = @"select id_rechnungen,
                             id_ksa,
@@ -249,27 +217,10 @@ namespace Ruddat_NK
             if (piArt == 9)
             {
                 lsAnd = " And ";
-                // Nur StartDatum         22.2.2016 Endedatum auf "<" geändert
-                if ((adtWtStart > DateTime.MinValue) && (adtWtEnd == DateTime.MinValue))
-                {
-                    ldtAdd = adtWtStart.AddDays(1);
-                    lsWhereAdd2 = lsAnd + " rechnungen.datum_von >= Convert(DateTime," + "\'" + adtWtStart + "',104) ";
-                    //     + "And rechnungen.datum_bis <= Convert(DateTime," + "\'" + ldtAdd + "',104)";
-                }
-
-                // Start und EndeDatum       22.2.2016 Endedatum auf "<" geändert
-                if ((adtWtStart > DateTime.MinValue) && (adtWtEnd > DateTime.MinValue))
-                {
-                    lsWhereAdd2 = lsAnd + " rechnungen.datum_von >= Convert(DateTime," + "\'" + adtWtStart + "',104) ";
-                    //+ "And rechnungen.datum_bis <= Convert(DateTime," + "\'" + adtWtEnd + "',104)";
-                }
-                // Wurde kein Datum gewählt, aktuelles Jahr zeigen
-                else
-                {
-                    lsWhereAdd2 = lsAnd + " rechnungen.datum_von >= Convert(DateTime," + "\'" + ldtStart + "',104) ";
-                    //  + "And rechnungen.datum_bis <= Convert(DateTime," + "\'" + ldtEnd + "',104)";
-                }
-
+                lsField = "rechnungen.datum_von";
+                liOne = 1;
+                lsWhereAdd2 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsField, lsAnd, liOne, aiDb);
+                
                 lsSql = @"select id_rechnungen,
                             id_ksa,
                             datum_rechnung as datum,
@@ -296,27 +247,10 @@ namespace Ruddat_NK
             if (piArt == 10)
             {
                 lsAnd = " And ";
-                // Nur StartDatum         22.2.2016 Endedatum auf "<" geändert
-                if ((adtWtStart > DateTime.MinValue) && (adtWtEnd == DateTime.MinValue))
-                {
-                    ldtAdd = adtWtStart.AddDays(1);
-                    lsWhereAdd2 = lsAnd + " rechnungen.datum_von >= Convert(DateTime," + "\'" + adtWtStart + "',104) ";
-                    //      + "And rechnungen.datum_bis <= Convert(DateTime," + "\'" + ldtAdd + "',104)";
-                }
-
-                // Start und EndeDatum       22.2.2016 Endedatum auf "<" geändert
-                if ((adtWtStart > DateTime.MinValue) && (adtWtEnd > DateTime.MinValue))
-                {
-                    lsWhereAdd2 = lsAnd + " rechnungen.datum_von >= Convert(DateTime," + "\'" + adtWtStart + "',104) ";
-                    //+ "And rechnungen.datum_bis <= Convert(DateTime," + "\'" + adtWtEnd + "',104)";
-                }
-                // Wurde kein Datum gewählt, aktuelles Jahr zeigen
-                else
-                {
-                    lsWhereAdd2 = lsAnd + " rechnungen.datum_von >= Convert(DateTime," + "\'" + ldtStart + "',104) ";
-                    //  + "And rechnungen.datum_bis <= Convert(DateTime," + "\'" + ldtEnd + "',104)";
-                }
-
+                lsField = "rechnungen.datum_von";
+                liOne = 2;
+                lsWhereAdd2 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsField, lsAnd, liOne, aiDb);
+                
                 lsSql = @"select id_rechnungen,
                             id_ksa,
                             datum_rechnung as datum,
@@ -411,28 +345,9 @@ namespace Ruddat_NK
                 lsWhereAdd = " Where ( timeline.Id_rechnung = " + piId.ToString() + " or timeline.Id_vorauszahlung = " + piId.ToString() + " or timeline.Id_zaehlerstand = " + piId.ToString() + " )";
                 lsOrder = " Order by art_kostenart.sort, timeline.dt_monat ";
                 lsAnd = " And ";
-
-                // Nur StartDatum         22.2.2016 Endedatum auf "<" geändert
-                if ((adtWtStart > DateTime.MinValue) && (adtWtEnd == DateTime.MinValue))
-                {
-                    ldtAdd = adtWtStart.AddDays(1);
-                    lsWhereAdd3 = lsAnd + " timeline.dt_monat >= Convert(DateTime," + "\'" + adtWtStart + "',104) "
-                                    + "And timeline.dt_monat <= Convert(DateTime," + "\'" + ldtAdd + "',104)";
-                }
-
-                // Start und EndeDatum       22.2.2016 Endedatum auf "<" geändert
-                if ((adtWtStart > DateTime.MinValue) && (adtWtEnd > DateTime.MinValue))
-                {
-                    lsWhereAdd3 = lsAnd + " timeline.dt_monat >= Convert(DateTime," + "\'" + adtWtStart + "',104) "
-                                + "And timeline.dt_monat <= Convert(DateTime," + "\'" + adtWtEnd + "',104)";
-                }
-                // Wurde kein Datum gewählt, aktuelles Jahr zeigen
-                else
-                {
-                    lsWhereAdd3 = lsAnd + " timeline.dt_monat >= Convert(DateTime," + "\'" + ldtStart + "',104) "
-                                + "And timeline.dt_monat <= Convert(DateTime," + "\'" + ldtEnd + "',104)";
-                }
-
+                lsField = "timeline.dt_monat";
+                liOne = 2;
+                lsWhereAdd2 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsField, lsAnd, liOne, aiDb);
                 lsSql = lsSql + lsWhereAdd + lsWhereAdd2 + lsWhereAdd3 + lsOrder;
             }
 
@@ -479,26 +394,9 @@ namespace Ruddat_NK
             if (piArt == 23 || piArt == 24 || piArt == 25)
             {
                 lsAnd = " And ";
-                // Nur StartDatum         22.2.2016 Endedatum auf "<" geändert
-                if ((adtWtStart > DateTime.MinValue) && (adtWtEnd == DateTime.MinValue))
-                {
-                    ldtAdd = adtWtStart.AddDays(1);
-                    lsWhereAdd2 = lsAnd + " zahlungen.datum_von >= Convert(DateTime," + "\'" + adtWtStart + "',104) "
-                                    + "And zahlungen.datum_von <= Convert(DateTime," + "\'" + ldtAdd + "',104)";
-                }
-
-                // Start und EndeDatum       22.2.2016 Endedatum auf "<" geändert
-                if ((adtWtStart > DateTime.MinValue) && (adtWtEnd > DateTime.MinValue))
-                {
-                    lsWhereAdd2 = lsAnd + " zahlungen.datum_von >= Convert(DateTime," + "\'" + adtWtStart + "',104) "
-                    + "And zahlungen.datum_von <= Convert(DateTime," + "\'" + adtWtEnd + "',104)";
-                }
-                // Wurde kein Datum gewählt, aktuelles Jahr zeigen
-                else
-                {
-                    lsWhereAdd2 = lsAnd + " zahlungen.datum_von >= Convert(DateTime," + "\'" + ldtStart + "',104) "
-                        + "And zahlungen.datum_von <= Convert(DateTime," + "\'" + ldtEnd + "',104)";
-                }
+                lsField = "zahlungen.datum_von";
+                liOne = 2;
+                lsWhereAdd2 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsField, lsAnd, liOne, aiDb);
 
                 if (piArt == 23)  // Zahlungen für Mieter
                 {
@@ -562,26 +460,9 @@ namespace Ruddat_NK
             if (piArt == 34 || piArt == 35)
             {
                 lsAnd = " And ";
-                // Nur StartDatum         22.2.2016 Endedatum auf "<" geändert
-                if ((adtWtStart > DateTime.MinValue) && (adtWtEnd == DateTime.MinValue))
-                {
-                    ldtAdd = adtWtStart.AddDays(1);
-                    lsWhereAdd2 = lsAnd + " zaehlerstaende.datum_von >= Convert(DateTime," + "\'" + adtWtStart + "',104) "
-                                    + "And zaehlerstaende.datum_von <= Convert(DateTime," + "\'" + ldtAdd + "',104)";
-                }
-
-                // Start und EndeDatum       22.2.2016 Endedatum auf "<" geändert
-                if ((adtWtStart > DateTime.MinValue) && (adtWtEnd > DateTime.MinValue))
-                {
-                    lsWhereAdd2 = lsAnd + " zaehlerstaende.datum_von >= Convert(DateTime," + "\'" + adtWtStart + "',104) "
-                    + "And zaehlerstaende.datum_von <= Convert(DateTime," + "\'" + adtWtEnd + "',104)";
-                }
-                // Wurde kein Datum gewählt, aktuelles Jahr zeigen
-                else
-                {
-                    lsWhereAdd2 = lsAnd + " zaehlerstaende.datum_von >= Convert(DateTime," + "\'" + ldtStart + "',104) "
-                        + "And zaehlerstaende.datum_von <= Convert(DateTime," + "\'" + ldtEnd + "',104)";
-                }
+                lsField = "zaehlerstaende.datum_von";
+                liOne = 2;
+                lsWhereAdd2 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsField, lsAnd, liOne, aiDb);
 
                 if (piArt == 34)  // Zählerstände für Objekte
                 {
@@ -702,29 +583,13 @@ namespace Ruddat_NK
                             break;
                     }
 
-                    // Nur StartDatum         22.2.2016 Endedatum auf "<" geändert
-                    if ((adtWtStart > DateTime.MinValue) && (adtWtEnd == DateTime.MinValue))
-                    {
-                        ldtAdd = adtWtStart.AddDays(1);
-                        lsWhereAdd2 = lsAnd + " timeline.dt_monat >= Convert(DateTime," + "\'" + adtWtStart + "',104) "
-                                        + "And timeline.dt_monat <= Convert(DateTime," + "\'" + ldtAdd + "',104)";
-                    }
-
-                    // Start und EndeDatum       22.2.2016 Endedatum auf "<" geändert
-                    if ((adtWtStart > DateTime.MinValue) && (adtWtEnd > DateTime.MinValue))
-                    {
-                        lsWhereAdd2 = lsAnd + " timeline.dt_monat >= Convert(DateTime," + "\'" + adtWtStart + "',104) "
-                        + "And timeline.dt_monat <= Convert(DateTime," + "\'" + adtWtEnd + "',104)";
-                    }
-                    // Wurde kein Datum gewählt, aktuelles Jahr zeigen
-                    else
-                    {
-                        lsWhereAdd2 = lsAnd + " timeline.dt_monat >= Convert(DateTime," + "\'" + ldtStart + "',104) "
-                            + "And timeline.dt_monat <= Convert(DateTime," + "\'" + ldtEnd + "',104)";
-                    }
+                    lsField = "timeline.dt_monat";
+                    liOne = 2;
+                    lsWhereAdd2 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsField, lsAnd, liOne, aiDb);
+                    lsAnd = " AND ";
 
                     // Nur wenn Ausdruck gewünscht wird
-                    lsWhereAdd3 = " And art_kostenart.sort > 0";
+                    lsWhereAdd3 = lsAnd + " art_kostenart.sort > 0";
 
                     lsSql = lsSql + lsWhereAdd2 + lsWhereAdd3 + lsWhereAdd4;
                     lsSql = lsSql + lsGroup + lsOrder;
@@ -739,26 +604,9 @@ namespace Ruddat_NK
             if (piArt == 108)   // Objekte
             {
                 lsAnd = " And ";
-                // Nur StartDatum         22.2.2016 Endedatum auf "<" geändert
-                if ((adtWtStart > DateTime.MinValue) && (adtWtEnd == DateTime.MinValue))
-                {
-                    ldtAdd = adtWtStart.AddDays(1);
-                    lsWhereAdd2 = lsAnd + " rechnungen.datum_rechnung >= Convert(DateTime," + "\'" + adtWtStart + "',104) "
-                                    + "And rechnungen.datum_rechnung <= Convert(DateTime," + "\'" + ldtAdd + "',104)";
-                }
-
-                // Start und EndeDatum       22.2.2016 Endedatum auf "<" geändert
-                if ((adtWtStart > DateTime.MinValue) && (adtWtEnd > DateTime.MinValue))
-                {
-                    lsWhereAdd2 = lsAnd + " rechnungen.datum_rechnung >= Convert(DateTime," + "\'" + adtWtStart + "',104) "
-                    + "And rechnungen.datum_rechnung <= Convert(DateTime," + "\'" + adtWtEnd + "',104)";
-                }
-                // Wurde kein Datum gewählt, aktuelles Jahr zeigen
-                else
-                {
-                    lsWhereAdd2 = lsAnd + " rechnungen.datum_rechnung >= Convert(DateTime," + "\'" + ldtStart + "',104) "
-                        + "And rechnungen.datum_rechnung <= Convert(DateTime," + "\'" + ldtEnd + "',104)";
-                }
+                lsField = "rechnungen.datum_rechnung";
+                liOne = 2;
+                lsWhereAdd2 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsField, lsAnd, liOne, aiDb);
 
                 lsSql = @"select id_rechnungen,
                         art_kostenart.bez as kbez,
@@ -787,26 +635,9 @@ namespace Ruddat_NK
             if (piArt == 109)   // ObjektTeile
             {
                 lsAnd = " And ";
-                // Nur StartDatum         22.2.2016 Endedatum auf "<" geändert
-                if ((adtWtStart > DateTime.MinValue) && (adtWtEnd == DateTime.MinValue))
-                {
-                    ldtAdd = adtWtStart.AddDays(1);
-                    lsWhereAdd2 = lsAnd + " rechnungen.datum_rechnung >= Convert(DateTime," + "\'" + adtWtStart + "',104) "
-                                    + "And rechnungen.datum_rechnung <= Convert(DateTime," + "\'" + ldtAdd + "',104)";
-                }
-
-                // Start und EndeDatum       22.2.2016 Endedatum auf "<" geändert
-                if ((adtWtStart > DateTime.MinValue) && (adtWtEnd > DateTime.MinValue))
-                {
-                    lsWhereAdd2 = lsAnd + " rechnungen.datum_rechnung >= Convert(DateTime," + "\'" + adtWtStart + "',104) "
-                    + "And rechnungen.datum_rechnung <= Convert(DateTime," + "\'" + adtWtEnd + "',104)";
-                }
-                // Wurde kein Datum gewählt, aktuelles Jahr zeigen
-                else
-                {
-                    lsWhereAdd2 = lsAnd + " rechnungen.datum_rechnung >= Convert(DateTime," + "\'" + ldtStart + "',104) "
-                        + "And rechnungen.datum_rechnung <= Convert(DateTime," + "\'" + ldtEnd + "',104)";
-                }
+                lsField = "rechnungen.datum_rechnung";
+                liOne = 2;
+                lsWhereAdd2 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsField, lsAnd, liOne, aiDb);
 
                 lsSql = @"select id_rechnungen,
                         art_kostenart.bez as kbez,
@@ -835,26 +666,9 @@ namespace Ruddat_NK
             if (piArt == 110)   // Mieter
             {
                 lsAnd = " And ";
-                // Nur StartDatum         22.2.2016 Endedatum auf "<" geändert
-                if ((adtWtStart > DateTime.MinValue) && (adtWtEnd == DateTime.MinValue))
-                {
-                    ldtAdd = adtWtStart.AddDays(1);
-                    lsWhereAdd2 = lsAnd + " rechnungen.datum_rechnung >= Convert(DateTime," + "\'" + adtWtStart + "',104) "
-                                    + "And rechnungen.datum_rechnung <= Convert(DateTime," + "\'" + ldtAdd + "',104)";
-                }
-
-                // Start und EndeDatum       22.2.2016 Endedatum auf "<" geändert
-                if ((adtWtStart > DateTime.MinValue) && (adtWtEnd > DateTime.MinValue))
-                {
-                    lsWhereAdd2 = lsAnd + " rechnungen.datum_rechnung >= Convert(DateTime," + "\'" + adtWtStart + "',104) "
-                    + "And rechnungen.datum_rechnung <= Convert(DateTime," + "\'" + adtWtEnd + "',104)";
-                }
-                // Wurde kein Datum gewählt, aktuelles Jahr zeigen
-                else
-                {
-                    lsWhereAdd2 = lsAnd + " rechnungen.datum_rechnung >= Convert(DateTime," + "\'" + ldtStart + "',104) "
-                        + "And rechnungen.datum_rechnung <= Convert(DateTime," + "\'" + ldtEnd + "',104)";
-                }
+                lsField = "rechnungen.datum_rechnung";
+                liOne = 2;
+                lsWhereAdd2 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsField, lsAnd, liOne, aiDb);
 
                 lsSql = @"select id_rechnungen,
                         art_kostenart.bez as kbez,
@@ -884,26 +698,9 @@ namespace Ruddat_NK
             if (piArt == 123 || piArt == 124 || piArt == 125)
             {
                 lsAnd = " And ";
-                // Nur StartDatum         22.2.2016 Endedatum auf "<" geändert
-                if ((adtWtStart > DateTime.MinValue) && (adtWtEnd == DateTime.MinValue))
-                {
-                    ldtAdd = adtWtStart.AddDays(1);
-                    lsWhereAdd2 = lsAnd + " zahlungen.datum_von >= Convert(DateTime," + "\'" + adtWtStart + "',104) "
-                                    + "And zahlungen.datum_von <= Convert(DateTime," + "\'" + ldtAdd + "',104)";
-                }
-
-                // Start und EndeDatum       22.2.2016 Endedatum auf "<" geändert
-                if ((adtWtStart > DateTime.MinValue) && (adtWtEnd > DateTime.MinValue))
-                {
-                    lsWhereAdd2 = lsAnd + " zahlungen.datum_von >= Convert(DateTime," + "\'" + adtWtStart + "',104) "
-                    + "And zahlungen.datum_von <= Convert(DateTime," + "\'" + adtWtEnd + "',104)";
-                }
-                // Wurde kein Datum gewählt, aktuelles Jahr zeigen
-                else
-                {
-                    lsWhereAdd2 = lsAnd + " zahlungen.datum_von >= Convert(DateTime," + "\'" + ldtStart + "',104) "
-                        + "And zahlungen.datum_von <= Convert(DateTime," + "\'" + ldtEnd + "',104)";
-                }
+                lsField = "zahlungen.datum_von";
+                liOne = 2;
+                lsWhereAdd2 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsField, lsAnd, liOne, aiDb);
 
                 if (piArt == 124)   // Objekte
                 {
@@ -975,32 +772,13 @@ namespace Ruddat_NK
                 }
             }
 
-
-
             // Nur Where für Reports Zählerstände
             if (piArt == 133 || piArt == 134 || piArt == 135)
             {
                 lsAnd = " And ";
-                // Nur StartDatum         22.2.2016 Endedatum auf "<" geändert
-                if ((adtWtStart > DateTime.MinValue) && (adtWtEnd == DateTime.MinValue))
-                {
-                    ldtAdd = adtWtStart.AddDays(1);
-                    lsWhereAdd2 = lsAnd + " zaehlerstaende.datum_von >= Convert(DateTime," + "\'" + adtWtStart + "',104) "
-                                    + "And zaehlerstaende.datum_von <= Convert(DateTime," + "\'" + ldtAdd + "',104)";
-                }
-
-                // Start und EndeDatum       22.2.2016 Endedatum auf "<" geändert
-                if ((adtWtStart > DateTime.MinValue) && (adtWtEnd > DateTime.MinValue))
-                {
-                    lsWhereAdd2 = lsAnd + " zaehlerstaende.datum_von >= Convert(DateTime," + "\'" + adtWtStart + "',104) "
-                    + "And zaehlerstaende.datum_von <= Convert(DateTime," + "\'" + adtWtEnd + "',104)";
-                }
-                // Wurde kein Datum gewählt, aktuelles Jahr zeigen
-                else
-                {
-                    lsWhereAdd2 = lsAnd + " zaehlerstaende.datum_von >= Convert(DateTime," + "\'" + ldtStart + "',104) "
-                        + "And zaehlerstaende.datum_von <= Convert(DateTime," + "\'" + ldtEnd + "',104)";
-                }
+                lsField = "zaehlerstaende.datum_von";
+                liOne = 2;
+                lsWhereAdd2 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsField, lsAnd, liOne, aiDb);
 
                 if (piArt == 134)   // Objekte
                 {
@@ -1065,27 +843,9 @@ namespace Ruddat_NK
                 lsSql = lsWhereAdd1;    // nur Where
                 lsAnd = " And ";
                 lsWhereAdd4 = lsAnd + " (timeline.id_rechnung > 0 or timeline.id_zaehlerstand > 0) ";     // nur Rechnungen und Zählerstände
-
-                // Nur StartDatum         22.2.2016 Endedatum auf "<" geändert
-                if ((adtWtStart > DateTime.MinValue) && (adtWtEnd == DateTime.MinValue))
-                {
-                    ldtAdd = adtWtStart.AddDays(1);
-                    lsWhereAdd2 = lsAnd + " timeline.dt_monat >= Convert(DateTime," + "\'" + adtWtStart + "',104) "
-                                    + "And timeline.dt_monat <= Convert(DateTime," + "\'" + ldtAdd + "',104)";
-                }
-
-                // Start und EndeDatum       22.2.2016 Endedatum auf "<" geändert
-                if ((adtWtStart > DateTime.MinValue) && (adtWtEnd > DateTime.MinValue))
-                {
-                    lsWhereAdd2 = lsAnd + " timeline.dt_monat >= Convert(DateTime," + "\'" + adtWtStart + "',104) "
-                    + "And timeline.dt_monat <= Convert(DateTime," + "\'" + adtWtEnd + "',104)";
-                }
-                // Wurde kein Datum gewählt, aktuelles Jahr zeigen
-                else
-                {
-                    lsWhereAdd2 = lsAnd + " timeline.dt_monat >= Convert(DateTime," + "\'" + ldtStart + "',104) "
-                        + "And timeline.dt_monat <= Convert(DateTime," + "\'" + ldtEnd + "',104)";
-                }
+                lsField = "timeline.dt_monat";
+                liOne = 2;
+                lsWhereAdd2 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsField, lsAnd, liOne, aiDb);
 
                 lsSql = lsSql + lsWhereAdd2 + lsWhereAdd4;
                 lsSql = lsSql + lsGroup + lsOrder;
@@ -1094,7 +854,7 @@ namespace Ruddat_NK
             {
                 lsAnd = " Where ";
             }
-
+            
             //----------------------------------------------------------------------------------------------------------------
             // Den Header für Reports befüllen
             //----------------------------------------------------------------------------------------------------------------
@@ -1105,48 +865,19 @@ namespace Ruddat_NK
                 DateTime ldtEndTmp = DateTime.MinValue;
 
                 lsAnd = " And ";
-                // Nur StartDatum         22.2.2016 Endedatum auf "<" geändert
-                if ((adtWtStart > DateTime.MinValue) && (adtWtEnd == DateTime.MinValue))
-                {
-                    ldtAdd = adtWtStart.AddDays(1);
-                    lsWhereAdd2 = lsAnd + " vorrauszahlungen.datum_von >= Convert(DateTime," + "\'" + adtWtStart + "',104) "
-                                    + "And vorrauszahlungen.datum_von <= Convert(DateTime," + "\'" + ldtAdd + "',104)";
-                    ldtStartTmp = adtWtStart;
-                    ldtEndTmp = ldtAdd;
-                }
-
-                // Start und EndeDatum       22.2.2016 Endedatum auf "<" geändert
-                if ((adtWtStart > DateTime.MinValue) && (adtWtEnd > DateTime.MinValue))
-                {
-                    lsWhereAdd2 = lsAnd + " zahlungen.datum_von >= Convert(DateTime," + "\'" + adtWtStart + "',104) "
-                    + "And zahlungen.datum_von <= Convert(DateTime," + "\'" + adtWtEnd + "',104)";
-                    ldtStartTmp = adtWtStart;
-                    ldtEndTmp = adtWtEnd;
-                }
-                // Wurde kein Datum gewählt, aktuelles Jahr zeigen
-                else
-                {
-                    lsWhereAdd2 = lsAnd + " zahlungen.datum_von >= Convert(DateTime," + "\'" + ldtStart + "',104) "
-                        + "And zahlungen.datum_von <= Convert(DateTime," + "\'" + ldtEnd + "',104)";
-                    ldtStartTmp = ldtStart;
-                    ldtEndTmp = ldtEnd;
-                }
+                lsField = "vorrauszahlungen.datum_von";
+                liOne = 2;
+                lsWhereAdd2 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsField, lsAnd, liOne, aiDb);
 
                 if (piArt == 201)   // Objekte
                 {
-                    lsSql = @"Delete from x_abr_info;
-                        Insert into x_abr_info (id_filiale,id_objekt,abr_dat_von,abr_dat_bis) 
-                        values (" + aiFiliale + "," + piId.ToString() + ", Convert(DateTime," + "\'" + ldtStartTmp + "',104) , Convert(DateTime," + "\'" + ldtEndTmp + "',104))";
+                    lsSql = RdQueriesTime.GetAbrInfo(aiFiliale, piId, liIdObjTeil, liIdObjTeil, ldtStartTmp, ldtEndTmp, piArt, aiDb);
                 }
 
                 if (piArt == 202)   // ObjektTeile
                 {
                     // hier muss mal die Teilobjekt ID ermittelt werden (aus dem Vertrag)
                     liIdObj = Timeline.getIdObj(piId, asConnectString, 2);
-
-                    lsSql = @"Delete from x_abr_info;
-                        Insert into x_abr_info (id_filiale,id_objekt,id_objekt_teil,abr_dat_von,abr_dat_bis) 
-                        values (" + aiFiliale + "," + liIdObj.ToString() + "," + piId.ToString() + ", Convert(DateTime," + "\'" + ldtStartTmp + "',104) , Convert(DateTime," + "\'" + ldtEndTmp + "',104))";
                 }
 
                 if (piArt == 203)   // Mieter
@@ -1155,9 +886,6 @@ namespace Ruddat_NK
                     liIdObjTeil = Timeline.getIdObjTeil(piId, asConnectString);
                     // und die Objekt ID auch
                     liIdObj = Timeline.getIdObj(piId, asConnectString, 1);
-                    lsSql = @"Delete from x_abr_info;
-                        Insert into x_abr_info (id_filiale,id_mieter,id_objekt,id_objekt_teil,abr_dat_von,abr_dat_bis) 
-                        values (" + aiFiliale + "," + piId.ToString() + "," + liIdObj.ToString() + "," + liIdObjTeil.ToString() + ", Convert(DateTime," + "\'" + ldtStartTmp + "',104) , Convert(DateTime," + "\'" + ldtEndTmp + "',104))";
                 }
             }
 
@@ -1209,26 +937,9 @@ namespace Ruddat_NK
                             break;
                     }
 
-                    // Nur StartDatum         22.2.2016 Endedatum auf "<" geändert
-                    if ((adtWtStart > DateTime.MinValue) && (adtWtEnd == DateTime.MinValue))
-                    {
-                        ldtAdd = adtWtStart.AddDays(1);
-                        lsWhereAddTime = RdQueriesTime.GetDateQuery(adtWtStart, ldtAdd, aiDb);
-                        lsWhereAdd2 = lsAnd + lsWhereAddTime;
-                    }
-
-                    // Start und EndeDatum       22.2.2016 Endedatum auf "<" geändert
-                    if ((adtWtStart > DateTime.MinValue) && (adtWtEnd > DateTime.MinValue))
-                    {
-                        lsWhereAddTime = RdQueriesTime.GetDateQuery(adtWtStart, adtWtEnd, aiDb);
-                        lsWhereAdd2 = lsAnd + lsWhereAddTime;
-                    }
-                    // Wurde kein Datum gewählt, aktuelles Jahr zeigen
-                    else
-                    {
-                        lsWhereAddTime = RdQueriesTime.GetDateQuery(adtWtStart, ldtEnd, aiDb);
-                        lsWhereAdd2 = lsAnd + lsWhereAddTime;
-                    }
+                    lsField = "timeline.dt_monat";
+                    liOne = 2;
+                    lsWhereAdd2 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsField, lsAnd, liOne, aiDb);
 
                     lsSql = lsSql + lsWhereAdd2;
                     lsSql = lsSql + lsGroup + lsOrder;
@@ -1250,32 +961,9 @@ namespace Ruddat_NK
                 DateTime ldtEndTmp = DateTime.MinValue;
 
                 lsAnd = " And ";
-                // Nur StartDatum         22.2.2016 Endedatum auf "<" geändert
-                if ((adtWtStart > DateTime.MinValue) && (adtWtEnd == DateTime.MinValue))
-                {
-                    ldtAdd = adtWtStart.AddDays(1);
-                    lsWhereAdd2 = lsAnd + " vorrauszahlungen.datum_von >= Convert(DateTime," + "\'" + adtWtStart + "',104) "
-                                    + "And vorrauszahlungen.datum_von <= Convert(DateTime," + "\'" + ldtAdd + "',104)";
-                    ldtStartTmp = adtWtStart;
-                    ldtEndTmp = ldtAdd;
-                }
-
-                // Start und EndeDatum       22.2.2016 Endedatum auf "<" geändert
-                if ((adtWtStart > DateTime.MinValue) && (adtWtEnd > DateTime.MinValue))
-                {
-                    lsWhereAdd2 = lsAnd + " zahlungen.datum_von >= Convert(DateTime," + "\'" + adtWtStart + "',104) "
-                    + "And zahlungen.datum_von <= Convert(DateTime," + "\'" + adtWtEnd + "',104)";
-                    ldtStartTmp = adtWtStart;
-                    ldtEndTmp = adtWtEnd;
-                }
-                // Wurde kein Datum gewählt, aktuelles Jahr zeigen
-                else
-                {
-                    lsWhereAdd2 = lsAnd + " zahlungen.datum_von >= Convert(DateTime," + "\'" + ldtStart + "',104) "
-                        + "And zahlungen.datum_von <= Convert(DateTime," + "\'" + ldtEnd + "',104)";
-                    ldtStartTmp = ldtStart;
-                    ldtEndTmp = ldtEnd;
-                }
+                lsField = "vorrauszahlungen.datum_von";
+                liOne = 2;
+                lsWhereAdd2 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsField, lsAnd, liOne, aiDb);
 
                 lsSql = @"Select Id_abr_content,
                             id_timeline,

@@ -53,6 +53,7 @@ namespace Ruddat_NK
 
         // Todo Timeline für 2.te Datenbank erweitern und testen. Sind Datumseinträge enthalten?
         // Todo fetchdata erstmal stumpf verdoppeln 
+        // Todo mglst viel ion Fetchdata packen
 
         // Neue Id für Timeline ermitteln
         public static int getTimelineId(string asConnectString, int asArt)
@@ -87,7 +88,7 @@ namespace Ruddat_NK
 
                 if (lvGetLastTempId != null)
                 {
-                    Int32.TryParse(lvGetLastTempId.ToString(), out liGetLastTempId);    // Ulf! TODO testen
+                    Int32.TryParse(lvGetLastTempId.ToString(), out liGetLastTempId);    //TODO testen
                 }
                 else
                 {
@@ -697,7 +698,6 @@ namespace Ruddat_NK
                                 break;
 
                             case 2:     // Timeline löschen
-                                        // Pass both strings to a new SqlCommand object.
                                 SqlCommand command2 = new SqlCommand(psSql, connect);
                                 SqlDataReader queryCommandReader = command2.ExecuteReader();
                                 break;
@@ -1248,7 +1248,6 @@ namespace Ruddat_NK
                                 }
                                 break;
                             case 8:     // Mwst Satz holen
-
                                 SqlCommand command10 = new SqlCommand(psSql, connect);
                                 sdg = new SqlDataAdapter(command10);
                                 tableSeven = new DataTable();
@@ -1265,7 +1264,6 @@ namespace Ruddat_NK
                                 }
 
                                 break;
-
                             case 11:    // Zahlungen > Timeline erzeugen bearbeiten
                                 tableZlg = new DataTable();         // Zahlungen
                                 SqlCommand command11 = new SqlCommand(psSql, connect);
@@ -1527,7 +1525,6 @@ namespace Ruddat_NK
 
                                 break;
                             case 23:        // Zählerstände Timeline Create
-
                                 tableCntNew = new DataTable();         // Zahlungen
                                 SqlCommand command23 = new SqlCommand(psSql2, connect);
                                 sdCntNew = new SqlDataAdapter(command23);
@@ -1627,10 +1624,6 @@ namespace Ruddat_NK
                 default:
                     break;
             }
-
-
-
-
             return (liRows);     
         }
 

@@ -731,7 +731,6 @@ namespace Ruddat_NK
                             kostenvertZl.ItemsSource = tableVert.DefaultView;
                         }
 
-
                         // Tabelle Infos für Abrechnung
                         if (piArt == 17)
                         {

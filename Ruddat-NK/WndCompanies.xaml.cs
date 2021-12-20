@@ -117,7 +117,6 @@ namespace Ruddat_NK
                     sdCmp = new SqlDataAdapter(command);
                     sdCmp.Fill(tableCmp);
                     dgrCmp.ItemsSource = tableCmp.DefaultView;
-
                     break;
                 case 2: // Adressen
                     tableAdr = new DataTable();         
@@ -125,7 +124,6 @@ namespace Ruddat_NK
                     sdAdr = new SqlDataAdapter(command2);
                     sdAdr.Fill(tableAdr);
                     dgrAdr.ItemsSource = tableAdr.DefaultView;
-
                     break;
                 case 3: // Adressarten
                     tableAda = new DataTable();         
@@ -133,7 +131,6 @@ namespace Ruddat_NK
                     sdAda = new SqlDataAdapter(command3);
                     sdAda.Fill(tableAda);
                     adressenart.ItemsSource = tableAda.DefaultView;
-
                     break;
                 default:
                     break;
