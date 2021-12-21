@@ -545,7 +545,6 @@ namespace Ruddat_NK
                     {
                         MySqlConnection con;
                         con = new MySqlConnection(gsConnectString);
-
                         MySqlCommand com = new MySqlCommand(psSql, con);
 
                         // Daten für Filiale holen
