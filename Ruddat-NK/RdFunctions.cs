@@ -72,59 +72,14 @@ namespace Ruddat_NK
         static string gsConnectString = "";
         static string lsSql = "";
 
-        // Todo Timeline für 2.te Datenbank erweitern und testen. Sind Datumseinträge enthalten?
-        // Todo fetchdata erstmal stumpf verdoppeln 
-        // Todo mglst viel ion Fetchdata packen
-
-        // Neue Id für Timeline ermitteln
+        // Bisher höchste Id für Timeline ermitteln
         public static int getTimelineId(string asConnectString, int asArt)
         {
             Int32 liGetLastTempId = 0;
 
-            switch (asArt)
-            {
-                case 1:
-                    lsSql = "Select max(id_extern_timeline )from rechnungen";
-                    break;
-                case 2:
-                    lsSql = "Select max(id_extern_timeline )from zahlungen";
-                    break;
-                case 3:
-                    lsSql = "Select max(id_extern_timeline )from zaehlerstaende";
-                    break;
-                default:
-                    break;
-            }
+            lsSql = getSql(26, asArt, "", "", 0);
+            liGetLastTempId = fetchData(lsSql, "", 26, gsConnectString);
 
-            SqlConnection connect;
-            connect = new SqlConnection(asConnectString);
-            SqlCommand command = new SqlCommand(lsSql, connect);
-
-            try
-            {
-                // Db open
-                connect.Open();
-
-                var lvGetLastTempId = command.ExecuteScalar();
-
-                if (lvGetLastTempId != null)
-                {
-                    Int32.TryParse(lvGetLastTempId.ToString(), out liGetLastTempId);    //TODO testen
-                }
-                else
-                {
-                    liGetLastTempId = 0;
-                }
-
-                connect.Close();
-            }
-            catch
-            {
-                MessageBox.Show("Es wurden keine GetLastTempId gefunden\n" +
-                        "Prüfen Sie bitte die Datenbankverbindung\n",
-                        "Achtung (rdfunctions.getTimelineId id extern timeline)",
-                         MessageBoxButton.OK);
-            }
             return (liGetLastTempId);
         }
 
@@ -202,12 +157,14 @@ namespace Ruddat_NK
             string dt = (DateTime.Now.Year.ToString()) + "-01-01";
             DateTime ldtStart = DateTime.Parse(dt);                 // Jahresanfang
 
-            // Rechnungen mit definierter id_extern_timeline
-            if (piArt == 1)
-            {
-                lsWhereAdd = piId.ToString() + " ";
 
-                lsSql = @"select id_rechnungen,
+            switch (piArt)
+            {
+                case 1:
+                    // Rechnungen mit definierter id_extern_timeline
+                    lsWhereAdd = piId.ToString() + " ";
+
+                    lsSql = @"select id_rechnungen,
                                     id_ksa,
                                     datum_rechnung as datum,
                                     datum_von as von,
@@ -226,23 +183,19 @@ namespace Ruddat_NK
                                     id_verteilung
                             from rechnungen
 					        where id_extern_timeline = " + lsWhereAdd +
-            " Order by rechnungen.datum_rechnung desc";
-            }
+                          " Order by rechnungen.datum_rechnung desc";
+                    break;
+                case 2:
+                    // Timeline löschen
+                    lsWhereAdd = piId.ToString() + " ";
 
-            // Timeline löschen
-            if (piArt == 2)
-            {
-                lsWhereAdd = piId.ToString() + " ";
-
-                lsSql = @"delete from timeline
+                    lsSql = @"delete from timeline
 					        where id_rechnung = " + lsWhereAdd + " or id_vorauszahlung = " + lsWhereAdd + " or id_zaehlerstand = " + lsWhereAdd;
-            }
-
-            // Timeline neu erzeugen in ps2 steht, welches Feld beschrieben werden soll
-            if (piArt == 3)
-            {
-                lsWhereAdd = piId.ToString() + " ";
-                lsSql = @"select 
+                    break;
+                case 3:
+                    // Timeline neu erzeugen in ps2 steht, welches Feld beschrieben werden soll
+                    lsWhereAdd = piId.ToString() + " ";
+                    lsSql = @"select 
                                 id_timeline,     
                                 id_rechnung,     
                                 id_vorauszahlung,
@@ -262,14 +215,12 @@ namespace Ruddat_NK
                                 leerstand,
                                 id_import
                             from timeline
-                            where " + ps2 + " = " + " \'" + lsWhereAdd + "\'";            
-            }
-
-            // Timeline neu erzeugen in ps2 steht, welches Feld beschrieben werden soll
-            if (piArt == 31)
-            {
-                lsWhereAdd = piId.ToString() + " ";
-                lsSql = @"select 
+                            where " + ps2 + " = " + " \'" + lsWhereAdd + "\'";
+                    break;
+                case 31:
+                    // Timeline neu erzeugen in ps2 steht, welches Feld beschrieben werden soll
+                    lsWhereAdd = piId.ToString() + " ";
+                    lsSql = @"select 
                                 id_timeline,     
                                 id_rechnung,     
                                 id_vorauszahlung,
@@ -289,18 +240,16 @@ namespace Ruddat_NK
                                 leerstand,
                                 id_import
                             from timeline
-                            where " + ps2 + " = " + lsWhereAdd ;
-            }
+                            where " + ps2 + " = " + lsWhereAdd;
+                    break;
+                case 4:
+                    // TimelineRelations sollen geschrieben werden
+                    // Hier auf Grundlage des Objektes
+                    // Beschrieben werden die Kosten für Objektteile
+                    lsWhereAdd = "id_rechnung = " + piId.ToString() + " ";
+                    lsWhereAdd2 = " id_objekt = " + ps2 + " ";
 
-            // TimelineRelations sollen geschrieben werden
-            // Hier auf Grundlage des Objektes
-            // Beschrieben werden die Kosten für Objektteile
-            if (piArt == 4)
-            {
-                lsWhereAdd = "id_rechnung = " + piId.ToString() + " ";
-                lsWhereAdd2 = " id_objekt = " + ps2 + " ";
-
-                lsSql = @"select 
+                    lsSql = @"select 
                                 id_timeline,     
                                 id_rechnung,     
                                 id_vorauszahlung,
@@ -321,17 +270,15 @@ namespace Ruddat_NK
                                 id_import
                             from timeline
                                 where " + lsWhereAdd + " and " + lsWhereAdd2 + " order by dt_monat";
-            }
+                    break;
+                case 5:
+                    // TimelineRelations sollen geschrieben werden
+                    // Hier auf Grundlage des ObjektTeils
+                    // Beschrieben werden die Kosten für Mieter
+                    lsWhereAdd = " (id_rechnung = " + piId.ToString() + " or id_vorauszahlung = " + piId.ToString() + " or id_zaehlerstand = " + piId.ToString() + ") ";
+                    lsWhereAdd2 = " id_objekt_teil > 0 "; // + ps2 + " ";
 
-            // TimelineRelations sollen geschrieben werden
-            // Hier auf Grundlage des ObjektTeils
-            // Beschrieben werden die Kosten für Mieter
-            if (piArt == 5)
-            {
-                lsWhereAdd = " (id_rechnung = " + piId.ToString() + " or id_vorauszahlung = " + piId.ToString() + " or id_zaehlerstand = " + piId.ToString() + ") ";
-                lsWhereAdd2 = " id_objekt_teil > 0 "; // + ps2 + " ";
-
-                lsSql = @"select 
+                    lsSql = @"select 
                                 id_timeline,     
                                 id_rechnung,     
                                 id_vorauszahlung,
@@ -351,14 +298,12 @@ namespace Ruddat_NK
                                 leerstand,
                                 id_import
                             from timeline
-                                where " + lsWhereAdd + " and " + lsWhereAdd2 + "order by dt_monat" ;
-            }
-
-            // für die TimelineRelation Objektteile holen
-            if (piArt == 6)
-            {
-                lsWhereAdd = "id_objekt = " + piId.ToString() + " ";
-                lsSql = @"select id_objekt_teil,
+                                where " + lsWhereAdd + " and " + lsWhereAdd2 + "order by dt_monat";
+                    break;
+                case 6:
+                    // für die TimelineRelation Objektteile holen
+                    lsWhereAdd = "id_objekt = " + piId.ToString() + " ";
+                    lsSql = @"select id_objekt_teil,
                                 id_objekt,
                                 bez,
                                 geschoss,
@@ -368,46 +313,37 @@ namespace Ruddat_NK
                                 prozent_anteil,
                                 personen_anteil_flag
                             from objekt_teil
-                            where " + lsWhereAdd; 
-            }
-
-            if (piArt == 7)
-            {
-                lsWhereAdd = "id_mieter = " + piId.ToString() + " ";
-                lsSql = @"select id_mieter,
+                            where " + lsWhereAdd;
+                    break;
+                case 7:
+                    lsWhereAdd = "id_mieter = " + piId.ToString() + " ";
+                    lsSql = @"select id_mieter,
                                 id_vertrag,
                                 bez
                             from mieter
                             where " + lsWhereAdd;
-            }
-
-            // MwstSatz holen Art ist bebekannt
-            if (piArt == 8)
-            {
-                lsWhereAdd = "Id_mwst_art = " + piId.ToString() + " ";
-                lsSql = @"select Id_mwst_art,
+                    break;
+                case 8:
+                    lsWhereAdd = "Id_mwst_art = " + piId.ToString() + " ";
+                    lsSql = @"select Id_mwst_art,
                                  bez,
                                  mwst
                             from art_mwst
                             where " + lsWhereAdd;
-            }
-
-            // MwstSatz holen Bezeichnung ist bekannt Bsp. "normal"
-            if (piArt == 9)
-            {
-                lsWhereAdd = "bez = " + " \'" + ps2 + "\' ";
-                lsSql = @"select Id_mwst_art,
+                    break;
+                case 9:
+                    // MwstSatz holen Bezeichnung ist bekannt Bsp. "normal"
+                    lsWhereAdd = "bez = " + " \'" + ps2 + "\' ";
+                    lsSql = @"select Id_mwst_art,
                                  bez,
                                  mwst
                             from art_mwst
                             where " + lsWhereAdd;
-            }
-
-            // Zahlungen
-            if (piArt == 11)
-	        {
-		        lsWhereAdd = "id_vz = " + piId.ToString() + " ";
-                lsSql = @"select id_vz,
+                    break;
+                case 11:
+                    // Zahlungen
+                    lsWhereAdd = "id_vz = " + piId.ToString() + " ";
+                    lsSql = @"select id_vz,
                                     id_mieter,
                                     id_objekt,
                                     id_objekt_teil,
@@ -421,13 +357,11 @@ namespace Ruddat_NK
                                     flag_timeline,
                                     id_ksa
                             from zahlungen where " + lsWhereAdd;
-	        }
-
-            // Zahlungen mit definierter Timeline
-            if (piArt == 12)
-            {
-                lsWhereAdd = "id_extern_timeline = " + piId.ToString() + " ";
-                lsSql = @"select id_vz,
+                    break;
+                case 12:
+                    // Zahlungen mit definierter Timeline
+                    lsWhereAdd = "id_extern_timeline = " + piId.ToString() + " ";
+                    lsSql = @"select id_vz,
                                     id_mieter,
                                     id_objekt,
                                     id_objekt_teil,
@@ -442,12 +376,11 @@ namespace Ruddat_NK
                                     id_ksa,
                                     id_import
                             from zahlungen where " + lsWhereAdd;
-            }
-            // Zahlungen aus automatischem Import. Alle mit flag_timeline = 1 und der übergebenen Import ID
-            if (piArt == 13)
-            {
-                lsWhereAdd = "id_import = " + piId.ToString() + " ";
-                lsSql = @"select id_vz,
+                    break;
+                case 13:
+                    // Zahlungen aus automatischem Import. Alle mit flag_timeline = 1 und der übergebenen Import ID
+                    lsWhereAdd = "id_import = " + piId.ToString() + " ";
+                    lsSql = @"select id_vz,
                                     id_mieter,
                                     id_objekt,
                                     id_objekt_teil,
@@ -462,6 +395,180 @@ namespace Ruddat_NK
                                     id_ksa,
                                     id_import
                             from zahlungen where flag_timeline = 1 and " + lsWhereAdd;
+                    break;
+                case 21:
+                    // Zählerstände mit definierter Timeline
+                    lsWhereAdd = "id_extern_timeline = " + piId.ToString() + " ";
+                    lsSql = @"select Id_zs,               
+                            id_zaehler,          
+                            id_einheit,          
+                            zs,           
+                            datum_von,
+                            verbrauch,
+                            preis_einheit_netto,
+                            preis_einheit_brutto,
+                            id_extern_timeline,
+                            id_objekt,
+                            id_objekt_teil,
+                            id_ksa
+                        from zaehlerstaende where " + lsWhereAdd;
+                    break;
+                case 24:
+                    // Zählerinfo für Report Nebenkosten holen
+                    lsWhereAdd = " Where id_extern_timeline = " + piId.ToString() + " ";
+                    lsSql = @"select Id_zs,               
+                            zaehlerstaende.id_zaehler,          
+                            zaehlerstaende.id_einheit,          
+                            zaehlerstaende.zs,           
+                            zaehlerstaende.datum_von,
+                            zaehlerstaende.verbrauch,
+                            zaehlerstaende.preis_einheit_netto,
+                            zaehlerstaende.preis_einheit_brutto,
+                            zaehlerstaende.id_extern_timeline,
+                            zaehlerstaende.id_objekt,
+                            zaehlerstaende.id_objekt_teil,
+                            zaehlerstaende.id_ksa,
+                            zaehler.zaehlernummer,
+                            zaehler.zaehlerort,
+							art_einheit.bez
+                        from zaehlerstaende
+                        left join zaehler on zaehler.Id_zaehler = zaehlerstaende.id_zaehler
+                        left join art_einheit on zaehler.id_einheit = art_einheit.Id_einheit "
+                        + lsWhereAdd;
+                    break;
+                case 25:
+                    // Zusammenstellungen der gewählten Wohnungen für den Report Nebenkosten
+                    lsSql = @"select Id_obj_mix_parts,id_objekt_mix,id_objekt,id_objekt_teil,bez,sel,flaeche_anteil,    
+                                id_timeline,ges_fl_behalten,erklaerung,geschoss,lage
+                                    from objekt_mix_parts";
+                    lsWhereAdd = " where sel > 0 and id_timeline = " + piId.ToString() + " ";
+                    // lsWhereAdd2 = " and id_objekt = " + piId2.ToString() + " ";
+                    lsSql = lsSql + lsWhereAdd + lsWhereAdd2;
+                    break;
+                case 26:    
+                    // Max Ids ermitteln
+                    switch (piId)
+                    {
+                        case 1:
+                            lsSql = "Select max(id_extern_timeline) from rechnungen";
+                            break;
+                        case 2:
+                            lsSql = "Select max(id_extern_timeline) from zahlungen";
+                            break;
+                        case 3:
+                            lsSql = "Select max(id_extern_timeline) from zaehlerstaende";
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
+                case 27:
+                    lsSql = "Select id_objekt_teil from objekt_mix_parts where sel = 1 and id_objekt_teil = " + piId.ToString();
+                    break;
+                case 28:
+                    switch (piId2)
+                    {
+                        case 1:
+                            // Weiterleitung an Objektteil
+                            lsSql = @"Select art_kostenart.wtl_obj_teil from timeline 
+                                join art_kostenart on timeline.id_ksa = art_kostenart.id_ksa
+                                Where timeline.id_rechnung = " + piId.ToString();
+                            break;
+                        // Weiterleitung an Mieter
+                        case 2:
+                            lsSql = @"Select art_kostenart.wtl_mieter from timeline 
+                                join art_kostenart on timeline.id_ksa = art_kostenart.id_ksa
+                                Where timeline.id_rechnung = " + piId.ToString();
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
+                case 29:
+                    lsSql = @"select mieter.Id_mieter as mid
+                            from objekt_teil
+                        join objekt on objekt_teil.id_objekt = objekt.Id_objekt
+                        Join filiale on filiale.id_filiale = objekt.Id_filiale
+                        join mieter on mieter.id_filiale = filiale.Id_Filiale
+                            where objekt_teil.Id_objekt_teil = " + piId.ToString();
+                    break;
+                case 30:        // Kostenstellenart Zähler
+                    switch (piId)
+                    {
+                        case 1:
+                            lsSql = @"Select id_ksa From art_kostenart Where ksa_zahlung = 1 Order by sort;";
+                            break;
+                        case 2:
+                            lsSql = @"Select id_ksa From art_kostenart Where ksa_zaehler = 1 Order by sort;";
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
+                case 32:        // Die VerteilungsId aus Rechnungen ermitteln
+                    lsSql = @"Select id_verteilung From rechnungen Where id_extern_timeline = " + piId.ToString();
+                    break;
+                case 33:        // Verteilungs ID aus art_verteilung ermitteln
+                    lsSql = @"Select id_verteilung From art_verteilung Where kb = '" + ps2.ToString() + "'";
+                    break;
+                case 34:        // Aus den Verträgen die Teilobjekt ID anhand der Mieter ID ermitteln
+                    lsSql = @"Select id_objekt_teil From vertrag Where id_mieter = " + piId.ToString();
+                    break;
+                case 35:       // Die Objekt ID aus den Vertragsdaten ermitteln aus der Mieter Id = 1 oder der Teilobjekt ID = 2
+                    switch (piId2)
+                    {
+                        case 1:
+                            lsSql = @"Select id_objekt From vertrag Where id_mieter = " + piId.ToString();
+                            break;
+                        case 2:
+                            lsSql = @"Select id_objekt From vertrag Where id_objekt_teil = " + piId.ToString();
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
+                case 36:        // Report löschen
+                    lsSql = "delete from x_abr_content;";
+                    break;
+                case 37:        // Id Zähler aus Zählernummer
+                    lsSql = @"select id_zaehler from zaehler where zaehlernummer = '" + ps2.ToString().Trim() + "\'";
+                    break;
+                case 38:        // Mwst Satz Zähler
+                    lsSql = @"Select art_mwst.mwst from zaehler 
+                        left join art_mwst on zaehler.id_mwst_art = art_mwst.Id_mwst_art
+                      where id_zaehler = " + piId.ToString();
+                    break;
+                case 39:
+                    lsSql = @"insert into objekt_mix_parts (Id_objekt_teil,id_objekt,flaeche_anteil,bez,geschoss,lage)
+                            select Id_objekt_teil,id_objekt,flaeche_anteil,bez,geschoss,lage from objekt_teil";
+                    lsWhereAdd = " where objekt_teil.id_objekt = " + piId.ToString() + " ";
+                    lsSql = lsSql + lsWhereAdd;
+                    break;
+                case 40:
+                    lsSql = @"Select Count(*) from objekt_mix_parts";
+                    lsWhereAdd = " where id_timeline = " + piId.ToString() + " ";
+                    lsSql = lsSql + lsWhereAdd;
+                    break;
+                case 41:
+                    lsSql = "Select ges_fl_behalten from objekt_mix_parts where id_objekt = " + piId.ToString();
+                    break;
+                case 42:
+                    lsSql = @"Delete from objekt_mix_parts";
+                    break;
+                case 43:
+                    lsSql = @"Select id_objekt_teil from vertrag where vertrag.id_mieter = " + piId.ToString();
+                    break;
+                case 44:
+                    lsSql = "select id_rg_nr from rgnr Where flag_besetzt != 1 Order by id_rg_nr";
+                    break;
+                case 45:
+                    lsSql = @"Update rgnr Set rgnr.flag_besetzt = 1 where rgnr.id_rg_nr = " + piId.ToString();
+                    break;
+                case 46:
+                    lsSql = @"Update timeline Set timeline.id_rg_nr = " + piId.ToString() + ps2;
+                    break;
+                default:
+                    break;
             }
 
             // Aus der Rechnungs ID die untergeordneten Summen der Timeline ermitteln
@@ -517,62 +624,6 @@ namespace Ruddat_NK
                 lsSql = lsSql + lsGroup + lsOrder;
             }
 
-            // Zählerstände mit definierter Timeline
-            if (piArt == 21)
-            {
-                lsWhereAdd = "id_extern_timeline = " + piId.ToString() + " ";
-                lsSql = @"select Id_zs,               
-                            id_zaehler,          
-                            id_einheit,          
-                            zs,           
-                            datum_von,
-                            verbrauch,
-                            preis_einheit_netto,
-                            preis_einheit_brutto,
-                            id_extern_timeline,
-                            id_objekt,
-                            id_objekt_teil,
-                            id_ksa
-                        from zaehlerstaende where " + lsWhereAdd;
-            }
-
-            if (piArt == 24)            // Zählerinfo für Report Nebenkosten holen
-            {
-                lsWhereAdd = " Where id_extern_timeline = " + piId.ToString() + " ";
-                lsSql = @"select Id_zs,               
-                            zaehlerstaende.id_zaehler,          
-                            zaehlerstaende.id_einheit,          
-                            zaehlerstaende.zs,           
-                            zaehlerstaende.datum_von,
-                            zaehlerstaende.verbrauch,
-                            zaehlerstaende.preis_einheit_netto,
-                            zaehlerstaende.preis_einheit_brutto,
-                            zaehlerstaende.id_extern_timeline,
-                            zaehlerstaende.id_objekt,
-                            zaehlerstaende.id_objekt_teil,
-                            zaehlerstaende.id_ksa,
-                            zaehler.zaehlernummer,
-                            zaehler.zaehlerort,
-							art_einheit.bez
-                        from zaehlerstaende
-                        left join zaehler on zaehler.Id_zaehler = zaehlerstaende.id_zaehler
-                        left join art_einheit on zaehler.id_einheit = art_einheit.Id_einheit "
-                    + lsWhereAdd;
-            }
-
-            if (piArt == 25)        // Zusammenstellungen der gewählten Wohnungen für den Report Nebenkosten
-            {
-                lsSql = @"select Id_obj_mix_parts,id_objekt_mix,id_objekt,id_objekt_teil,bez,sel,flaeche_anteil,    
-                                id_timeline,ges_fl_behalten,erklaerung,geschoss,lage
-                                    from objekt_mix_parts";
-                lsWhereAdd = " where sel > 0 and id_timeline = " + piId.ToString() + " ";
-                // lsWhereAdd2 = " and id_objekt = " + piId2.ToString() + " ";
-                lsSql = lsSql + lsWhereAdd + lsWhereAdd2;
-            }
-
-            // Schnippsel
-            // where " + ps2 + " = " + " \'" + lsWhereAdd + "\'";            
-
             return lsSql;
         }
 
@@ -604,7 +655,7 @@ namespace Ruddat_NK
             decimal ldVerbrauch = 0;    // Zähler Verbrauch
             decimal[] ladBetraege = new decimal[12];
 
-            Int32 liRows = 0;
+            Int32 liReturn = 0;
             int zl = 0;
             int liZlgOrRg = 0;
             int liExternId = 0;
@@ -770,6 +821,246 @@ namespace Ruddat_NK
                                 sdParts = new SqlDataAdapter(command);
                                 sdParts.Fill(tableParts);
                                 break;
+                            case 26:            // Bisher höchste ID ermitteln
+                                var lvGetLastTempId = command.ExecuteScalar();
+                                int liGetLastTempId;
+
+                                if (lvGetLastTempId != null)
+                                {
+                                    Int32.TryParse(lvGetLastTempId.ToString(), out liReturn);
+                                }
+                                else
+                                {
+                                    liReturn = 0;
+                                }
+                                break;
+                            case 27:            // ObjektTeil ermitteln
+                                var lvGetObjt = command.ExecuteScalar();
+                                if (lvGetObjt != null)
+                                {
+                                    int.TryParse(lvGetObjt.ToString(), out liReturn);
+                                }
+                                else
+                                {
+                                    liReturn = 0;
+                                }
+                                break;
+                            case 28:            // Weiterleitung ermitteln
+                                var lvWtl = command.ExecuteScalar();
+                                if (lvWtl != DBNull.Value)
+                                {
+                                    liReturn = Convert.ToInt32(lvWtl);
+                                }
+                                else
+                                {
+                                    liReturn = 0;
+                                }
+                                break;
+                            case 29:                // MieterId ermitteln
+                                var lvMieterId = command.ExecuteScalar();
+
+                                if (lvMieterId != DBNull.Value)
+                                {
+                                    if (lvMieterId != null)
+                                    {
+                                        Int32.TryParse(lvMieterId.ToString(), out liReturn);
+                                    }
+                                }
+                                else
+                                {
+                                    liReturn = 0;
+                                }
+                                break;
+                            case 30:           // Die Nebenkosten ID in der Tabelle art_KostenArt ermitteln
+                                var lvKsa = command.ExecuteScalar();
+
+                                if (lvKsa != DBNull.Value)
+                                {
+                                    if (lvKsa != null)
+                                    {
+                                        liReturn = Convert.ToInt32(lvKsa);
+                                    }
+                                }
+                                else
+                                {
+                                    liReturn = 0;
+                                }
+                                break;
+                            case 32:        // Die VerteilungsId aus Rechnungen ermitteln
+                                var lvRechnungId = command.ExecuteScalar();
+
+                                if (lvRechnungId != DBNull.Value)
+                                {
+                                    if (lvRechnungId != null)
+                                    {
+                                        liReturn = Convert.ToInt32(lvRechnungId);
+                                    }
+                                }
+                                else
+                                {
+                                    liReturn = 0;
+                                }
+                                break;
+                            case 33:
+                                var vertId = command.ExecuteScalar();
+
+                                if (vertId != DBNull.Value)
+                                {
+                                    if (vertId != null)
+                                    {
+                                        liReturn = Convert.ToInt32(vertId);
+                                    }
+                                }
+                                else
+                                {
+                                    liReturn = 0;
+                                }
+                                break;
+                            case 34:
+                                var lvMieter2Id = command.ExecuteScalar();
+
+                                if (lvMieter2Id != DBNull.Value)
+                                {
+                                    if (lvMieter2Id != null)
+                                    {
+                                        liReturn = Convert.ToInt32(lvMieter2Id);
+                                    }
+                                }
+                                else
+                                {
+                                    liReturn = 0;
+                                }
+                                break;
+                            case 35:
+                                var lvRechnung2Id = command.ExecuteScalar();
+
+                                if (lvRechnung2Id != DBNull.Value)
+                                {
+                                    if (lvRechnung2Id != null)
+                                    {
+                                        liReturn = Convert.ToInt32(lvRechnung2Id);
+                                    }
+                                }
+                                else
+                                {
+                                    liReturn = 0;
+                                }
+                                break;
+                            case 36:
+                                SqlCommand command36 = new SqlCommand(psSql2, connect);
+                                SqlDataReader queryCommandReader36 = command36.ExecuteReader();
+                                liReturn = 1;
+                                break;
+                            case 37:
+                                var lvZlId = command.ExecuteScalar();
+
+                                if (lvZlId != DBNull.Value)
+                                {
+                                    if (lvZlId != null)
+                                    {
+                                        liReturn = Convert.ToInt16(lvZlId);
+                                    }
+                                }
+                                else
+                                {
+                                    liReturn = 0;
+                                }
+                                break;
+                            case 38:    // Mwst Satz Zähler
+                                var lvMwstSatz = command.ExecuteScalar();
+
+                                if (lvMwstSatz != DBNull.Value)
+                                {
+                                    if (lvMwstSatz != null)
+                                    {
+                                        liReturn = Convert.ToInt16(lvMwstSatz);
+                                    }
+                                }
+                                else
+                                {
+                                    liReturn = 0;
+                                }
+                                break;
+                            case 39:
+                                var lvRows = command.ExecuteScalar();
+
+                                if (lvRows != DBNull.Value)
+                                {
+                                    if (lvRows != null)
+                                    {
+                                        liReturn = Convert.ToInt16(lvRows);
+                                    }
+                                }
+                                else
+                                {
+                                    liReturn = 0;
+                                }
+                                break;
+                            case 40:
+                                var lvRows2 = command.ExecuteScalar();
+
+                                if (lvRows2 != DBNull.Value)
+                                {
+                                    if (lvRows2 != null)
+                                    {
+                                        liReturn = Convert.ToInt16(lvRows2);
+                                    }
+                                }
+                                else
+                                {
+                                    liReturn = 0;
+                                }
+                                break;
+                            case 41:
+                                var lvGetFlag = command.ExecuteScalar();
+
+                                if (lvGetFlag != null && liObjekt > 0)
+                                {
+
+                                    int.TryParse(lvGetFlag.ToString(), out liReturn);
+                                }
+                                else
+                                {
+                                    liReturn = 0;
+                                }
+                                break;
+                            case 42:
+                                var lvRows3 = command.ExecuteScalar();
+                                liReturn = 1;
+
+                                break;
+                            case 43:
+                                var lvGetInfo = command.ExecuteScalar();
+
+                                if (lvGetInfo != null)
+                                {
+                                    Int32.TryParse(lvGetInfo.ToString(), out liReturn);
+                                }
+                                else
+                                {
+                                    liReturn = 0;
+                                }
+                                break;
+                            case 44:
+                                var lvGetInfo2 = command.ExecuteScalar();
+
+                                if (lvGetInfo2 != null)
+                                {
+                                    Int32.TryParse(lvGetInfo2.ToString(), out liReturn);
+                                }
+                                else
+                                {
+                                    liReturn = 0;
+                                }
+                                break;
+                            case 45:
+                                var lvRows4 = command.ExecuteScalar();
+                                liReturn = 1;
+                                break;
+                            case 46:
+                                var lvRows5 = command.ExecuteScalar();
+                                liReturn = 1;
+                                break;
                             default:
                                 break;
                         }
@@ -927,6 +1218,238 @@ namespace Ruddat_NK
                                 mysdParts = new MySqlDataAdapter(command);
                                 mysdParts.Fill(tableParts);
                                 break;
+                            case 26:            // Bisher höchste ID ermitteln
+                                var lvGetLastTempId = command.ExecuteScalar();
+                                int liGetLastTempId;
+
+                                if (lvGetLastTempId != null)
+                                {
+                                    Int32.TryParse(lvGetLastTempId.ToString(), out liGetLastTempId);
+                                }
+                                else
+                                {
+                                    liGetLastTempId = 0;
+                                }
+                                liReturn = liGetLastTempId;
+                                break;
+                            case 27:            // ObjektTeil ermitteln
+                                var lvGetObjt = command.ExecuteScalar();
+
+                                if (lvGetObjt != null)
+                                {
+                                    int.TryParse(lvGetObjt.ToString(), out liObjektTeil);
+                                }
+                                else
+                                {
+                                    liObjektTeil = 0;
+                                }
+                                liReturn = liObjektTeil;
+                                break;
+                            case 28:            // Weiterleitung ermitteln
+                                var lvWtl = command.ExecuteScalar();
+                                if (lvWtl != DBNull.Value)
+                                {
+                                    liReturn = Convert.ToInt32(lvWtl);
+                                }
+                                else
+                                {
+                                    liReturn = 0;
+                                }
+                                break;
+                            case 29:            // MieterId ermitteln
+                                var lvMieterId = command.ExecuteScalar();
+
+                                if (lvMieterId != DBNull.Value)
+                                {
+                                    if (lvMieterId != null)
+                                    {
+                                        Int32.TryParse(lvMieterId.ToString(), out liReturn);
+                                    }
+                                }
+                                else
+                                {
+                                    liReturn = 0;
+                                }
+                                break;
+                            case 30:            // Die Nebenkosten ID in der Tabelle art_KostenArt ermitteln
+                                var lvKsa = command.ExecuteScalar();
+
+                                if (lvKsa != DBNull.Value)
+                                {
+                                    if (lvKsa != null)
+                                    {
+                                        liReturn = Convert.ToInt32(lvKsa);
+                                    }
+                                }
+                                else
+                                {
+                                    liReturn = 0;
+                                }
+                                break;
+                            case 32:        // Die VerteilungsId aus Rechnungen ermitteln
+                                var lvRechnungId = command.ExecuteScalar();
+
+                                if (lvRechnungId != DBNull.Value)
+                                {
+                                    if (lvRechnungId != null)
+                                    {
+                                        liReturn = Convert.ToInt32(lvRechnungId);
+                                    }
+                                }
+                                else
+                                {
+                                    liReturn = 0;
+                                }
+                                break;
+                            case 33:
+                                var vertId = command.ExecuteScalar();
+
+                                if (vertId != DBNull.Value)
+                                {
+                                    if (vertId != null)
+                                    {
+                                        liReturn = Convert.ToInt32(vertId);
+                                    }
+                                }
+                                else
+                                {
+                                    liReturn = 0;
+                                }
+                                break;
+                            case 34:
+                                var lvMieter2Id = command.ExecuteScalar();
+
+                                if (lvMieter2Id != DBNull.Value)
+                                {
+                                    if (lvMieter2Id != null)
+                                    {
+                                        liReturn = Convert.ToInt32(lvMieter2Id);
+                                    }
+                                }
+                                else
+                                {
+                                    liReturn = 0;
+                                }
+                                break;
+                            case 35:
+                                var lvRechnung2Id = command.ExecuteScalar();
+
+                                if (lvRechnung2Id != DBNull.Value)
+                                {
+                                    if (lvRechnung2Id != null)
+                                    {
+                                        liReturn = Convert.ToInt32(lvRechnung2Id);
+                                    }
+                                }
+                                else
+                                {
+                                    liReturn = 0;
+                                }
+                                break;
+                            case 36:
+                                MySqlCommand command36 = new MySqlCommand(psSql2, connect);
+                                MySqlDataReader queryCommandReader36 = command36.ExecuteReader();
+                                liReturn = 1;
+                                break;
+                            case 37:
+                                var lvZlId = command.ExecuteScalar();
+
+                                if (lvZlId != DBNull.Value)
+                                {
+                                    if (lvZlId != null)
+                                    {
+                                        liReturn = Convert.ToInt16(lvZlId);
+                                    }
+                                }
+                                else
+                                {
+                                    liReturn = 0;
+                                }
+                                break;
+                            case 38:    // Mwst Satz Zähler
+                                var lvMwstSatz = command.ExecuteScalar();
+
+                                if (lvMwstSatz != DBNull.Value)
+                                {
+                                    if (lvMwstSatz != null)
+                                    {
+                                        liReturn = Convert.ToInt16(lvMwstSatz);
+                                    }
+                                }
+                                else
+                                {
+                                    liReturn = 0;
+                                }
+                                break;
+                            case 39:
+                                var lvRows = command.ExecuteScalar();
+
+                                if (lvRows != DBNull.Value)
+                                {
+                                    if (lvRows != null)
+                                    {
+                                        liReturn = Convert.ToInt16(lvRows);
+                                    }
+                                }
+                                else
+                                {
+                                    liReturn = 0;
+                                }
+                                break;
+                            case 40:
+                                var lvRows2 = command.ExecuteScalar();
+
+                                if (lvRows2 != DBNull.Value)
+                                {
+                                    if (lvRows2 != null)
+                                    {
+                                        liReturn = Convert.ToInt16(lvRows2);
+                                    }
+                                }
+                                else
+                                {
+                                    liReturn = 0;
+                                }
+                                break;
+                            case 41:
+                                var lvGetFlag = command.ExecuteScalar();
+
+                                if (lvGetFlag != null && liObjekt > 0)
+                                {
+
+                                    int.TryParse(lvGetFlag.ToString(), out liReturn);
+                                }
+                                else
+                                {
+                                    liReturn = 0;
+                                }
+                                break;
+                            case 42:
+                                var lvRows3 = command.ExecuteScalar();
+                                if (lvRows3 != DBNull.Value)
+                                {
+                                    if (lvRows3 != null)
+                                    {
+                                        liReturn = Convert.ToInt16(lvRows3);
+                                    }
+                                }
+                                else
+                                {
+                                    liReturn = 0;
+                                }
+                                break;
+                            case 43:
+                                var lvGetInfo = command.ExecuteScalar();
+
+                                if (lvGetInfo != null)
+                                {
+                                    Int32.TryParse(lvGetInfo.ToString(), out liReturn);
+                                }
+                                else
+                                {
+                                    liReturn = 0;
+                                }
+                                break;
                             default:
                                 break;
                         }
@@ -939,13 +1462,11 @@ namespace Ruddat_NK
                         MessageBox.Show("Verarbeitungsfehler ERROR fetchdata RdFunctions 0006\n piArt = " + piArt.ToString(),
                                 "Achtung");
                     }
-
-
                     break;
                 default:
                     break;
             }
-            return (liRows);     
+            return (liReturn);     
         }
 
         // Datenbankaktionen nach Datafetch
@@ -1018,14 +1539,14 @@ namespace Ruddat_NK
 
                                     // Weiterleitung an ObjektTeil aus der Kostenart ermitteln
                                     // 1 = Weiterleitung an Teilobjekt
-                                    if (getWtl(1, liExternId))
+                                    if (getWtl(1, liExternId)==1)   // Todo ist jetzt int funktion testen
                                     {
                                         liObjektTeil = 0;
                                         // Timeline neu erzeugen für Relationen
                                         liOk = TimelineCreateRelations(liExternId, liObjekt, liObjektTeil, liMieter);
 
                                         // 2 = Weiterleitung an Mieter
-                                        if (getWtl(2, liExternId))
+                                        if (getWtl(2, liExternId)==1)   // Todo ist jetzt int funktion testen
                                         {
                                             liObjekt = 0;
                                             liObjektTeil = 1;   // Auslöser für das Weiterleiten an Mieter
@@ -1044,7 +1565,7 @@ namespace Ruddat_NK
                                     liOk = TimelineCreate(liExternId, "id_rechnung");
                                     // Weiterleitung an ObjektTeil aus der Kostenart ermitteln
                                     // 2 = Weiterleitung an Mieter
-                                    if (getWtl(2, liExternId))
+                                    if (getWtl(2, liExternId)==1) // Todo wurde int, testen
                                     {
                                         // Timeline neu erzeugen für Relationen
                                         liOk = TimelineCreateRelations(liExternId, liObjekt, liObjektTeil, liMieter);
@@ -2218,7 +2739,7 @@ namespace Ruddat_NK
                 lsSql = "Select flaeche_anteil from objekt_teil where id_objekt_teil = " + aiTObjekt.ToString();
             }
 
-            // Todo Mysql
+            //Todo Mysql !!
             SqlConnection connect;
             connect = new SqlConnection(asConnectString);
             SqlCommand command = new SqlCommand(lsSql, connect);
@@ -2361,40 +2882,8 @@ namespace Ruddat_NK
         {
             int liObjektTeil = 0;
 
-            String lsSql = "Select id_objekt_teil from objekt_mix_parts where sel = 1 and id_objekt_teil = " + aiObjektTeil.ToString();
-
-            // Todo Mysql
-            SqlConnection connect;
-            connect = new SqlConnection(gsConnectString);
-            SqlCommand command = new SqlCommand(lsSql, connect);
-
-            // art_day
-            try
-            {
-                // Db open
-                connect.Open();
-                var lvGetObjt = command.ExecuteScalar();
-
-                if (lvGetObjt != null)
-                {
-                    int.TryParse(lvGetObjt.ToString(), out liObjektTeil);   // Ulf! TODO testen
-                }
-                else
-                {
-                    liObjektTeil = 0;
-                }
-
-                connect.Close();
-            }
-            catch
-            {
-                MessageBox.Show("Es wurden keine Objektteil in der Auswahl gefunden gefunden\n" +
-                        "Prüfen Sie bitte die Datenbankverbindung\n",
-                        "Achtung (Timeline.getObjektTeilAuswahl)",
-                         MessageBoxButton.OK);
-            }
-
-
+            String lsSql = getSql(27, aiObjektTeil, "", "", 0);
+            liObjektTeil = fetchData(lsSql, "", 27, gsConnectString);
 
             return liObjektTeil;
         }
@@ -2403,60 +2892,15 @@ namespace Ruddat_NK
         // Ist eine Weitergabe der Kosten in art_kostenart eingetragen
         // 1 = Grundlage ist das Objekt > geht an ObjektTeil
         // 2 = Grundlage ist Objektteil > geht an Mieter
-        private static bool getWtl(int p, int liExternId)
+        private static int getWtl(int p, int liExternId)
         {
-            bool lbWtl = false;
+            int liWtl = 0;
             string lsSql = "";
 
-            switch (p)
-            {
-                case 1:
-                    // Weiterleitung an Objektteil
-                    lsSql = @"Select art_kostenart.wtl_obj_teil from timeline 
-                                join art_kostenart on timeline.id_ksa = art_kostenart.id_ksa
-                                Where timeline.id_rechnung = " + liExternId.ToString();
-                    break;
-                    // Weiterleitung an Mieter
-                case 2:
-                    lsSql = @"Select art_kostenart.wtl_mieter from timeline 
-                                join art_kostenart on timeline.id_ksa = art_kostenart.id_ksa
-                                Where timeline.id_rechnung = " + liExternId.ToString();
-                    break;
-                default:
-                    break;
-            }
+            lsSql = getSql(28, liExternId, "", "", p);
+            liWtl = fetchData(lsSql, "", 28, gsConnectString);
 
-            // Todo Mysql
-            SqlConnection connect;
-            connect = new SqlConnection(gsConnectString);
-            SqlCommand command = new SqlCommand(lsSql, connect);
-
-            // art_day
-            try
-            {
-                // Db open
-                connect.Open();
-                var lvWtl = command.ExecuteScalar();
-
-                if (lvWtl != DBNull.Value)
-                {
-                    lbWtl = Convert.ToBoolean(lvWtl);               
-                }
-                else
-                {
-                    lbWtl = false;
-                }
-
-                connect.Close();
-            }
-            catch
-            {
-                MessageBox.Show("Es wurden keine Weiterleitungsinformation gefunden\n" +
-                        "Prüfen Sie bitte die Datenbankverbindung\n",
-                        "Achtung (Timeline.getWtl)",
-                         MessageBoxButton.OK);
-            }
-            return lbWtl;
+            return liWtl;
         }
 
         // Hier wird der aktuelle Mieter für den gegebenen Monat der Timeline ermittelt
@@ -2472,41 +2916,10 @@ namespace Ruddat_NK
                         Where id_objekt_teil = " + aiObjektTeil.ToString() +
                         " AND vertrag.datum_von <= Convert(DateTime," + "\'" + adtMonat + "',104) "
                         + " AND vertrag.datum_bis >= Convert(DateTime," + "\'" + adtMonat + "',104)";
-            // + " AND vertrag_aktiv = 1 "; // Sollteauch ohne Aktiv Kennzeichen gehen TODO ULF!
+            // + " AND vertrag_aktiv = 1 "; 
+            //TODO  Sollte auch ohne Aktiv Kennzeichen gehen TODO ULF!
 
-            // Todo Mysql
-            SqlConnection connect;
-            connect = new SqlConnection(asConnect);
-            SqlCommand command = new SqlCommand(lsSql, connect);
-
-            // art_day
-            try
-            {
-                // Db open
-                connect.Open();
-                var lvMieterId = command.ExecuteScalar();
-
-                if (lvMieterId != DBNull.Value)
-                {
-                    if (lvMieterId != null)
-                    {
-                        Int32.TryParse(lvMieterId.ToString(), out liMieterId);                        
-                    }
-                }
-                else
-                {
-                    liMieterId = 0;
-                }
-
-                connect.Close();
-            }
-            catch
-            {
-                MessageBox.Show("Es wurden keine Mieterinformation gefunden\n" +
-                        "Prüfen Sie bitte die Datenbankverbindung\n",
-                        "Achtung (Timeline.getAktMieter)",
-                         MessageBoxButton.OK);
-            }
+            liMieterId = fetchData(lsSql, "", 29, gsConnectString);
 
             return liMieterId;
         }
@@ -2526,41 +2939,10 @@ namespace Ruddat_NK
                         join objekt on objekt_teil.id_objekt = objekt.Id_objekt
                         Join filiale on filiale.id_filiale = objekt.Id_filiale
                         join mieter on mieter.id_filiale = filiale.Id_Filiale
-                            where objekt_teil.Id_objekt_teil = " + aiObjektTeil.ToString();                
-            }
+                            where objekt_teil.Id_objekt_teil = " + aiObjektTeil.ToString();
 
-            // Todo Mysql
-            SqlConnection connect;
-            connect = new SqlConnection(asConnect);
-            SqlCommand command = new SqlCommand(lsSql, connect);
-
-            // art_day
-            try
-            {
-                // Db open
-                connect.Open();
-                var lvMieterId = command.ExecuteScalar();
-
-                if (lvMieterId != DBNull.Value)
-                {
-                    if (lvMieterId != null)
-                    {
-                        liMieterId = Convert.ToInt32(lvMieterId);   
-                    }
-                }
-                else
-                {
-                    liMieterId = 0;
-                }
-
-                connect.Close();
-            }
-            catch
-            {
-                MessageBox.Show("Es wurden keine Mieterinformation gefunden\n" +
-                        "Prüfen Sie bitte die Datenbankverbindung\n",
-                        "Achtung (Timeline.getMieterLeerstand)",
-                         MessageBoxButton.OK);
+                lsSql = getSql(29, aiObjektTeil, "", "", 0);
+                liMieterId = fetchData(lsSql, "", 29, gsConnectString);
             }
 
             return liMieterId;
@@ -2633,7 +3015,6 @@ namespace Ruddat_NK
                 {
                     ldAnzahlPersonen = 0;
                 }
-
                 connect.Close();
             }
             catch
@@ -2654,51 +3035,8 @@ namespace Ruddat_NK
             int liKsaId = 0;
             String lsSql = "";
 
-            switch (aiArt)
-            {
-                case 1:
-                    lsSql = @"Select id_ksa From art_kostenart Where ksa_zahlung = 1 Order by sort;";
-                    break;
-                case 2:
-                    lsSql = @"Select id_ksa From art_kostenart Where ksa_zaehler = 1 Order by sort;";
-                    break;
-                default:
-                    break;
-            }
-
-            // Todo Mysql
-            SqlConnection connect;
-            connect = new SqlConnection(asConnect);
-            SqlCommand command = new SqlCommand(lsSql, connect);
-
-            // art_day
-            try
-            {
-                // Db open
-                connect.Open();
-                var lvKsa = command.ExecuteScalar();
-
-                if (lvKsa != DBNull.Value)
-                {
-                    if (lvKsa != null)
-                    {
-                        liKsaId = Convert.ToInt32(lvKsa);
-                    }
-                }
-                else
-                {
-                    liKsaId = 0;
-                }
-
-                connect.Close();
-            }
-            catch
-            {
-                MessageBox.Show("Es wurde keine Nebenkosten ID gefunden\n" +
-                        "Prüfen Sie bitte die Datenbankverbindung\n",
-                        "Achtung (Timeline.getNkId)",
-                         MessageBoxButton.OK);
-            }
+            lsSql = getSql(30, aiArt, "", "", 0);
+            liKsaId = fetchData(lsSql, "", 30, gsConnectString);
 
             return liKsaId;
         }
@@ -2754,41 +3092,8 @@ namespace Ruddat_NK
             int liVerteilungId = 0;
             String lsSql = "";
 
-            lsSql = @"Select id_verteilung From rechnungen Where id_extern_timeline = " + aiTimelineId.ToString();
-
-            // Todo Mysql
-            SqlConnection connect;
-            connect = new SqlConnection(asConnect);
-            SqlCommand command = new SqlCommand(lsSql, connect);
-
-            // art_day
-            try
-            {
-                // Db open
-                connect.Open();
-                var lvRechnungId = command.ExecuteScalar();
-
-                if (lvRechnungId != DBNull.Value)
-                {
-                    if (lvRechnungId != null)
-                    {
-                        liVerteilungId = Convert.ToInt32(lvRechnungId);
-                    }
-                }
-                else
-                {
-                    liVerteilungId = 0;
-                }
-
-                connect.Close();
-            }
-            catch
-            {
-                MessageBox.Show("Es wurde kein Verteilungsstring gefunden\n" +
-                        "Prüfen Sie bitte die Datenbankverbindung\n",
-                        "Achtung (Timeline.getVerteilung)",
-                         MessageBoxButton.OK);
-            }
+            lsSql = getSql(32, aiTimelineId, "", "", 0);
+            liVerteilungId = fetchData(lsSql, "", 32, gsConnectString);
 
             return liVerteilungId;
         }
@@ -2799,45 +3104,11 @@ namespace Ruddat_NK
             int liVerteilungId = 0;
             String lsSql = "";
 
-            lsSql = @"Select id_verteilung From art_verteilung Where kb = '" + asBez.ToString() +"'";
+            lsSql = getSql(33, 0, asBez, "", 0);
+            liVerteilungId = fetchData(lsSql, "", 33, gsConnectString);
 
-            // Todo Mysql
-            SqlConnection connect;
-            connect = new SqlConnection(asConnect);
-            SqlCommand command = new SqlCommand(lsSql, connect);
-
-            // art_day
-            try
-            {
-                // Db open
-                connect.Open();
-                var vertId = command.ExecuteScalar();
-
-                if (vertId != DBNull.Value)
-                {
-                    if (vertId != null)
-                    {
-                        liVerteilungId = Convert.ToInt32(vertId);
-                    }
-                }
-                else
-                {
-                    liVerteilungId = 0;
-                }
-
-                connect.Close();
-            }
-            catch
-            {
-                MessageBox.Show("Es wurde keine VerteilungsID gefunden\n" +
-                        "Prüfen Sie bitte die Datenbankverbindung\n",
-                        "Achtung (Timeline.getIdArtVerteilung)",
-                         MessageBoxButton.OK);
-            }
             return liVerteilungId;
         }
-
-
 
 
         // Den Verteilungskurzstring aus der Tabelle art_verteilung ermitteln
@@ -3003,41 +3274,9 @@ namespace Ruddat_NK
             int liIdObjTeil = 0;
             String lsSql = "";
 
-            lsSql = @"Select id_objekt_teil From vertrag Where id_mieter = " + aiId.ToString();
+            lsSql = getSql(34, aiId, "", "", 0);
+            liIdObjTeil = fetchData(lsSql, "", 34, gsConnectString);
 
-            // Todo Mysql
-            SqlConnection connect;
-            connect = new SqlConnection(asConnect);
-            SqlCommand command = new SqlCommand(lsSql, connect);
-
-            // art_day
-            try
-            {
-                // Db open
-                connect.Open();
-                var lvMieterId = command.ExecuteScalar();
-
-                if (lvMieterId != DBNull.Value)
-                {
-                    if (lvMieterId != null)
-                    {
-                        liIdObjTeil = Convert.ToInt32(lvMieterId);
-                    }                    
-                }
-                else
-                {
-                    liIdObjTeil = 0;
-                }
-
-                connect.Close();
-            }
-            catch
-            {
-                MessageBox.Show("Es wurde kein Teilobjekt gefunden\n" +
-                        "Prüfen Sie bitte die Datenbankverbindung\n",
-                        "Achtung (Timeline.getIdObjTeil)",
-                         MessageBoxButton.OK);
-            }
             return liIdObjTeil;
         }
 
@@ -3047,51 +3286,9 @@ namespace Ruddat_NK
             int liIdObj = 0;
             String lsSql = "";
 
-            switch (aiArt)
-            {
-                case 1:
-                    lsSql = @"Select id_objekt From vertrag Where id_mieter = " + aiId.ToString();
-                    break;
-                case 2:
-                    lsSql = @"Select id_objekt From vertrag Where id_objekt_teil = " + aiId.ToString();
-                    break;
-                default:
-                    break;
-            }
+            lsSql = getSql(35, aiId, "", "", aiArt);
+            liIdObj = fetchData(lsSql, "", 35, gsConnectString);
 
-            // Todo Mysql
-            SqlConnection connect;
-            connect = new SqlConnection(asConnect);
-            SqlCommand command = new SqlCommand(lsSql, connect);
-
-            // art_day
-            try
-            {
-                // Db open
-                connect.Open();
-                var lvRechnungId = command.ExecuteScalar();
-
-                if (lvRechnungId != DBNull.Value)
-                {
-                    if (lvRechnungId != null)
-                    {
-                        liIdObj = Convert.ToInt32(lvRechnungId);
-                    }
-                }
-                else
-                {
-                    liIdObj = 0;
-                }
-
-                connect.Close();
-            }
-            catch
-            {
-                MessageBox.Show("Es wurde kein Objekt gefunden\n" +
-                        "Prüfen Sie bitte die Datenbankverbindung\n",
-                        "Achtung (Timeline.getIdObj)",
-                         MessageBoxButton.OK);
-            }
             return liIdObj;
         }
 
@@ -3563,32 +3760,10 @@ namespace Ruddat_NK
             int liOk = 0;
 
             // kann schonmal gelöscht werden
-            String lsSql = "delete from x_abr_content;";
+            lsSql = getSql(36, 0, "", "", 0);
+            liOk = fetchData(lsSql, "", 36, gsConnectString);
 
-            // Todo Mysql
-            SqlConnection connect;
-            connect = new SqlConnection(asConnect);
-
-            SqlCommand command = new SqlCommand(lsSql, connect);
-
-            // import_file
-            try
-            {
-                // Db open
-                connect.Open();
-                SqlDataReader queryCommandReader = command.ExecuteReader();
-                liOk = 1;
-                connect.Close();
-            }
-            catch
-            {
-                MessageBox.Show("Tabelle x_abr_content konnte nicht geleert werden\n",
-                        "Achtung RdFunctions.delContent",
-                         MessageBoxButton.OK);
-                liOk = 0;
-            }
             return (liOk);
-
         }
 
         // Die Rechnungs ID aus dem SqlStatement ermitteln
@@ -3657,47 +3832,13 @@ namespace Ruddat_NK
         // Zähler Id vom Namen des Zählers ermitteln
         internal static int getZlId(string lsZlName, string asConnect)
         {
-
             String lsSql = "";
             int liZlId = 0;
 
-            lsSql = @"select id_zaehler from zaehler where zaehlernummer = '" + lsZlName.ToString().Trim() + "\'";
+            lsSql = getSql(37, 0, lsZlName, "", 0);
+            liZlId = fetchData(lsSql, "", 37, gsConnectString);
 
-            // Todo Mysql
-            SqlConnection connect;
-            connect = new SqlConnection(asConnect);
-            SqlCommand command = new SqlCommand(lsSql, connect);
-
-            // art_day
-            try
-            {
-                // Db open
-                connect.Open();
-                var lvZlId = command.ExecuteScalar();
-
-                if (lvZlId != DBNull.Value)
-                {
-                    if (lvZlId != null)
-                    {
-                        liZlId = Convert.ToInt16(lvZlId); 
-                    }
-                }
-                else
-                {
-                    liZlId = 0;
-                }
-
-                connect.Close();
-            }
-            catch
-            {
-                MessageBox.Show("Es wurde keine Zähler Id gefunden\n" +
-                        "Prüfen Sie bitte die Datenbankverbindung\n",
-                        "Achtung (Timeline.getZlId)",
-                         MessageBoxButton.OK);
-            }
             return liZlId;
-
         }
 
         // Mehrwertsteuersatz für Zähler holen (aus ZählerId)
@@ -3706,42 +3847,9 @@ namespace Ruddat_NK
             String lsSql = "";
             int liMwstSatz = 0;
 
-            lsSql = @"Select art_mwst.mwst from zaehler 
-                        left join art_mwst on zaehler.id_mwst_art = art_mwst.Id_mwst_art
-                      where id_zaehler = " + aiZlId.ToString();
+            lsSql = getSql(38, aiZlId, "", "", 0);
+            liMwstSatz = fetchData(lsSql, "", 38, gsConnectString);
 
-            // Todo Mysql
-            SqlConnection connect;
-            connect = new SqlConnection(asConnect);
-            SqlCommand command = new SqlCommand(lsSql, connect);
-
-            // art_day
-            try
-            {
-                // Db open
-                connect.Open();
-                var lvMwstSatz = command.ExecuteScalar();
-
-                if (lvMwstSatz != DBNull.Value)
-                {
-                    if (lvMwstSatz != null)
-                    {
-                        liMwstSatz = Convert.ToInt16(lvMwstSatz);   
-                    }
-                }
-                else
-                {
-                    liMwstSatz = 0;
-                }
-                connect.Close();
-            }
-            catch
-            {
-                MessageBox.Show("Es wurde keine Zähler Id gefunden\n" +
-                        "Prüfen Sie bitte die Datenbankverbindung\n",
-                        "Achtung (Timeline.getMwstSatzZaehler)",
-                         MessageBoxButton.OK);
-            }
             return liMwstSatz;
         }
 
@@ -3768,7 +3876,6 @@ namespace Ruddat_NK
             {
                 liOk = 2;
             }
-
             return liOk;
         }
 
@@ -3776,47 +3883,11 @@ namespace Ruddat_NK
         private static int copyParts(string asConnect, int aiObjekt, int aiTimeLineId)
         {
             String lsSql = "";
-            String lsWhereAdd = "";
             int liObj = 0;
 
-            
-            lsSql = @"insert into objekt_mix_parts (Id_objekt_teil,id_objekt,flaeche_anteil,bez,geschoss,lage)
-                            select Id_objekt_teil,id_objekt,flaeche_anteil,bez,geschoss,lage from objekt_teil";
-            lsWhereAdd = " where objekt_teil.id_objekt = " + aiObjekt.ToString() + " ";
-            lsSql = lsSql + lsWhereAdd;
+            lsSql = getSql(39, aiObjekt, "", "", 0);
+            liObj = fetchData(lsSql, "", 39, gsConnectString);
 
-            // Todo Mysql
-            SqlConnection connect;
-            connect = new SqlConnection(asConnect);
-            SqlCommand command = new SqlCommand(lsSql, connect);
-
-            // art_day
-            try
-            {
-                // Db open
-                connect.Open();
-                var lvRows = command.ExecuteScalar();
-
-                if (lvRows != DBNull.Value)
-                {
-                    if (lvRows != null)
-                    {
-                        liObj = Convert.ToInt16(lvRows);    
-                    }
-                }
-                else
-                {
-                    liObj = 0;
-                }
-                connect.Close();
-            }
-            catch
-            {
-                MessageBox.Show("Es konnten keine Parts kopiert werden\n" +
-                        "Prüfen Sie bitte die Datenbankverbindung\n",
-                        "Achtung (Timeline.copyParts)",
-                         MessageBoxButton.OK);
-            }
             return liObj;
         }
 
@@ -3824,46 +3895,11 @@ namespace Ruddat_NK
         private static int getInfoFromParts(string asConnect, int aiTimeLineId)
         {
             String lsSql = "";
-            String lsWhereAdd = "";
             int liRows = 0;
 
-            lsSql = @"Select Count(*) from objekt_mix_parts";
-            lsWhereAdd = " where id_timeline = " + aiTimeLineId.ToString() + " ";
+            lsSql = getSql(40, aiTimeLineId, "", "", 0);
+            liRows = fetchData(lsSql, "", 40, gsConnectString);
 
-            lsSql = lsSql + lsWhereAdd;
-
-            // Todo Mysql
-            SqlConnection connect;
-            connect = new SqlConnection(asConnect);
-            SqlCommand command = new SqlCommand(lsSql, connect);
-
-            // art_day
-            try
-            {
-                // Db open
-                connect.Open();
-                var lvRows = command.ExecuteScalar();
-
-                if (lvRows != DBNull.Value)
-                {
-                    if (lvRows != null)
-                    {
-                        liRows = Convert.ToInt16(lvRows);    
-                    }
-                }
-                else
-                {
-                    liRows = 0;
-                }
-                connect.Close();
-            }
-            catch
-            {
-                MessageBox.Show("Es wurde keine Parts gefunden\n" +
-                        "Prüfen Sie bitte die Datenbankverbindung\n",
-                        "Achtung (Timeline.getInfoFromParts)",
-                         MessageBoxButton.OK);
-            }
             return liRows;
         }
 
@@ -3984,7 +4020,7 @@ namespace Ruddat_NK
                                 case 0:
                                     lsVertInfo = @"Berechnete Gesamtfläche: " + ldGesamtflaecheObjekt.ToString("0.##") + "m² / " +
                                         "Mietfläche: " + ldFlaecheTObjekt.ToString("0.##") + "m² ";
-                                        // "Faktor: " + (ldFlaecheTObjekt / ldGesamtflaecheObjekt).ToString("0.##");
+                                    // "Faktor: " + (ldFlaecheTObjekt / ldGesamtflaecheObjekt).ToString("0.##");
                                     // Infos der Beteiligten Wohnungen an der Auswahl holen
                                     // aiIdRechnung ist hier die extern timeline ID ACHTUNG!
                                     // Das hier nur in Detaillierten Abrechnung drucken
@@ -4055,37 +4091,9 @@ namespace Ruddat_NK
             int liFlag = 0;
             string lsSql = "";
 
-            lsSql = "Select ges_fl_behalten from objekt_mix_parts where id_objekt = " + liObjekt.ToString();
+            lsSql = getSql(41, liObjekt, "", "", 0);
+            liFlag = fetchData(lsSql, "", 41, gsConnectString);
 
-            // Todo Mysql
-            SqlConnection connect;
-            connect = new SqlConnection(asConnect);
-            SqlCommand command = new SqlCommand(lsSql, connect);
-
-            // art_day
-            try
-            {
-                // Db open
-                connect.Open();
-                var lvGetFlag = command.ExecuteScalar();
-
-                if (lvGetFlag != null && liObjekt > 0)
-                {
-                    int.TryParse(lvGetFlag.ToString(), out liFlag);
-                }
-                else
-                {
-                    liFlag = 0;
-                }
-                connect.Close();
-            }
-            catch
-            {
-                MessageBox.Show("Es wurden kein Flag Gesamtfläche gefunden\n" +
-                        "Objekt Id und Getflag:" + liObjekt.ToString() +"/" + liFlag.ToString()  + "\n",
-                        "Achtung (Timeline.getObjektFlaecheAuswFlag)",
-                         MessageBoxButton.OK);
-            }
             return liFlag;
         }
 
@@ -4202,28 +4210,10 @@ namespace Ruddat_NK
         internal static void deleteParts(string asConnect)
         {
             string lsSql = "";
+            int liOk = 0;
 
-            lsSql = @"Delete from objekt_mix_parts";
-
-            SqlConnection connect;
-            connect = new SqlConnection(asConnect);
-            SqlCommand command = new SqlCommand(lsSql, connect);
-
-            // art_day
-            try
-            {
-                // Db open
-                connect.Open();
-                var lvRows = command.ExecuteScalar();
-                connect.Close();
-            }
-            catch
-            {
-                MessageBox.Show("Es konnten keine Parts gelöscht\n" +
-                        "Prüfen Sie bitte die Datenbankverbindung\n",
-                        "Achtung (Timeline.deleteParts)",
-                         MessageBoxButton.OK);
-            }
+            lsSql = getSql(42, 0, "", "", 0);
+            liOk = fetchData(lsSql, "", 42, gsConnectString);
         }
 
         // Informationen über Vertragsbeginn und Ende mit der Mieter id
@@ -4288,43 +4278,8 @@ namespace Ruddat_NK
             string lsSql = "";
             int liInfo = 0;
 
-            switch (aiArt)
-            {
-                case 1:
-                    lsSql = @"Select id_objekt_teil from vertrag where vertrag.id_mieter = " + liIdMieter.ToString();
-                    break;
-                  default:
-                    break;
-            }
-
-            SqlConnection connect;
-            connect = new SqlConnection(asConnect);
-            SqlCommand command = new SqlCommand(lsSql, connect);
-
-            // art_day
-            try
-            {
-                // Db open
-                connect.Open();
-                var lvGetInfo = command.ExecuteScalar();
-
-                if (lvGetInfo != null)
-                {
-                    Int32.TryParse(lvGetInfo.ToString(),out liInfo);
-                }
-                else
-                {
-                    liInfo = 0;
-                }
-                connect.Close();
-            }
-            catch
-            {
-                MessageBox.Show("Es wurden keine Info aus Vertrag  gefunden\n" +
-                        "Prüfen Sie bitte die Datenbankverbindung\n",
-                        "Achtung (Timeline.getVertragInfoFromMieter)",
-                         MessageBoxButton.OK);
-            }
+            lsSql = getSql(43, liIdMieter, "", "", 0);
+            liInfo = fetchData(lsSql, "", 43, gsConnectString);
 
             return liInfo;
         }
@@ -4332,39 +4287,11 @@ namespace Ruddat_NK
         // Rechnungsnummer für Anschreiben aus dem Pool besorgen
         private static int getRgNrFromPool(string asConnect)
         {
-            string lsSql = "select id_rg_nr from rgnr Where flag_besetzt != 1 Order by id_rg_nr";
+            string lsSql = "";
             int liInfo = 0;
 
-
-
-            SqlConnection connect;
-            connect = new SqlConnection(asConnect);
-            SqlCommand command = new SqlCommand(lsSql, connect);
-
-            // art_day
-            try
-            {
-                // Db open
-                connect.Open();
-                var lvGetInfo = command.ExecuteScalar();
-
-                if (lvGetInfo != null)
-                {
-                    Int32.TryParse(lvGetInfo.ToString(), out liInfo);
-                }
-                else
-                {
-                    liInfo = 0;
-                }
-                connect.Close();
-            }
-            catch
-            {
-                MessageBox.Show("Es wurden keine Rechnungsnummer aus dem Pool  gefunden\n" +
-                        "Prüfen Sie bitte die Datenbankverbindung\n",
-                        "Achtung (Timeline.getRgNrFromPool)",
-                         MessageBoxButton.OK);
-            }
+            lsSql = getSql(44, 0, "", "", 0);
+            liInfo = fetchData(lsSql, "", 44, gsConnectString);
 
             return liInfo;
         }
@@ -4375,28 +4302,9 @@ namespace Ruddat_NK
             string lsSql = "";
             int liOk = 0;
 
-            lsSql = @"Update rgnr Set rgnr.flag_besetzt = 1 where rgnr.id_rg_nr = " + liIdRgNr.ToString();
+            lsSql = getSql(45, liIdRgNr, "", "", 0);
+            liOk = fetchData(lsSql, "", 45, gsConnectString);
 
-            SqlConnection connect;
-            connect = new SqlConnection(asConnect);
-            SqlCommand command = new SqlCommand(lsSql, connect);
-
-            // art_day
-            try
-            {
-                // Db open
-                connect.Open();
-                var lvRows = command.ExecuteScalar();
-                liOk = 1;
-                connect.Close();
-            }
-            catch
-            {
-                MessageBox.Show("Es konnte keine Rechnungsnummer auf besetzt gesetzt werden\n" +
-                        "Prüfen Sie bitte die Datenbankverbindung\n",
-                        "Achtung (Timeline.setRgNrFromPool)",
-                         MessageBoxButton.OK);
-            }
             return liOk;
         }
 
@@ -4406,28 +4314,9 @@ namespace Ruddat_NK
             string lsSql = "";
             int liOk = 0;
 
-            lsSql = @"Update timeline Set timeline.id_rg_nr = " + aiIdRgNr.ToString() + asSqlRgNr;
+            lsSql = getSql(46, aiIdRgNr, asSqlRgNr, "", 0);
+            liOk = fetchData(lsSql, "", 46, gsConnectString);
 
-            SqlConnection connect;
-            connect = new SqlConnection(asConnect);
-            SqlCommand command = new SqlCommand(lsSql, connect);
-
-            // art_day
-            try
-            {
-                // Db open
-                connect.Open();
-                var lvRows = command.ExecuteScalar();
-                liOk = 1;
-                connect.Close();
-            }
-            catch
-            {
-                MessageBox.Show("Es konnte keine Rechnungsnummer auf besetzt gesetzt werden\n" +
-                        "Prüfen Sie bitte die Datenbankverbindung\n",
-                        "Achtung (Timeline.setRgNrFromPool)",
-                         MessageBoxButton.OK);
-            }
             return liOk;
         }
 
