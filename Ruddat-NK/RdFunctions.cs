@@ -91,7 +91,7 @@ namespace Ruddat_NK
         // Zahlungen
         // Flag = 11 > ändern
         // Flag = 12 > löschen
-        // Zählerstädene
+        // Zählerstände
         // Flag = 21 > ändern
         // Flag = 22 > löschen
         public static void editTimeline(int liTimelineId, int liFlagAdd , string asConnectString)
@@ -635,45 +635,12 @@ namespace Ruddat_NK
             DateTime ldtMonat = DateTime.MinValue;
             DateTime ldtVertrag = DateTime.MinValue;
 
-            int liObjekt = 0;
-            int liObjektTeil = 0;
-            int liMieter = 0;
-            int liKsa = 0; // Kostenstellenart
-            int liMonths = 0; //Anzahl der einzutragenden Monate
-            int liDaysStart = 0; // Anzahl der Tages Startmonats
-            int liDaysEnd = 0; // Anzahl der Tages EndMonats
-            int liDaysInMonth = 0; // Tage im Monat aus Vertrag
-            int liSave = 1;  // Freigabe 
+            int liOk = 0;
             int liDb = 1;    // Welche Datenbank 1= MsSql 2= Mysql
 
-            decimal ldBetragNetto = 0;
-            decimal ldBetragSollNetto = 0;
-            decimal ldBetragBrutto = 0;
-            decimal ldBetragSollBrutto = 0;
-            decimal ldGesamtflaeche = 0;
-            decimal ldZs = 0;            // Zählerstand
-            decimal ldVerbrauch = 0;    // Zähler Verbrauch
             decimal[] ladBetraege = new decimal[12];
 
             Int32 liReturn = 0;
-            int zl = 0;
-            int liZlgOrRg = 0;
-            int liExternId = 0;
-            int liRechnungId = 0;
-            int liZahlungId = 0;
-            int liZaehlerstandId = 0;
-            int liOk = 0;
-            int liAnzPersonenObj = 0;
-            int liAnzPersonenObt = 0;
-            int liFlTml = 0;            // Flag TimeLine in Zahlungen
-            int liImportId = 0;         // Import Id
-            int liVerteilungId = 0;     // Id Kostenverteilung
-            int liRgId = 0;             // Rechnungs ID
-            int liZsId = 0;             // Zähler Id
-
-            string lsVerteilung = "";
-            //string lsObjektBez = "", lsObjektTeilBez = "";
-            //string lsObjektBezS = "";
 
             // Datenbankwahl 1=MsSql 2= Mysql
             switch (liDb)
@@ -704,7 +671,7 @@ namespace Ruddat_NK
                                 sda = new SqlDataAdapter(command);
                                 sda.Fill(tableOne);
                                 // Externe ID aus der Rechnung ermitteln 
-                                liExternId = MakeAfterFetch(piArt, 1, 0, 0);
+                                int liExternId = MakeAfterFetch(piArt, 1, 0, 0);
 
                                 // Timeline neue Datensätze erzeugen
                                 tableThree = new DataTable();
@@ -822,244 +789,16 @@ namespace Ruddat_NK
                                 sdParts.Fill(tableParts);
                                 break;
                             case 26:            // Bisher höchste ID ermitteln
-                                var lvGetLastTempId = command.ExecuteScalar();
-                                int liGetLastTempId;
+                                var lvGetId = command.ExecuteScalar();
 
-                                if (lvGetLastTempId != null)
+                                if (lvGetId != null)
                                 {
-                                    Int32.TryParse(lvGetLastTempId.ToString(), out liReturn);
+                                    Int32.TryParse(lvGetId.ToString(), out liReturn);
                                 }
                                 else
                                 {
                                     liReturn = 0;
                                 }
-                                break;
-                            case 27:            // ObjektTeil ermitteln
-                                var lvGetObjt = command.ExecuteScalar();
-                                if (lvGetObjt != null)
-                                {
-                                    int.TryParse(lvGetObjt.ToString(), out liReturn);
-                                }
-                                else
-                                {
-                                    liReturn = 0;
-                                }
-                                break;
-                            case 28:            // Weiterleitung ermitteln
-                                var lvWtl = command.ExecuteScalar();
-                                if (lvWtl != DBNull.Value)
-                                {
-                                    liReturn = Convert.ToInt32(lvWtl);
-                                }
-                                else
-                                {
-                                    liReturn = 0;
-                                }
-                                break;
-                            case 29:                // MieterId ermitteln
-                                var lvMieterId = command.ExecuteScalar();
-
-                                if (lvMieterId != DBNull.Value)
-                                {
-                                    if (lvMieterId != null)
-                                    {
-                                        Int32.TryParse(lvMieterId.ToString(), out liReturn);
-                                    }
-                                }
-                                else
-                                {
-                                    liReturn = 0;
-                                }
-                                break;
-                            case 30:           // Die Nebenkosten ID in der Tabelle art_KostenArt ermitteln
-                                var lvKsa = command.ExecuteScalar();
-
-                                if (lvKsa != DBNull.Value)
-                                {
-                                    if (lvKsa != null)
-                                    {
-                                        liReturn = Convert.ToInt32(lvKsa);
-                                    }
-                                }
-                                else
-                                {
-                                    liReturn = 0;
-                                }
-                                break;
-                            case 32:        // Die VerteilungsId aus Rechnungen ermitteln
-                                var lvRechnungId = command.ExecuteScalar();
-
-                                if (lvRechnungId != DBNull.Value)
-                                {
-                                    if (lvRechnungId != null)
-                                    {
-                                        liReturn = Convert.ToInt32(lvRechnungId);
-                                    }
-                                }
-                                else
-                                {
-                                    liReturn = 0;
-                                }
-                                break;
-                            case 33:
-                                var vertId = command.ExecuteScalar();
-
-                                if (vertId != DBNull.Value)
-                                {
-                                    if (vertId != null)
-                                    {
-                                        liReturn = Convert.ToInt32(vertId);
-                                    }
-                                }
-                                else
-                                {
-                                    liReturn = 0;
-                                }
-                                break;
-                            case 34:
-                                var lvMieter2Id = command.ExecuteScalar();
-
-                                if (lvMieter2Id != DBNull.Value)
-                                {
-                                    if (lvMieter2Id != null)
-                                    {
-                                        liReturn = Convert.ToInt32(lvMieter2Id);
-                                    }
-                                }
-                                else
-                                {
-                                    liReturn = 0;
-                                }
-                                break;
-                            case 35:
-                                var lvRechnung2Id = command.ExecuteScalar();
-
-                                if (lvRechnung2Id != DBNull.Value)
-                                {
-                                    if (lvRechnung2Id != null)
-                                    {
-                                        liReturn = Convert.ToInt32(lvRechnung2Id);
-                                    }
-                                }
-                                else
-                                {
-                                    liReturn = 0;
-                                }
-                                break;
-                            case 36:
-                                SqlCommand command36 = new SqlCommand(psSql2, connect);
-                                SqlDataReader queryCommandReader36 = command36.ExecuteReader();
-                                liReturn = 1;
-                                break;
-                            case 37:
-                                var lvZlId = command.ExecuteScalar();
-
-                                if (lvZlId != DBNull.Value)
-                                {
-                                    if (lvZlId != null)
-                                    {
-                                        liReturn = Convert.ToInt16(lvZlId);
-                                    }
-                                }
-                                else
-                                {
-                                    liReturn = 0;
-                                }
-                                break;
-                            case 38:    // Mwst Satz Zähler
-                                var lvMwstSatz = command.ExecuteScalar();
-
-                                if (lvMwstSatz != DBNull.Value)
-                                {
-                                    if (lvMwstSatz != null)
-                                    {
-                                        liReturn = Convert.ToInt16(lvMwstSatz);
-                                    }
-                                }
-                                else
-                                {
-                                    liReturn = 0;
-                                }
-                                break;
-                            case 39:
-                                var lvRows = command.ExecuteScalar();
-
-                                if (lvRows != DBNull.Value)
-                                {
-                                    if (lvRows != null)
-                                    {
-                                        liReturn = Convert.ToInt16(lvRows);
-                                    }
-                                }
-                                else
-                                {
-                                    liReturn = 0;
-                                }
-                                break;
-                            case 40:
-                                var lvRows2 = command.ExecuteScalar();
-
-                                if (lvRows2 != DBNull.Value)
-                                {
-                                    if (lvRows2 != null)
-                                    {
-                                        liReturn = Convert.ToInt16(lvRows2);
-                                    }
-                                }
-                                else
-                                {
-                                    liReturn = 0;
-                                }
-                                break;
-                            case 41:
-                                var lvGetFlag = command.ExecuteScalar();
-
-                                if (lvGetFlag != null && liObjekt > 0)
-                                {
-
-                                    int.TryParse(lvGetFlag.ToString(), out liReturn);
-                                }
-                                else
-                                {
-                                    liReturn = 0;
-                                }
-                                break;
-                            case 42:
-                                var lvRows3 = command.ExecuteScalar();
-                                liReturn = 1;
-
-                                break;
-                            case 43:
-                                var lvGetInfo = command.ExecuteScalar();
-
-                                if (lvGetInfo != null)
-                                {
-                                    Int32.TryParse(lvGetInfo.ToString(), out liReturn);
-                                }
-                                else
-                                {
-                                    liReturn = 0;
-                                }
-                                break;
-                            case 44:
-                                var lvGetInfo2 = command.ExecuteScalar();
-
-                                if (lvGetInfo2 != null)
-                                {
-                                    Int32.TryParse(lvGetInfo2.ToString(), out liReturn);
-                                }
-                                else
-                                {
-                                    liReturn = 0;
-                                }
-                                break;
-                            case 45:
-                                var lvRows4 = command.ExecuteScalar();
-                                liReturn = 1;
-                                break;
-                            case 46:
-                                var lvRows5 = command.ExecuteScalar();
-                                liReturn = 1;
                                 break;
                             default:
                                 break;
@@ -1071,7 +810,7 @@ namespace Ruddat_NK
                     catch
                     {
                         // Die Anwendung anhalten 
-                        MessageBox.Show("Verarbeitungsfehler ERROR fetchdata RdFunctions 0006\n piArt = " + piArt.ToString(),
+                        MessageBox.Show("Verarbeitungsfehler ERROR fetchdata RdFunctions \n piArt = " + piArt.ToString(),
                                 "Achtung");
                     }
                     break;
@@ -1101,7 +840,7 @@ namespace Ruddat_NK
                                 mysda = new MySqlDataAdapter(command);
                                 mysda.Fill(tableOne);
                                 // Externe ID aus der Rechnung ermitteln 
-                                liExternId = MakeAfterFetch(piArt, 1, 0, 0);
+                                int liExternId = MakeAfterFetch(piArt, 1, 0, 0);
 
                                 // Timeline neue Datensätze erzeugen
                                 tableThree = new DataTable();
@@ -1218,232 +957,11 @@ namespace Ruddat_NK
                                 mysdParts = new MySqlDataAdapter(command);
                                 mysdParts.Fill(tableParts);
                                 break;
-                            case 26:            // Bisher höchste ID ermitteln
-                                var lvGetLastTempId = command.ExecuteScalar();
-                                int liGetLastTempId;
-
-                                if (lvGetLastTempId != null)
+                            case 26:            // ID ermitteln Allgemein
+                                var lvGetId = command.ExecuteScalar();
+                                if (lvGetId != null)
                                 {
-                                    Int32.TryParse(lvGetLastTempId.ToString(), out liGetLastTempId);
-                                }
-                                else
-                                {
-                                    liGetLastTempId = 0;
-                                }
-                                liReturn = liGetLastTempId;
-                                break;
-                            case 27:            // ObjektTeil ermitteln
-                                var lvGetObjt = command.ExecuteScalar();
-
-                                if (lvGetObjt != null)
-                                {
-                                    int.TryParse(lvGetObjt.ToString(), out liObjektTeil);
-                                }
-                                else
-                                {
-                                    liObjektTeil = 0;
-                                }
-                                liReturn = liObjektTeil;
-                                break;
-                            case 28:            // Weiterleitung ermitteln
-                                var lvWtl = command.ExecuteScalar();
-                                if (lvWtl != DBNull.Value)
-                                {
-                                    liReturn = Convert.ToInt32(lvWtl);
-                                }
-                                else
-                                {
-                                    liReturn = 0;
-                                }
-                                break;
-                            case 29:            // MieterId ermitteln
-                                var lvMieterId = command.ExecuteScalar();
-
-                                if (lvMieterId != DBNull.Value)
-                                {
-                                    if (lvMieterId != null)
-                                    {
-                                        Int32.TryParse(lvMieterId.ToString(), out liReturn);
-                                    }
-                                }
-                                else
-                                {
-                                    liReturn = 0;
-                                }
-                                break;
-                            case 30:            // Die Nebenkosten ID in der Tabelle art_KostenArt ermitteln
-                                var lvKsa = command.ExecuteScalar();
-
-                                if (lvKsa != DBNull.Value)
-                                {
-                                    if (lvKsa != null)
-                                    {
-                                        liReturn = Convert.ToInt32(lvKsa);
-                                    }
-                                }
-                                else
-                                {
-                                    liReturn = 0;
-                                }
-                                break;
-                            case 32:        // Die VerteilungsId aus Rechnungen ermitteln
-                                var lvRechnungId = command.ExecuteScalar();
-
-                                if (lvRechnungId != DBNull.Value)
-                                {
-                                    if (lvRechnungId != null)
-                                    {
-                                        liReturn = Convert.ToInt32(lvRechnungId);
-                                    }
-                                }
-                                else
-                                {
-                                    liReturn = 0;
-                                }
-                                break;
-                            case 33:
-                                var vertId = command.ExecuteScalar();
-
-                                if (vertId != DBNull.Value)
-                                {
-                                    if (vertId != null)
-                                    {
-                                        liReturn = Convert.ToInt32(vertId);
-                                    }
-                                }
-                                else
-                                {
-                                    liReturn = 0;
-                                }
-                                break;
-                            case 34:
-                                var lvMieter2Id = command.ExecuteScalar();
-
-                                if (lvMieter2Id != DBNull.Value)
-                                {
-                                    if (lvMieter2Id != null)
-                                    {
-                                        liReturn = Convert.ToInt32(lvMieter2Id);
-                                    }
-                                }
-                                else
-                                {
-                                    liReturn = 0;
-                                }
-                                break;
-                            case 35:
-                                var lvRechnung2Id = command.ExecuteScalar();
-
-                                if (lvRechnung2Id != DBNull.Value)
-                                {
-                                    if (lvRechnung2Id != null)
-                                    {
-                                        liReturn = Convert.ToInt32(lvRechnung2Id);
-                                    }
-                                }
-                                else
-                                {
-                                    liReturn = 0;
-                                }
-                                break;
-                            case 36:
-                                MySqlCommand command36 = new MySqlCommand(psSql2, connect);
-                                MySqlDataReader queryCommandReader36 = command36.ExecuteReader();
-                                liReturn = 1;
-                                break;
-                            case 37:
-                                var lvZlId = command.ExecuteScalar();
-
-                                if (lvZlId != DBNull.Value)
-                                {
-                                    if (lvZlId != null)
-                                    {
-                                        liReturn = Convert.ToInt16(lvZlId);
-                                    }
-                                }
-                                else
-                                {
-                                    liReturn = 0;
-                                }
-                                break;
-                            case 38:    // Mwst Satz Zähler
-                                var lvMwstSatz = command.ExecuteScalar();
-
-                                if (lvMwstSatz != DBNull.Value)
-                                {
-                                    if (lvMwstSatz != null)
-                                    {
-                                        liReturn = Convert.ToInt16(lvMwstSatz);
-                                    }
-                                }
-                                else
-                                {
-                                    liReturn = 0;
-                                }
-                                break;
-                            case 39:
-                                var lvRows = command.ExecuteScalar();
-
-                                if (lvRows != DBNull.Value)
-                                {
-                                    if (lvRows != null)
-                                    {
-                                        liReturn = Convert.ToInt16(lvRows);
-                                    }
-                                }
-                                else
-                                {
-                                    liReturn = 0;
-                                }
-                                break;
-                            case 40:
-                                var lvRows2 = command.ExecuteScalar();
-
-                                if (lvRows2 != DBNull.Value)
-                                {
-                                    if (lvRows2 != null)
-                                    {
-                                        liReturn = Convert.ToInt16(lvRows2);
-                                    }
-                                }
-                                else
-                                {
-                                    liReturn = 0;
-                                }
-                                break;
-                            case 41:
-                                var lvGetFlag = command.ExecuteScalar();
-
-                                if (lvGetFlag != null && liObjekt > 0)
-                                {
-
-                                    int.TryParse(lvGetFlag.ToString(), out liReturn);
-                                }
-                                else
-                                {
-                                    liReturn = 0;
-                                }
-                                break;
-                            case 42:
-                                var lvRows3 = command.ExecuteScalar();
-                                if (lvRows3 != DBNull.Value)
-                                {
-                                    if (lvRows3 != null)
-                                    {
-                                        liReturn = Convert.ToInt16(lvRows3);
-                                    }
-                                }
-                                else
-                                {
-                                    liReturn = 0;
-                                }
-                                break;
-                            case 43:
-                                var lvGetInfo = command.ExecuteScalar();
-
-                                if (lvGetInfo != null)
-                                {
-                                    Int32.TryParse(lvGetInfo.ToString(), out liReturn);
+                                    Int32.TryParse(lvGetId.ToString(), out liReturn);
                                 }
                                 else
                                 {
@@ -1459,7 +977,7 @@ namespace Ruddat_NK
                     catch
                     {
                         // Die Anwendung anhalten 
-                        MessageBox.Show("Verarbeitungsfehler ERROR fetchdata RdFunctions 0006\n piArt = " + piArt.ToString(),
+                        MessageBox.Show("Verarbeitungsfehler ERROR fetchdata RdFunctions \n piArt = " + piArt.ToString(),
                                 "Achtung");
                     }
                     break;
@@ -1469,7 +987,261 @@ namespace Ruddat_NK
             return (liReturn);     
         }
 
-        // Datenbankaktionen nach Datafetch
+        // Daten aus der Db holen hier nur Dezimalwerte
+        public static decimal fetchDataDecimal(string psSql, string psSql2, int piArt, string asConnectString)
+        {
+            DateTime ldtStart = DateTime.MinValue;
+            DateTime ldtEnd = DateTime.MinValue;
+            DateTime ldtMonat = DateTime.MinValue;
+            DateTime ldtVertrag = DateTime.MinValue;
+
+            int liDb = 1;    // TODO Welche Datenbank 1= MsSql 2= Mysql
+
+            decimal[] ladBetraege = new decimal[12];
+            decimal ldReturn = 0;
+
+            // Datenbankwahl 1=MsSql 2= Mysql
+            switch (liDb)
+            {
+                case 1:             //-------------------------MsSql
+                    try
+                    {
+                        SqlConnection connect;
+                        connect = new SqlConnection(asConnectString);
+                        SqlCommand command = new SqlCommand(psSql, connect);
+                        connect.Open();
+
+                        if (piArt == 1)     // Dezimalwert ermitteln Allgemein
+                        {
+                            var lvGetId = command.ExecuteScalar();
+
+                            if (lvGetId != null)
+                            {
+                                decimal.TryParse(lvGetId.ToString(), out ldReturn);
+                            }
+                            else
+                            {
+                                ldReturn = 0;
+                            }
+                        }
+                        // db close
+                        connect.Close();
+                    }
+
+                    catch
+                    {
+                        // Die Anwendung anhalten 
+                        MessageBox.Show("Verarbeitungsfehler ERROR fetchdataDecimal RdFunctions \n piArt = " + piArt.ToString(),
+                                "Achtung");
+                    }
+                    break;
+                case 2:
+                    try
+                    {
+                        MySqlConnection connect;
+                        connect = new MySqlConnection(asConnectString);
+                        MySqlCommand command = new MySqlCommand(psSql, connect);
+                        connect.Open();
+
+                        if (piArt == 1)     // Dezimalwert ermitteln Allgemein
+                        {
+                            var lvGetId = command.ExecuteScalar();
+                            if (lvGetId != null)
+                            {
+                                decimal.TryParse(lvGetId.ToString(), out ldReturn);
+                            }
+                            else
+                            {
+                                ldReturn = 0;
+                            }
+                        }
+                        // db close
+                        connect.Close();
+                    }
+                    catch
+                    {
+                        // Die Anwendung anhalten 
+                        MessageBox.Show("Verarbeitungsfehler ERROR fetchdataDecimal RdFunctions \n piArt = " + piArt.ToString(),
+                                "Achtung");
+                    }
+                    break;
+                default:
+                    break;
+            }
+            return (ldReturn);
+        }
+
+        // Daten aus der Db holen hier nur Strings
+        public static string fetchDataString(string psSql, string psSql2, int piArt, string asConnectString)
+        {
+            DateTime ldtStart = DateTime.MinValue;
+            DateTime ldtEnd = DateTime.MinValue;
+            DateTime ldtMonat = DateTime.MinValue;
+            DateTime ldtVertrag = DateTime.MinValue;
+
+            int liDb = 1;    // TODO Welche Datenbank 1= MsSql 2= Mysql
+
+            decimal[] ladBetraege = new decimal[12];
+            string lsReturn = "";
+
+            // Datenbankwahl 1=MsSql 2= Mysql
+            switch (liDb)
+            {
+                case 1:             //-------------------------MsSql
+                    try
+                    {
+                        SqlConnection connect;
+                        connect = new SqlConnection(asConnectString);
+                        SqlCommand command = new SqlCommand(psSql, connect);
+                        connect.Open();
+
+                        if (piArt == 1)     // Dezimalwert ermitteln Allgemein
+                        {
+                            var lvGetId = command.ExecuteScalar();
+
+                            if (lvGetId != null)
+                            {
+                                lsReturn = lvGetId.ToString().Trim();
+                            }
+                            else
+                            {
+                                lsReturn = "";
+                            }
+                        }
+                        // db close
+                        connect.Close();
+                    }
+
+                    catch
+                    {
+                        // Die Anwendung anhalten 
+                        MessageBox.Show("Verarbeitungsfehler ERROR fetchdataString RdFunctions \n piArt = " + piArt.ToString(),
+                                "Achtung");
+                    }
+                    break;
+                case 2:
+                    try
+                    {
+                        MySqlConnection connect;
+                        connect = new MySqlConnection(asConnectString);
+                        MySqlCommand command = new MySqlCommand(psSql, connect);
+                        connect.Open();
+
+                        if (piArt == 1)     // Dezimalwert ermitteln Allgemein
+                        {
+                            var lvGetId = command.ExecuteScalar();
+                            if (lvGetId != null)
+                            {
+                                lsReturn = lvGetId.ToString().Trim();
+                            }
+                            else
+                            {
+                                lsReturn = "";
+                            }
+                        }
+                        // db close
+                        connect.Close();
+                    }
+                    catch
+                    {
+                        // Die Anwendung anhalten 
+                        MessageBox.Show("Verarbeitungsfehler ERROR fetchdataString RdFunctions \n piArt = " + piArt.ToString(),
+                                "Achtung");
+                    }
+                    break;
+                default:
+                    break;
+            }
+            return (lsReturn);
+        }
+
+
+        // Daten aus der Db holen hier nur Strings
+        public static DateTime fetchDataDate(string psSql, string psSql2, int piArt, string asConnectString)
+        {
+            DateTime ldtStart = DateTime.MinValue;
+            DateTime ldtEnd = DateTime.MinValue;
+            DateTime ldtMonat = DateTime.MinValue;
+            DateTime ldtVertrag = DateTime.MinValue;
+
+            int liDb = 1;    // TODO Welche Datenbank 1= MsSql 2= Mysql
+
+            decimal[] ladBetraege = new decimal[12];
+            DateTime ldtReturn = DateTime.MinValue;
+
+            // Datenbankwahl 1=MsSql 2= Mysql
+            switch (liDb)
+            {
+                case 1:             //-------------------------MsSql
+                    try
+                    {
+                        SqlConnection connect;
+                        connect = new SqlConnection(asConnectString);
+                        SqlCommand command = new SqlCommand(psSql, connect);
+                        connect.Open();
+
+                        if (piArt == 1)     // Dezimalwert ermitteln Allgemein
+                        {
+                            var lvGetId = command.ExecuteScalar();
+
+                            if (lvGetId != null)
+                            {
+                                DateTime.TryParse(lvGetId.ToString(), out ldtReturn);
+                            }
+                            else
+                            {
+                                ldtReturn = DateTime.MinValue;
+                            }
+                        }
+                        // db close
+                        connect.Close();
+                    }
+
+                    catch
+                    {
+                        // Die Anwendung anhalten 
+                        MessageBox.Show("Verarbeitungsfehler ERROR fetchdataString RdFunctions \n piArt = " + piArt.ToString(),
+                                "Achtung");
+                    }
+                    break;
+                case 2:
+                    try
+                    {
+                        MySqlConnection connect;
+                        connect = new MySqlConnection(asConnectString);
+                        MySqlCommand command = new MySqlCommand(psSql, connect);
+                        connect.Open();
+
+                        if (piArt == 1)     // Dezimalwert ermitteln Allgemein
+                        {
+                            var lvGetId = command.ExecuteScalar();
+
+                            if (lvGetId != null)
+                            {
+                                DateTime.TryParse(lvGetId.ToString(), out ldtReturn);
+                            }
+                            else
+                            {
+                                ldtReturn = DateTime.MinValue;
+                            }
+                        }
+                        // db close
+                        connect.Close();
+                    }
+                    catch
+                    {
+                        // Die Anwendung anhalten 
+                        MessageBox.Show("Verarbeitungsfehler ERROR fetchdataString RdFunctions \n piArt = " + piArt.ToString(),
+                                "Achtung");
+                    }
+                    break;
+                default:
+                    break;
+            }
+            return (ldtReturn);
+        }
+
+        // Datenbankaktionen nach fetchdata
         private static int MakeAfterFetch(int aiArt, int aiTeil, int ai1, int ai2)
         {
             DateTime ldtStart = DateTime.MinValue;
@@ -2153,7 +1925,7 @@ namespace Ruddat_NK
                                 {
                                     liMieter = (int)tableZlg.Rows[i].ItemArray.GetValue(1);
                                     // Timeline neu erzeugen Mieter aus Zahlungen
-                                    // ACHTUNG hier Kontrolle einbauen, ob Mietvertrag gültig ist ULF TODO !
+                                    // TODO ACHTUNG hier Kontrolle einbauen, ob Mietvertrag gültig ist
                                     liOk = TimelineCreate(liExternId, "id_vorauszahlung");
                                 }
                         }
@@ -2251,7 +2023,6 @@ namespace Ruddat_NK
                                     SqlCommandBuilder commandBuilder = new SqlCommandBuilder(sdTml);
                                     sdTml.UpdateCommand = commandBuilder.GetUpdateCommand();
                                     sdTml.InsertCommand = commandBuilder.GetInsertCommand();
-
                                     sdTml.Update(tableTml);
                                 }
                                 else
@@ -2485,13 +2256,13 @@ namespace Ruddat_NK
             // Das ist eine Vorrauszahlung
             if (liZlgOrRg == 2)
             {
-                
+                //TODO Vorrauszahlung
             }
 
             // Das ist ein Zählerstand
             if (liZlgOrRg == 3)
             {
-
+                //TODO Zählerstand
             }
 
             return ldBetraege;
@@ -2656,10 +2427,6 @@ namespace Ruddat_NK
             return liMwstSatz;
         }
 
-
-        // Todo Umbau RdFunctions: Hier ist das erste Command, dass nach fetchdata muss
-        // Todo erst danach wird alles verdoppelt für MySql
-
         // Gesamtfläche eines Objektes holen
         private static decimal getObjektflaeche(int aiObjekt, int aiTObjekt, int aiMieterId, string asConnectString)
         {
@@ -2686,37 +2453,10 @@ namespace Ruddat_NK
             {
                 lsSql = "Select flaeche_gesamt from objekt where id_objekt = " + aiObjekt.ToString();
             }
+        
+            // Daten holen
+            ldGesamtflaeche = fetchDataDecimal(lsSql, "", 1, gsConnectString);
 
-            // Todo Mysql
-            SqlConnection connect;
-            connect = new SqlConnection(asConnectString);
-            SqlCommand command = new SqlCommand(lsSql, connect);
-
-            // art_day
-            try
-            {
-                // Db open
-                connect.Open();
-                var lvGetFlaeche = command.ExecuteScalar();
-
-                if (lvGetFlaeche != null)
-                {
-                    decimal.TryParse(lvGetFlaeche.ToString(), out ldGesamtflaeche);   // Ulf! TODO testen
-                }
-                else
-                {
-                    lvGetFlaeche = 0;
-                }
-
-                connect.Close();
-            }
-            catch
-            {
-                MessageBox.Show("Es wurden keine Gesamtfläche gefunden\n" +
-                        "Prüfen Sie bitte die Datenbankverbindung\n",
-                        "Achtung (Timeline.getObjektFlaeche)",
-                         MessageBoxButton.OK);
-            }
             return ldGesamtflaeche;
         }
 
@@ -2739,36 +2479,9 @@ namespace Ruddat_NK
                 lsSql = "Select flaeche_anteil from objekt_teil where id_objekt_teil = " + aiTObjekt.ToString();
             }
 
-            //Todo Mysql !!
-            SqlConnection connect;
-            connect = new SqlConnection(asConnectString);
-            SqlCommand command = new SqlCommand(lsSql, connect);
+            // Daten holen
+            ldFlaeche = fetchDataDecimal(lsSql, "", 1, gsConnectString);
 
-            // art_day
-            try
-            {
-                // Db open
-                connect.Open();
-                var lvGetFlaeche = command.ExecuteScalar();
-
-                if (lvGetFlaeche != null)
-                {
-                    decimal.TryParse(lvGetFlaeche.ToString(), out ldFlaeche);   // TODO Ulf! testen
-                }
-                else
-                {
-                    lvGetFlaeche = 0;
-                }
-
-                connect.Close();
-            }
-            catch
-            {
-                MessageBox.Show("Es wurden keine Gesamtfläche gefunden\n" +
-                        "Prüfen Sie bitte die Datenbankverbindung\n",
-                        "Achtung (Timeline.getTObjektFlaeche)",
-                         MessageBoxButton.OK);
-            }
             return ldFlaeche;
         }
 
@@ -2789,36 +2502,9 @@ namespace Ruddat_NK
                 lsSql = "Select prozent_anteil from objekt_teil where id_objekt_teil = " + liObjTeilId.ToString();                
             }
 
-            // Todo Mysql
-            SqlConnection connect;
-            connect = new SqlConnection(asConnectString);
-            SqlCommand command = new SqlCommand(lsSql, connect);
+            // Daten holen
+            ldAnteil = fetchDataDecimal(lsSql, "", 1, gsConnectString);
 
-            // art_day
-            try
-            {
-                // Db open
-                connect.Open();
-                var lvGetAnteil = command.ExecuteScalar();
-
-                if (lvGetAnteil != null && (liObjTeilId > 0 || aiTObjekt > 0))
-                {
-                    decimal.TryParse(ldAnteil.ToString(), out ldAnteil);  // TODO Ulf! testen
-                }
-                else
-                {
-                    lvGetAnteil = 0;
-                }
-
-                connect.Close();
-            }
-            catch
-            {
-                MessageBox.Show("Es wurden keine % Anteil gefunden\n" +
-                        "Prüfen Sie bitte die Datenbankverbindung\n",
-                        "Achtung (Timeline.getTObjektAnteil)",
-                         MessageBoxButton.OK);
-            }
             return ldAnteil;
         }
 
@@ -2845,35 +2531,9 @@ namespace Ruddat_NK
                     break;
             }
 
-            // Todo Mysql
-            SqlConnection connect;
-            connect = new SqlConnection(asConnect);
-            SqlCommand command = new SqlCommand(lsSql, connect);
+            // Daten holen
+            ldGesamtflaeche = fetchDataDecimal(lsSql, "", 1, gsConnectString);
 
-            // art_day
-            try
-            {
-                // Db open
-                connect.Open();
-                var lvGetFlaeche = command.ExecuteScalar();
-
-                if (lvGetFlaeche != null && liObjekt > 0)
-                {
-                    decimal.TryParse(lvGetFlaeche.ToString(), out ldGesamtflaeche);  // Ulf! TODO testen
-                }
-                else
-                {
-                    lvGetFlaeche = 0;
-                }
-                connect.Close();
-            }
-            catch
-            {
-                MessageBox.Show("Es wurden keine Gesamtfläche gefunden\n" +
-                        "Prüfen Sie bitte die Datenbankverbindung\n",
-                        "Achtung (Timeline.getObjektFlaecheAuswahl)",
-                         MessageBoxButton.OK);
-            }
             return ldGesamtflaeche;
         }
 
@@ -2883,7 +2543,7 @@ namespace Ruddat_NK
             int liObjektTeil = 0;
 
             String lsSql = getSql(27, aiObjektTeil, "", "", 0);
-            liObjektTeil = fetchData(lsSql, "", 27, gsConnectString);
+            liObjektTeil = fetchData(lsSql, "", 26, gsConnectString);
 
             return liObjektTeil;
         }
@@ -2898,7 +2558,7 @@ namespace Ruddat_NK
             string lsSql = "";
 
             lsSql = getSql(28, liExternId, "", "", p);
-            liWtl = fetchData(lsSql, "", 28, gsConnectString);
+            liWtl = fetchData(lsSql, "", 26, gsConnectString);
 
             return liWtl;
         }
@@ -2919,7 +2579,7 @@ namespace Ruddat_NK
             // + " AND vertrag_aktiv = 1 "; 
             //TODO  Sollte auch ohne Aktiv Kennzeichen gehen TODO ULF!
 
-            liMieterId = fetchData(lsSql, "", 29, gsConnectString);
+            liMieterId = fetchData(lsSql, "", 26, gsConnectString);
 
             return liMieterId;
         }
@@ -2942,7 +2602,7 @@ namespace Ruddat_NK
                             where objekt_teil.Id_objekt_teil = " + aiObjektTeil.ToString();
 
                 lsSql = getSql(29, aiObjektTeil, "", "", 0);
-                liMieterId = fetchData(lsSql, "", 29, gsConnectString);
+                liMieterId = fetchData(lsSql, "", 26, gsConnectString);
             }
 
             return liMieterId;
@@ -2992,38 +2652,9 @@ namespace Ruddat_NK
 
             lsSql = lsSql + lsSqlAdd;
 
-            // Todo Mysql
-            SqlConnection connect;
-            connect = new SqlConnection(asConnectString);
-            SqlCommand command = new SqlCommand(lsSql, connect);
+            // Daten holen
+            ldAnzahlPersonen = fetchDataDecimal(lsSql, "", 1, gsConnectString);
 
-            // art_day
-            try
-            {
-                // Db open
-                connect.Open();
-                var lvAnzPersonen = command.ExecuteScalar();
-
-                if (lvAnzPersonen != DBNull.Value)
-                {
-                    if (lvAnzPersonen != null)
-                    {
-                        ldAnzahlPersonen = Convert.ToDecimal(lvAnzPersonen);
-                    }
-                }
-                else
-                {
-                    ldAnzahlPersonen = 0;
-                }
-                connect.Close();
-            }
-            catch
-            {
-                MessageBox.Show("Es wurden keine Personeninformation gefunden\n" +
-                        "Prüfen Sie bitte die Datenbankverbindung\n",
-                        "Achtung (Timeline.getAktPersonen)",
-                         MessageBoxButton.OK);
-            }
             return ldAnzahlPersonen;
         }
 
@@ -3036,7 +2667,7 @@ namespace Ruddat_NK
             String lsSql = "";
 
             lsSql = getSql(30, aiArt, "", "", 0);
-            liKsaId = fetchData(lsSql, "", 30, gsConnectString);
+            liKsaId = fetchData(lsSql, "", 26, gsConnectString);
 
             return liKsaId;
         }
@@ -3048,40 +2679,7 @@ namespace Ruddat_NK
             String lsSql = "";
 
             lsSql = @"Select kb From art_verteilung Where id_verteilung = " + aiVerteilungId.ToString();
-
-            // Todo Mysql
-            SqlConnection connect;
-            connect = new SqlConnection(asConnect);
-            SqlCommand command = new SqlCommand(lsSql, connect);
-
-            // art_day
-            try
-            {
-                // Db open
-                connect.Open();
-                var lvVerteilung = command.ExecuteScalar();
-
-                if (lvVerteilung != DBNull.Value)
-                {
-                    if (lvVerteilung != null)
-                    {
-                        lsVerteilung = lvVerteilung.ToString().Trim();
-                    }
-                }
-                else
-                {
-                    lsVerteilung = "";
-                }
-
-                connect.Close();
-            }
-            catch
-            {
-                MessageBox.Show("Es wurde kein Verteilungsstring gefunden\n" +
-                        "Prüfen Sie bitte die Datenbankverbindung\n",
-                        "Achtung (Timeline.getVerteilung)",
-                         MessageBoxButton.OK);
-            }
+            lsVerteilung = fetchDataString(lsSql, "", 1, gsConnectString);
 
             return lsVerteilung;
         }
@@ -3093,7 +2691,7 @@ namespace Ruddat_NK
             String lsSql = "";
 
             lsSql = getSql(32, aiTimelineId, "", "", 0);
-            liVerteilungId = fetchData(lsSql, "", 32, gsConnectString);
+            liVerteilungId = fetchData(lsSql, "", 26, gsConnectString);
 
             return liVerteilungId;
         }
@@ -3105,7 +2703,7 @@ namespace Ruddat_NK
             String lsSql = "";
 
             lsSql = getSql(33, 0, asBez, "", 0);
-            liVerteilungId = fetchData(lsSql, "", 33, gsConnectString);
+            liVerteilungId = fetchData(lsSql, "", 26, gsConnectString);
 
             return liVerteilungId;
         }
@@ -3118,40 +2716,7 @@ namespace Ruddat_NK
             String lsSql = "";
 
             lsSql = @"Select kb From art_verteilung Where bez = '" + asVerteilung.ToString().Trim() + " '";
-
-            // Todo Mysql
-            SqlConnection connect;
-            connect = new SqlConnection(asConnect);
-            SqlCommand command = new SqlCommand(lsSql, connect);
-
-            // art_day
-            try
-            {
-                // Db open
-                connect.Open();
-                var lvVerteilung = command.ExecuteScalar();
-
-                if (lvVerteilung != DBNull.Value)
-                {
-                    if (lvVerteilung != null)
-                    {
-                        lsVerteilung = lvVerteilung.ToString().Trim();
-                    }
-                }
-                else
-                {
-                    lsVerteilung = "";
-                }
-
-                connect.Close();
-            }
-            catch
-            {
-                MessageBox.Show("Es wurde kein Verteilungsstring gefunden\n" +
-                        "Prüfen Sie bitte die Datenbankverbindung\n",
-                        "Achtung (Timeline.getVerteilung)",
-                         MessageBoxButton.OK);
-            }
+            lsVerteilung = fetchDataString(lsSql, "", 1, gsConnectString);
 
             return lsVerteilung;
         }
@@ -3275,7 +2840,7 @@ namespace Ruddat_NK
             String lsSql = "";
 
             lsSql = getSql(34, aiId, "", "", 0);
-            liIdObjTeil = fetchData(lsSql, "", 34, gsConnectString);
+            liIdObjTeil = fetchData(lsSql, "", 26, gsConnectString);
 
             return liIdObjTeil;
         }
@@ -3287,7 +2852,7 @@ namespace Ruddat_NK
             String lsSql = "";
 
             lsSql = getSql(35, aiId, "", "", aiArt);
-            liIdObj = fetchData(lsSql, "", 35, gsConnectString);
+            liIdObj = fetchData(lsSql, "", 26, gsConnectString);
 
             return liIdObj;
         }
@@ -3761,7 +3326,7 @@ namespace Ruddat_NK
 
             // kann schonmal gelöscht werden
             lsSql = getSql(36, 0, "", "", 0);
-            liOk = fetchData(lsSql, "", 36, gsConnectString);
+            liOk = fetchData(lsSql, "", 26, gsConnectString);
 
             return (liOk);
         }
@@ -3792,40 +3357,11 @@ namespace Ruddat_NK
                 lsSql = @"select zs from zaehlerstaende where id_zaehler = " + aiZlId.ToString() + " Order by zs desc";                
             }
 
-            // Todo Mysql
-            SqlConnection connect;
-            connect = new SqlConnection(asConnect);
-            SqlCommand command = new SqlCommand(lsSql, connect);
+            // Daten holen
+            ldZlStandOld = fetchDataDecimal(lsSql, "", 1, gsConnectString);
+            // Differenz
+            ldZlVerbrauch = adZlStand - ldZlStandOld;
 
-            // art_day
-            try
-            {
-                // Db open
-                connect.Open();
-                var lvZlStandOld = command.ExecuteScalar();
-
-                if (lvZlStandOld != DBNull.Value)
-                {
-                    if (lvZlStandOld != null)
-                    {
-                        ldZlStandOld = Convert.ToDecimal(lvZlStandOld);
-                        ldZlVerbrauch = adZlStand - ldZlStandOld;        
-                    }
-                }
-                else
-                {
-                    ldZlStandOld = 0;
-                }
-
-                connect.Close();
-            }
-            catch
-            {
-                MessageBox.Show("Es wurde kein Verbrauch gefunden\n" +
-                        "Prüfen Sie bitte die Datenbankverbindung\n",
-                        "Achtung (Timeline.getZlVerbrauch)",
-                         MessageBoxButton.OK);
-            }
             return ldZlVerbrauch;
         }
 
@@ -3836,7 +3372,7 @@ namespace Ruddat_NK
             int liZlId = 0;
 
             lsSql = getSql(37, 0, lsZlName, "", 0);
-            liZlId = fetchData(lsSql, "", 37, gsConnectString);
+            liZlId = fetchData(lsSql, "", 26, gsConnectString);
 
             return liZlId;
         }
@@ -3848,7 +3384,7 @@ namespace Ruddat_NK
             int liMwstSatz = 0;
 
             lsSql = getSql(38, aiZlId, "", "", 0);
-            liMwstSatz = fetchData(lsSql, "", 38, gsConnectString);
+            liMwstSatz = fetchData(lsSql, "", 26, gsConnectString);
 
             return liMwstSatz;
         }
@@ -3886,7 +3422,7 @@ namespace Ruddat_NK
             int liObj = 0;
 
             lsSql = getSql(39, aiObjekt, "", "", 0);
-            liObj = fetchData(lsSql, "", 39, gsConnectString);
+            liObj = fetchData(lsSql, "", 26, gsConnectString);
 
             return liObj;
         }
@@ -3898,7 +3434,7 @@ namespace Ruddat_NK
             int liRows = 0;
 
             lsSql = getSql(40, aiTimeLineId, "", "", 0);
-            liRows = fetchData(lsSql, "", 40, gsConnectString);
+            liRows = fetchData(lsSql, "", 26, gsConnectString);
 
             return liRows;
         }
@@ -4092,7 +3628,7 @@ namespace Ruddat_NK
             string lsSql = "";
 
             lsSql = getSql(41, liObjekt, "", "", 0);
-            liFlag = fetchData(lsSql, "", 41, gsConnectString);
+            liFlag = fetchData(lsSql, "", 26, gsConnectString);
 
             return liFlag;
         }
@@ -4121,34 +3657,8 @@ namespace Ruddat_NK
                     break;
 	        }
 
-            SqlConnection connect;
-            connect = new SqlConnection(asConnect);
-            SqlCommand command = new SqlCommand(lsSql, connect);
+            lsRgInfo = fetchDataString(lsSql, "", 1, gsConnectString);
 
-            // art_day
-            try
-            {
-                // Db open
-                connect.Open();
-                var lvGetRgNr = command.ExecuteScalar();
-
-                if (lvGetRgNr != null )
-                {
-                    lsRgInfo = lvGetRgNr.ToString();
-                }
-                else
-                {
-                    lsRgInfo = "";
-                }
-                connect.Close();
-            }
-            catch
-            {
-                MessageBox.Show("Es wurden kein Flag Gesamtfläche gefunden\n" +
-                        "Prüfen Sie bitte die Datenbankverbindung\n",
-                        "Achtung (Timeline.getRgNr)",
-                         MessageBoxButton.OK);
-            }
             return lsRgInfo;
         }
 
@@ -4213,7 +3723,7 @@ namespace Ruddat_NK
             int liOk = 0;
 
             lsSql = getSql(42, 0, "", "", 0);
-            liOk = fetchData(lsSql, "", 42, gsConnectString);
+            liOk = fetchData(lsSql, "", 26, gsConnectString);
         }
 
         // Informationen über Vertragsbeginn und Ende mit der Mieter id
@@ -4224,6 +3734,7 @@ namespace Ruddat_NK
             DateTime ldtVertrag = DateTime.MinValue;
             string lsSql = "";
 
+            // Todo DatumsKonvertierung Mysql
             switch (aiArt)
             {
                 case 1:
@@ -4239,35 +3750,8 @@ namespace Ruddat_NK
                 default:
                     break;
             }
-
-            SqlConnection connect;
-            connect = new SqlConnection(asConnectString);
-            SqlCommand command = new SqlCommand(lsSql, connect);
-
-            // art_day
-            try
-            {
-                // Db open
-                connect.Open();
-                var lvGetVertragsDatum = command.ExecuteScalar();
-
-                if (lvGetVertragsDatum != null)
-                {
-                    DateTime.TryParse(lvGetVertragsDatum.ToString(),out ldtVertrag);
-                }
-                else
-                {
-                    ldtVertrag = DateTime.MinValue;
-                }
-                connect.Close();
-            }
-            catch
-            {
-                MessageBox.Show("Es wurden kein Datum aus Vertrag  gefunden\n" +
-                        "Prüfen Sie bitte die Datenbankverbindung\n",
-                        "Achtung (Timeline.getVertragInfo)",
-                         MessageBoxButton.OK);
-            }
+            // Daten holen
+            ldtVertrag = fetchDataDate(lsSql, "", 1, gsConnectString);
 
             return ldtVertrag;
         }
@@ -4279,7 +3763,7 @@ namespace Ruddat_NK
             int liInfo = 0;
 
             lsSql = getSql(43, liIdMieter, "", "", 0);
-            liInfo = fetchData(lsSql, "", 43, gsConnectString);
+            liInfo = fetchData(lsSql, "", 26, gsConnectString);
 
             return liInfo;
         }
@@ -4291,7 +3775,7 @@ namespace Ruddat_NK
             int liInfo = 0;
 
             lsSql = getSql(44, 0, "", "", 0);
-            liInfo = fetchData(lsSql, "", 44, gsConnectString);
+            liInfo = fetchData(lsSql, "", 26, gsConnectString);
 
             return liInfo;
         }
@@ -4303,7 +3787,7 @@ namespace Ruddat_NK
             int liOk = 0;
 
             lsSql = getSql(45, liIdRgNr, "", "", 0);
-            liOk = fetchData(lsSql, "", 45, gsConnectString);
+            liOk = fetchData(lsSql, "", 26, gsConnectString);
 
             return liOk;
         }
@@ -4315,7 +3799,7 @@ namespace Ruddat_NK
             int liOk = 0;
 
             lsSql = getSql(46, aiIdRgNr, asSqlRgNr, "", 0);
-            liOk = fetchData(lsSql, "", 46, gsConnectString);
+            liOk = fetchData(lsSql, "", 26, gsConnectString);
 
             return liOk;
         }
