@@ -29,6 +29,7 @@ namespace Ruddat_NK
         static DataTable tableZlInfo;
         static DataTable tableObjTeil;      // Objektteile
         static DataTable tableParts;        // objekt_mix_parts
+        static DataTable tableTmlCheckRgNr;  // Hier checken, ob schon eine Rechnungsnmmerfür das Anschreiben drin ist
         static SqlDataAdapter sda;
         // static SqlDataAdapter sdb;
         static SqlDataAdapter sdc;
@@ -71,6 +72,7 @@ namespace Ruddat_NK
 
         static string gsConnectString = "";
         static string lsSql = "";
+        static int giDb = 1; // TODO Welche Datenbank
 
         // Bisher höchste Id für Timeline ermitteln
         public static int getTimelineId(string asConnectString, int asArt)
@@ -800,6 +802,11 @@ namespace Ruddat_NK
                                     liReturn = 0;
                                 }
                                 break;
+                            case 27:
+                                SqlCommand command271 = new SqlCommand(psSql, connect);
+                                // Create a SqlDataReader
+                                SqlDataReader queryCommandReader01 = command271.ExecuteReader();
+                                break;
                             default:
                                 break;
                         }
@@ -967,6 +974,12 @@ namespace Ruddat_NK
                                 {
                                     liReturn = 0;
                                 }
+                                break;
+                            case 27:    // Hier checken, ob schon eine Rechnungsnmmerfür das Anschreiben drin ist
+                                MySqlCommand command271 = new MySqlCommand(psSql, connect);
+                                // Create a SqlDataReader
+                                MySqlDataReader queryCommandReader271 = command271.ExecuteReader();
+                                tableTmlCheckRgNr.Load(queryCommandReader271);
                                 break;
                             default:
                                 break;
@@ -1241,6 +1254,65 @@ namespace Ruddat_NK
             return (ldtReturn);
         }
 
+        // Einige Commandbuilder wurden hier vereint
+        private static void MakeCommand(int aiDb, int aiArt)
+        {
+
+            switch (aiDb)   // 1= MsSql 2= Mysql
+            {
+                case 1:
+                    switch (aiArt)
+                    {
+                        case 1:
+                            SqlCommandBuilder commandBuilder11 = new SqlCommandBuilder(sdc);
+                            sdc.Update(tableThree);
+                            break;
+                        case 2:
+                            SqlCommandBuilder commandBuilder12 = new SqlCommandBuilder(sdc);
+                            sdc.Update(tableFour);
+                            break;
+                        case 3:
+                            SqlCommandBuilder commandBuilder13 = new SqlCommandBuilder(sdc);
+                            sdc.Update(tableThree);
+                            break;
+                        case 4:
+                            SqlCommandBuilder commandBuilder14 = new SqlCommandBuilder(sdTml);
+                            sdTml.Update(tableTml);
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
+                case 2:
+                    switch (aiArt)
+                    {
+                        case 1:
+                            MySqlCommandBuilder commandBuilder21 = new MySqlCommandBuilder(mysdc);
+                            mysdc.Update(tableThree);
+                            break;
+                        case 2:
+                            MySqlCommandBuilder commandBuilder22 = new MySqlCommandBuilder(mysdc);
+                            mysdc.Update(tableFour);
+                            break;
+                        case 3:
+                            MySqlCommandBuilder commandBuilder23 = new MySqlCommandBuilder(mysdc);
+                            mysdc.Update(tableThree);
+                            break;
+                        case 4:
+                            MySqlCommandBuilder commandBuilder24 = new MySqlCommandBuilder(mysdTml);
+                            mysdTml.Update(tableTml);
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+
+        }
+
         // Datenbankaktionen nach fetchdata
         private static int MakeAfterFetch(int aiArt, int aiTeil, int ai1, int ai2)
         {
@@ -1467,14 +1539,9 @@ namespace Ruddat_NK
 
                                     } while (zl <= liMonths);
 
-                                    // Todo hier mehrfach auch Mysql berücksichtigen
-                                    // Die Variable GiDb erstmal holen evtl aus xml Datei??
+                                    // TODO Die Variable GiDb erstmal holen evtl aus xml Datei??
                                     // und alles ab in die Datenbank
-                                    SqlCommandBuilder commandBuilder = new SqlCommandBuilder(sdc);
-                                    sdc.UpdateCommand = commandBuilder.GetUpdateCommand();
-                                    sdc.InsertCommand = commandBuilder.GetInsertCommand();
-
-                                    sdc.Update(tableThree);
+                                    MakeCommand(giDb, 1);
                                 }
                                 else
                                 {
@@ -1694,14 +1761,8 @@ namespace Ruddat_NK
 
                                 liSave = 1;
                             }
-
                             // und alle TimelineEinträge ab in die Datenbank
-                            // Todo Mysql
-                            SqlCommandBuilder commandBuilder = new SqlCommandBuilder(sdc);
-                            sdc.UpdateCommand = commandBuilder.GetUpdateCommand();
-                            sdc.InsertCommand = commandBuilder.GetInsertCommand();
-
-                            sdc.Update(tableFour);
+                            MakeCommand(giDb, 2);
                         }
                         else
                         {
@@ -1854,12 +1915,8 @@ namespace Ruddat_NK
                             }
                             liSave = 1;
 
-                            // Todo Mysql
                             // und alle TimelineEinträge ab in die Datenbank
-                            SqlCommandBuilder commandBuilder = new SqlCommandBuilder(sdc);
-                            sdc.UpdateCommand = commandBuilder.GetUpdateCommand();
-                            sdc.InsertCommand = commandBuilder.GetInsertCommand();
-                            sdc.Update(tableThree);
+                            MakeCommand(giDb, 3);
                         }
                         else
                         {
@@ -2146,13 +2203,8 @@ namespace Ruddat_NK
 
                             tableTml.Rows.Add(dr);
 
-                            // Todo Mysql
                             // und alles ab in die Datenbank
-                            SqlCommandBuilder commandBuilder = new SqlCommandBuilder(sdTml);
-                            sdTml.UpdateCommand = commandBuilder.GetUpdateCommand();
-                            sdTml.InsertCommand = commandBuilder.GetInsertCommand();
-                            sdTml.Update(tableTml);
-
+                            MakeCommand(giDb, 4);
                         }
                         else
                         {
@@ -2886,24 +2938,16 @@ namespace Ruddat_NK
             DataTable tableTimeline = new DataTable();
             DataTable tableTimeline1 = new DataTable();     // Kosten des Objektes darstellen 
             DataTable tableContent = new DataTable();       // Content
-            DataTable tableTmlCheckRgNr = new DataTable();  // Hier checken, ob schon eine Rechnungsnmmerfür das Anschreiben drin ist
-
-            connect = new SqlConnection(asConnect);
 
             try
             {
-                // Db open
-                connect.Open();
-
                 if (aiAnschreiben == 1)
                 {
                     // Rechnunsnummer für Anschreiben prüfen und einsetzen
                     // ist eine id_rg_nr in der Timeline vorhanden?
-                    SqlCommand command01 = new SqlCommand(asSql, connect);
-                    // Create a SqlDataReader
-                    SqlDataReader queryCommandReader01 = command01.ExecuteReader();
-                    // Create a DataTable object to hold all the data returned by the query.
-                    tableTmlCheckRgNr.Load(queryCommandReader01);
+
+                    liOk = fetchData(asSql, "", 27, gsConnectString);
+
                     if (tableTmlCheckRgNr.Rows.Count > 0)
                     {
                         if (tableTmlCheckRgNr.Rows[0].ItemArray.GetValue(22) != DBNull.Value)
@@ -2931,6 +2975,8 @@ namespace Ruddat_NK
                         }
                     } 
                 }
+
+                // Todo Mysql hier weiter
                 // Erste Tabelle Timeline holen
                 SqlCommand command = new SqlCommand(asSql, connect);
                 // Create a SqlDataReader
