@@ -511,9 +511,16 @@ namespace Ruddat_NK
 
             if (piArt == 38)
             {
-                // Zahlung löschenm
+                // Zahlung löschen
                 lsSql = "Delete from zahlungen Where id_vz = " + piId.ToString();
             }
+
+            if (piArt == 40)
+            {
+                // Zählerstände löschen
+                lsSql = "Delete from zaehlerstaende Where id_zs = " + piId.ToString();
+            }
+
 
             // -----------------------------------------------------------------------------------------------------------------------------
             // ----------------------------------------------------Reports ab hier----------------------------------------------------------

@@ -516,7 +516,7 @@ namespace Ruddat_NK
                         }
                         if (piArt == 23)
                         {
-                            SqlDataAdapter sda = new SqlDataAdapter(command);
+                            // SqlDataAdapter sda = new SqlDataAdapter(command);
                             SqlCommandBuilder commandBuilder23 = new SqlCommandBuilder(sda);
                             sda.Update(tableOne);
                         }
@@ -528,17 +528,26 @@ namespace Ruddat_NK
                         }
                         if (piArt == 37)
                         {
-                            SqlDataAdapter sdZlg = new SqlDataAdapter(command);
+                            // SqlDataAdapter sdZlg = new SqlDataAdapter(command);
                             SqlCommandBuilder commandBuilder37 = new SqlCommandBuilder(sdZlg);
                             sdZlg.Update(tableZlg);
                         }
                         if (piArt == 38)
                         {
                             // Zahlung löschen
-                            SqlDataReader queryCommandReader = command.ExecuteReader();
+                            SqlDataReader queryCommandReader38 = command.ExecuteReader();
                         }
-
-
+                        if (piArt == 39)
+                        {
+                            // Zählerstände
+                            SqlCommandBuilder commandBuilder39 = new SqlCommandBuilder(sdZlWert);
+                            sdZlWert.Update(tableZlWert);
+                        }
+                        if (piArt == 40)
+                        {
+                            // Zählerstände
+                            SqlDataReader queryCommandReader40 = command.ExecuteReader();
+                        }
                         // db close
                         connect.Close();
                     }
@@ -787,7 +796,7 @@ namespace Ruddat_NK
                         }
                         if (piArt == 23)
                         {
-                            MySqlDataAdapter mysda = new MySqlDataAdapter(com);
+                            // MySqlDataAdapter mysda = new MySqlDataAdapter(com);
                             MySqlCommandBuilder commandBuilder23 = new MySqlCommandBuilder(mysda);
                             mysda.Update(tableOne);
                         }
@@ -799,7 +808,7 @@ namespace Ruddat_NK
                         }
                         if (piArt == 37)
                         {
-                            MySqlDataAdapter mysdZlg = new MySqlDataAdapter(com);
+                            // MySqlDataAdapter mysdZlg = new MySqlDataAdapter(com);
                             MySqlCommandBuilder commandBuilder37 = new MySqlCommandBuilder(mysdZlg);
                             sdZlg.Update(tableZlg);
                         }
@@ -807,6 +816,17 @@ namespace Ruddat_NK
                         {
                             // Zahlung löschen
                             MySqlDataReader queryCommandReader = com.ExecuteReader();
+                        }
+                        if (piArt == 39)
+                        {
+                            // Zählerstände
+                            MySqlCommandBuilder commandBuilder39 = new MySqlCommandBuilder(mysdZlWert);
+                            mysdZlWert.Update(tableZlWert);
+                        }
+                        if (piArt == 40)
+                        {
+                            // Zählerstände löschen
+                            MySqlDataReader queryCommandReader40 = com.ExecuteReader();
                         }
                         // db close
                         con.Close();
@@ -1339,7 +1359,7 @@ namespace Ruddat_NK
             }
 
             // ID Unabhängige Daten 
-            // Combobox Mwst in rechnungen befüllen Art = 11
+            // Combobox Mwst in Rechnungen befüllen Art = 11
             lsSql = RdQueries.GetSqlSelect(12, 0, "", "", ldtFrom, ldtTo,giFiliale,gsConnect, giDb);
             liRows = FetchData(lsSql, 12, giDb, gsConnect);
             // Combobox Kostenverteilung in Rechnungen befüllen Art = 16
@@ -1389,7 +1409,7 @@ namespace Ruddat_NK
                     // Abrechnungen (Kosten,Kostenverteilung,Kostenverteilung Summen,Zahlungen Summe,Personen,Zähler,Art)
                     Timeline.saveLastSql(lsSqlTimeline, lsSqlAbrContent, "",
                             "", lsSqlZahlungen, lsSqlSumme, "", lsSqlTimeline2, "kostendetail","");       // direkte Kosten detailliert
-                    Timeline.saveLastVal(ldtFrom, ldtTo, "Datum");                                     // Übergabe des Datumsbereiches 
+                    Timeline.saveLastVal(ldtFrom, ldtTo, "Datum");                                        // Übergabe des Datumsbereiches 
                     break;
                 default:
                     break;
@@ -1803,10 +1823,10 @@ namespace Ruddat_NK
         private void btnCntSave_Click(object sender, RoutedEventArgs e)
         {
             int liOk = 0;
+            string lsSql = "";
 
-            // Todo Mysql 
-            SqlCommandBuilder commandBuilder = new SqlCommandBuilder(sdZlWert);
-            sdZlWert.Update(tableZlWert);
+            // Update
+            liOk = FetchData("", 39, giDb, gsConnect);
 
             // Timeline bearbeiten Art 21 = Zähler   
             Timeline.editTimeline(giTimelineId, giFlagTimeline, gsConnect);
@@ -1816,33 +1836,13 @@ namespace Ruddat_NK
             if (giDelZlWertId > 0)
             {
                 // Den Zählerstand löschen
-                String lsSql = "Delete from zaehlerstaende Where id_zs = " + giDelZlWertId.ToString();
+                lsSql = Timeline.getSql(40, giDelZlWertId, "", "", 0);
+                liOk = FetchData(lsSql, 40, giDb, gsConnect);
 
-                SqlConnection connect;
-                connect = new SqlConnection(gsConnect);
-
-                SqlCommand command = new SqlCommand(lsSql, connect);
-
-                // import_file
-                try
-                {
-                    // Db open
-                    connect.Open();
-                    SqlDataReader queryCommandReader = command.ExecuteReader();
-                    connect.Close();
-                }
-                catch
-                {
-                    MessageBox.Show("In Tabelle Zählerstände konnte nicht gelöscht werden\n" +
-                            "Prüfen Sie bitte die Datenbankverbindung\n",
-                            "Achtung btnCntSave_Click",
-                                MessageBoxButton.OK);
-                }
             }
-
-            // Update der Daten
-            liOk = updateAllDataGrids(0);
-
+             // Update der Daten
+             liOk = updateAllDataGrids(0);
+           
             // Die IDs und Flags zurücksetzen
             giDelZlWertId = 0;
             giZlId = 0;                 // globale Zähler Id

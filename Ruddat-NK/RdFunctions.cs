@@ -1141,8 +1141,6 @@ namespace Ruddat_NK
             DateTime ldtMonat = DateTime.MinValue;
             DateTime ldtVertrag = DateTime.MinValue;
 
-            int liDb = 1;    // TODO Welche Datenbank 1= MsSql 2= Mysql
-
             decimal[] ladBetraege = new decimal[12];
             string lsReturn = "";
 
