@@ -752,10 +752,9 @@ namespace Ruddat_NK
                         // Tabelle Infos für Abrechnung
                         if (piArt == 17)
                         {
-                            //TODO prüfen und einsetzen
-                            //tableAbrInfo = new DataTable();    // Abrechnung
-                            //mysdAbrInfo = new MySqlDataAdapter(com);
-                            //mysdAbrInfo.Fill(tableAbrInfo);
+                            tableAbrInfo = new DataTable();    // Abrechnung
+                            mysdAbrInfo = new MySqlDataAdapter(com);
+                            mysdAbrInfo.Fill(tableAbrInfo);
                         }
 
                         // Tabelle Leerstände
@@ -1114,7 +1113,7 @@ namespace Ruddat_NK
             {
                 // Daten für Treeview holen
                 lsSql = RdQueries.GetSqlSelect(2, giFiliale, "", "", DateTime.Today, DateTime.Today, giFiliale, gsConnect, giDb);
-                liRows = FetchData(lsSql, 2, giDb, , gsConnect);
+                liRows = FetchData(lsSql, 2, giDb, gsConnect);
                 giIndex = 0;        // Index auf 0 setzen, da ja nix angwählte ist
             }
 

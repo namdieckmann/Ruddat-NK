@@ -109,13 +109,11 @@ namespace Ruddat_NK
                 default:
                     break;
             }
-
-
             return (lsWhere);
         }
 
         // AbrechnungsInfos zurückgeben
-        internal static string GetAbrInfo(int aiFiliale, int liIdObj, int piId, int liIdObjTeil, DateTime ldtStartTmp, DateTime ldtEndTmp, int aiArt, int aiDb)
+        internal static string GetAbrInfo(int aiFiliale, int liIdObj, int liIdObjTeil, int liMieterId, DateTime ldtStartTmp, DateTime ldtEndTmp, int aiArt, int aiDb)
         {
             string lsSql = "";
 
@@ -124,20 +122,20 @@ namespace Ruddat_NK
                 case 1:     // MsSql
                     switch (aiArt)
                     {
-                        case 201:
+                        case 201:       // Objekt
                             lsSql = @"Delete from x_abr_info;
                         Insert into x_abr_info (id_filiale,id_objekt,abr_dat_von,abr_dat_bis) 
-                        values (" + aiFiliale + "," + piId.ToString() + ", Convert(DateTime," + "\'" + ldtStartTmp + "',104) , Convert(DateTime," + "\'" + ldtEndTmp + "',104))";
+                        values (" + aiFiliale + "," + liIdObj.ToString() + ", Convert(DateTime," + "\'" + ldtStartTmp + "',104) , Convert(DateTime," + "\'" + ldtEndTmp + "',104))";
                             break;
-                        case 202:
+                        case 202:       // ObjektTeil
                             lsSql = @"Delete from x_abr_info;
                         Insert into x_abr_info (id_filiale,id_objekt,id_objekt_teil,abr_dat_von,abr_dat_bis) 
-                        values (" + aiFiliale + "," + liIdObj.ToString() + "," + piId.ToString() + ", Convert(DateTime," + "\'" + ldtStartTmp + "',104) , Convert(DateTime," + "\'" + ldtEndTmp + "',104))";
+                        values (" + aiFiliale + "," + liIdObj.ToString() + "," + liIdObjTeil.ToString() + ", Convert(DateTime," + "\'" + ldtStartTmp + "',104) , Convert(DateTime," + "\'" + ldtEndTmp + "',104))";
                             break;
-                        case 203:
+                        case 203:       // Mieter
                             lsSql = @"Delete from x_abr_info;
                         Insert into x_abr_info (id_filiale,id_mieter,id_objekt,id_objekt_teil,abr_dat_von,abr_dat_bis) 
-                        values (" + aiFiliale + "," + piId.ToString() + "," + liIdObj.ToString() + "," + liIdObjTeil.ToString() + ", Convert(DateTime," + "\'" + ldtStartTmp + "',104) , Convert(DateTime," + "\'" + ldtEndTmp + "',104))";
+                        values (" + aiFiliale + "," + liMieterId.ToString() + "," + liIdObj.ToString() + "," + liIdObjTeil.ToString() + ", Convert(DateTime," + "\'" + ldtStartTmp + "',104) , Convert(DateTime," + "\'" + ldtEndTmp + "',104))";
                             break;
                         default:
                             break;
@@ -146,20 +144,26 @@ namespace Ruddat_NK
                 case 2:     // MySql
                     switch (aiArt)
                     {
-                        case 201:
-                            lsSql = @"Delete from x_abr_info;
-                        Insert into x_abr_info (id_filiale,id_objekt,abr_dat_von,abr_dat_bis) 
-                        values (" + aiFiliale + "," + piId.ToString() + ", convert('" + ldtStartTmp.ToString() + "',datetime) , convert('" + ldtEndTmp.ToString() + "',datetime))";
+                        case 201:           // Objekt
+                            lsSql = @"Delete from x_abr_info Where Id_info > 0;
+                                        Insert into x_abr_info (id_filiale,id_objekt,abr_dat_von,abr_dat_bis) 
+                                        values (" + aiFiliale + "," + liIdObj.ToString() + ", " +
+                                        "date_format(\"" + ldtStartTmp.ToString("dd.MM.yyyy") + "\",\"%d.%m.%y\"), " +
+                                        "date_format(\"" + ldtEndTmp.ToString("dd.MM.yyyy") + "\",\"%d.%m.%y\"))";
                             break;
-                        case 202:
-                            lsSql = @"Delete from x_abr_info;
-                        Insert into x_abr_info (id_filiale,id_objekt,id_objekt_teil,abr_dat_von,abr_dat_bis) 
-                        values (" + aiFiliale + "," + liIdObj.ToString() + "," + piId.ToString() + ", convert('" + ldtStartTmp.ToString() + "',datetime) , convert('" + ldtEndTmp.ToString() + "',datetime))";
-                            break;
-                        case 203:
-                            lsSql = @"Delete from x_abr_info;
-                        Insert into x_abr_info (id_filiale,id_mieter,id_objekt,id_objekt_teil,abr_dat_von,abr_dat_bis) 
-                        values (" + aiFiliale + "," + piId.ToString() + "," + liIdObj.ToString() + "," + liIdObjTeil.ToString() + ", convert('" + ldtStartTmp.ToString() + "',datetime), convert('" + ldtEndTmp.ToString() + "',datetime))";
+                        case 202:           // ObjektTeil
+                            lsSql = @"Delete from x_abr_info Where Id_info > 0;
+                                        Insert into x_abr_info (id_filiale,id_objekt,id_objekt_teil,abr_dat_von,abr_dat_bis) 
+                                        values(" + aiFiliale + ", " + liIdObj.ToString() + ", " + liIdObjTeil.ToString() + ", " +
+                                        "date_format(\"" + ldtStartTmp.ToString("dd.MM.yyyy") + "\",\"%d.%m.%y\"), " +
+                                        "date_format(\"" +ldtEndTmp.ToString("dd.MM.yyyy") + "\",\"%d.%m.%y\"))";
+                                                        break;
+                        case 203:           // Mieter
+                            lsSql = @"Delete from x_abr_info Where Id_info > 0;
+                                        Insert into x_abr_info (id_filiale,id_mieter,id_objekt,id_objekt_teil,abr_dat_von,abr_dat_bis) 
+                                        values (" + aiFiliale + "," + liMieterId.ToString() + "," + liIdObj.ToString() + "," + liIdObjTeil.ToString() + ", " +
+                                        "date_format(\"" + ldtStartTmp.ToString("dd.MM.yyyy") + "\",\"%d.%m.%y\"), " +
+                                        "date_format(\"" + ldtEndTmp.ToString("dd.MM.yyyy") + "\",\"%d.%m.%y\"))";
                             break;
                         default:
                             break;

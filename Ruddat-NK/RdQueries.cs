@@ -17,9 +17,7 @@ namespace Ruddat_NK
             String lsWhereAdd2 = "";
             String lsWhereAdd3 = "";
             String lsWhereAdd4 = "";
-            String lsWhereAddTime = "";
             String lsField = "";
-            String lsFieldTwo = "";
             String lsAnd = " Where ";
             String lsOrder = "";
             String lsGroup = "";
@@ -31,8 +29,9 @@ namespace Ruddat_NK
             DateTime ldtStart = DateTime.Parse(lsStart);                 // Jahresanfang VorJahr
             DateTime ldtEnd = DateTime.Parse(lsEnd);
             int liOne = 0;                                          // Ein oder 2 Zeitangaben
-            int liIdObjTeil = 0;
-            int liIdObj = 0;
+            int liMieterId = 0;
+            int liObjId = 0;
+            int liObjTeilId = 0;
 
             if (piArt == 1)
             {
@@ -872,33 +871,40 @@ namespace Ruddat_NK
             //----------------------------------------------------------------------------------------------------------------
             if (piArt == 201 || piArt == 202 || piArt == 203)
             {
+
                 // Ddatetimes für das Sql Statement
                 DateTime ldtStartTmp = DateTime.MinValue;
                 DateTime ldtEndTmp = DateTime.MinValue;
 
-                lsAnd = " And ";
-                lsField = "vorrauszahlungen.datum_von";
-                liOne = 2;
-                lsWhereAdd2 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsField, lsAnd, liOne, aiDb);
+                //lsAnd = " Where ";
+                //lsField = "vorrauszahlungen.datum_von";
+                //liOne = 2;
+                //lsWhereAdd2 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsField, lsAnd, liOne, aiDb);
 
-                if (piArt == 201)   // Objekte
+                switch (piArt)
                 {
-                    lsSql = RdQueriesTime.GetAbrInfo(aiFiliale, piId, liIdObjTeil, liIdObjTeil, ldtStartTmp, ldtEndTmp, piArt, aiDb);
+                    case 201:       // Objekt ID übergeben
+                        liObjId = piId;
+                        ldtStartTmp = adtWtStart;
+                        ldtEndTmp = ldtAdd;
+                        break;
+                    case 202:       // TeilObjekt ID übergeben
+                        ldtStartTmp = adtWtStart;
+                        ldtEndTmp = adtWtEnd;
+                        liObjTeilId = piId;
+                        liObjId = Timeline.getIdObj(piId, asConnectString, 2);
+                        break;
+                    case 203:       // Mieter Id übergeben
+                        ldtStartTmp = ldtStart;
+                        ldtEndTmp = ldtEnd;
+                        liMieterId = piId;
+                        liObjTeilId = Timeline.getIdObjTeil(piId, asConnectString);
+                        liObjId = Timeline.getIdObj(piId, asConnectString, 1);
+                        break;
+                    default:
+                        break;
                 }
-
-                if (piArt == 202)   // ObjektTeile
-                {
-                    // hier muss mal die Teilobjekt ID ermittelt werden (aus dem Vertrag)
-                    liIdObj = Timeline.getIdObj(piId, asConnectString, 2);
-                }
-
-                if (piArt == 203)   // Mieter
-                {
-                    // hier muss mal die Teilobjekt ID ermittelt werden (aus dem Vertrag)
-                    liIdObjTeil = Timeline.getIdObjTeil(piId, asConnectString);
-                    // und die Objekt ID auch
-                    liIdObj = Timeline.getIdObj(piId, asConnectString, 1);
-                }
+                lsSql = RdQueriesTime.GetAbrInfo(aiFiliale, liObjId, liObjTeilId, liMieterId, ldtStartTmp, ldtEndTmp, piArt, aiDb);
             }
 
             // Leerstand 
