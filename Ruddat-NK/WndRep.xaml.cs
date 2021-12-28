@@ -19,6 +19,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Xml;
 using Microsoft.Reporting.WinForms;
+using MySql.Data.MySqlClient;
 
 namespace Ruddat_NK
 {
@@ -34,7 +35,8 @@ namespace Ruddat_NK
         public String gsPath;
         public String gsSql;
         public string gsSqlWhere = "";
-        public int    giHeaderId;
+        public int giHeaderId;
+        public int giDb;
 
         private MainWindow mainWindow;
         // ConnectString übernehmen
@@ -45,7 +47,13 @@ namespace Ruddat_NK
             // TODO: Complete member initialization
             this.mainWindow = mainWindow;
             InitializeComponent();
-            
+        }
+
+        // Aus Delegates
+        // Welche Datenbank wird verwendet 1=MsSql 2=Sqlite
+        public void getDb(int aiDb)
+        {
+            giDb = aiDb;    // 1= MsSql 2 = MySql
             String lsPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
             string lsSqlDirekt = "";
             string lsSqlContent = "";
@@ -57,7 +65,7 @@ namespace Ruddat_NK
             string lsSqlSum = "";
             string lsDatVon = "";
             string lsDatBis = "";
-            Int32 liRows = 0;  
+            Int32 liRows = 0;
 
             gsPath = lsPath;
 
@@ -68,10 +76,10 @@ namespace Ruddat_NK
             lsSqlHeader = getSql("", 1, 0);
             // SqlSelect Firmenadresse holen
             lsSqlFadr = getSql("", 2, 0);
-           
+
             // Sql-Statement holen
             lsSqlDirekt = DbReadSql(lsPath, 1);         // Art 1 = Erstes SQL Statement Rechungen,Zahlungen, Kosten Direkt Tabelle Timeline                
-            if (gsReportName == "kosten" || gsReportName == "kostendetail"|| gsReportName == "anschreiben")
+            if (gsReportName == "kosten" || gsReportName == "kostendetail" || gsReportName == "anschreiben")
             {
                 lsSqlContent = DbReadSql(lsPath, 2);        // Art 2 = Hauptinhalt der Abrechnung  Tabelle x_abr_content
                 lsSqlContent2 = DbReadSql(lsPath, 7);       // Art 7 = Hauptinhalt nur ObjektKosten 
@@ -83,7 +91,7 @@ namespace Ruddat_NK
             }
             // Report füllen
             liRows = fetchData(lsSqlDirekt, lsSqlHeader, lsSqlFadr, lsSqlZahlungen, lsSqlSum,
-                lsSqlContent, lsSqlContent2 ,gsReportName, lsDatVon, lsDatBis, lsSqlRgNr);
+                lsSqlContent, lsSqlContent2, gsReportName, lsDatVon, lsDatBis, lsSqlRgNr, aiDb);
         }
 
         // Sql Scripts erstellen
@@ -182,12 +190,10 @@ namespace Ruddat_NK
 
         // Daten aus der Datenbank holen und zeigen 
         private Int32 fetchData(string asSql, string asSqlHeader, string asSqlFadr, string asSqlZahlungen, string asSqlSumme,
-            string asSqlContent, string asSqlContent2, string asReportName, string asDatVon, string asDatBis, string asSqlRgNr)
+            string asSqlContent, string asSqlContent2, string asReportName, string asDatVon, string asDatBis, string asSqlRgNr, int aiDb)
         {
             int liRows = 0;
             int liOk = 0;
-
-            SqlConnection connect;
 
             DataTable tableRep = new DataTable();           // Grid
             DataTable tableHeader = new DataTable();        // Grid
@@ -197,221 +203,441 @@ namespace Ruddat_NK
             DataTable tableContent = new DataTable();
             DataTable tableContentShow = new DataTable();
 
-            connect = new SqlConnection(gsConnect);
-
             string lsSqlContentShow = "";   // Darstellung der Abrechnungsdaten
 
             if (asSql.Length > 0)
             {
-                try
+                switch (aiDb)
                 {
-                    // Db open
-                    connect.Open();
-
-                    // Report
-                    SqlCommand command = new SqlCommand(asSql, connect);
-                    // Create a SqlDataReader
-                    SqlDataReader queryCommandReader = command.ExecuteReader();
-                    // Create a DataTable object to hold all the data returned by the query.
-                    tableRep.Load(queryCommandReader);
-                    liRows = tableRep.Rows.Count;
-
-                    // Header für Report
-                    SqlCommand command2 = new SqlCommand(asSqlHeader, connect);
-                    // Create a SqlDataReader
-                    SqlDataReader queryCommandReader2 = command2.ExecuteReader();
-                    // Create a DataTable object to hold all the data returned by the query.
-                    tableHeader.Load(queryCommandReader2);
-
-                    // Firmenadresse für Report
-                    SqlCommand command3 = new SqlCommand(asSqlFadr, connect);
-                    // Create a SqlDataReader
-                    SqlDataReader queryCommandReader3 = command3.ExecuteReader();
-                    // Create a DataTable object to hold all the data returned by the query.
-                    tableFadr.Load(queryCommandReader3);
-
-                    if (asSqlZahlungen.Length > 0)
-                    {
-                        // DataSet für Zahlungen
-                        SqlCommand command4 = new SqlCommand(asSqlZahlungen, connect);
-                        // Create a SqlDataReader
-                        SqlDataReader queryCommandReader4 = command4.ExecuteReader();
-                        // Create a DataTable object to hold all the data returned by the query.
-                        tableZahlungen.Load(queryCommandReader4);
-                    }
-                    if (asSqlSumme.Length > 0)
-                    {
-                        // DataSet für Zahlungen
-                        SqlCommand command5 = new SqlCommand(asSqlSumme, connect);
-                        // Create a SqlDataReader
-                        SqlDataReader queryCommandReader5 = command5.ExecuteReader();
-                        // Create a DataTable object to hold all the data returned by the query.
-                        tableSumme.Load(queryCommandReader5);
-                    }
-
-                    if (asSqlContent.Length > 0)
-                    {
-                        // DataSet für Inhalt Abrechnungen aus x_abr_content
-                        SqlCommand command6 = new SqlCommand(asSqlContent, connect);
-                        // Create a SqlDataReader
-                        SqlDataReader queryCommandReader6 = command6.ExecuteReader();
-                        // Create a DataTable object to hold all the data returned by the query.
-                        tableContent.Load(queryCommandReader6);
-                    }
-
-                    liRows = 1;
-                    if (liRows > 0)
-                    {
-                        if (asReportName == "rechnungen")
+                    case 1:
+                        try
                         {
-                            this.Title = "Report Rechnungen";
-                            // Report befüllen
-                            RepView.Reset();
-                            ReportDataSource rds = new ReportDataSource("DataSet1", tableRep);
-                            ReportDataSource rdsHd = new ReportDataSource("DataSetHeader", tableHeader);
-                            ReportDataSource rdsFa = new ReportDataSource("DataSetFadr", tableFadr);
-                            RepView.LocalReport.DataSources.Add(rds);
-                            RepView.LocalReport.DataSources.Add(rdsHd);
-                            RepView.LocalReport.DataSources.Add(rdsFa);
-                            RepView.LocalReport.ReportEmbeddedResource = "Ruddat_NK.ReportRechnungen.rdlc";
-                            // RepView.
-                            RepView.RefreshReport();
-                        }
-                        if (asReportName == "zahlungen")
-                        {
-                            this.Title = "Report Zahlungen";
-                            // Report befüllen
-                            RepView.Reset();
-                            ReportDataSource rds = new ReportDataSource("DataSet1", tableRep);
-                            ReportDataSource rdsHd = new ReportDataSource("DataSetHeader", tableHeader);
-                            ReportDataSource rdsFa = new ReportDataSource("DataSetFadr", tableFadr);
-                            RepView.LocalReport.DataSources.Add(rds);
-                            RepView.LocalReport.DataSources.Add(rdsHd);
-                            RepView.LocalReport.DataSources.Add(rdsFa);
-                            RepView.LocalReport.ReportEmbeddedResource = "Ruddat_NK.ReportZahlungen.rdlc";
-                            RepView.RefreshReport();
-                        }
-                        if (asReportName == "kosten")  // Nebenkostenabrecnung
-                        {
-                            // Die Tabelle x_abr_content muss befüllt werden
-                            liOk = Timeline.fill_content(asSql, asSqlContent, asSqlContent2, asDatVon, asDatBis, gsConnect,"",0);
-                            // Dann die Tabelle laden 
-                            // Hauptcontent für Abrechnung holen
-                            lsSqlContentShow = getSql("", 3, 0);
+                            SqlConnection connect;
+                            connect = new SqlConnection(gsConnect);
+                            // Db open
+                            connect.Open();
+
+                            // Report
+                            SqlCommand command = new SqlCommand(asSql, connect);
+                            // Create a SqlDataReader
+                            SqlDataReader queryCommandReader = command.ExecuteReader();
+                            // Create a DataTable object to hold all the data returned by the query.
+                            tableRep.Load(queryCommandReader);
+                            liRows = tableRep.Rows.Count;
+
+                            // Header für Report
+                            SqlCommand command2 = new SqlCommand(asSqlHeader, connect);
+                            // Create a SqlDataReader
+                            SqlDataReader queryCommandReader2 = command2.ExecuteReader();
+                            // Create a DataTable object to hold all the data returned by the query.
+                            tableHeader.Load(queryCommandReader2);
+
+                            // Firmenadresse für Report
+                            SqlCommand command3 = new SqlCommand(asSqlFadr, connect);
+                            // Create a SqlDataReader
+                            SqlDataReader queryCommandReader3 = command3.ExecuteReader();
+                            // Create a DataTable object to hold all the data returned by the query.
+                            tableFadr.Load(queryCommandReader3);
+
+                            if (asSqlZahlungen.Length > 0)
+                            {
+                                // DataSet für Zahlungen
+                                SqlCommand command4 = new SqlCommand(asSqlZahlungen, connect);
+                                // Create a SqlDataReader
+                                SqlDataReader queryCommandReader4 = command4.ExecuteReader();
+                                // Create a DataTable object to hold all the data returned by the query.
+                                tableZahlungen.Load(queryCommandReader4);
+                            }
+                            if (asSqlSumme.Length > 0)
+                            {
+                                // DataSet für Zahlungen
+                                SqlCommand command5 = new SqlCommand(asSqlSumme, connect);
+                                // Create a SqlDataReader
+                                SqlDataReader queryCommandReader5 = command5.ExecuteReader();
+                                // Create a DataTable object to hold all the data returned by the query.
+                                tableSumme.Load(queryCommandReader5);
+                            }
 
                             if (asSqlContent.Length > 0)
                             {
                                 // DataSet für Inhalt Abrechnungen aus x_abr_content
-                                SqlCommand command7 = new SqlCommand(lsSqlContentShow, connect);
+                                SqlCommand command6 = new SqlCommand(asSqlContent, connect);
                                 // Create a SqlDataReader
-                                SqlDataReader queryCommandReader7 = command7.ExecuteReader();
+                                SqlDataReader queryCommandReader6 = command6.ExecuteReader();
                                 // Create a DataTable object to hold all the data returned by the query.
-                                tableContentShow.Load(queryCommandReader7);
+                                tableContent.Load(queryCommandReader6);
+                            }
 
-                                this.Title = "Report Kosten";
-                                // Report befüllen
-                                RepView.Reset();
-                                ReportDataSource rds = new ReportDataSource("DataSet1", tableRep);
-                                ReportDataSource rdsHd = new ReportDataSource("DataSet2", tableHeader);
-                                ReportDataSource rdsFa = new ReportDataSource("DataSet3", tableFadr);
-                                ReportDataSource rdsZlg = new ReportDataSource("DataSet4", tableZahlungen);   // Im Report Dataset Zahlungen verwenden
-                                ReportDataSource rdsSum = new ReportDataSource("DataSet5", tableSumme);       // Im Report Dataset Zahlungen verwenden
-                                ReportDataSource rdsCon = new ReportDataSource("DataSet6", tableContentShow); // Content
-                                RepView.LocalReport.DataSources.Add(rds);
-                                RepView.LocalReport.DataSources.Add(rdsHd);
-                                RepView.LocalReport.DataSources.Add(rdsFa);
-                                RepView.LocalReport.DataSources.Add(rdsZlg);
-                                RepView.LocalReport.DataSources.Add(rdsSum);
-                                RepView.LocalReport.DataSources.Add(rdsCon);
-                                RepView.LocalReport.ReportEmbeddedResource = "Ruddat_NK.ReportAbrechnung.rdlc";
-                                RepView.RefreshReport();
+                            liRows = 1;
+                            if (liRows > 0)
+                            {
+                                if (asReportName == "rechnungen")
+                                {
+                                    this.Title = "Report Rechnungen";
+                                    // Report befüllen
+                                    RepView.Reset();
+                                    ReportDataSource rds = new ReportDataSource("DataSet1", tableRep);
+                                    ReportDataSource rdsHd = new ReportDataSource("DataSetHeader", tableHeader);
+                                    ReportDataSource rdsFa = new ReportDataSource("DataSetFadr", tableFadr);
+                                    RepView.LocalReport.DataSources.Add(rds);
+                                    RepView.LocalReport.DataSources.Add(rdsHd);
+                                    RepView.LocalReport.DataSources.Add(rdsFa);
+                                    RepView.LocalReport.ReportEmbeddedResource = "Ruddat_NK.ReportRechnungen.rdlc";
+                                    // RepView.
+                                    RepView.RefreshReport();
+                                }
+                                if (asReportName == "zahlungen")
+                                {
+                                    this.Title = "Report Zahlungen";
+                                    // Report befüllen
+                                    RepView.Reset();
+                                    ReportDataSource rds = new ReportDataSource("DataSet1", tableRep);
+                                    ReportDataSource rdsHd = new ReportDataSource("DataSetHeader", tableHeader);
+                                    ReportDataSource rdsFa = new ReportDataSource("DataSetFadr", tableFadr);
+                                    RepView.LocalReport.DataSources.Add(rds);
+                                    RepView.LocalReport.DataSources.Add(rdsHd);
+                                    RepView.LocalReport.DataSources.Add(rdsFa);
+                                    RepView.LocalReport.ReportEmbeddedResource = "Ruddat_NK.ReportZahlungen.rdlc";
+                                    RepView.RefreshReport();
+                                }
+                                if (asReportName == "kosten")  // Nebenkostenabrecnung
+                                {
+                                    // Die Tabelle x_abr_content muss befüllt werden
+                                    liOk = Timeline.fill_content(asSql, asSqlContent, asSqlContent2, asDatVon, asDatBis, gsConnect, "", 0);
+                                    // Dann die Tabelle laden 
+                                    // Hauptcontent für Abrechnung holen
+                                    lsSqlContentShow = getSql("", 3, 0);
+
+                                    if (asSqlContent.Length > 0)
+                                    {
+                                        // DataSet für Inhalt Abrechnungen aus x_abr_content
+                                        SqlCommand command7 = new SqlCommand(lsSqlContentShow, connect);
+                                        // Create a SqlDataReader
+                                        SqlDataReader queryCommandReader7 = command7.ExecuteReader();
+                                        // Create a DataTable object to hold all the data returned by the query.
+                                        tableContentShow.Load(queryCommandReader7);
+
+                                        this.Title = "Report Kosten";
+                                        // Report befüllen
+                                        RepView.Reset();
+                                        ReportDataSource rds = new ReportDataSource("DataSet1", tableRep);
+                                        ReportDataSource rdsHd = new ReportDataSource("DataSet2", tableHeader);
+                                        ReportDataSource rdsFa = new ReportDataSource("DataSet3", tableFadr);
+                                        ReportDataSource rdsZlg = new ReportDataSource("DataSet4", tableZahlungen);   // Im Report Dataset Zahlungen verwenden
+                                        ReportDataSource rdsSum = new ReportDataSource("DataSet5", tableSumme);       // Im Report Dataset Zahlungen verwenden
+                                        ReportDataSource rdsCon = new ReportDataSource("DataSet6", tableContentShow); // Content
+                                        RepView.LocalReport.DataSources.Add(rds);
+                                        RepView.LocalReport.DataSources.Add(rdsHd);
+                                        RepView.LocalReport.DataSources.Add(rdsFa);
+                                        RepView.LocalReport.DataSources.Add(rdsZlg);
+                                        RepView.LocalReport.DataSources.Add(rdsSum);
+                                        RepView.LocalReport.DataSources.Add(rdsCon);
+                                        RepView.LocalReport.ReportEmbeddedResource = "Ruddat_NK.ReportAbrechnung.rdlc";
+                                        RepView.RefreshReport();
+                                    }
+                                }
+                                if (asReportName == "kostendetail")  // Nebenkostenabrecnung detailliert
+                                {
+                                    // Die Tabelle x_abr_content muss befüllt werden
+                                    liOk = Timeline.fill_content(asSql, asSqlContent, asSqlContent2, asDatVon, asDatBis, gsConnect, "", 0);
+                                    // Dann die Tabelle laden 
+                                    // Hauptcontent für Abrechnung holen
+                                    lsSqlContentShow = getSql("", 3, 0);
+
+                                    if (asSqlContent.Length > 0)
+                                    {
+                                        // DataSet für Inhalt Abrechnungen aus x_abr_content
+                                        SqlCommand command7 = new SqlCommand(lsSqlContentShow, connect);
+                                        // Create a SqlDataReader
+                                        SqlDataReader queryCommandReader7 = command7.ExecuteReader();
+                                        // Create a DataTable object to hold all the data returned by the query.
+                                        tableContentShow.Load(queryCommandReader7);
+
+                                        this.Title = "Report Kosten";
+                                        // Report befüllen
+                                        RepView.Reset();
+                                        ReportDataSource rds = new ReportDataSource("DataSet1", tableRep);
+                                        ReportDataSource rdsHd = new ReportDataSource("DataSet2", tableHeader);
+                                        ReportDataSource rdsFa = new ReportDataSource("DataSet3", tableFadr);
+                                        ReportDataSource rdsZlg = new ReportDataSource("DataSet4", tableZahlungen);   // Im Report Dataset Zahlungen verwenden
+                                        ReportDataSource rdsSum = new ReportDataSource("DataSet5", tableSumme);       // Im Report Dataset Zahlungen verwenden
+                                        ReportDataSource rdsCon = new ReportDataSource("DataSet6", tableContentShow); // Content
+                                        RepView.LocalReport.DataSources.Add(rds);
+                                        RepView.LocalReport.DataSources.Add(rdsHd);
+                                        RepView.LocalReport.DataSources.Add(rdsFa);
+                                        RepView.LocalReport.DataSources.Add(rdsZlg);
+                                        RepView.LocalReport.DataSources.Add(rdsSum);
+                                        RepView.LocalReport.DataSources.Add(rdsCon);
+                                        RepView.LocalReport.ReportEmbeddedResource = "Ruddat_NK.ReportAbrechnungdetailliert.rdlc";
+                                        RepView.RefreshReport();
+                                    }
+                                }
+                                if (asReportName == "anschreiben")  // Anschreiben
+                                {
+
+                                    // Die Tabelle x_abr_content muss befüllt werden
+                                    liOk = Timeline.fill_content(asSql, asSqlContent, asSqlContent2, asDatVon, asDatBis, gsConnect, asSqlRgNr, 1);
+                                    // Dann die Tabelle laden 
+                                    // Hauptcontent für Abrechnung holen
+                                    lsSqlContentShow = getSql("", 3, 0);
+
+                                    if (asSqlContent.Length > 0)
+                                    {
+                                        // DataSet für Inhalt Abrechnungen aus x_abr_content
+                                        SqlCommand command7 = new SqlCommand(lsSqlContentShow, connect);
+                                        // Create a SqlDataReader
+                                        SqlDataReader queryCommandReader7 = command7.ExecuteReader();
+                                        // Create a DataTable object to hold all the data returned by the query.
+                                        tableContentShow.Load(queryCommandReader7);
+
+                                        this.Title = "Report Kosten";
+                                        // Report befüllen
+                                        RepView.Reset();
+                                        ReportDataSource rds = new ReportDataSource("DataSet1", tableRep);
+                                        ReportDataSource rdsHd = new ReportDataSource("DataSet2", tableHeader);
+                                        ReportDataSource rdsFa = new ReportDataSource("DataSet3", tableFadr);
+                                        ReportDataSource rdsZlg = new ReportDataSource("DataSet4", tableZahlungen);   // Im Report Dataset Zahlungen verwenden
+                                        ReportDataSource rdsSum = new ReportDataSource("DataSet5", tableSumme);       // Im Report Dataset Zahlungen verwenden
+                                        ReportDataSource rdsCon = new ReportDataSource("DataSet6", tableContentShow); // Content
+                                        RepView.LocalReport.DataSources.Add(rds);
+                                        RepView.LocalReport.DataSources.Add(rdsHd);
+                                        RepView.LocalReport.DataSources.Add(rdsFa);
+                                        RepView.LocalReport.DataSources.Add(rdsZlg);
+                                        RepView.LocalReport.DataSources.Add(rdsSum);
+                                        RepView.LocalReport.DataSources.Add(rdsCon);
+                                        RepView.LocalReport.ReportEmbeddedResource = "Ruddat_NK.ReportAnschreiben.rdlc";
+                                        RepView.RefreshReport();
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                MessageBox.Show("Es wurde kein Objekt angewählt oder es sind keine Daten vorhanden", "Keine Daten");
                             }
                         }
-                        if (asReportName == "kostendetail")  // Nebenkostenabrecnung detailliert
+                        catch
                         {
-                            // Die Tabelle x_abr_content muss befüllt werden
-                            liOk = Timeline.fill_content(asSql, asSqlContent, asSqlContent2, asDatVon, asDatBis, gsConnect,"",0);
-                            // Dann die Tabelle laden 
-                            // Hauptcontent für Abrechnung holen
-                            lsSqlContentShow = getSql("", 3, 0);
+                            // Die Anwendung anhalten
+                            MessageBox.Show("Verarbeitungsfehler Error WndRep.F01\n" +
+                                    "Achtung");
+                        }
+                        break;
+                    case 2:
+                        try
+                        {
+                            MySqlConnection connect;
+                            connect = new MySqlConnection(gsConnect);
+                            // Db open
+                            connect.Open();
+
+                            // Report
+                            MySqlCommand command = new MySqlCommand(asSql, connect);
+                            // Create a MySqlDataReader
+                            MySqlDataReader queryCommandReader = command.ExecuteReader();
+                            // Create a DataTable object to hold all the data returned by the query.
+                            tableRep.Load(queryCommandReader);
+                            liRows = tableRep.Rows.Count;
+
+                            // Header für Report
+                            MySqlCommand command2 = new MySqlCommand(asSqlHeader, connect);
+                            // Create a MySqlDataReader
+                            MySqlDataReader queryCommandReader2 = command2.ExecuteReader();
+                            // Create a DataTable object to hold all the data returned by the query.
+                            tableHeader.Load(queryCommandReader2);
+
+                            // Firmenadresse für Report
+                            MySqlCommand command3 = new MySqlCommand(asSqlFadr, connect);
+                            // Create a MySqlDataReader
+                            MySqlDataReader queryCommandReader3 = command3.ExecuteReader();
+                            // Create a DataTable object to hold all the data returned by the query.
+                            tableFadr.Load(queryCommandReader3);
+
+                            if (asSqlZahlungen.Length > 0)
+                            {
+                                // DataSet für Zahlungen
+                                MySqlCommand command4 = new MySqlCommand(asSqlZahlungen, connect);
+                                // Create a MySqlDataReader
+                                MySqlDataReader queryCommandReader4 = command4.ExecuteReader();
+                                // Create a DataTable object to hold all the data returned by the query.
+                                tableZahlungen.Load(queryCommandReader4);
+                            }
+                            if (asSqlSumme.Length > 0)
+                            {
+                                // DataSet für Zahlungen
+                                MySqlCommand command5 = new MySqlCommand(asSqlSumme, connect);
+                                // Create a MySqlDataReader
+                                MySqlDataReader queryCommandReader5 = command5.ExecuteReader();
+                                // Create a DataTable object to hold all the data returned by the query.
+                                tableSumme.Load(queryCommandReader5);
+                            }
 
                             if (asSqlContent.Length > 0)
                             {
                                 // DataSet für Inhalt Abrechnungen aus x_abr_content
-                                SqlCommand command7 = new SqlCommand(lsSqlContentShow, connect);
-                                // Create a SqlDataReader
-                                SqlDataReader queryCommandReader7 = command7.ExecuteReader();
+                                MySqlCommand command6 = new MySqlCommand(asSqlContent, connect);
+                                // Create a MySqlDataReader
+                                MySqlDataReader queryCommandReader6 = command6.ExecuteReader();
                                 // Create a DataTable object to hold all the data returned by the query.
-                                tableContentShow.Load(queryCommandReader7);
-
-                                this.Title = "Report Kosten";
-                                // Report befüllen
-                                RepView.Reset();
-                                ReportDataSource rds = new ReportDataSource("DataSet1", tableRep);
-                                ReportDataSource rdsHd = new ReportDataSource("DataSet2", tableHeader);
-                                ReportDataSource rdsFa = new ReportDataSource("DataSet3", tableFadr);
-                                ReportDataSource rdsZlg = new ReportDataSource("DataSet4", tableZahlungen);   // Im Report Dataset Zahlungen verwenden
-                                ReportDataSource rdsSum = new ReportDataSource("DataSet5", tableSumme);       // Im Report Dataset Zahlungen verwenden
-                                ReportDataSource rdsCon = new ReportDataSource("DataSet6", tableContentShow); // Content
-                                RepView.LocalReport.DataSources.Add(rds);
-                                RepView.LocalReport.DataSources.Add(rdsHd);
-                                RepView.LocalReport.DataSources.Add(rdsFa);
-                                RepView.LocalReport.DataSources.Add(rdsZlg);
-                                RepView.LocalReport.DataSources.Add(rdsSum);
-                                RepView.LocalReport.DataSources.Add(rdsCon);
-                                RepView.LocalReport.ReportEmbeddedResource = "Ruddat_NK.ReportAbrechnungdetailliert.rdlc";
-                                RepView.RefreshReport();
+                                tableContent.Load(queryCommandReader6);
                             }
-                        }
-                        if (asReportName == "anschreiben")  // Anschreiben
-                        {
 
-                            // Die Tabelle x_abr_content muss befüllt werden
-                            liOk = Timeline.fill_content(asSql, asSqlContent, asSqlContent2, asDatVon, asDatBis, gsConnect, asSqlRgNr,1);
-                            // Dann die Tabelle laden 
-                            // Hauptcontent für Abrechnung holen
-                            lsSqlContentShow = getSql("", 3, 0);
-
-                            if (asSqlContent.Length > 0)
+                            liRows = 1;
+                            if (liRows > 0)
                             {
-                                // DataSet für Inhalt Abrechnungen aus x_abr_content
-                                SqlCommand command7 = new SqlCommand(lsSqlContentShow, connect);
-                                // Create a SqlDataReader
-                                SqlDataReader queryCommandReader7 = command7.ExecuteReader();
-                                // Create a DataTable object to hold all the data returned by the query.
-                                tableContentShow.Load(queryCommandReader7);
+                                if (asReportName == "rechnungen")
+                                {
+                                    this.Title = "Report Rechnungen";
+                                    // Report befüllen
+                                    RepView.Reset();
+                                    ReportDataSource rds = new ReportDataSource("DataSet1", tableRep);
+                                    ReportDataSource rdsHd = new ReportDataSource("DataSetHeader", tableHeader);
+                                    ReportDataSource rdsFa = new ReportDataSource("DataSetFadr", tableFadr);
+                                    RepView.LocalReport.DataSources.Add(rds);
+                                    RepView.LocalReport.DataSources.Add(rdsHd);
+                                    RepView.LocalReport.DataSources.Add(rdsFa);
+                                    RepView.LocalReport.ReportEmbeddedResource = "Ruddat_NK.ReportRechnungen.rdlc";
+                                    // RepView.
+                                    RepView.RefreshReport();
+                                }
+                                if (asReportName == "zahlungen")
+                                {
+                                    this.Title = "Report Zahlungen";
+                                    // Report befüllen
+                                    RepView.Reset();
+                                    ReportDataSource rds = new ReportDataSource("DataSet1", tableRep);
+                                    ReportDataSource rdsHd = new ReportDataSource("DataSetHeader", tableHeader);
+                                    ReportDataSource rdsFa = new ReportDataSource("DataSetFadr", tableFadr);
+                                    RepView.LocalReport.DataSources.Add(rds);
+                                    RepView.LocalReport.DataSources.Add(rdsHd);
+                                    RepView.LocalReport.DataSources.Add(rdsFa);
+                                    RepView.LocalReport.ReportEmbeddedResource = "Ruddat_NK.ReportZahlungen.rdlc";
+                                    RepView.RefreshReport();
+                                }
+                                if (asReportName == "kosten")  // Nebenkostenabrecnung
+                                {
+                                    // Die Tabelle x_abr_content muss befüllt werden
+                                    liOk = Timeline.fill_content(asSql, asSqlContent, asSqlContent2, asDatVon, asDatBis, gsConnect, "", 0);
+                                    // Dann die Tabelle laden 
+                                    // Hauptcontent für Abrechnung holen
+                                    lsSqlContentShow = getSql("", 3, 0);
 
-                                this.Title = "Report Kosten";
-                                // Report befüllen
-                                RepView.Reset();
-                                ReportDataSource rds = new ReportDataSource("DataSet1", tableRep);
-                                ReportDataSource rdsHd = new ReportDataSource("DataSet2", tableHeader);
-                                ReportDataSource rdsFa = new ReportDataSource("DataSet3", tableFadr);
-                                ReportDataSource rdsZlg = new ReportDataSource("DataSet4", tableZahlungen);   // Im Report Dataset Zahlungen verwenden
-                                ReportDataSource rdsSum = new ReportDataSource("DataSet5", tableSumme);       // Im Report Dataset Zahlungen verwenden
-                                ReportDataSource rdsCon = new ReportDataSource("DataSet6", tableContentShow); // Content
-                                RepView.LocalReport.DataSources.Add(rds);
-                                RepView.LocalReport.DataSources.Add(rdsHd);
-                                RepView.LocalReport.DataSources.Add(rdsFa);
-                                RepView.LocalReport.DataSources.Add(rdsZlg);
-                                RepView.LocalReport.DataSources.Add(rdsSum);
-                                RepView.LocalReport.DataSources.Add(rdsCon);
-                                RepView.LocalReport.ReportEmbeddedResource = "Ruddat_NK.ReportAnschreiben.rdlc";
-                                RepView.RefreshReport();
+                                    if (asSqlContent.Length > 0)
+                                    {
+                                        // DataSet für Inhalt Abrechnungen aus x_abr_content
+                                        MySqlCommand command7 = new MySqlCommand(lsSqlContentShow, connect);
+                                        // Create a SqlDataReader
+                                        MySqlDataReader queryCommandReader7 = command7.ExecuteReader();
+                                        // Create a DataTable object to hold all the data returned by the query.
+                                        tableContentShow.Load(queryCommandReader7);
+
+                                        this.Title = "Report Kosten";
+                                        // Report befüllen
+                                        RepView.Reset();
+                                        ReportDataSource rds = new ReportDataSource("DataSet1", tableRep);
+                                        ReportDataSource rdsHd = new ReportDataSource("DataSet2", tableHeader);
+                                        ReportDataSource rdsFa = new ReportDataSource("DataSet3", tableFadr);
+                                        ReportDataSource rdsZlg = new ReportDataSource("DataSet4", tableZahlungen);   // Im Report Dataset Zahlungen verwenden
+                                        ReportDataSource rdsSum = new ReportDataSource("DataSet5", tableSumme);       // Im Report Dataset Zahlungen verwenden
+                                        ReportDataSource rdsCon = new ReportDataSource("DataSet6", tableContentShow); // Content
+                                        RepView.LocalReport.DataSources.Add(rds);
+                                        RepView.LocalReport.DataSources.Add(rdsHd);
+                                        RepView.LocalReport.DataSources.Add(rdsFa);
+                                        RepView.LocalReport.DataSources.Add(rdsZlg);
+                                        RepView.LocalReport.DataSources.Add(rdsSum);
+                                        RepView.LocalReport.DataSources.Add(rdsCon);
+                                        RepView.LocalReport.ReportEmbeddedResource = "Ruddat_NK.ReportAbrechnung.rdlc";
+                                        RepView.RefreshReport();
+                                    }
+                                }
+                                if (asReportName == "kostendetail")  // Nebenkostenabrecnung detailliert
+                                {
+                                    // Die Tabelle x_abr_content muss befüllt werden
+                                    liOk = Timeline.fill_content(asSql, asSqlContent, asSqlContent2, asDatVon, asDatBis, gsConnect, "", 0);
+                                    // Dann die Tabelle laden 
+                                    // Hauptcontent für Abrechnung holen
+                                    lsSqlContentShow = getSql("", 3, 0);
+
+                                    if (asSqlContent.Length > 0)
+                                    {
+                                        // DataSet für Inhalt Abrechnungen aus x_abr_content
+                                        MySqlCommand command7 = new MySqlCommand(lsSqlContentShow, connect);
+                                        // Create a SqlDataReader
+                                        MySqlDataReader queryCommandReader7 = command7.ExecuteReader();
+                                        // Create a DataTable object to hold all the data returned by the query.
+                                        tableContentShow.Load(queryCommandReader7);
+
+                                        this.Title = "Report Kosten";
+                                        // Report befüllen
+                                        RepView.Reset();
+                                        ReportDataSource rds = new ReportDataSource("DataSet1", tableRep);
+                                        ReportDataSource rdsHd = new ReportDataSource("DataSet2", tableHeader);
+                                        ReportDataSource rdsFa = new ReportDataSource("DataSet3", tableFadr);
+                                        ReportDataSource rdsZlg = new ReportDataSource("DataSet4", tableZahlungen);   // Im Report Dataset Zahlungen verwenden
+                                        ReportDataSource rdsSum = new ReportDataSource("DataSet5", tableSumme);       // Im Report Dataset Zahlungen verwenden
+                                        ReportDataSource rdsCon = new ReportDataSource("DataSet6", tableContentShow); // Content
+                                        RepView.LocalReport.DataSources.Add(rds);
+                                        RepView.LocalReport.DataSources.Add(rdsHd);
+                                        RepView.LocalReport.DataSources.Add(rdsFa);
+                                        RepView.LocalReport.DataSources.Add(rdsZlg);
+                                        RepView.LocalReport.DataSources.Add(rdsSum);
+                                        RepView.LocalReport.DataSources.Add(rdsCon);
+                                        RepView.LocalReport.ReportEmbeddedResource = "Ruddat_NK.ReportAbrechnungdetailliert.rdlc";
+                                        RepView.RefreshReport();
+                                    }
+                                }
+                                if (asReportName == "anschreiben")  // Anschreiben
+                                {
+
+                                    // Die Tabelle x_abr_content muss befüllt werden
+                                    liOk = Timeline.fill_content(asSql, asSqlContent, asSqlContent2, asDatVon, asDatBis, gsConnect, asSqlRgNr, 1);
+                                    // Dann die Tabelle laden 
+                                    // Hauptcontent für Abrechnung holen
+                                    lsSqlContentShow = getSql("", 3, 0);
+
+                                    if (asSqlContent.Length > 0)
+                                    {
+                                        // DataSet für Inhalt Abrechnungen aus x_abr_content
+                                        MySqlCommand command7 = new MySqlCommand(lsSqlContentShow, connect);
+                                        // Create a SqlDataReader
+                                        MySqlDataReader queryCommandReader7 = command7.ExecuteReader();
+                                        // Create a DataTable object to hold all the data returned by the query.
+                                        tableContentShow.Load(queryCommandReader7);
+
+                                        this.Title = "Report Kosten";
+                                        // Report befüllen
+                                        RepView.Reset();
+                                        ReportDataSource rds = new ReportDataSource("DataSet1", tableRep);
+                                        ReportDataSource rdsHd = new ReportDataSource("DataSet2", tableHeader);
+                                        ReportDataSource rdsFa = new ReportDataSource("DataSet3", tableFadr);
+                                        ReportDataSource rdsZlg = new ReportDataSource("DataSet4", tableZahlungen);   // Im Report Dataset Zahlungen verwenden
+                                        ReportDataSource rdsSum = new ReportDataSource("DataSet5", tableSumme);       // Im Report Dataset Zahlungen verwenden
+                                        ReportDataSource rdsCon = new ReportDataSource("DataSet6", tableContentShow); // Content
+                                        RepView.LocalReport.DataSources.Add(rds);
+                                        RepView.LocalReport.DataSources.Add(rdsHd);
+                                        RepView.LocalReport.DataSources.Add(rdsFa);
+                                        RepView.LocalReport.DataSources.Add(rdsZlg);
+                                        RepView.LocalReport.DataSources.Add(rdsSum);
+                                        RepView.LocalReport.DataSources.Add(rdsCon);
+                                        RepView.LocalReport.ReportEmbeddedResource = "Ruddat_NK.ReportAnschreiben.rdlc";
+                                        RepView.RefreshReport();
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                MessageBox.Show("Es wurde kein Objekt angewählt oder es sind keine Daten vorhanden", "Keine Daten");
                             }
                         }
-                    }
-                    else
-                    {
-                        MessageBox.Show("Es wurde kein Objekt angewählt oder es sind keine Daten vorhanden", "Keine Daten");
-                    }
+                        catch
+                        {
+                            // Die Anwendung anhalten
+                            MessageBox.Show("Verarbeitungsfehler Error WndRep.F01\n" +
+                                    "Achtung");
+                        }
+                        break;
+                    default:
+                        break;
                 }
-                catch
-                {
-                    // Die Anwendung anhalten
-                    MessageBox.Show("Verarbeitungsfehler Error WndRep.F01\n" +
-                            "Achtung");
-                  }
             }
             else
             {

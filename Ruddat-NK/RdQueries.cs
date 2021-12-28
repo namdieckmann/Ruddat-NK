@@ -505,16 +505,14 @@ namespace Ruddat_NK
 
             if (piArt == 36)
             {
-                // Den Import aus wt_hours_add löschen
+                // Rechnung löschen
                 lsSql = "Delete from rechnungen Where id_rechnungen = " + piId.ToString();
             }
-
             if (piArt == 38)
             {
                 // Zahlung löschen
                 lsSql = "Delete from zahlungen Where id_vz = " + piId.ToString();
             }
-
             if (piArt == 40)
             {
                 // Zählerstände löschen

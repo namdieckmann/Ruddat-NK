@@ -81,6 +81,12 @@ namespace Ruddat_NK
 
         // Datenübergabe an WndChooseSet
         public delegate void delPassData(int giTimelineId);
+        // Übergabe an Reports und Stammdaten
+        public delegate void DelPassDataSql(string Sql);
+        public delegate void DelPassDataArt(int Art);
+        public delegate void DelPassConnect(string Connect);
+        public delegate void DelPassShowArt(int show);
+        public delegate void DelPassDb(int giDb);
 
         public MainWindow()
         {
@@ -514,7 +520,7 @@ namespace Ruddat_NK
                             zleh.ItemsSource = tableZlNummer.DefaultView;
                             zlmw.ItemsSource = tableZlNummer.DefaultView;
                         }
-                        if (piArt == 23)
+                        if (piArt == 35)
                         {
                             // SqlDataAdapter sda = new SqlDataAdapter(command);
                             SqlCommandBuilder commandBuilder23 = new SqlCommandBuilder(sda);
@@ -574,6 +580,8 @@ namespace Ruddat_NK
                         MySqlConnection con;
                         con = new MySqlConnection(asConnect);
                         MySqlCommand com = new MySqlCommand(psSql, con);
+                        // Db open
+                        con.Open();
 
                         // Daten für Filiale holen
                         if (piArt == 1)
@@ -794,7 +802,7 @@ namespace Ruddat_NK
                             zleh.ItemsSource = tableZlNummer.DefaultView;
                             zlmw.ItemsSource = tableZlNummer.DefaultView;
                         }
-                        if (piArt == 23)
+                        if (piArt == 35)
                         {
                             // MySqlDataAdapter mysda = new MySqlDataAdapter(com);
                             MySqlCommandBuilder commandBuilder23 = new MySqlCommandBuilder(mysda);
@@ -806,11 +814,11 @@ namespace Ruddat_NK
                             // Rechnungen löschen
                             MySqlDataReader queryCommandReader36 = com.ExecuteReader();
                         }
-                        if (piArt == 37)
+                        if (piArt == 37)    // Zahlung 
                         {
                             // MySqlDataAdapter mysdZlg = new MySqlDataAdapter(com);
                             MySqlCommandBuilder commandBuilder37 = new MySqlCommandBuilder(mysdZlg);
-                            sdZlg.Update(tableZlg);
+                            mysdZlg.Update(tableZlg);
                         }
                         if (piArt == 38)
                         {
@@ -1536,6 +1544,9 @@ namespace Ruddat_NK
             string lsSql = "";
             int liOk = 0;
 
+            // TableOne wird aktualsiert Rechnungen TableOne
+            liOk = FetchData("", 35, giDb, gsConnect);
+
             // Timeline bearbeiten    Art 1 = Rechnungen
             Timeline.editTimeline(giTimelineId, giFlagTimeline, gsConnect);
 
@@ -1544,7 +1555,7 @@ namespace Ruddat_NK
             if (giDelId > 0)
             {
                 // Rechnungen löschen
-                lsSql = Timeline.getSql(36, giDelId, "", "", 0);
+                lsSql = RdQueries.GetSqlSelect(36, giDelId, "", "", DateTime.MinValue, DateTime.MinValue, giFiliale, gsConnect, giDb);
                 liOk = FetchData(lsSql, 36, giDb, gsConnect);
             }
 
@@ -1651,7 +1662,7 @@ namespace Ruddat_NK
             int liOk = 0;
             string lsSql = "";
 
-            lsSql = Timeline.getSql(37, 0, "", "", 0);
+            // Datenverbindung
             liOk = FetchData(lsSql, 37, giDb, gsConnect);
             
             // Timeline bearbeiten Art 2 = Zahlungen   
@@ -1661,7 +1672,7 @@ namespace Ruddat_NK
             // Gibt es eine Datensatz ID zum Löschen (button btnRgDel)
             if (giDelZlId > 0)
             {
-                lsSql = Timeline.getSql(38, giDelZlId, "", "", 0);
+                lsSql = RdQueries.GetSqlSelect(38, giDelZlId, "", "", DateTime.MinValue, DateTime.MinValue, giFiliale, gsConnect, giDb);
                 liOk = FetchData(lsSql, 38, giDb, gsConnect);
             }
 
@@ -1836,7 +1847,7 @@ namespace Ruddat_NK
             if (giDelZlWertId > 0)
             {
                 // Den Zählerstand löschen
-                lsSql = Timeline.getSql(40, giDelZlWertId, "", "", 0);
+                lsSql = RdQueries.GetSqlSelect(40, giDelZlWertId, "", "", DateTime.MinValue, DateTime.MinValue, giFiliale, gsConnect, giDb);
                 liOk = FetchData(lsSql, 40, giDb, gsConnect);
 
             }
@@ -2149,7 +2160,7 @@ namespace Ruddat_NK
                     if (lsNetto.Length > 0)
                     {
                         ldNetto = Convert.ToDecimal(lsNetto);
-                        ldBrutto = ldNetto + (ldNetto / 100) * liMwstSatz;                          // Bruttobetrag
+                        ldBrutto = ldNetto + ((ldNetto / 100) * liMwstSatz);                          // Bruttobetrag
                         tableZlg.Rows[liSel][7] = ldBrutto;
                     }
                 }
@@ -2494,6 +2505,10 @@ namespace Ruddat_NK
             updateAllDataGrids(3);
             
             WndRep frmRep = new WndRep(this);
+
+            DelPassDataArt delegt = new DelPassDataArt(frmRep.getDb);
+            delegt(giDb);
+
             frmRep.ShowDialog();
         }
 
@@ -2504,6 +2519,8 @@ namespace Ruddat_NK
             updateAllDataGrids(4);
 
             WndRep frmRep = new WndRep(this);
+            DelPassDataArt delegt = new DelPassDataArt(frmRep.getDb);
+            delegt(giDb);
             frmRep.ShowDialog();
 
         }
@@ -2514,6 +2531,8 @@ namespace Ruddat_NK
             updateAllDataGrids(5);
 
             WndRep frmRep = new WndRep(this);
+            DelPassDataArt delegt = new DelPassDataArt(frmRep.getDb);
+            delegt(giDb);
             frmRep.ShowDialog();
         }
 
@@ -2524,6 +2543,8 @@ namespace Ruddat_NK
             updateAllDataGrids(6);
 
             WndRep frmRep = new WndRep(this);
+            DelPassDataArt delegt = new DelPassDataArt(frmRep.getDb);
+            delegt(giDb);
             frmRep.ShowDialog();
         }
 
@@ -2532,9 +2553,11 @@ namespace Ruddat_NK
         {
             // Sql Statement für das Anschreiben in XML Datei speichern
             updateAllDataGrids(7);
-
             WndRep frmRep = new WndRep(this);
+            DelPassDataArt delegt = new DelPassDataArt(frmRep.getDb);
+            delegt(giDb);
             frmRep.ShowDialog();
+            // Todo Delegates weiterführen
         }
 
         // STAMMDATEN -----------------------------------------------------------

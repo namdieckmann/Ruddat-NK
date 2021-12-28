@@ -10,7 +10,8 @@ namespace Ruddat_NK
     public class Timeline
     {
         // Datensätze Rechnungen
-        static DataTable tableOne;
+        static DataTable tableOne;          // Rechnungen
+        static DataTable tableOneTime;      // Rechnungen für TimelineCreate
         // static DataTable tableTwo;
         static DataTable tableThree;
         static DataTable tableFour;
@@ -34,7 +35,7 @@ namespace Ruddat_NK
         static DataTable tableTimeline1;     // Kosten des Objektes darstellen 
         static DataTable tableContent;       // Content
         static SqlDataAdapter sda;
-        // static SqlDataAdapter sdb;
+        static SqlDataAdapter sdb;
         static SqlDataAdapter sdc;
         // static SqlDataAdapter sdd;
         static SqlDataAdapter sde;
@@ -54,7 +55,7 @@ namespace Ruddat_NK
         static SqlDataAdapter sdParts;
 
         static MySqlDataAdapter mysda;
-        // static MySqlDataAdapter mysdb;
+        static MySqlDataAdapter mysdb;
         static MySqlDataAdapter mysdc;
         // static MySqlDataAdapter mysdd;
         static MySqlDataAdapter mysde;
@@ -107,9 +108,8 @@ namespace Ruddat_NK
             {
                 case 1:
                     // Rechnungen Daten holen mit id extern timeline
-                    lsSql = Timeline.getSql(1, liTimelineId, "", "",0);
-                    // Sql, Art = 1 
-                    liRows = Timeline.fetchData(lsSql,"", 1, asConnect, giDb);
+                    lsSql = Timeline.getSql(1, liTimelineId, "", "",0);     // Rechnungen
+                    liRows = Timeline.fetchData(lsSql,"", 1, asConnect, giDb);  // TableOne
                     break;
                 case 2:
                     // Rechnung Timeline löschen
@@ -158,7 +158,6 @@ namespace Ruddat_NK
             DateTime ldtEnd = DateTime.Today;                       // Heute
             string dt = (DateTime.Now.Year.ToString()) + "-01-01";
             DateTime ldtStart = DateTime.Parse(dt);                 // Jahresanfang
-
 
             switch (piArt)
             {
@@ -532,8 +531,8 @@ namespace Ruddat_NK
                 case 36:        // Report löschen
                     lsSql = "delete from x_abr_content;";
                     break;
-                case 37:        // Id Zähler aus Zählernummer
-                    lsSql = @"select id_zaehler from zaehler where zaehlernummer = '" + ps2.ToString().Trim() + "\'";
+                case 37:        // Zähler Id
+                    lsSql = @"select id_zaehler from zaehler where zaehlernummer = '" + piId.ToString().Trim() + "\'";
                     break;
                 case 38:        // Mwst Satz Zähler
                     lsSql = @"Select art_mwst.mwst from zaehler 
@@ -637,6 +636,7 @@ namespace Ruddat_NK
             DateTime ldtMonat = DateTime.MinValue;
             DateTime ldtVertrag = DateTime.MinValue;
 
+            int liExternId;
             int liOk = 0;
 
             decimal[] ladBetraege = new decimal[12];
@@ -660,26 +660,27 @@ namespace Ruddat_NK
                                 tableOne = new DataTable();         // Rechnung 
                                 sda = new SqlDataAdapter(command);
                                 sda.Fill(tableOne);
-                                liOk = MakeAfterFetch(piArt, 1, 0, 0, asConnect);
+                                liOk = MakeAfterFetch(piArt, 1, 0, 0, asConnect, aiDb);
                                 break;
                             case 2:     // Timeline löschen
                                 SqlDataReader queryCommandReader = command.ExecuteReader();
                                 break;
-                            case 3:     // Rechnungen Timeline Create
-                                tableOne = new DataTable();         // Rechnungen
-                                sda = new SqlDataAdapter(command);
-                                sda.Fill(tableOne);
+                            case 3:     // Rechnungen + Timeline Create
+                                tableOneTime = new DataTable();         // Rechnungen
+                                SqlCommand command3 = new SqlCommand(psSql2, connect);
+                                sdb = new SqlDataAdapter(command3);
+                                sdb.Fill(tableOneTime);
                                 // Externe ID aus der Rechnung ermitteln 
-                                int liExternId = MakeAfterFetch(piArt, 1, 0, 0, asConnect);
+                                liExternId = MakeAfterFetch(piArt, 1, 0, 0, asConnect, aiDb);
 
                                 // Timeline neue Datensätze erzeugen
                                 tableThree = new DataTable();
-                                SqlCommand command3 = new SqlCommand(psSql, connect);
-                                sdc = new SqlDataAdapter(command3);
+                                SqlCommand command31 = new SqlCommand(psSql, connect);
+                                sdc = new SqlDataAdapter(command31);
                                 sdc.Fill(tableThree);
-                                liExternId = MakeAfterFetch(piArt, 2, liExternId, 0, asConnect);
-                                break;
+                                liExternId = MakeAfterFetch(piArt, 2, liExternId, 0, asConnect, aiDb);
 
+                                break;
                             case 4:     // Rechnungen Timeline Create Relations Objektteile schreiben
                                 // tableFive beiinhaltet die Objektteile zu einem gewählten Objekt
                                 SqlCommand command6 = new SqlCommand(psSql2, connect);
@@ -699,7 +700,7 @@ namespace Ruddat_NK
                                 tableFour = new DataTable();
                                 sdc = new SqlDataAdapter(command7);
                                 sdc.Fill(tableFour);
-                                liOk = MakeAfterFetch(piArt, 0, 0, 0, asConnect);
+                                liOk = MakeAfterFetch(piArt, 0, 0, 0, asConnect, aiDb);
                                 break;
                             case 5:     // Rechnungen Timeline Create Relations Mieter schreiben
                                 // Vorhandene Timeline einlesen
@@ -714,33 +715,33 @@ namespace Ruddat_NK
                                 sdc = new SqlDataAdapter(command8);
                                 sdc.Fill(tableThree);
                                 // Schleife durch Timeline
-                                liOk = MakeAfterFetch(piArt, 0, 0, 0, asConnect);
+                                liOk = MakeAfterFetch(piArt, 0, 0, 0, asConnect, aiDb);
                                 break;
                             case 8:     // Mwst Satz holen
                                 sdg = new SqlDataAdapter(command);
                                 tableSeven = new DataTable();
                                 sdg.Fill(tableSeven);
-                                liOk = MakeAfterFetch(piArt, 0, 0, 0, asConnect);
+                                liOk = MakeAfterFetch(piArt, 0, 0, 0, asConnect, aiDb);
                                 break;
                             case 11:    // Zahlungen > Timeline erzeugen bearbeiten
                                 tableZlg = new DataTable();         // Zahlungen
                                 sdZlg = new SqlDataAdapter(command);
                                 sdZlg.Fill(tableZlg);
-                                liOk = MakeAfterFetch(piArt, 0, 0, 0, asConnect);
+                                liOk = MakeAfterFetch(piArt, 0, 0, 0, asConnect, aiDb);
                                 break;
                             case 13:        // Zahlungen Timeline neu erzeugen
                                 tableZlgNew = new DataTable();         // Zahlungen
                                 SqlCommand command13 = new SqlCommand(psSql2, connect);
                                 sdZlgNew = new SqlDataAdapter(command13);
                                 sdZlgNew.Fill(tableZlgNew);
-                                liExternId = MakeAfterFetch(piArt, 1, 0, 0, asConnect);
+                                liExternId = MakeAfterFetch(piArt, 1, 0, 0, asConnect, aiDb);
 
                                 // Timeline neue Datensätze erzeugen
                                 SqlCommand command131 = new SqlCommand(psSql, connect);
                                 tableTml = new DataTable();
                                 sdTml = new SqlDataAdapter(command131);
                                 sdTml.Fill(tableTml);
-                                liOk = MakeAfterFetch(piArt, 2, 0, 0, asConnect);
+                                liOk = MakeAfterFetch(piArt, 2, 0, 0, asConnect, aiDb);
                                 break;
                             case 14:        // Summen aus Objekt für Report Content
                                 tableConSumObj = new DataTable();
@@ -756,13 +757,13 @@ namespace Ruddat_NK
                                 tableRgId = new DataTable();
                                 sdRgId = new SqlDataAdapter(command);
                                 sdRgId.Fill(tableRgId);
-                                liOk = MakeAfterFetch(piArt, 0, 0, 0, asConnect);
+                                liOk = MakeAfterFetch(piArt, 0, 0, 0, asConnect, aiDb);
                                 break;
                             case 21:                               // Zählerstände
                                 tableCnt = new DataTable();
                                 sdCnt = new SqlDataAdapter(command);
                                 sdCnt.Fill(tableCnt);
-                                liOk = MakeAfterFetch(piArt, 0, 0, 0, asConnect);
+                                liOk = MakeAfterFetch(piArt, 0, 0, 0, asConnect, aiDb);
                                 break;
                             case 23:        // Zählerstände Timeline Create
                                 tableCntNew = new DataTable();         // Zahlungen
@@ -774,7 +775,7 @@ namespace Ruddat_NK
                                 tableTml = new DataTable();
                                 sdTml = new SqlDataAdapter(command231);
                                 sdTml.Fill(tableTml);
-                                liOk = MakeAfterFetch(piArt, 0, 0, 0, asConnect);
+                                liOk = MakeAfterFetch(piArt, 0, 0, 0, asConnect, aiDb);
                                 break;
                             case 24:            // Zählerinformationen für Report Nebenkostenabrechnungen
                                 tableZlInfo = new DataTable();
@@ -827,10 +828,15 @@ namespace Ruddat_NK
                                 tableContent.Load(queryCommandReader30);
                                 break;
                             case 31:
+                                // Todo Mysql das wird wohl noch nicht funtionieren
                                 // ReportContent Ab in die Datenbank
                                 SqlDataAdapter adp = new SqlDataAdapter(command);
                                 SqlCommandBuilder commandBuilder31 = new SqlCommandBuilder(adp);
                                 adp.Update(tableContent);
+                                break;
+                            case 32:
+                                SqlCommandBuilder commandBuilder = new SqlCommandBuilder(sdTml);
+                                sdTml.Update(tableTml);
                                 break;
                             default:
                                 break;
@@ -860,28 +866,27 @@ namespace Ruddat_NK
                                 tableOne = new DataTable();         // Rechnung 
                                 mysda = new MySqlDataAdapter(command);
                                 mysda.Fill(tableOne);
-                                liOk = MakeAfterFetch(piArt, 1, 0, 0, asConnect);
+                                liOk = MakeAfterFetch(piArt, 1, 0, 0, asConnect, aiDb);
                                 break;
 
                             case 2:     // Timeline löschen
                                 MySqlDataReader queryCommandReader = command.ExecuteReader();
                                 break;
-
                             case 3:     // Rechnungen Timeline Create
-                                tableOne = new DataTable();         // Rechnungen
-                                mysda = new MySqlDataAdapter(command);
-                                mysda.Fill(tableOne);
+                                tableOneTime = new DataTable();         // Rechnungen
+                                MySqlCommand command3 = new MySqlCommand(psSql2, connect);
+                                mysdb = new MySqlDataAdapter(command3);
+                                mysdb.Fill(tableOneTime);
                                 // Externe ID aus der Rechnung ermitteln 
-                                int liExternId = MakeAfterFetch(piArt, 1, 0, 0, asConnect);
+                                liExternId = MakeAfterFetch(piArt, 1, 0, 0, asConnect, aiDb);
 
                                 // Timeline neue Datensätze erzeugen
                                 tableThree = new DataTable();
-                                MySqlCommand command3 = new MySqlCommand(psSql, connect);
-                                mysdc = new MySqlDataAdapter(command3);
+                                MySqlCommand command31 = new MySqlCommand(psSql, connect);
+                                mysdc = new MySqlDataAdapter(command31);
                                 mysdc.Fill(tableThree);
-                                liExternId = MakeAfterFetch(piArt, 2, liExternId, 0, asConnect);
+                                liExternId = MakeAfterFetch(piArt, 2, liExternId, 0, asConnect, aiDb);
                                 break;
-
                             case 4:     // Rechnungen Timeline Create Relations Objektteile schreiben
                                 // tableFive beiinhaltet die Objektteile zu einem gewählten Objekt
                                 MySqlCommand command6 = new MySqlCommand(psSql2, connect);
@@ -902,7 +907,7 @@ namespace Ruddat_NK
                                 mysdc = new MySqlDataAdapter(command7);
                                 mysdc.Fill(tableFour);
 
-                                liOk = MakeAfterFetch(piArt, 0, 0, 0, asConnect);
+                                liOk = MakeAfterFetch(piArt, 0, 0, 0, asConnect, aiDb);
                                 break;
                             case 5:     // Rechnungen Timeline Create Relations Mieter schreiben
                                 // Vorhandene Timeline einlesen
@@ -917,33 +922,33 @@ namespace Ruddat_NK
                                 mysdc = new MySqlDataAdapter(command8);
                                 mysdc.Fill(tableThree);
                                 // Schleife durch Timeline
-                                liOk = MakeAfterFetch(piArt, 0, 0, 0, asConnect);
+                                liOk = MakeAfterFetch(piArt, 0, 0, 0, asConnect, aiDb);
                                 break;
                             case 8:     // Mwst Satz holen
                                 mysdg = new MySqlDataAdapter(command);
                                 tableSeven = new DataTable();
                                 mysdg.Fill(tableSeven);
-                                liOk = MakeAfterFetch(piArt, 0, 0, 0, asConnect);
+                                liOk = MakeAfterFetch(piArt, 0, 0, 0, asConnect, aiDb);
                                 break;
                             case 11:    // Zahlungen > Timeline erzeugen bearbeiten
                                 tableZlg = new DataTable();         // Zahlungen
                                 mysdZlg = new MySqlDataAdapter(command);
                                 mysdZlg.Fill(tableZlg);
-                                liOk = MakeAfterFetch(piArt, 0, 0, 0, asConnect);
+                                liOk = MakeAfterFetch(piArt, 0, 0, 0, asConnect, aiDb);
                                 break;
                             case 13:        // Zahlungen Timeline neu erzeugen
                                 tableZlgNew = new DataTable();         // Zahlungen
                                 MySqlCommand command13 = new MySqlCommand(psSql2, connect);
                                 mysdZlgNew = new MySqlDataAdapter(command13);
                                 mysdZlgNew.Fill(tableZlgNew);
-                                liExternId = MakeAfterFetch(piArt, 1, 0, 0, asConnect);
+                                liExternId = MakeAfterFetch(piArt, 1, 0, 0, asConnect, aiDb);
 
                                 // Timeline neue Datensätze erzeugen
                                 MySqlCommand command131 = new MySqlCommand(psSql, connect);
                                 tableTml = new DataTable();
                                 mysdTml = new MySqlDataAdapter(command131);
                                 mysdTml.Fill(tableTml);
-                                liOk = MakeAfterFetch(piArt, 2, 0, 0, asConnect);
+                                liOk = MakeAfterFetch(piArt, 2, 0, 0, asConnect, aiDb);
                                 break;
                             case 14:        // Summen aus Objekt für Report Content
                                 tableConSumObj = new DataTable();
@@ -959,13 +964,13 @@ namespace Ruddat_NK
                                 tableRgId = new DataTable();
                                 mysdRgId = new MySqlDataAdapter(command);
                                 mysdRgId.Fill(tableRgId);
-                                liOk = MakeAfterFetch(piArt, 0, 0, 0, asConnect);
+                                liOk = MakeAfterFetch(piArt, 0, 0, 0, asConnect, aiDb);
                                 break;
                             case 21:                               // Zählerstände
                                 tableCnt = new DataTable();
                                 mysdCnt = new MySqlDataAdapter(command);
                                 mysdCnt.Fill(tableCnt);
-                                liOk = MakeAfterFetch(piArt, 0, 0, 0, asConnect);
+                                liOk = MakeAfterFetch(piArt, 0, 0, 0, asConnect, aiDb);
                                 break;
                             case 23:        // Zählerstände Timeline Create
                                 tableCntNew = new DataTable();         // Zahlungen
@@ -977,7 +982,7 @@ namespace Ruddat_NK
                                 tableTml = new DataTable();
                                 mysdTml = new MySqlDataAdapter(command231);
                                 mysdTml.Fill(tableTml);
-                                liOk = MakeAfterFetch(piArt, 0, 0, 0, asConnect);
+                                liOk = MakeAfterFetch(piArt, 0, 0, 0, asConnect, aiDb);
                                 break;
                             case 24:            // Zählerinformationen für Report Nebenkostenabrechnungen
                                 tableZlInfo = new DataTable();
@@ -1027,10 +1032,15 @@ namespace Ruddat_NK
                                 tableContent.Load(queryCommandReader301);
                                 break;
                             case 31:
+                                // Todo Mysql das wird wohl noch nicht funtionieren
                                 // ReportContent Ab in die Datenbank
                                 MySqlDataAdapter myadp = new MySqlDataAdapter(command);
                                 MySqlCommandBuilder commandBuilder31 = new MySqlCommandBuilder(myadp);
                                 myadp.Update(tableContent);
+                                break;
+                            case 32:
+                                MySqlCommandBuilder commandBuilder32 = new MySqlCommandBuilder(mysdTml);
+                                mysdTml.Update(tableTml);
                                 break;
                             default:
                                 break;
@@ -1359,7 +1369,7 @@ namespace Ruddat_NK
         }
 
         // Datenbankaktionen nach fetchdata
-        private static int MakeAfterFetch(int aiArt, int aiTeil, int ai1, int ai2, string asConnect)
+        private static int MakeAfterFetch(int aiArt, int aiTeil, int ai1, int ai2, string asConnect, int aiDb)
         {
             DateTime ldtStart = DateTime.MinValue;
             DateTime ldtEnd = DateTime.MinValue;
@@ -1454,7 +1464,7 @@ namespace Ruddat_NK
                                     liOk = TimelineCreate(liExternId, "id_rechnung", asConnect);
                                     // Weiterleitung an ObjektTeil aus der Kostenart ermitteln
                                     // 2 = Weiterleitung an Mieter
-                                    if (getWtl(2, liExternId, asConnect)==1) // Todo wurde int, testen
+                                    if (getWtl(2, liExternId, asConnect) == 1) // Todo wurde int, testen
                                     {
                                         // Timeline neu erzeugen für Relationen
                                         liOk = TimelineCreateRelations(liExternId, liObjekt, liObjektTeil, liMieter, asConnect);
@@ -1467,7 +1477,7 @@ namespace Ruddat_NK
                                 {
                                     liMieter = (int)tableOne.Rows[i].ItemArray.GetValue(10);
                                     // Timeline neu erzeugen Mieter aus Rechnungen
-                                    // ACHTUNG hier Kontrolle einbauen, ob Mietvertrag gültig ist ULF
+                                    // TODO hier Kontrolle einbauen, ob Mietvertrag gültig ist ULF
                                     liOk = TimelineCreate(liExternId, "id_rechnung", asConnect);
                                 }
                         }
@@ -2120,12 +2130,9 @@ namespace Ruddat_NK
 
                                     } while (zl <= liMonths);
 
-                                    // Todo Mysql
+                                    // Todo MySql : Das wird wohl nocht nicht funktionieren, es musss ja nur die Tabelle content update gemacht werden
                                     // und alles ab in die Datenbank
-                                    SqlCommandBuilder commandBuilder = new SqlCommandBuilder(sdTml);
-                                    sdTml.UpdateCommand = commandBuilder.GetUpdateCommand();
-                                    sdTml.InsertCommand = commandBuilder.GetInsertCommand();
-                                    sdTml.Update(tableTml);
+                                    liOk = fetchData("", "", 32, asConnect, aiDb);
                                 }
                                 else
                                 {
@@ -3370,11 +3377,9 @@ namespace Ruddat_NK
         private static int delContent(string asConnect)
         {
             int liOk = 0;
-
             // kann schonmal gelöscht werden
             lsSql = getSql(36, 0, "", "", 0);
             liOk = fetchData(lsSql, "", 26, asConnect, giDb);
-
             return (liOk);
         }
 
@@ -3382,7 +3387,7 @@ namespace Ruddat_NK
         internal static int getRechnungsId(string asSqlTimeline, string asConnect)
         {
             int liIdRechnung = 0;
-
+ 
             liIdRechnung = fetchData(asSqlTimeline,"", 16, asConnect, giDb);
 
             return (liIdRechnung);

@@ -20,8 +20,8 @@ namespace Ruddat_NK
                                           + asField +" <= Convert(DateTime," + "\'" + adtEnd + "',104)";
                     break;
                 case 2:         // MySql
-                    LsSql = asField + " >= convert('" + adtStart.ToString()  + "',datetime) AND "
-                                          + asField + " <= convert('" + adtEnd.ToString() + "',datetime)";
+                    LsSql = asField + " >= date_format(\"" + adtStart.ToString("dd.MM.yyyy") + "\",\"%d.%m.%y\") AND "
+                                          + asField + " <= date_format(\"" + adtEnd.ToString("dd.MM.yyyy") + "\",\"%d.%m.%y\")";
                     break;
                 default:
                     break;
@@ -40,7 +40,7 @@ namespace Ruddat_NK
                     LsSql = asFieldOne + " >= Convert(DateTime, " + "\'" + adtStart + "', 104) ";
                     break;
                 case 2:         // MySql
-                    LsSql = asFieldOne + " >= convert('" + adtStart.ToString() + "',datetime) ";
+                    LsSql = asFieldOne + " >= date_format(\"" + adtStart.ToString("dd.MM.yyyy") + "\",\"%d.%m.%y\") ";
                     break;
                 default:
                     break;

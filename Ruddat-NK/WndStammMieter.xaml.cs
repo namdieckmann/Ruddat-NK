@@ -34,7 +34,6 @@ namespace Ruddat_NK
         public string psConnect { get; set; }
         public int giObjId = 0;
 
-
         DataTable tableCmp;
         SqlDataAdapter sdCmp;
         DataTable tableMieter;
