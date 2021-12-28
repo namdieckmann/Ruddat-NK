@@ -174,5 +174,25 @@ namespace Ruddat_NK
             }
             return (lsSql);
         }
+
+        internal static string GetDateQueryResultVertrag(DateTime adtStart, string asField, int aiOne, int aiDb)
+        {
+            string LsWhereAdd = "";
+            string lsAnd = " AND ";
+
+            switch (aiDb)
+            {
+                case 1:
+                    LsWhereAdd = lsAnd + asField + " <= Convert(DateTime, " + "\'" + adtStart + "', 104) ";
+                    break;
+                case 2:
+                    LsWhereAdd = lsAnd + asField + " <= date_format(\"" + adtStart.ToString("dd.MM.yyyy") + "\",\"%d.%m.%y\") ";
+                                          
+                    break;
+                default:
+                    break;
+            }
+            return (LsWhereAdd);
+        } 
     }
 }

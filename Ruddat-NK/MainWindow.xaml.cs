@@ -2066,8 +2066,8 @@ namespace Ruddat_NK
                     liExternId = Int32.Parse(rowview.Row[5].ToString());
                     if (liExternId > 0)
                     {
-                        // Daten für Deatils zeigen
-                        lsSql = RdQueries.GetSqlSelect(13, liExternId, giIndex.ToString(), lsIdObj, ldtFrom, ldtTo,giFiliale,gsConnect, giDb);
+                        // Daten für Details zeigen
+                        lsSql = RdQueries.GetSqlSelect(13, liExternId, giIndex.ToString(), lsIdObj, ldtFrom, ldtTo, giFiliale,gsConnect, giDb);
                         liOk = FetchData(lsSql, 13, giDb, gsConnect);
                     }
                 }

@@ -53,6 +53,7 @@ namespace Ruddat_NK
         static SqlDataAdapter sdZlInfo;
         //static SqlDataAdapter sdObjTeil;
         static SqlDataAdapter sdParts;
+        static SqlDataAdapter adp;
 
         static MySqlDataAdapter mysda;
         static MySqlDataAdapter mysdb;
@@ -73,6 +74,7 @@ namespace Ruddat_NK
         static MySqlDataAdapter mysdZlInfo;
         // static MySqlDataAdapter mysdObjTeil;
         static MySqlDataAdapter mysdParts;
+        static MySqlDataAdapter myadp;
 
         static string lsSql = "";
         static int giDb = 2;                    // TODO Welche Datenbank 
@@ -824,17 +826,17 @@ namespace Ruddat_NK
                                 // ReportContent füllen
                                 tableContent = new DataTable();
                                 SqlCommand command30 = new SqlCommand(psSql, connect);
+                                adp = new SqlDataAdapter(command);
                                 SqlDataReader queryCommandReader30 = command30.ExecuteReader();
                                 tableContent.Load(queryCommandReader30);
                                 break;
                             case 31:
-                                // Todo Mysql das wird wohl noch nicht funtionieren
                                 // ReportContent Ab in die Datenbank
-                                SqlDataAdapter adp = new SqlDataAdapter(command);
                                 SqlCommandBuilder commandBuilder31 = new SqlCommandBuilder(adp);
                                 adp.Update(tableContent);
                                 break;
                             case 32:
+                                // Timeline
                                 SqlCommandBuilder commandBuilder = new SqlCommandBuilder(sdTml);
                                 sdTml.Update(tableTml);
                                 break;
@@ -1013,6 +1015,7 @@ namespace Ruddat_NK
                                 break;
                             case 28:
                                 // Erste Tabelle Timeline holen
+                                tableTimeline = new DataTable();
                                 MySqlCommand command281 = new MySqlCommand(psSql, connect);
                                 // Create a SqlDataReader
                                 MySqlDataReader queryCommandReader281 = command281.ExecuteReader();
@@ -1021,24 +1024,26 @@ namespace Ruddat_NK
                                 break;
                             case 29:
                                 // Zweite Tabelle Timeline ObjektKostendarstellung (Zähler)
+                                tableTimeline1 = new DataTable();
                                 MySqlCommand command291 = new MySqlCommand(psSql, connect);
                                 MySqlDataReader queryCommandReader291 = command291.ExecuteReader();
                                 tableTimeline1.Load(queryCommandReader291);
                                 break;
                             case 30:
                                 // ReportContent füllen
+                                tableContent = new DataTable();
                                 MySqlCommand command301 = new MySqlCommand(psSql, connect);
+                                myadp = new MySqlDataAdapter(command301);
                                 MySqlDataReader queryCommandReader301 = command301.ExecuteReader();
                                 tableContent.Load(queryCommandReader301);
                                 break;
                             case 31:
-                                // Todo Mysql das wird wohl noch nicht funtionieren
                                 // ReportContent Ab in die Datenbank
-                                MySqlDataAdapter myadp = new MySqlDataAdapter(command);
                                 MySqlCommandBuilder commandBuilder31 = new MySqlCommandBuilder(myadp);
                                 myadp.Update(tableContent);
                                 break;
                             case 32:
+                                // Timeline update
                                 MySqlCommandBuilder commandBuilder32 = new MySqlCommandBuilder(mysdTml);
                                 mysdTml.Update(tableTml);
                                 break;
@@ -1383,7 +1388,7 @@ namespace Ruddat_NK
             int liMonths = 0; //Anzahl der einzutragenden Monate
             int liDaysStart = 0; // Anzahl der Tages Startmonats
             int liDaysEnd = 0; // Anzahl der Tages EndMonats
-            int liDaysInMonth = 0; // Tage im Monat aus Vertrag
+            // int liDaysInMonth = 0; // Tage im Monat aus Vertrag
             int liSave = 1;  // Freigabe 
 
             decimal ldBetragNetto = 0;
@@ -1813,7 +1818,6 @@ namespace Ruddat_NK
                                 {
                                     tableFour.Rows.Add(dr);
                                 }
-
                                 liSave = 1;
                             }
                             // und alle TimelineEinträge ab in die Datenbank
@@ -1880,8 +1884,7 @@ namespace Ruddat_NK
                             // dr[4] = liObjekt; nicht eintragen
                             // dr[5] = liObjektTeil; nicht eintragen
 
-                            // Aktuellen Mieter ermitteln / Ohne Aktivkennzeichen!
-                            // TODO ULF! Gibt es am Monatsende einen zweiten Mieter muss das hier durch eine 2.te Funtion ermittelt 
+                            // Aktuellen Mieter ermitteln
                             liMieter = getAktMieter(liObjektTeil, ldtMonat, asConnect);
 
                             // Mieter gefunden
@@ -1894,27 +1897,28 @@ namespace Ruddat_NK
                                 // Beginnt der Vertrag in diesem Monat?
                                 ldtVertrag = getVertragInfo(1, ldtMonat, liMieter, asConnect);
 
-                                // Tageszahl von Monatsbeginn an ermitteln
-                                if (ldtVertrag > DateTime.MinValue)
-                                {
-                                    liDaysStart = ldtVertrag.Day;
-                                    liDaysInMonth = System.DateTime.DaysInMonth(ldtVertrag.Year, ldtVertrag.Month);
-                                    liDaysInMonth = liDaysInMonth - liDaysStart;
-                                    ldBetragNetto = (ldBetragNetto / liDaysInMonth) * liDaysInMonth;
-                                    ldBetragBrutto = (ldBetragBrutto / liDaysInMonth) * liDaysInMonth;
-                                }
+                                // Todo Tage anteilig berechnen
+                                //// Tageszahl von Monatsbeginn an ermitteln
+                                //if (ldtVertrag > DateTime.MinValue)
+                                //{
+                                //    liDaysStart = ldtVertrag.Day;
+                                //    liDaysInMonth = System.DateTime.DaysInMonth(ldtVertrag.Year, ldtVertrag.Month);
+                                //    liDaysInMonth = liDaysInMonth - liDaysStart;
+                                //    ldBetragNetto = (ldBetragNetto / liDaysInMonth) * liDaysInMonth;
+                                //    ldBetragBrutto = (ldBetragBrutto / liDaysInMonth) * liDaysInMonth;
+                                //}
 
-                                // Endet der Vetrag in diesem Monat?
-                                ldtVertrag = getVertragInfo(2, ldtMonat, liMieter, asConnect);
+                                //// Endet der Vetrag in diesem Monat?
+                                //ldtVertrag = getVertragInfo(2, ldtMonat, liMieter, asConnect);
 
-                                // Tageszahl zum Monatsende ermitteln
-                                if (ldtVertrag > DateTime.MinValue)
-                                {
-                                    liDaysStart = ldtVertrag.Day;
-                                    liDaysInMonth = System.DateTime.DaysInMonth(ldtVertrag.Year, ldtVertrag.Month);
-                                    ldBetragNetto = (ldBetragNetto / liDaysInMonth) * liDaysStart;
-                                    ldBetragBrutto = (ldBetragBrutto / liDaysInMonth) * liDaysStart;
-                                }
+                                //// Tageszahl zum Monatsende ermitteln
+                                //if (ldtVertrag > DateTime.MinValue)
+                                //{
+                                //    liDaysStart = ldtVertrag.Day;
+                                //    liDaysInMonth = System.DateTime.DaysInMonth(ldtVertrag.Year, ldtVertrag.Month);
+                                //    ldBetragNetto = (ldBetragNetto / liDaysInMonth) * liDaysStart;
+                                //    ldBetragBrutto = (ldBetragBrutto / liDaysInMonth) * liDaysStart;
+                                //}
 
                                 dr[6] = liMieter;
                             }
@@ -2130,7 +2134,6 @@ namespace Ruddat_NK
 
                                     } while (zl <= liMonths);
 
-                                    // Todo MySql : Das wird wohl nocht nicht funktionieren, es musss ja nur die Tabelle content update gemacht werden
                                     // und alles ab in die Datenbank
                                     liOk = fetchData("", "", 32, asConnect, aiDb);
                                 }
@@ -2379,11 +2382,9 @@ namespace Ruddat_NK
             string lsSql = "";
             string lsSql2 = "";
 
-
             // Dann werden die Kosten verteilt:
             // Nach Objektteil nur nach Quadratmetern oder Anteilig
             // Nach Mieter auch nach Personenzahl
-
 
             if (liObjekt > 0 )                       // Timeline Objektteil schreiben
             {
@@ -2654,8 +2655,7 @@ namespace Ruddat_NK
 
 
         // Ist eine Weitergabe der Kosten in art_kostenart eingetragen
-        // 1 = Grundlage ist das Objekt > geht an ObjektTeil
-        // 2 = Grundlage ist Objektteil > geht an Mieter
+        // 1 = Weiterleitung
         private static int getWtl(int p, int liExternId, string asConnect)
         {
             int liWtl = 0;
@@ -2676,13 +2676,7 @@ namespace Ruddat_NK
             // adtMonat umbauen soll immer den ersten des Monats zeigen
             adtMonat = adtMonat.AddDays(- (adtMonat.Day - 1));
 
-            lsSql = @"Select id_mieter from vertrag
-                        Where id_objekt_teil = " + aiObjektTeil.ToString() +
-                        " AND vertrag.datum_von <= Convert(DateTime," + "\'" + adtMonat + "',104) "
-                        + " AND vertrag.datum_bis >= Convert(DateTime," + "\'" + adtMonat + "',104)";
-            // + " AND vertrag_aktiv = 1 "; 
-            //TODO  Sollte auch ohne Aktiv Kennzeichen gehen TODO ULF!
-
+            lsSql = RdQueries.GetSqlSelect(41, aiObjektTeil, "", "", adtMonat, DateTime.MinValue, 0, asConnect, giDb);
             liMieterId = fetchData(lsSql, "", 26, asConnect, giDb);
 
             return liMieterId;
@@ -2985,15 +2979,14 @@ namespace Ruddat_NK
         liOk = Timeline.delContent(asConnect);
 
         // Timeline einlesen
-        DataTable tableTimeline = new DataTable();
-        DataTable tableTimeline1 = new DataTable();     // Kosten des Objektes darstellen 
-        DataTable tableContent = new DataTable();       // Content
+        //tableTimeline = new DataTable();
+        //tableTimeline1 = new DataTable();     // Kosten des Objektes darstellen 
+        //tableContent = new DataTable();       // Content
 
         if (aiAnschreiben == 1)
         {
             // Rechnunsnummer für Anschreiben prüfen und einsetzen
             // ist eine id_rg_nr in der Timeline vorhanden?
-
             liOk = fetchData(asSql, "", 27, asConnect, giDb);
 
             if (tableTmlCheckRgNr.Rows.Count > 0)
@@ -3570,13 +3563,14 @@ namespace Ruddat_NK
             // Direkte Verteilung 1:1 weiterleiten  
             if (lsVerteilung == "di")
             {
-                lsVertInfo = "lt. Rechnung";
+                // lsVertInfo = "lt. Rechnung";
+                lsVertInfo = "Aus Rg.Nr: \n" + getRgInfo(aiIdRechnung, asConnect, 1);
             }
 
             // Nix wird verteilt                    
             if (lsVerteilung == "nl")
             {
-                lsVertInfo = "";        // Verteilung Keine Ulf!
+                lsVertInfo = "";        
             }
 
             // Zähler 
@@ -3786,22 +3780,7 @@ namespace Ruddat_NK
             DateTime ldtVertrag = DateTime.MinValue;
             string lsSql = "";
 
-            // Todo DatumsKonvertierung Mysql
-            switch (aiArt)
-            {
-                case 1:
-                    lsSql = @"Select datum_von from vertrag where vertrag.id_mieter = " + aiMieter.ToString() +
-                             " and Month(vertrag.datum_von) = Month(Convert(DateTime," + "\'" + adtMonat + "',104))" +
-                             " and Year(vertrag.datum_von) = Year(Convert(DateTime," + "\'" + adtMonat + "',104))";
-                    break;
-                case 2:
-                    lsSql = @"Select datum_bis from vertrag where vertrag.id_mieter = " + aiMieter.ToString() +
-                            " and Month(vertrag.datum_bis) = Month(Convert(DateTime," + "\'" + adtMonat + "',104))" +
-                            " and Year(vertrag.datum_bis) = Year(Convert(DateTime," + "\'" + adtMonat + "',104))";
-                    break;
-                default:
-                    break;
-            }
+            lsSql = RdQueries.GetSqlSelect(42, aiMieter, "", "", adtMonat, DateTime.MinValue, aiArt, asConnect, giDb);
             // Daten holen
             ldtVertrag = fetchDataDate(lsSql, "", 1, asConnect, giDb);
 

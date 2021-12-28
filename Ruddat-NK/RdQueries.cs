@@ -18,6 +18,7 @@ namespace Ruddat_NK
             String lsWhereAdd3 = "";
             String lsWhereAdd4 = "";
             String lsField = "";
+            String lsFieldTo = "";  
             String lsAnd = " Where ";
             String lsOrder = "";
             String lsGroup = "";
@@ -346,7 +347,7 @@ namespace Ruddat_NK
                 lsAnd = " And ";
                 lsField = "timeline.dt_monat";
                 liOne = 2;
-                lsWhereAdd2 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsField, lsAnd, liOne, aiDb);
+                lsWhereAdd3 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsField, lsAnd, liOne, aiDb);
                 lsSql = lsSql + lsWhereAdd + lsWhereAdd2 + lsWhereAdd3 + lsOrder;
             }
 
@@ -517,8 +518,29 @@ namespace Ruddat_NK
             {
                 // Zählerstände löschen
                 lsSql = "Delete from zaehlerstaende Where id_zs = " + piId.ToString();
+            }   // Mieter Id aus Vertrag ermitteln
+            if (piArt == 41)
+            {
+                lsSql = @"Select id_mieter from vertrag
+                        Where id_objekt_teil = " + piId.ToString() + " AND vertrag_aktiv = 1 " ;
+                lsField = "vertrag.datum_von";
+                lsWhereAdd2 = RdQueriesTime.GetDateQueryResultVertrag(adtWtStart, lsField, liOne, aiDb);
+                lsSql = lsSql + lsWhereAdd2;
+            }   // Vertragsbeginn oder -ende
+            if (piArt == 42)
+            {
+                switch (aiFiliale)      // Filiale wird hier verwendet, um Vetragsbeginn oder -ende zu ermitteln
+                {
+                    case 1:
+                        lsSql = @"Select datum_von from vertrag where vertrag.id_mieter = " + piId.ToString() + " AND vertrag_aktiv = 1 ";
+                        break;
+                    case 2:
+                        lsSql = @"Select datum_bis from vertrag where vertrag.id_mieter = " + piId.ToString() + " AND vertrag_aktiv = 1 ";
+                        break;
+                    default:
+                        break;
+                }
             }
-
 
             // -----------------------------------------------------------------------------------------------------------------------------
             // ----------------------------------------------------Reports ab hier----------------------------------------------------------
