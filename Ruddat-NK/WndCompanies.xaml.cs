@@ -1,24 +1,9 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Xml;
-
+using MySql.Data.MySqlClient;
 
 namespace Ruddat_NK
 {
@@ -32,14 +17,17 @@ namespace Ruddat_NK
 
         // ConnectString übernehmen
         public string psConnect { get; set; }
+        public int giDb = 0;
 
         DataTable tableCmp;
-        SqlDataAdapter sdCmp;
-        DataTable tableAdr;
-        SqlDataAdapter sdAdr;
         DataTable tableAda;
+        DataTable tableAdr;
+        SqlDataAdapter sdCmp;
+        SqlDataAdapter sdAdr;
         SqlDataAdapter sdAda;
-
+        MySqlDataAdapter mysdCmp;
+        MySqlDataAdapter mysdAdr;
+        MySqlDataAdapter mysdAda;
 
         // Hier Übergabe des Mainwindows für Übergabe des ConnectStrings
         public WndCompanies(MainWindow mainWindow)
@@ -71,6 +59,12 @@ namespace Ruddat_NK
             liRows = fetchData(lsSql, 3);
         }
 
+        // Welche Datenbank
+        internal void getDb(int aiDb)
+        {
+            giDb = aiDb;
+        }
+
         // Sql zusammenstellen
         private string getSql(string asSql, int aiArt, int aiId)
         {
@@ -90,6 +84,12 @@ namespace Ruddat_NK
                 case 3:
                     lsSql = @"Select id_art_adresse,bez from art_adresse Order by sort";
                     break;
+                case 5:
+                    lsSql = "Delete from filiale Where id_filiale = " + aiId.ToString();
+                    break;
+                case 6:
+                    lsSql = @"Select id_filiale from objekt where id_filiale = " + aiId.ToString();
+                    break;
                 default:
                     break;
             }
@@ -106,36 +106,119 @@ namespace Ruddat_NK
             btnSave.IsEnabled = false;
             btnAdd.IsEnabled = true;
 
-            SqlConnection connect;
-            connect = new SqlConnection(gsConnect);
-
-            switch (aiArt)
+            switch (giDb)
             {
-                case 1: // Firmen
-                    tableCmp = new DataTable();         
-                    SqlCommand command = new SqlCommand(asSql, connect);
-                    sdCmp = new SqlDataAdapter(command);
-                    sdCmp.Fill(tableCmp);
-                    dgrCmp.ItemsSource = tableCmp.DefaultView;
+                case 1:
+                    SqlConnection connect;
+                    connect = new SqlConnection(gsConnect);
+                    connect.Open();
+
+                    switch (aiArt)
+                    {
+                        case 1: // Firmen
+                            tableCmp = new DataTable();
+                            SqlCommand command = new SqlCommand(asSql, connect);
+                            sdCmp = new SqlDataAdapter(command);
+                            sdCmp.Fill(tableCmp);
+                            dgrCmp.ItemsSource = tableCmp.DefaultView;
+                            break;
+                        case 2: // Adressen
+                            tableAdr = new DataTable();
+                            SqlCommand command2 = new SqlCommand(asSql, connect);
+                            sdAdr = new SqlDataAdapter(command2);
+                            sdAdr.Fill(tableAdr);
+                            dgrAdr.ItemsSource = tableAdr.DefaultView;
+                            break;
+                        case 3: // Adressarten
+                            tableAda = new DataTable();
+                            SqlCommand command3 = new SqlCommand(asSql, connect);
+                            sdAda = new SqlDataAdapter(command3);
+                            sdAda.Fill(tableAda);
+                            adressenart.ItemsSource = tableAda.DefaultView;
+                            break;
+                        case 4:
+                            SqlCommandBuilder commandBuilder = new SqlCommandBuilder(sdCmp);
+                            sdCmp.Update(tableCmp);
+                            break;
+                        case 5:
+                            SqlCommand command5 = new SqlCommand(asSql, connect);
+                            SqlDataReader queryCommandReader = command5.ExecuteReader();
+                            break;
+                        case 6:
+                            SqlCommand command6 = new SqlCommand(asSql, connect);
+                            int liId;
+                            var lvId = command6.ExecuteScalar();
+                            if (lvId != DBNull.Value)
+                            {
+                                liId = Convert.ToInt32(lvId);
+                            }
+                            else
+                            {
+                                liId = 0;
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                    connect.Close();
                     break;
-                case 2: // Adressen
-                    tableAdr = new DataTable();         
-                    SqlCommand command2 = new SqlCommand(asSql, connect);
-                    sdAdr = new SqlDataAdapter(command2);
-                    sdAdr.Fill(tableAdr);
-                    dgrAdr.ItemsSource = tableAdr.DefaultView;
-                    break;
-                case 3: // Adressarten
-                    tableAda = new DataTable();         
-                    SqlCommand command3 = new SqlCommand(asSql, connect);
-                    sdAda = new SqlDataAdapter(command3);
-                    sdAda.Fill(tableAda);
-                    adressenart.ItemsSource = tableAda.DefaultView;
+                case 2:
+                    MySqlConnection myConnect;
+                    myConnect = new MySqlConnection(gsConnect);
+                    myConnect.Open();
+
+                    switch (aiArt)
+                    {
+                        case 1: // Firmen
+                            tableCmp = new DataTable();
+                            MySqlCommand command = new MySqlCommand(asSql, myConnect);
+                            mysdCmp = new MySqlDataAdapter(command);
+                            mysdCmp.Fill(tableCmp);
+                            dgrCmp.ItemsSource = tableCmp.DefaultView;
+                            break;
+                        case 2: // Adressen
+                            tableAdr = new DataTable();
+                            MySqlCommand command2 = new MySqlCommand(asSql, myConnect);
+                            mysdAdr = new MySqlDataAdapter(command2);
+                            mysdAdr.Fill(tableAdr);
+                            dgrAdr.ItemsSource = tableAdr.DefaultView;
+                            break;
+                        case 3: // Adressarten
+                            tableAda = new DataTable();
+                            MySqlCommand command3 = new MySqlCommand(asSql, myConnect);
+                            mysdAda = new MySqlDataAdapter(command3);
+                            mysdAda.Fill(tableAda);
+                            adressenart.ItemsSource = tableAda.DefaultView;
+                            break;
+                        case 4:
+                            MySqlCommandBuilder commandBuilder = new MySqlCommandBuilder(mysdCmp);
+                            mysdCmp.Update(tableCmp);
+                            break;
+                        case 5:
+                            MySqlCommand command5 = new MySqlCommand(asSql, myConnect);
+                            MySqlDataReader queryCommandReader = command5.ExecuteReader();
+                            break;
+                        case 6:
+                            MySqlCommand command6 = new MySqlCommand(asSql, myConnect);
+                            int liId;
+                            var lvId = command6.ExecuteScalar();
+                            if (lvId != DBNull.Value)
+                            {
+                                liId = Convert.ToInt32(lvId);
+                            }
+                            else
+                            {
+                                liId = 0;
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                    myConnect.Close();
                     break;
                 default:
                     break;
             }
-
             return liRows;
         }
 
@@ -158,6 +241,8 @@ namespace Ruddat_NK
             int liId = 0;
             int liSel = dgrCmp.SelectedIndex;
             int liRows = 0;
+            int liOk = 0;
+            string lsSql = "";
             string lsSql2 = "";
 
 
@@ -166,10 +251,7 @@ namespace Ruddat_NK
 
             if (btnSave.Content.ToString() == "Speichern")
             {
-                SqlCommandBuilder commandBuilder = new SqlCommandBuilder(sdCmp);
-
-                sdCmp.UpdateCommand = commandBuilder.GetUpdateCommand();
-                sdCmp.InsertCommand = commandBuilder.GetInsertCommand();
+                fetchData("", 4);
             }
             else  // Löschen
             {
@@ -182,33 +264,13 @@ namespace Ruddat_NK
 
                         if (liId >= 0)
                         {
-                            // Den Import aus wt_hours_add löschen
-                            String lsSql = "Delete from filiale Where id_filiale = " + liId.ToString();
-
-                            SqlConnection connect;
-                            connect = new SqlConnection(gsConnect);
-                            SqlCommand command = new SqlCommand(lsSql, connect);
-
-                            try
-                            {
-                                // Db open
-                                connect.Open();
-                                SqlDataReader queryCommandReader = command.ExecuteReader();
-                                connect.Close();
-                            }
-                            catch
-                            {
-                                MessageBox.Show("In Tabelle Gesellschaften konnte nicht gelöscht werden\n" +
-                                        "Prüfen Sie bitte die Datenbankverbindung\n",
-                                        "Achtung WndCompanies.Cmp.del",
-                                            MessageBoxButton.OK);
-                            }
+                            lsSql = getSql("",5,liId);
+                            liOk = fetchData(lsSql, 5);
                         }
                     }
                 }
             }
 
-            sdCmp.Update(tableCmp);
             // SqlSelect erstellen
             lsSql2 = getSql("cmp", 1, 0);
             // Daten holen
@@ -216,7 +278,6 @@ namespace Ruddat_NK
 
             btnSave.Content = "Speichern";
             btnDel.IsEnabled = true;
-
         }
 
         // Es wurde etwas geändert; speichern öffnen
@@ -269,42 +330,13 @@ namespace Ruddat_NK
         private int getDelInfo(int aiId)
         {
             int liId = 0;
-            String lsSql = "";
+            string lsSql = "";
 
-            lsSql = @"Select id_filiale from objekt where id_filiale = " + aiId.ToString();
+            lsSql = getSql("", 6, aiId);
+            liId = fetchData(lsSql, 6);
 
-            SqlConnection connect;
-            connect = new SqlConnection(gsConnect);
-            SqlCommand command = new SqlCommand(lsSql, connect);
-
-            // art_day
-            try
-            {
-                // Db open
-                connect.Open();
-                var lvId = command.ExecuteScalar();
-
-                if (lvId != DBNull.Value)
-                {
-                    liId = Convert.ToInt32(lvId);
-                }
-                else
-                {
-                    liId = 0;
-                }
-
-                connect.Close();
-            }
-            catch
-            {
-                MessageBox.Show("Es wurden keine Informationen für das Löschen einer Filiale gefunden\n" +
-                        "Prüfen Sie bitte die Datenbankverbindung\n",
-                        "Achtung (WndCmp.getdelInfo)",
-                         MessageBoxButton.OK);
-            }
             return liId;
         }
-
 
         // Gesellschaft löschen ( nur offen, wenn sie nicht verwendet wird
         private void btnDel_Click(object sender, RoutedEventArgs e)
@@ -441,6 +473,5 @@ namespace Ruddat_NK
         {
             btnAdrDel.IsEnabled = true;
         }
-
     }
 }

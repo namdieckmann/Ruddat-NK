@@ -1,23 +1,8 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Xml;
+using MySql.Data.MySqlClient;
 
 
 namespace Ruddat_NK
@@ -34,12 +19,14 @@ namespace Ruddat_NK
         public int giObjektId = 0;
         public int giArt = 0;
         public int giFlBehalten = 0;
+        public int giDb = 0;
 
         // ConnectString übernehmen
         public string psConnect { get; set; }
 
         DataTable tableParts;
         SqlDataAdapter sdParts;
+        MySqlDataAdapter mysdParts;
 
         public WndChooseSet(MainWindow mainWindow)
         {
@@ -48,6 +35,12 @@ namespace Ruddat_NK
 
             // ConnectString global
             gsConnect = this.mainWindow.psConnect;
+        }
+
+        // Welche Datenbank
+        internal void getDb(int aiDb)
+        {
+            giDb = aiDb;
         }
 
         // Sql zusammenstellen
@@ -86,22 +79,53 @@ namespace Ruddat_NK
         {
             int liRows = 0;
 
-            SqlConnection connect;
-            connect = new SqlConnection(gsConnect);
-
-            switch (aiArt)
+            switch (giDb)
             {
-                case 1: // objekt_mix_parts
-                    tableParts = new DataTable();
-                    SqlCommand command = new SqlCommand(asSql, connect);
-                    sdParts = new SqlDataAdapter(command);
-                    sdParts.Fill(tableParts);
-                    dgrChoose.ItemsSource = tableParts.DefaultView;
-
+                case 1:
+                    SqlConnection connect;
+                    connect = new SqlConnection(gsConnect);
+                    switch (aiArt)
+                    {
+                        case 1: // objekt_mix_parts
+                            tableParts = new DataTable();
+                            SqlCommand command = new SqlCommand(asSql, connect);
+                            sdParts = new SqlDataAdapter(command);
+                            sdParts.Fill(tableParts);
+                            dgrChoose.ItemsSource = tableParts.DefaultView;
+                            break;
+                        case 2:
+                            SqlCommandBuilder commandBuilder2 = new SqlCommandBuilder(sdParts);
+                            sdParts.Update(tableParts);
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
+                case 2:
+                    MySqlConnection myConnect;
+                    myConnect = new MySqlConnection(gsConnect);
+                    switch (aiArt)
+                    {
+                        case 1: // objekt_mix_parts
+                            tableParts = new DataTable();
+                            MySqlCommand command = new MySqlCommand(asSql, myConnect);
+                            mysdParts = new MySqlDataAdapter(command);
+                            mysdParts.Fill(tableParts);
+                            dgrChoose.ItemsSource = tableParts.DefaultView;
+                            break;
+                        case 2:
+                            MySqlCommandBuilder commandBuilder2 = new MySqlCommandBuilder(mysdParts);
+                            mysdParts.Update(tableParts);
+                            break;
+                        default:
+                            break;
+                    }
                     break;
                 default:
                     break;
             }
+
+
             return liRows;
         }
 
@@ -150,6 +174,7 @@ namespace Ruddat_NK
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             int liRows = 0;
+            int liOk = 0;
 
             // Neue Daten > Timeline ID eintragen
             if (giArt == 1 || giArt == 2)
@@ -165,13 +190,7 @@ namespace Ruddat_NK
                     }
                 }
             }
-
-            SqlCommandBuilder commandBuilder = new SqlCommandBuilder(sdParts);
-
-            sdParts.UpdateCommand = commandBuilder.GetUpdateCommand();
-            sdParts.InsertCommand = commandBuilder.GetInsertCommand();
-
-            sdParts.Update(tableParts);
+            liOk = fetchData("", 2);
         }
     }
 }

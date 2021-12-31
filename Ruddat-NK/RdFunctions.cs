@@ -3485,7 +3485,7 @@ namespace Ruddat_NK
         }
 
         // Verteilungsinformationen für die Nebenkostenabrechnung ermitteln
-        // aiId Rechnung ist die extern Timeline ID ACHTUNG!!
+        // aiId Rechnung ist die Rechnungs Id aus extern Timeline ID ACHTUNG!!
         private static object getVerteilungsInfo(string asConnect, int aiIdRechnung, int aiArtVerteilungId, 
             int aiObjektId, int aiTObjektId, int aiMieterId, 
             string asDatVon, string asDatBis, int aiIdExternTimelineZaehlerstand, int aiDetailGrad)

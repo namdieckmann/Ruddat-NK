@@ -1868,7 +1868,6 @@ namespace Ruddat_NK
 
         // Rechnungen Netto und Brutto Umrechnungen
         // und für die bedingte Verteilung von Flächen das Auswahlformular öffnen
-
         private void DgrRechnungen_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
         {
             int liMwstSatz = 99;
@@ -1898,12 +1897,13 @@ namespace Ruddat_NK
                     // Wurde eine Bedingte Verteilung gewählt? Auswahlformular öffnen?
                     if (lsArtVertKurz == "fa")
                     {
-
                         // Objekt Mix neu anlegen mit Objekt ID und 
                         liOk = Timeline.makeChoose(giObjekt,giTimelineId,gsConnect);
                         // Objekt Mix Parts auswählen
                         WndChooseSet frmChooseSet = new WndChooseSet(this);
-
+                        // Welche Datenbank
+                        delPassData delegt4 = new delPassData(frmChooseSet.getDb);
+                        delegt4(giDb);
                         // Übergabe der TimeLine ID an das Auswahlfenster
                         delPassData delegt = new delPassData(frmChooseSet.getTimelineId);
                         delegt(giTimelineId);
@@ -2609,6 +2609,9 @@ namespace Ruddat_NK
 
             WndCompanies frmCmp = new WndCompanies(this);
             frmCmp.ShowDialog();
+
+            DelPassDataArt delegt = new DelPassDataArt(frmCmp.getDb);
+            delegt(giDb);
 
             // Update der Daten nach Firmenwechsel
             updateAllDataGrids(1);
