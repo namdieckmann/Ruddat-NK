@@ -1,23 +1,9 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Xml;
+using MySql.Data.MySqlClient;
 
 
 namespace Ruddat_NK
@@ -29,19 +15,18 @@ namespace Ruddat_NK
     {
         private MainWindow mainWindow;
         public String gsConnect;
+        public int giDb;
 
         // ConnectString übernehmen
         public string psConnect { get; set; }
 
         DataTable tableKsa;
         SqlDataAdapter sdKsa;
+        MySqlDataAdapter mysdKsa;
 
         // Hier Übergabe des Mainwindows für Übergabe des ConnectStrings
         public WndKsa(MainWindow mainWindow)
         {
-            String lsSql = "";
-            int liRows = 0;
-
             this.mainWindow = mainWindow;
             InitializeComponent();
 
@@ -52,45 +37,66 @@ namespace Ruddat_NK
             this.btnSave.IsEnabled = false;
             this.btnDel.IsEnabled = false;
             this.rbObj.IsChecked = true;
-
-            // SqlSelect erstellen
-            lsSql = getSql("ksa",1);
-            // Daten holen
-            liRows = fetchData(lsSql, "ksa");
         }
 
+
+        internal void getDb(int aiDb)
+        {
+            String lsSql = "";
+            int liRows = 0;
+
+            giDb = aiDb;
+
+            // SqlSelect erstellen
+            lsSql = getSql(1, 1, 0);
+            // Daten holen
+            liRows = fetchData(lsSql, 1);
+        }
+
+
         // Sql zusammenstellen
-        private string getSql(string asSql, int aiArt)
+        private string getSql(int aiArt, int aiChoose, int aiId)
         {
             string lsSql = "";
 
             switch (aiArt)
             {
-                case 1:         // Objekte
-                    lsSql = "select bez,wtl_obj_teil,wtl_mieter,sort,id_ksa,ksa_objekt,ksa_obj_teil,ksa_mieter,ksa_zahlung,ksa_zaehler from art_kostenart Where ksa_objekt = 1 Order by bez";
+                case 1:
+                    switch (aiChoose)
+                    {
+                        case 1:         // Objekte
+                            lsSql = "select bez,wtl_obj_teil,wtl_mieter,sort,id_ksa,ksa_objekt,ksa_obj_teil,ksa_mieter,ksa_zahlung,ksa_zaehler from art_kostenart Where ksa_objekt = 1 Order by bez";
+                            break;
+                        case 2:         // Teilobjekte
+                            lsSql = "select bez,wtl_obj_teil,wtl_mieter,sort,id_ksa,ksa_objekt,ksa_obj_teil,ksa_mieter,ksa_zahlung,ksa_zaehler from art_kostenart Where ksa_obj_teil = 1 Order by bez";
+                            break;
+                        case 3:         // Mieter
+                            lsSql = "select bez,wtl_obj_teil,wtl_mieter,sort,id_ksa,ksa_objekt,ksa_obj_teil,ksa_mieter,ksa_zahlung,ksa_zaehler from art_kostenart Where ksa_mieter = 1 Order by bez";
+                            break;
+                        case 4:         // Zahlung
+                            lsSql = "select bez,wtl_obj_teil,wtl_mieter,sort,id_ksa,ksa_objekt,ksa_obj_teil,ksa_mieter,ksa_zahlung,ksa_zaehler from art_kostenart Where ksa_zahlung = 1 Order by bez";
+                            break;
+                        case 5:         // Zähler
+                            lsSql = "select bez,wtl_obj_teil,wtl_mieter,sort,id_ksa,ksa_objekt,ksa_obj_teil,ksa_mieter,ksa_zahlung,ksa_zaehler from art_kostenart Where ksa_zaehler = 1 Order by bez";
+                            break;
+                        default:
+                            break;
+                    }
                     break;
-                case 2:         // Teilobjekte
-                    lsSql = "select bez,wtl_obj_teil,wtl_mieter,sort,id_ksa,ksa_objekt,ksa_obj_teil,ksa_mieter,ksa_zahlung,ksa_zaehler from art_kostenart Where ksa_obj_teil = 1 Order by bez";
+                case 3:
+                    lsSql = "Delete from art_kostenart Where id_ksa = " + aiId.ToString();
                     break;
-                case 3:         // Mieter
-                    lsSql = "select bez,wtl_obj_teil,wtl_mieter,sort,id_ksa,ksa_objekt,ksa_obj_teil,ksa_mieter,ksa_zahlung,ksa_zaehler from art_kostenart Where ksa_mieter = 1 Order by bez";
-                    break;
-                case 4:         // Zahlung
-                    lsSql = "select bez,wtl_obj_teil,wtl_mieter,sort,id_ksa,ksa_objekt,ksa_obj_teil,ksa_mieter,ksa_zahlung,ksa_zaehler from art_kostenart Where ksa_zahlung = 1 Order by bez";
-                    break;
-                case 5:         // Zähler
-                    lsSql = "select bez,wtl_obj_teil,wtl_mieter,sort,id_ksa,ksa_objekt,ksa_obj_teil,ksa_mieter,ksa_zahlung,ksa_zaehler from art_kostenart Where ksa_zaehler = 1 Order by bez";
+                case 4:
+                    lsSql = @"Select id_ksa from Rechnungen where id_ksa = " + aiId.ToString();
                     break;
                 default:
                     break;
             }
-
-
             return lsSql;
         }
 
         // Daten holen
-        private int fetchData(string asSql, string p)
+        private int fetchData(string asSql, int aiArt)
         {
             int liRows = 0;
 
@@ -99,17 +105,90 @@ namespace Ruddat_NK
             btnDel.IsEnabled = false;
             btnAdd.IsEnabled = true;
 
-            SqlConnection connect;
-            connect = new SqlConnection(gsConnect);
+            switch (giDb)
+            {
+                case 1:
+                    SqlConnection connect;
+                    connect = new SqlConnection(gsConnect);
+                    connect.Open();
+                    switch (aiArt)
+                    {
+                        case 1:
+                            tableKsa = new DataTable();         // Kostenarten 
+                            SqlCommand command = new SqlCommand(asSql, connect);
+                            sdKsa = new SqlDataAdapter(command);
+                            sdKsa.Fill(tableKsa);
+                            dgrKsa.ItemsSource = tableKsa.DefaultView;
+                            break;
+                        case 2:
+                            SqlCommandBuilder commandBuilder = new SqlCommandBuilder(sdKsa);
+                            sdKsa.Update(tableKsa);
+                            break;
+                        case 3:
+                            SqlCommand command3 = new SqlCommand(asSql, connect);
+                            SqlDataReader queryCommandReader = command3.ExecuteReader();
+                            break;
+                        case 4:
+                            SqlCommand command4 = new SqlCommand(asSql, connect);
+                            var lvId = command4.ExecuteScalar();
 
-            tableKsa = new DataTable();         // Kostenarten 
-            SqlCommand command = new SqlCommand(asSql, connect);
-            sdKsa = new SqlDataAdapter(command);
-            sdKsa.Fill(tableKsa);
+                            if (lvId != DBNull.Value)
+                            {
+                                liRows = Convert.ToInt32(lvId);     // LiRows wird als Id missbraucht
+                            }
+                            else
+                            {
+                                liRows = 0;
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                    connect.Close();
+                    break;
+                case 2:
+                    MySqlConnection myConnect;
+                    myConnect = new MySqlConnection(gsConnect);
+                    myConnect.Open();
+                    switch (aiArt)
+                    {
+                        case 1:
+                            tableKsa = new DataTable();         // Kostenarten 
+                            MySqlCommand mycommand = new MySqlCommand(asSql, myConnect);
+                            mysdKsa = new MySqlDataAdapter(mycommand);
+                            mysdKsa.Fill(tableKsa);
+                            dgrKsa.ItemsSource = tableKsa.DefaultView;
+                            break;
+                        case 2:
+                            MySqlCommandBuilder commandBuilder = new MySqlCommandBuilder(mysdKsa);
+                            mysdKsa.Update(tableKsa);
+                            break;
+                        case 3:
+                            MySqlCommand command3 = new MySqlCommand(asSql, myConnect);
+                            MySqlDataReader queryCommandReader = command3.ExecuteReader();
+                            break;
+                        case 4:
+                            MySqlCommand command4 = new MySqlCommand(asSql, myConnect);
+                            var lvId = command4.ExecuteScalar();
 
-            dgrKsa.ItemsSource = tableKsa.DefaultView;
+                            if (lvId != DBNull.Value)
+                            {
+                                liRows = Convert.ToInt32(lvId);     // LiRows wird als Id missbraucht
+                            }
+                            else
+                            {
+                                liRows = 0;
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                    myConnect.Close();
+                    break;
+                default:
+                    break;
 
-
+            }
             return liRows;
         }
 
@@ -127,9 +206,9 @@ namespace Ruddat_NK
             if (rbObj.IsChecked == true)
             {
                 // SqlSelect erstellen
-                lsSql = getSql("ksa", 1);
+                lsSql = getSql(1,1,0);
                 // Daten holen
-                liRows = fetchData(lsSql, "ksa");
+                liRows = fetchData(lsSql, 1);
 
                 dgrKsa.Columns[1].Visibility = Visibility.Visible;
                 dgrKsa.Columns[2].Visibility = Visibility.Visible;
@@ -151,9 +230,9 @@ namespace Ruddat_NK
             if (rbObjTeil.IsChecked == true)
             {
                 // SqlSelect erstellen
-                lsSql = getSql("ksa", 2);
+                lsSql = getSql(1, 2, 0);
                 // Daten holen
-                liRows = fetchData(lsSql, "ksa");
+                liRows = fetchData(lsSql, 1);
 
                 dgrKsa.Columns[1].Visibility = Visibility.Collapsed;
                 dgrKsa.Columns[2].Visibility = Visibility.Visible;
@@ -170,9 +249,9 @@ namespace Ruddat_NK
             if (rbMieter.IsChecked == true)
             {
                 // SqlSelect erstellen
-                lsSql = getSql("ksa", 3);
+                lsSql = getSql(1, 3, 0);
                 // Daten holen
-                liRows = fetchData(lsSql, "ksa");
+                liRows = fetchData(lsSql, 1);
 
                 dgrKsa.Columns[1].Visibility = Visibility.Collapsed;
                 dgrKsa.Columns[2].Visibility = Visibility.Collapsed;
@@ -189,9 +268,9 @@ namespace Ruddat_NK
             if (rbzahlung.IsChecked == true)
             {
                 // SqlSelect erstellen
-                lsSql = getSql("ksa", 4);
+                lsSql = getSql(1, 4, 0);
                 // Daten holen
-                liRows = fetchData(lsSql, "ksa");
+                liRows = fetchData(lsSql, 1);
 
                 dgrKsa.Columns[1].Visibility = Visibility.Collapsed;
                 dgrKsa.Columns[2].Visibility = Visibility.Collapsed;
@@ -208,9 +287,9 @@ namespace Ruddat_NK
             if (rbzaehler.IsChecked == true)
             {
                 // SqlSelect erstellen
-                lsSql = getSql("ksa", 5);
+                lsSql = getSql(1, 5, 0);
                 // Daten holen
-                liRows = fetchData(lsSql, "ksa");
+                liRows = fetchData(lsSql, 1);
 
                 dgrKsa.Columns[1].Visibility = Visibility.Collapsed;
                 dgrKsa.Columns[2].Visibility = Visibility.Collapsed;
@@ -219,7 +298,7 @@ namespace Ruddat_NK
         }
 
 
-        // datensatz zufügen
+        // Datensatz zufügen
         private void btnAdd_Click(object sender, RoutedEventArgs e)
         {
             // Buttons 
@@ -259,19 +338,18 @@ namespace Ruddat_NK
         {
 
             int liId = 0;
+            int liOk = 0;
             int liSel = dgrKsa.SelectedIndex;
             int liRows = 0;
-            string lsSql2 = "";
+            string lsSql = "";
 
             btnSave.IsEnabled = false;
             btnAdd.IsEnabled = true;
 
             if (btnSave.Content.ToString() == "Speichern")
             {
-                SqlCommandBuilder commandBuilder = new SqlCommandBuilder(sdKsa);
 
-                sdKsa.UpdateCommand = commandBuilder.GetUpdateCommand();
-                sdKsa.InsertCommand = commandBuilder.GetInsertCommand();
+                liOk = fetchData("", 2);
             }
             else
             {
@@ -281,62 +359,41 @@ namespace Ruddat_NK
                     if ((rowview.Row[4] != DBNull.Value))
                     {
                         liId = Int32.Parse(rowview.Row[4].ToString());
-
                         if (liId >= 0)
                         {
-                            // Den Import aus wt_hours_add löschen
-                            String lsSql = "Delete from art_kostenart Where id_ksa = " + liId.ToString();
-
-                            SqlConnection connect;
-                            connect = new SqlConnection(gsConnect);
-                            SqlCommand command = new SqlCommand(lsSql, connect);
-
-                            try
-                            {
-                                // Db open
-                                connect.Open();
-                                SqlDataReader queryCommandReader = command.ExecuteReader();
-                                connect.Close();
-                            }
-                            catch
-                            {
-                                MessageBox.Show("In Tabelle Kostenarten konnte nicht gelöscht werden\n" +
-                                        "Prüfen Sie bitte die Datenbankverbindung\n",
-                                        "Achtung",
-                                            MessageBoxButton.OK);
-                            }
+                            // Löschen
+                            lsSql = getSql(3, 0, liId);
+                            liOk = fetchData(lsSql, 3);
                         }
                     }
                 }
             }
 
-            sdKsa.Update(tableKsa);
-
             // Kostenart Objekt, ObjektTeil oder Mieter
             // SqlSelect erstellen
             if (rbObj.IsChecked == true)
             {
-                lsSql2 = getSql("ksa", 1);
+                lsSql = getSql(1, 1, 0);
             }
             if (rbObjTeil.IsChecked == true)
             {
-                lsSql2 = getSql("ksa", 2);
+                lsSql = getSql(1, 2, 0);
             }
             if (rbMieter.IsChecked == true)
             {
-                lsSql2 = getSql("ksa", 3);
+                lsSql = getSql(1, 3, 0);
             }
             if (rbzahlung.IsChecked == true)
             {
-                lsSql2 = getSql("ksa", 4);
+                lsSql = getSql(1, 4, 0);
             }
             if (rbzaehler.IsChecked == true)
             {
-                lsSql2 = getSql("ksa", 5);
+                lsSql = getSql(1, 5, 0);
             }
 
             // Daten holen
-            liRows = fetchData(lsSql2, "ksa");
+            liRows = fetchData(lsSql, 1);
             btnSave.Content = "Speichern";
         }
 
@@ -345,7 +402,6 @@ namespace Ruddat_NK
         {
             btnSave.IsEnabled = true;
         }
-
 
         // Prüfen, ob ein datensatz gelöscht werden darf
         // Existiert die id_ksa in Rechnungen?
@@ -381,37 +437,9 @@ namespace Ruddat_NK
             int liId = 0;
             String lsSql = "";
 
-            lsSql = @"Select id_ksa from Rechnungen where id_ksa = "+ aiId.ToString();
+            lsSql = getSql(4, 0, aiId);
+            liId = fetchData(lsSql, 4);
 
-            SqlConnection connect;
-            connect = new SqlConnection(gsConnect);
-            SqlCommand command = new SqlCommand(lsSql, connect);
-
-            // art_day
-            try
-            {
-                // Db open
-                connect.Open();
-                var lvId = command.ExecuteScalar();
-
-                if (lvId != DBNull.Value)
-                {
-                    liId = Convert.ToInt32(lvId);
-                }
-                else
-                {
-                    liId = 0;
-                }
-
-                connect.Close();
-            }
-            catch
-            {
-                MessageBox.Show("Es wurden keine Rechnungsinformation gefunden\n" +
-                        "Prüfen Sie bitte die Datenbankverbindung\n",
-                        "Achtung (WndKsa.getdelInfo)",
-                         MessageBoxButton.OK);
-            }
             return liId;
         }
 
@@ -419,12 +447,9 @@ namespace Ruddat_NK
         // Kostenart löschen
         private void btnDel_Click(object sender, RoutedEventArgs e)
         {
-            SqlCommandBuilder commandBuilder = new SqlCommandBuilder(sdKsa);
-
             btnSave.IsEnabled = true;
             btnSave.Content = "Wirklich löschen?";
             btnDel.IsEnabled = false;
-
         }
     }
 }

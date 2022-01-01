@@ -1,23 +1,9 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Xml;
+using MySql.Data.MySqlClient;
 
 namespace Ruddat_NK
 {
@@ -28,6 +14,7 @@ namespace Ruddat_NK
     {
         private MainWindow mainWindow;
         public String gsConnect;
+        public int giDb;
 
         // ConnectString übernehmen
         public string psConnect { get; set; }
@@ -36,12 +23,11 @@ namespace Ruddat_NK
         DataTable tableRgNrUse;
         SqlDataAdapter sdRgNr;
         SqlDataAdapter sdRgNrUse;
+        MySqlDataAdapter mysdRgNr;
+        MySqlDataAdapter mysdRgNrUse;
 
         public WndPoolRgNr(MainWindow mainWindow)
         {
-            string lsSql = "";
-            int liRows = 0;
-
             this.mainWindow = mainWindow;
             InitializeComponent();
 
@@ -51,21 +37,29 @@ namespace Ruddat_NK
             // save +  del Button abschalten
             this.btnSave.IsEnabled = false;
             this.btnDelete.IsEnabled = false;
+        }
+
+        // Welche Datenbank
+        internal void getDb(int aiDb)
+        {
+            string lsSql = "";
+            int liRows = 0;
+
+            giDb = aiDb;
 
             // SqlSelect Rechnungsnummern erstellen
-            lsSql = getSql("rgnr", 1, 0);
+            lsSql = getSql(1, 0);
             // Daten Rechnungsnummern holen
             liRows = fetchData(lsSql, 1);
 
             // SqlSelect Verwendete Rechnungsnummern
-            lsSql = getSql("rgnr", 2, 0);
+            lsSql = getSql(2, 0);
             // Daten Verwendete Rechnungsnummern holen
             liRows = fetchData(lsSql, 2);
-
         }
 
         // Sql zusammenstellen
-        private string getSql(string asSql, int aiArt, int aiId)
+        private string getSql(int aiArt, int aiId)
         {
             string lsSql = "";
 
@@ -75,12 +69,14 @@ namespace Ruddat_NK
                     lsSql = "select id_rg_nr,rgnr,id_mieter,flag_besetzt from rgnr Where flag_besetzt != 1 Order by id_rg_nr DESC";
                     break;
                 case 2:         // verwendete Rechnungsnummern
-                    lsSql = "select top 100 id_rg_nr,rgnr,id_mieter,flag_besetzt from rgnr Where flag_besetzt = 1 Order by id_rg_nr DESC";
+                    lsSql = "select id_rg_nr,rgnr,id_mieter,flag_besetzt from rgnr Where flag_besetzt = 1 Order by id_rg_nr DESC";
+                    break;
+                case 4:
+                    lsSql = "Delete from rgnr Where id_rg_nr = " + aiId.ToString();
                     break;
                  default:
                     break;
             }
-
             return lsSql;
         }
 
@@ -93,29 +89,79 @@ namespace Ruddat_NK
             btnSave.IsEnabled = false;
             btnAdd.IsEnabled = true;
 
-            SqlConnection connect;
-            connect = new SqlConnection(gsConnect);
-
-            switch (aiArt)
+            switch (giDb)
             {
-                case 1: // Rechnungsnummern
-                    tableRgNr = new DataTable();
-                    SqlCommand command = new SqlCommand(asSql, connect);
-                    sdRgNr = new SqlDataAdapter(command);
-                    sdRgNr.Fill(tableRgNr);
-                    dgrRgNr.ItemsSource = tableRgNr.DefaultView;
+                case 1:
+                    SqlConnection connect;
+                    connect = new SqlConnection(gsConnect);
+                    connect.Open();
+
+                    switch (aiArt)
+                    {
+                        case 1: // Rechnungsnummern
+                            tableRgNr = new DataTable();
+                            SqlCommand command = new SqlCommand(asSql, connect);
+                            sdRgNr = new SqlDataAdapter(command);
+                            sdRgNr.Fill(tableRgNr);
+                            dgrRgNr.ItemsSource = tableRgNr.DefaultView;
+                            break;
+                        case 2: // verwendete Rechnungsnummern
+                            tableRgNrUse = new DataTable();
+                            SqlCommand command2 = new SqlCommand(asSql, connect);
+                            sdRgNrUse = new SqlDataAdapter(command2);
+                            sdRgNrUse.Fill(tableRgNrUse);
+                            dgrRgNrUse.ItemsSource = tableRgNrUse.DefaultView;
+                            break;
+                        case 3:
+                            SqlCommandBuilder commandBuilder = new SqlCommandBuilder(sdRgNr);
+                            sdRgNr.Update(tableRgNr);
+                            break;
+                        case 4:
+                            SqlCommand command4 = new SqlCommand(asSql, connect);
+                            SqlDataReader queryCommandReader = command4.ExecuteReader();
+                            break;
+                        default:
+                            break;
+                    }
+                    connect.Close();
                     break;
-                case 2: // verwendete Rechnungsnummern
-                    tableRgNrUse = new DataTable();
-                    SqlCommand command2 = new SqlCommand(asSql, connect);
-                    sdRgNrUse = new SqlDataAdapter(command2);
-                    sdRgNrUse.Fill(tableRgNrUse);
-                    dgrRgNrUse.ItemsSource = tableRgNrUse.DefaultView;
+                case 2:
+                    MySqlConnection myConnect;
+                    myConnect = new MySqlConnection(gsConnect);
+                    myConnect.Open();
+
+                    switch (aiArt)
+                    {
+                        case 1: // Rechnungsnummern
+                            tableRgNr = new DataTable();
+                            MySqlCommand command = new MySqlCommand(asSql, myConnect);
+                            mysdRgNr = new MySqlDataAdapter(command);
+                            mysdRgNr.Fill(tableRgNr);
+                            dgrRgNr.ItemsSource = tableRgNr.DefaultView;
+                            break;
+                        case 2: // verwendete Rechnungsnummern
+                            tableRgNrUse = new DataTable();
+                            MySqlCommand command2 = new MySqlCommand(asSql, myConnect);
+                            mysdRgNrUse = new MySqlDataAdapter(command2);
+                            mysdRgNrUse.Fill(tableRgNrUse);
+                            dgrRgNrUse.ItemsSource = tableRgNrUse.DefaultView;
+                            break;
+                        case 3:
+                            MySqlCommandBuilder commandBuilder = new MySqlCommandBuilder(mysdRgNr);
+                            mysdRgNr.Update(tableRgNr);
+                            break;
+                        case 4:
+                            MySqlCommand command4 = new MySqlCommand(asSql, myConnect);
+                            MySqlDataReader queryCommandReader = command4.ExecuteReader();
+                            break;
+                        default:
+                            break;
+                    }
+                    myConnect.Close();
                     break;
                 default:
                     break;
             }
-
             return liRows;
         }
 
@@ -123,20 +169,17 @@ namespace Ruddat_NK
         private void btnSave_Click(object sender, RoutedEventArgs e)
         {
             int liId = 0;
+            int liOk = 0;
             int liSel = dgrRgNr.SelectedIndex;
             int liRows = 0;
-            string lsSql2 = "";
+            string lsSql = "";
 
             btnSave.IsEnabled = false;
             btnAdd.IsEnabled = true;
 
             if (btnSave.Content.ToString() == "Speichern")
             {
-                SqlCommandBuilder commandBuilder = new SqlCommandBuilder(sdRgNr);
-
-                sdRgNr.UpdateCommand = commandBuilder.GetUpdateCommand();
-                sdRgNr.InsertCommand = commandBuilder.GetInsertCommand();
-                sdRgNr.Update(tableRgNr);
+                liOk = fetchData("", 3);
             }
             else  // Löschen
             {
@@ -149,40 +192,18 @@ namespace Ruddat_NK
 
                         if (liId >= 0)
                         {
-                            // Den Import aus wt_hours_add löschen
-                            String lsSql = "Delete from rgnr Where id_rg_nr = " + liId.ToString();
-
-                            SqlConnection connect;
-                            connect = new SqlConnection(gsConnect);
-                            SqlCommand command = new SqlCommand(lsSql, connect);
-
-                            try
-                            {
-                                // Db open
-                                connect.Open();
-                                SqlDataReader queryCommandReader = command.ExecuteReader();
-                                
-                                sdRgNr.Update(tableRgNr);
-                                connect.Close();
-                            }
-                            catch
-                            {
-                                MessageBox.Show("In Tabelle Rechnungsnummern konnte nicht gelöscht werden\n" +
-                                        "Prüfen Sie bitte die Datenbankverbindung\n",
-                                        "Achtung WndPoolRgNr.Rg.del",
-                                            MessageBoxButton.OK);
-                            }
+                            // Löschen
+                            lsSql = getSql(4, liId);
+                            liOk = fetchData(lsSql, 4);
                         }
                     }
                 }
             }
-
-            
- 
+          
             // SqlSelect erstellen
-            lsSql2 = getSql("rgnr", 1, 0);
+            lsSql = getSql(1, 0);
             // Daten holen
-            liRows = fetchData(lsSql2, 1);
+            liRows = fetchData(lsSql, 1);
 
             btnSave.Content = "Speichern";
             btnDelete.IsEnabled = true;
@@ -235,7 +256,5 @@ namespace Ruddat_NK
         {
 
         }
-
-
     }
 }

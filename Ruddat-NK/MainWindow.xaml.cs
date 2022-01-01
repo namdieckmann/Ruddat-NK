@@ -2593,6 +2593,10 @@ namespace Ruddat_NK
         private void mnMasterKsa_Click(object sender, RoutedEventArgs e)
         {
             WndKsa frmKsa = new WndKsa(this);
+
+            DelPassDataArt delegt = new DelPassDataArt(frmKsa.getDb);
+            delegt(giDb);
+
             frmKsa.ShowDialog();
         }
 
@@ -2608,10 +2612,11 @@ namespace Ruddat_NK
         {
 
             WndCompanies frmCmp = new WndCompanies(this);
-            frmCmp.ShowDialog();
 
             DelPassDataArt delegt = new DelPassDataArt(frmCmp.getDb);
             delegt(giDb);
+
+            frmCmp.ShowDialog();
 
             // Update der Daten nach Firmenwechsel
             updateAllDataGrids(1);
@@ -2666,6 +2671,10 @@ namespace Ruddat_NK
         private void mnInputPool_Click(object sender, RoutedEventArgs e)
         {
             WndPoolRgNr frmPoolRgNr = new WndPoolRgNr(this);
+
+            DelPassDataArt delegt = new DelPassDataArt(frmPoolRgNr.getDb);
+            delegt(giDb);
+
             frmPoolRgNr.ShowDialog();
         }
 

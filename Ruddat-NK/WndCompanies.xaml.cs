@@ -32,9 +32,6 @@ namespace Ruddat_NK
         // Hier Übergabe des Mainwindows für Übergabe des ConnectStrings
         public WndCompanies(MainWindow mainWindow)
         {
-            String lsSql = "";
-            int liRows = 0;
-
             this.mainWindow = mainWindow;
             InitializeComponent();
 
@@ -47,22 +44,26 @@ namespace Ruddat_NK
             this.btnAdrSave.IsEnabled = false;
             this.btnAdrDel.IsEnabled = false;
             this.btnAdrAdd.IsEnabled = false;
-
-            // SqlSelect Firmen erstellen
-            lsSql = getSql("cmp", 1, 0);
-            // Daten Firmen holen
-            liRows = fetchData(lsSql,1);
-
-            // SqlSelect AdressArten
-            lsSql = getSql("ada", 3, 0);
-            // Daten Firmen holen
-            liRows = fetchData(lsSql, 3);
         }
 
         // Welche Datenbank
         internal void getDb(int aiDb)
         {
+            String lsSql = "";
+            int liRows = 0;
+
             giDb = aiDb;
+
+            // SqlSelect Firmen erstellen
+            lsSql = getSql("cmp", 1, 0);
+            // Daten Firmen holen
+            liRows = fetchData(lsSql, 1);
+
+            // SqlSelect AdressArten
+            lsSql = getSql("ada", 3, 0);
+            // Daten Firmen holen
+            liRows = fetchData(lsSql, 3);
+
         }
 
         // Sql zusammenstellen
@@ -89,6 +90,9 @@ namespace Ruddat_NK
                     break;
                 case 6:
                     lsSql = @"Select id_filiale from objekt where id_filiale = " + aiId.ToString();
+                    break;
+                case 8:
+                    lsSql = "Delete from adressen Where id_adressen = " + aiId.ToString();
                     break;
                 default:
                     break;
@@ -157,6 +161,14 @@ namespace Ruddat_NK
                                 liId = 0;
                             }
                             break;
+                        case 7:
+                            SqlCommandBuilder commandBuilder7 = new SqlCommandBuilder(sdAdr);
+                            sdAdr.Update(tableAdr);
+                            break;
+                        case 8:
+                            SqlCommand command8 = new SqlCommand(asSql, connect);
+                            SqlDataReader queryCommandReader8 = command8.ExecuteReader();
+                            break;
                         default:
                             break;
                     }
@@ -211,6 +223,14 @@ namespace Ruddat_NK
                                 liId = 0;
                             }
                             break;
+                        case 7:
+                            MySqlCommandBuilder commandBuilder7 = new MySqlCommandBuilder(mysdAdr);
+                            mysdAdr.Update(tableAdr);
+                            break;
+                        case 8:
+                            MySqlCommand command8 = new MySqlCommand(asSql, myConnect);
+                            MySqlDataReader queryCommandReader8 = command8.ExecuteReader();
+                            break;
                         default:
                             break;
                     }
@@ -234,7 +254,6 @@ namespace Ruddat_NK
             tableCmp.Rows.Add(dr);
         }
 
-
         // Änderung abspeichern
         private void btnSave_Click(object sender, RoutedEventArgs e)
         {
@@ -244,7 +263,6 @@ namespace Ruddat_NK
             int liOk = 0;
             string lsSql = "";
             string lsSql2 = "";
-
 
             btnSave.IsEnabled = false;
             btnAdd.IsEnabled = true;
@@ -350,6 +368,7 @@ namespace Ruddat_NK
         private void btnAdrSave_Click(object sender, RoutedEventArgs e)
         {
             int liId = 0;
+            int liOk = 0;
             int liIdCmp = 0;
             int liSelCmp = dgrCmp.SelectedIndex;
             int liSelAdr = dgrAdr.SelectedIndex;
@@ -361,11 +380,7 @@ namespace Ruddat_NK
 
             if (btnAdrSave.Content.ToString() == "Speichern")
             {
-                SqlCommandBuilder commandBuilder = new SqlCommandBuilder(sdAdr);
-
-                sdAdr.UpdateCommand = commandBuilder.GetUpdateCommand();
-                sdAdr.InsertCommand = commandBuilder.GetInsertCommand();
-
+                liOk = fetchData("", 7);
             }
             else  // Löschen
             {
@@ -379,31 +394,12 @@ namespace Ruddat_NK
                         if (liId >= 0)
                         {
                             // Firma löschen
-                            String lsSql2 = "Delete from adressen Where id_adressen = " + liId.ToString();
-
-                            SqlConnection connect;
-                            connect = new SqlConnection(gsConnect);
-                            SqlCommand command2 = new SqlCommand(lsSql2, connect);
-
-                            try
-                            {
-                                // Db open
-                                connect.Open();
-                                SqlDataReader queryCommandReader = command2.ExecuteReader();
-                                connect.Close();
-                            }
-                            catch
-                            {
-                                MessageBox.Show("In Tabelle Adressen konnte nicht gelöscht werden\n" +
-                                        "Prüfen Sie bitte die Datenbankverbindung\n",
-                                        "Achtung WndCompanies.Adr.delete",
-                                            MessageBoxButton.OK);
-                            }
+                            lsSql = getSql("", 8, liId);
+                            liOk = fetchData(lsSql, 8);
                         }
                     }
                 }
             }
-            sdAdr.Update(tableAdr);
 
             // Daten Adresse neu holen
             if (liSelCmp >= 0)
@@ -420,7 +416,6 @@ namespace Ruddat_NK
                     liRows = fetchData(lsSql, 2);
                 }
             }
-
             btnAdrSave.Content = "Speichern";
             btnAdrDel.IsEnabled = true;
         }
@@ -448,7 +443,6 @@ namespace Ruddat_NK
 
                     // Vorgaben eintragen, hier Firmen ID id_filiale
                     dr[4] = liId;
-
                     tableAdr.Rows.Add(dr);
                 }
             }
