@@ -1008,6 +1008,7 @@ namespace Ruddat_NK
                                 }
                                 break;
                             case 27:    // Hier checken, ob schon eine Rechnungsnmmerfür das Anschreiben drin ist
+                                tableTmlCheckRgNr = new DataTable();
                                 MySqlCommand command271 = new MySqlCommand(psSql, connect);
                                 // Create a SqlDataReader
                                 MySqlDataReader queryCommandReader271 = command271.ExecuteReader();

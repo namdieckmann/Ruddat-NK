@@ -2565,6 +2565,8 @@ namespace Ruddat_NK
         private void mnMasterObject_Click(object sender, RoutedEventArgs e)
         {
             WndStammObjekte frmStammObjekte = new WndStammObjekte(this);
+            DelPassDataArt delegt = new DelPassDataArt(frmStammObjekte.getDb);
+            delegt(giDb);
             frmStammObjekte.ShowDialog();
         }
 
@@ -2572,6 +2574,8 @@ namespace Ruddat_NK
         private void mnMasterObjPart_Click(object sender, RoutedEventArgs e)
         {
             WndStammObjTeile frmStammObjTeile = new WndStammObjTeile(this);
+            DelPassDataArt delegt = new DelPassDataArt(frmStammObjTeile.getDb);
+            delegt(giDb);
             frmStammObjTeile.ShowDialog();
         }
 
@@ -2579,6 +2583,8 @@ namespace Ruddat_NK
         private void mnMasterMieter_Click(object sender, RoutedEventArgs e)
         {
             WndStammMieter frmStammMieter = new WndStammMieter(this);
+            DelPassDataArt delegt = new DelPassDataArt(frmStammMieter.getDb);
+            delegt(giDb);
             frmStammMieter.ShowDialog();
         }
 
@@ -2586,6 +2592,8 @@ namespace Ruddat_NK
         private void mnMasterContract_Click(object sender, RoutedEventArgs e)
         {
             WndStammContract frmStammContract = new WndStammContract(this);
+            DelPassDataArt delegt = new DelPassDataArt(frmStammContract.getDb);
+            delegt(giDb);
             frmStammContract.ShowDialog();
         }
 

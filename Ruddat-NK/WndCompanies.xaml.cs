@@ -150,15 +150,14 @@ namespace Ruddat_NK
                             break;
                         case 6:
                             SqlCommand command6 = new SqlCommand(asSql, connect);
-                            int liId;
                             var lvId = command6.ExecuteScalar();
                             if (lvId != DBNull.Value)
                             {
-                                liId = Convert.ToInt32(lvId);
+                                liRows = Convert.ToInt32(lvId);         // LiRows hier als Id genommen
                             }
                             else
                             {
-                                liId = 0;
+                                liRows = 0;
                             }
                             break;
                         case 7:
@@ -212,15 +211,14 @@ namespace Ruddat_NK
                             break;
                         case 6:
                             MySqlCommand command6 = new MySqlCommand(asSql, myConnect);
-                            int liId;
                             var lvId = command6.ExecuteScalar();
                             if (lvId != DBNull.Value)
                             {
-                                liId = Convert.ToInt32(lvId);
-                            }
+                                liRows = Convert.ToInt32(lvId);     // LiRows hier als Id genommen
+                            }   
                             else
                             {
-                                liId = 0;
+                                liRows = 0;
                             }
                             break;
                         case 7:

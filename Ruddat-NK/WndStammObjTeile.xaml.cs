@@ -412,5 +412,10 @@ namespace Ruddat_NK
             }
             return liId;
         }
+
+        internal void getDb(int Art)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

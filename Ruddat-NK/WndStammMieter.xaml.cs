@@ -1,24 +1,10 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Xml;
-
+using MySql.Data.MySqlClient;
 
 namespace Ruddat_NK
 {
@@ -29,28 +15,34 @@ namespace Ruddat_NK
     {
         private MainWindow mainWindow;
         public String gsConnect;
+        public int giDb;
 
         // ConnectString übernehmen
         public string psConnect { get; set; }
         public int giObjId = 0;
 
         DataTable tableCmp;
-        SqlDataAdapter sdCmp;
         DataTable tableMieter;
-        SqlDataAdapter sdMieter;
         DataTable tableAdr;
-        SqlDataAdapter sdAdr;
         DataTable tableAda;
-        SqlDataAdapter sdAda;
         DataTable tableObj;
+
+        SqlDataAdapter sdAda;
+        SqlDataAdapter sdAdr;
+        SqlDataAdapter sdMieter;
+        SqlDataAdapter sdCmp;
         SqlDataAdapter sdObj;
+
+        MySqlDataAdapter mysdAda;
+        MySqlDataAdapter mysdAdr;
+        MySqlDataAdapter mysdMieter;
+        MySqlDataAdapter mysdCmp;
+        MySqlDataAdapter mysdObj;
+
 
         // Hier Übergabe des Mainwindows für Übergabe des ConnectStrings
         public WndStammMieter(MainWindow mainWindow)
         {
-            String lsSql = "";
-            int liRows = 0;
-
             this.mainWindow = mainWindow;
             InitializeComponent();
 
@@ -65,29 +57,39 @@ namespace Ruddat_NK
             this.btnAdrDel.IsEnabled = false;
             this.btnAdrAdd.IsEnabled = false;
 
+
+        }
+
+        internal void getDb(int aiDb)
+        {
+            string lsSql = "";
+            int liRows = 0;
+
+            giDb = aiDb;
             // SqlSelect Firmen erstellen
-            lsSql = getSql("cmp", 1, 0);
+            lsSql = getSql(1, 0);
             // Daten Firmen holen
             liRows = fetchData(lsSql, 1);
 
             // SqlSelect Mieter
-            lsSql = getSql("mieter", 2, 0);
+            lsSql = getSql(2, 0);
             // Daten Firmen holen
             liRows = fetchData(lsSql, 2);
 
             // SqlSelect Adressen
-            lsSql = getSql("adr", 3, 0);
+            lsSql = getSql(3, 0);
             // Daten Firmen holen
             liRows = fetchData(lsSql, 3);
 
             // SqlSelect AdressArten
-            lsSql = getSql("ada", 4, 0);
+            lsSql = getSql(4, 0);
             // Daten Firmen holen
             liRows = fetchData(lsSql, 4);
         }
 
+
         // Sql zusammenstellen
-        private string getSql(string asSql, int aiArt, int aiId)
+        private string getSql(int aiArt, int aiId)
         {
             string lsSql = "";
 
@@ -122,6 +124,18 @@ namespace Ruddat_NK
                     lsSql = @"Select Id_objekt,bez,nr_obj from objekt
                                 where id_filiale = " + aiId.ToString() + " Order by bez";
                     break;
+                case 7:         // Mieter löschen
+                    lsSql = "Delete from mieter Where id_mieter = " + aiId.ToString();
+                    break;
+                case 8:         // Püfen auf Löschen
+                    lsSql = @"Select id_mieter from vertrag where id_mieter = " + aiId.ToString();
+                    break;
+                case 9:         // Darf der Mieter für Leerstand gelöscht werden
+                    lsSql = @"Select id_mieter from timeline where id_mieter = " + aiId.ToString();
+                    break;
+                case 11:        // Adresse löschen
+                    lsSql = "Delete from adressen Where id_adressen = " + aiId.ToString();
+                    break;
                 default:
                     break;
             }
@@ -133,50 +147,191 @@ namespace Ruddat_NK
         {
             int liRows = 0;
 
-            SqlConnection connect;
-            connect = new SqlConnection(gsConnect);
-
-            switch (aiArt)
+            switch (giDb)
             {
-                case 1: // Firmen
-                    tableCmp = new DataTable();
-                    SqlCommand command = new SqlCommand(asSql, connect);
-                    sdCmp = new SqlDataAdapter(command);
-                    sdCmp.Fill(tableCmp);
-                    dgrStCmp.ItemsSource = tableCmp.DefaultView;
-                    liRows = tableCmp.Rows.Count;
+                case 1:
+                    SqlConnection connect;
+                    connect = new SqlConnection(gsConnect);
+                    connect.Open();
+                    switch (aiArt)
+                    {
+                        case 1:     // Firmen
+                            tableCmp = new DataTable();
+                            SqlCommand command = new SqlCommand(asSql, connect);
+                            sdCmp = new SqlDataAdapter(command);
+                            sdCmp.Fill(tableCmp);
+                            dgrStCmp.ItemsSource = tableCmp.DefaultView;
+                            liRows = tableCmp.Rows.Count;
+                            break;
+                        case 2:     // Mieter
+                            tableMieter = new DataTable();
+                            SqlCommand command2 = new SqlCommand(asSql, connect);
+                            sdMieter = new SqlDataAdapter(command2);
+                            sdMieter.Fill(tableMieter);
+                            dgrStMieter.ItemsSource = tableMieter.DefaultView;
+                            liRows = tableMieter.Rows.Count;
+                            break;
+                        case 3:     // Adressen
+                            tableAdr = new DataTable();
+                            SqlCommand command3 = new SqlCommand(asSql, connect);
+                            sdAdr = new SqlDataAdapter(command3);
+                            sdAdr.Fill(tableAdr);
+                            dgrAdr.ItemsSource = tableAdr.DefaultView;
+                            liRows = tableAdr.Rows.Count;
+                            break;
+                        case 4:     // Adressarten
+                            tableAda = new DataTable();
+                            SqlCommand command4 = new SqlCommand(asSql, connect);
+                            sdAda = new SqlDataAdapter(command4);
+                            sdAda.Fill(tableAda);
+                            adressenart.ItemsSource = tableAda.DefaultView;
+                            liRows = tableAda.Rows.Count;
+                            break;
+                        case 5:     // Objekte
+                            tableObj = new DataTable();
+                            SqlCommand command5 = new SqlCommand(asSql, connect);
+                            sdObj = new SqlDataAdapter(command5);
+                            sdObj.Fill(tableObj);
+                            dgrStObj.ItemsSource = tableObj.DefaultView;
+                            liRows = tableObj.Rows.Count;
+                            break;
+                        case 6:     // Mieter speichern
+                            SqlCommandBuilder commandBuilder6 = new SqlCommandBuilder(sdMieter);
+                            sdMieter.Update(tableMieter);
+                            break;
+                        case 7:     // Mieter löschen
+                            SqlCommand command7 = new SqlCommand(asSql, connect);
+                            SqlDataReader queryCommandReader = command7.ExecuteReader();
+                            break;
+                        case 8:     // Mieter prüfen auf Löschen
+                            SqlCommand command8 = new SqlCommand(asSql, connect);
+                            var lvId = command8.ExecuteScalar();
+
+                            if (lvId != DBNull.Value)
+                            {
+                                liRows = Convert.ToInt32(lvId);
+                            }
+                            else
+                            {
+                                liRows = 0;
+                            }
+                            break;
+                        case 9:     // Prüfen Löschen Mieter Leerstand
+                            SqlCommand command9 = new SqlCommand(asSql, connect);
+                            var lvId9 = command9.ExecuteScalar();
+                            if (lvId9 != DBNull.Value)
+                            {
+                                liRows = Convert.ToInt32(lvId9);
+                            }
+                            else
+                            {
+                                liRows = 0;
+                            }
+                            break;
+                        case 10:        // Adresse speichern
+                            SqlCommandBuilder commandBuilder10 = new SqlCommandBuilder(sdAdr);
+                            sdAdr.Update(tableAdr);
+                            break;
+                        case 11:        // Adresse löschen
+                            SqlCommand command11 = new SqlCommand(asSql, connect);
+                            SqlDataReader queryCommandReader11 = command11.ExecuteReader();
+                            break;
+                        default:
+                            break;
+                    }
+                    connect.Close();
                     break;
-                case 2: // Mieter
-                    tableMieter = new DataTable();
-                    SqlCommand command2 = new SqlCommand(asSql, connect);
-                    sdMieter = new SqlDataAdapter(command2);
-                    sdMieter.Fill(tableMieter);
-                    dgrStMieter.ItemsSource = tableMieter.DefaultView;
-                    liRows = tableMieter.Rows.Count;
-                    break;
-                case 3: // Adressen
-                    tableAdr = new DataTable();
-                    SqlCommand command3 = new SqlCommand(asSql, connect);
-                    sdAdr = new SqlDataAdapter(command3);
-                    sdAdr.Fill(tableAdr);
-                    dgrAdr.ItemsSource = tableAdr.DefaultView;
-                    liRows = tableAdr.Rows.Count;
-                    break;
-                case 4: // Adressarten
-                    tableAda = new DataTable();
-                    SqlCommand command4 = new SqlCommand(asSql, connect);
-                    sdAda = new SqlDataAdapter(command4);
-                    sdAda.Fill(tableAda);
-                    adressenart.ItemsSource = tableAda.DefaultView;
-                    liRows = tableAda.Rows.Count;
-                    break;
-                case 5: // Objekte
-                    tableObj = new DataTable();
-                    SqlCommand command5 = new SqlCommand(asSql, connect);
-                    sdObj = new SqlDataAdapter(command5);
-                    sdObj.Fill(tableObj);
-                    dgrStObj.ItemsSource = tableObj.DefaultView;
-                    liRows = tableObj.Rows.Count;
+                case 2:
+                    MySqlConnection myConnect;
+                    myConnect = new MySqlConnection(gsConnect);
+                    myConnect.Open();
+                    switch (aiArt)
+                    {
+                        case 1:     // Firmen
+                            tableCmp = new DataTable();
+                            MySqlCommand command = new MySqlCommand(asSql, myConnect);
+                            mysdCmp = new MySqlDataAdapter(command);
+                            mysdCmp.Fill(tableCmp);
+                            dgrStCmp.ItemsSource = tableCmp.DefaultView;
+                            liRows = tableCmp.Rows.Count;
+                            break;
+                        case 2:     // Mieter
+                            tableMieter = new DataTable();
+                            MySqlCommand command2 = new MySqlCommand(asSql, myConnect);
+                            mysdMieter = new MySqlDataAdapter(command2);
+                            mysdMieter.Fill(tableMieter);
+                            dgrStMieter.ItemsSource = tableMieter.DefaultView;
+                            liRows = tableMieter.Rows.Count;
+                            break;
+                        case 3:     // Adressen
+                            tableAdr = new DataTable();
+                            MySqlCommand command3 = new MySqlCommand(asSql, myConnect);
+                            mysdAdr = new MySqlDataAdapter(command3);
+                            mysdAdr.Fill(tableAdr);
+                            dgrAdr.ItemsSource = tableAdr.DefaultView;
+                            liRows = tableAdr.Rows.Count;
+                            break;
+                        case 4:     // Adressarten
+                            tableAda = new DataTable();
+                            MySqlCommand command4 = new MySqlCommand(asSql, myConnect);
+                            mysdAda = new MySqlDataAdapter(command4);
+                            mysdAda.Fill(tableAda);
+                            adressenart.ItemsSource = tableAda.DefaultView;
+                            liRows = tableAda.Rows.Count;
+                            break;
+                        case 5:     // Objekte
+                            tableObj = new DataTable();
+                            MySqlCommand command5 = new MySqlCommand(asSql, myConnect);
+                            mysdObj = new MySqlDataAdapter(command5);
+                            mysdObj.Fill(tableObj);
+                            dgrStObj.ItemsSource = tableObj.DefaultView;
+                            liRows = tableObj.Rows.Count;
+                            break;
+                        case 6:     // Mieter speichern
+                            MySqlCommandBuilder commandBuilder6 = new MySqlCommandBuilder(mysdMieter);
+                            mysdMieter.Update(tableMieter);
+                            break;
+                        case 7:     // Mieter löschen
+                            MySqlCommand command7 = new MySqlCommand(asSql, myConnect);
+                            MySqlDataReader queryCommandReader = command7.ExecuteReader();
+                            break;
+                        case 8:     // Mieter prüfen auf Löschen
+                            MySqlCommand command8 = new MySqlCommand(asSql, myConnect);
+                            var lvId = command8.ExecuteScalar();
+
+                            if (lvId != DBNull.Value)
+                            {
+                                liRows = Convert.ToInt32(lvId);
+                            }
+                            else
+                            {
+                                liRows = 0;
+                            }
+                            break;
+                        case 9:     // Prüfen Löschen Mieter Leerstand
+                            MySqlCommand command9 = new MySqlCommand(asSql, myConnect);
+                            var lvId9 = command9.ExecuteScalar();
+                            if (lvId9 != DBNull.Value)
+                            {
+                                liRows = Convert.ToInt32(lvId9);
+                            }
+                            else
+                            {
+                                liRows = 0;
+                            }
+                            break;
+                        case 10:        // Adresse speichern
+                            MySqlCommandBuilder commandBuilder10 = new MySqlCommandBuilder(mysdAdr);
+                            mysdAdr.Update(tableAdr);
+                            break;
+                        case 11:        // Adresse löschen
+                            MySqlCommand command11 = new MySqlCommand(asSql, myConnect);
+                            MySqlDataReader queryCommandReader11 = command11.ExecuteReader();
+                            break;
+                        default:
+                            break;
+                    }
+                    myConnect.Close();
                     break;
                 default:
                     break;
@@ -210,7 +365,7 @@ namespace Ruddat_NK
                     // Objekte dazu holen
 
                     // SqlSelect Objekte
-                    lsSql = getSql("obj", 5, liId);
+                    lsSql = getSql(5, liId);
                     // Daten Firmen holen
                     liRows = fetchData(lsSql, 5);
                     dgrAdr.ItemsSource=null;
@@ -218,7 +373,7 @@ namespace Ruddat_NK
 
                     // SqlSelect Mieter Leerstand
                     // SqlSelect erstellen
-                    lsSql2 = getSql("teil", 22, liId);
+                    lsSql2 = getSql(22, liId);
                     // Daten holen
                     liRows = fetchData(lsSql2, 2);
 
@@ -269,7 +424,7 @@ namespace Ruddat_NK
                     liId = Int32.Parse(rowview.Row[0].ToString());
 
                     // SqlSelect erstellen
-                    lsSql2 = getSql("teil", 21, liId);
+                    lsSql2 = getSql( 21, liId);
                     // Daten holen
                     liRows = fetchData(lsSql2, 2);
 
@@ -310,7 +465,7 @@ namespace Ruddat_NK
 
                     // Adressen dazu holen
                     // SqlSelect erstellen
-                    lsSql2 = getSql("adr", 3, liId);
+                    lsSql2 = getSql( 3, liId);
                     // Daten holen
                     liRows = fetchData(lsSql2, 3);
 
@@ -333,21 +488,18 @@ namespace Ruddat_NK
         // Mieter speichern, löschen
         private void btnSave_Click(object sender, RoutedEventArgs e)
         {
-
             int liId = 0;
+            int liOk = 0;
             int liSel = dgrStMieter.SelectedIndex;
             int liRows = 0;
-            string lsSql2 = "";
+            string lsSql = "";
 
             btnSave.IsEnabled = false;
             btnAdd.IsEnabled = true;
 
             if (btnSave.Content.ToString() == "Speichern")
             {
-                SqlCommandBuilder commandBuilder = new SqlCommandBuilder(sdMieter);
-
-                sdMieter.UpdateCommand = commandBuilder.GetUpdateCommand();
-                sdMieter.InsertCommand = commandBuilder.GetInsertCommand();
+                liOk = fetchData("", 6);
             }
             else  // Löschen
             {
@@ -357,36 +509,11 @@ namespace Ruddat_NK
                     if ((rowview.Row[0] != DBNull.Value))
                     {
                         liId = Int32.Parse(rowview.Row[0].ToString());
-
-                        if (liId >= 0)
-                        {
-                            // Den Import aus wt_hours_add löschen
-                            String lsSql = "Delete from mieter Where id_mieter = " + liId.ToString();
-
-                            SqlConnection connect;
-                            connect = new SqlConnection(gsConnect);
-                            SqlCommand command = new SqlCommand(lsSql, connect);
-
-                            try
-                            {
-                                // Db open
-                                connect.Open();
-                                SqlDataReader queryCommandReader = command.ExecuteReader();
-                                connect.Close();
-                            }
-                            catch
-                            {
-                                MessageBox.Show("In Tabelle Objekte konnte nicht gelöscht werden\n" +
-                                        "Prüfen Sie bitte die Datenbankverbindung\n",
-                                        "Achtung WndStammMieter.Mieter.del",
-                                            MessageBoxButton.OK);
-                            }
-                        }
+                        lsSql = getSql(7, liId);
+                        liOk = fetchData(lsSql, 7);
                     }
                 }
             }
-
-            sdMieter.Update(tableMieter);
 
             // Daten Mieter neu holen
             DataRowView rowview3 = dgrStObj.SelectedItem as DataRowView;
@@ -398,9 +525,9 @@ namespace Ruddat_NK
                     liId = Int32.Parse(rowview3.Row[0].ToString());
 
                     // SqlSelect erstellen
-                    lsSql2 = getSql("mieter", 21, liId);
+                    lsSql = getSql( 21, liId);
                     // Daten holen
-                    liRows = fetchData(lsSql2, 2);
+                    liRows = fetchData(lsSql, 2);
                 }                
             }
             else
@@ -413,9 +540,9 @@ namespace Ruddat_NK
                     {
                         liId = Int32.Parse(rowview4.Row[0].ToString());
                         // SqlSelect erstellen
-                        lsSql2 = getSql("mieter", 22, liId);
+                        lsSql = getSql( 22, liId);
                         // Daten holen
-                        liRows = fetchData(lsSql2, 2);
+                        liRows = fetchData(lsSql, 2);
                     }
                 }
             }
@@ -489,37 +616,9 @@ namespace Ruddat_NK
             int liId = 0;
             String lsSql = "";
 
-            lsSql = @"Select id_mieter from vertrag where id_mieter = " + aiId.ToString();
+            lsSql = getSql(8, aiId);
+            liId = fetchData(lsSql, 8);
 
-            SqlConnection connect;
-            connect = new SqlConnection(gsConnect);
-            SqlCommand command = new SqlCommand(lsSql, connect);
-
-            // art_day
-            try
-            {
-                // Db open
-                connect.Open();
-                var lvId = command.ExecuteScalar();
-
-                if (lvId != DBNull.Value)
-                {
-                    liId = Convert.ToInt32(lvId);
-                }
-                else
-                {
-                    liId = 0;
-                }
-
-                connect.Close();
-            }
-            catch
-            {
-                MessageBox.Show("Es wurden keine Informationen für das Löschen eines Mieters gefunden\n" +
-                        "Prüfen Sie bitte die Datenbankverbindung\n",
-                        "Achtung (WndStammMieter.getdelInfo)",
-                         MessageBoxButton.OK);
-            }
             return liId;
         }
 
@@ -529,37 +628,9 @@ namespace Ruddat_NK
             int liId = 0;
             String lsSql = "";
 
-            lsSql = @"Select id_mieter from timeline where id_mieter = " + aiId.ToString();
+            lsSql = getSql(9, aiId);
+            liId = fetchData(lsSql, 9);
 
-            SqlConnection connect;
-            connect = new SqlConnection(gsConnect);
-            SqlCommand command = new SqlCommand(lsSql, connect);
-
-            // art_day
-            try
-            {
-                // Db open
-                connect.Open();
-                var lvId = command.ExecuteScalar();
-
-                if (lvId != DBNull.Value)
-                {
-                    liId = Convert.ToInt32(lvId);
-                }
-                else
-                {
-                    liId = 0;
-                }
-
-                connect.Close();
-            }
-            catch
-            {
-                MessageBox.Show("Es wurden keine Informationen für das Löschen eines Mieters gefunden\n" +
-                        "Prüfen Sie bitte die Datenbankverbindung\n",
-                        "Achtung (WndStammMieter.getdelInfo)",
-                         MessageBoxButton.OK);
-            }
             return liId;
         }
 
@@ -568,19 +639,17 @@ namespace Ruddat_NK
         private void btnAdrSave_Click(object sender, RoutedEventArgs e)
         {
             int liId = 0;
+            int liOk = 0;
             int liSelObj = dgrStMieter.SelectedIndex;
             int liSelAdr = dgrAdr.SelectedIndex;
+            string lsSql = "";
 
             btnAdrSave.IsEnabled = false;
             btnAdrAdd.IsEnabled = true;
 
             if (btnAdrSave.Content.ToString() == "Speichern")
             {
-                SqlCommandBuilder commandBuilder = new SqlCommandBuilder(sdAdr);
-
-                sdAdr.UpdateCommand = commandBuilder.GetUpdateCommand();
-                sdAdr.InsertCommand = commandBuilder.GetInsertCommand();
-
+                liOk = fetchData("", 10);
             }
             else  // Löschen
             {
@@ -593,32 +662,13 @@ namespace Ruddat_NK
 
                         if (liId >= 0)
                         {
-                            // Firma löschen
-                            String lsSql2 = "Delete from adressen Where id_adressen = " + liId.ToString();
-
-                            SqlConnection connect;
-                            connect = new SqlConnection(gsConnect);
-                            SqlCommand command2 = new SqlCommand(lsSql2, connect);
-
-                            try
-                            {
-                                // Db open
-                                connect.Open();
-                                SqlDataReader queryCommandReader = command2.ExecuteReader();
-                                connect.Close();
-                            }
-                            catch
-                            {
-                                MessageBox.Show("In Tabelle Adressen konnte nicht gelöscht werden\n" +
-                                        "Prüfen Sie bitte die Datenbankverbindung\n",
-                                        "Achtung WndStammMieter.Adr.delete",
-                                            MessageBoxButton.OK);
-                            }
+                            // Adresse löschen
+                            lsSql = getSql(11, liId);
+                            liOk = fetchData(lsSql, 11);
                         }
                     }
                 }
             }
-            sdAdr.Update(tableAdr);
 
             btnAdrSave.Content = "Speichern";
             btnAdrDel.IsEnabled = true;

@@ -151,14 +151,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Ruddat-NK.exe" size="1882624">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Ruddat-NK.exe" size="1884160">
       <assemblyIdentity name="Ruddat-NK" version="18.9.28.1" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>W6ytVTRC2pbNktxR7qT+jvrggh63j0Rs93zoZMLPKCI=</dsig:DigestValue>
+        <dsig:DigestValue>JdKk13Zz3Zl7rwCJyEP8yR1cqN4LQZOWlWMJifPC8S8=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>

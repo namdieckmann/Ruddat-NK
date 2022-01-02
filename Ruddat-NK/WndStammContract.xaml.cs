@@ -1,24 +1,9 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Xml;
-
+using MySql.Data.MySqlClient;
 
 namespace Ruddat_NK
 {
@@ -29,28 +14,32 @@ namespace Ruddat_NK
     {
         private MainWindow mainWindow;
         public String gsConnect;
+        public int giDb;
 
         // ConnectString übernehmen
         public string psConnect { get; set; }
         public int giObjId = 0;
 
-        DataTable tableCmp;
         SqlDataAdapter sdCmp;
-        DataTable tableContract;
         SqlDataAdapter sdContract;
-        DataTable tableMieter;
         SqlDataAdapter sdMieter;
-        DataTable tableObj;
         SqlDataAdapter sdObj;
-        DataTable tableObjTeil;
         SqlDataAdapter sdObjTeil;
+        MySqlDataAdapter mysdCmp;
+        MySqlDataAdapter mysdContract;
+        MySqlDataAdapter mysdMieter;
+        MySqlDataAdapter mysdObj;
+        MySqlDataAdapter mysdObjTeil;
+
+        DataTable tableCmp;
+        DataTable tableContract;
+        DataTable tableMieter;
+        DataTable tableObj;
+        DataTable tableObjTeil;
 
         // Hier Übergabe des Mainwindows für Übergabe des ConnectStrings
         public WndStammContract(MainWindow mainWindow)
         {
-            String lsSql = "";
-            int liRows = 0;
-
             this.mainWindow = mainWindow;
             InitializeComponent();
 
@@ -61,35 +50,42 @@ namespace Ruddat_NK
             this.btnAdd.IsEnabled = false;
             this.btnSave.IsEnabled = false;
             this.btnDel.IsEnabled = false;
+        }
 
+        internal void getDb(int aiDb)
+        {
+            String lsSql = "";
+            int liRows = 0;
+
+            giDb = aiDb;
             // SqlSelect Firmen erstellen
-            lsSql = getSql("cmp", 1, 0);
+            lsSql = getSql(1, 0);
             // Daten Firmen holen
             liRows = fetchData(lsSql, 1);
 
             // SqlSelect Mieter (alle) Combobox Vertrage
-            lsSql = getSql("mieter", 52, 0);
+            lsSql = getSql(52, 0);
             // Daten Firmen holen
             liRows = fetchData(lsSql, 5);
 
             // SqlSelect Verträge
-            lsSql = getSql("contract", 2, 0);
+            lsSql = getSql(2, 0);
             // Daten Verträge holen
             liRows = fetchData(lsSql, 2);
 
             // SqlSelect Objekte
-            lsSql = getSql("obj", 3, 0);
+            lsSql = getSql(3, 0);
             // Daten Objekte holen
             liRows = fetchData(lsSql, 3);
 
             // SqlSelect ObjektTeile
-            lsSql = getSql("objteil", 4, 0);
+            lsSql = getSql(4, 0);
             // Daten ObjektTeile holen
             liRows = fetchData(lsSql, 4);
         }
 
         // Sql zusammenstellen
-        private string getSql(string asSql, int aiArt, int aiId)
+        private string getSql( int aiArt, int aiId)
         {
             string lsSql = "";
 
@@ -131,7 +127,12 @@ namespace Ruddat_NK
                     break;
                 case 52:         // Mieter (alle)
                     lsSql = @"Select id_mieter,bez,nr from mieter Order by bez";
-                                
+                    break;
+                case 8:         // Vertrag löschen
+                    lsSql = "Delete from vertrag Where id_vertrag = " + aiId.ToString();
+                    break;
+                case 9:
+                    lsSql = @"Select id_mieter from zahlungen where id_mieter = " + aiId.ToString();
                     break;
                 default:
                     break;
@@ -144,51 +145,139 @@ namespace Ruddat_NK
         {
             int liRows = 0;
 
-            SqlConnection connect;
-            connect = new SqlConnection(gsConnect);
-
-            switch (aiArt)
+            switch (giDb)
             {
-                case 1: // Firmen
-                    tableCmp = new DataTable();
-                    SqlCommand command = new SqlCommand(asSql, connect);
-                    sdCmp = new SqlDataAdapter(command);
-                    sdCmp.Fill(tableCmp);
-                    dgrStCmp.ItemsSource = tableCmp.DefaultView;
+                case 1:
+                    SqlConnection connect;
+                    connect = new SqlConnection(gsConnect);
+                    connect.Open();
 
+                    switch (aiArt)
+                    {
+                        case 1: // Firmen
+                            tableCmp = new DataTable();
+                            SqlCommand command = new SqlCommand(asSql, connect);
+                            sdCmp = new SqlDataAdapter(command);
+                            sdCmp.Fill(tableCmp);
+                            dgrStCmp.ItemsSource = tableCmp.DefaultView;
+                            break;
+                        case 2: // Verträge
+                            tableContract = new DataTable();
+                            SqlCommand command2 = new SqlCommand(asSql, connect);
+                            sdContract = new SqlDataAdapter(command2);
+                            sdContract.Fill(tableContract);
+                            dgrStContract.ItemsSource = tableContract.DefaultView;
+                            break;
+                        case 3: // Objekte
+                            tableObj = new DataTable();
+                            SqlCommand command3 = new SqlCommand(asSql, connect);
+                            sdObj = new SqlDataAdapter(command3);
+                            sdObj.Fill(tableObj);
+                            dgrStObj.ItemsSource = tableObj.DefaultView;
+                            break;
+                        case 4: // ObjektTeile
+                            tableObjTeil = new DataTable();
+                            SqlCommand command4 = new SqlCommand(asSql, connect);
+                            sdObjTeil = new SqlDataAdapter(command4);
+                            sdObjTeil.Fill(tableObjTeil);
+                            dgrObjTeil.ItemsSource = tableObjTeil.DefaultView;
+                            break;
+                        case 5: // Combobox Mieter
+                            tableMieter = new DataTable();
+                            SqlCommand command5 = new SqlCommand(asSql, connect);
+                            sdMieter = new SqlDataAdapter(command5);
+                            sdMieter.Fill(tableMieter);
+                            mieter.ItemsSource = tableMieter.DefaultView;
+                            break;
+                        case 6:     // Vertrag speichern
+                            SqlCommandBuilder commandBuilder6 = new SqlCommandBuilder(sdContract);
+                            sdContract.Update(tableContract);
+                            break;
+                        case 8:
+                            SqlCommand command8 = new SqlCommand(asSql, connect);
+                            SqlDataReader queryCommandReader = command8.ExecuteReader();
+                            break;
+                        case 9:
+                            SqlCommand command9 = new SqlCommand(asSql, connect);
+                            var lvId = command9.ExecuteScalar();
+                            if (lvId != DBNull.Value)
+                            {
+                                liRows = Convert.ToInt32(lvId);
+                            }
+                            else
+                            {
+                                liRows = 0;
+                            }
+                            break;
+                        default:
+                            break;
+                    }
                     break;
-                case 2: // Verträge
-                    tableContract = new DataTable();
-                    SqlCommand command2 = new SqlCommand(asSql, connect);
-                    sdContract = new SqlDataAdapter(command2);
-                    sdContract.Fill(tableContract);
-                    dgrStContract.ItemsSource = tableContract.DefaultView;
+                case 2:
+                    MySqlConnection myConnect;
+                    myConnect = new MySqlConnection(gsConnect);
+                    myConnect.Open();
 
-                    break;
-                case 3: // Objekte
-                    tableObj = new DataTable();
-                    SqlCommand command3 = new SqlCommand(asSql, connect);
-                    sdObj = new SqlDataAdapter(command3);
-                    sdObj.Fill(tableObj);
-                    dgrStObj.ItemsSource = tableObj.DefaultView;
-
-                    break;
-                case 4: // ObjektTeile
-                    tableObjTeil = new DataTable();
-                    SqlCommand command4 = new SqlCommand(asSql, connect);
-                    sdObjTeil = new SqlDataAdapter(command4);
-                    sdObjTeil.Fill(tableObjTeil);
-                    dgrObjTeil.ItemsSource = tableObjTeil.DefaultView;
-
-                    break;
-
-                case 5: // Combobox Mieter
-                    tableMieter = new DataTable();
-                    SqlCommand command5 = new SqlCommand(asSql, connect);
-                    sdMieter = new SqlDataAdapter(command5);
-                    sdMieter.Fill(tableMieter);
-                    mieter.ItemsSource = tableMieter.DefaultView;
-
+                    switch (aiArt)
+                    {
+                        case 1: // Firmen
+                            tableCmp = new DataTable();
+                            MySqlCommand command = new MySqlCommand(asSql, myConnect);
+                            mysdCmp = new MySqlDataAdapter(command);
+                            mysdCmp.Fill(tableCmp);
+                            dgrStCmp.ItemsSource = tableCmp.DefaultView;
+                            break;
+                        case 2: // Verträge
+                            tableContract = new DataTable();
+                            MySqlCommand command2 = new MySqlCommand(asSql, myConnect);
+                            mysdContract = new MySqlDataAdapter(command2);
+                            mysdContract.Fill(tableContract);
+                            dgrStContract.ItemsSource = tableContract.DefaultView;
+                            break;
+                        case 3: // Objekte
+                            tableObj = new DataTable();
+                            MySqlCommand command3 = new MySqlCommand(asSql, myConnect);
+                            mysdObj = new MySqlDataAdapter(command3);
+                            mysdObj.Fill(tableObj);
+                            dgrStObj.ItemsSource = tableObj.DefaultView;
+                            break;
+                        case 4: // ObjektTeile
+                            tableObjTeil = new DataTable();
+                            MySqlCommand command4 = new MySqlCommand(asSql, myConnect);
+                            mysdObjTeil = new MySqlDataAdapter(command4);
+                            mysdObjTeil.Fill(tableObjTeil);
+                            dgrObjTeil.ItemsSource = tableObjTeil.DefaultView;
+                            break;
+                        case 5: // Combobox Mieter
+                            tableMieter = new DataTable();
+                            MySqlCommand command5 = new MySqlCommand(asSql, myConnect);
+                            mysdMieter = new MySqlDataAdapter(command5);
+                            mysdMieter.Fill(tableMieter);
+                            mieter.ItemsSource = tableMieter.DefaultView;
+                            break;
+                        case 6:     // Vertrag speichern
+                            MySqlCommandBuilder commandBuilder6 = new MySqlCommandBuilder(mysdContract);
+                            mysdContract.Update(tableContract);
+                            break;
+                        case 8:
+                            MySqlCommand command8 = new MySqlCommand(asSql, myConnect);
+                            MySqlDataReader queryCommandReader = command8.ExecuteReader();
+                            break;
+                        case 9:
+                            MySqlCommand command9 = new MySqlCommand(asSql, myConnect);
+                            var lvId = command9.ExecuteScalar();
+                            if (lvId != DBNull.Value)
+                            {
+                                liRows = Convert.ToInt32(lvId);
+                            }
+                            else
+                            {
+                                liRows = 0;
+                            }
+                            break;
+                        default:
+                            break;
+                    }
                     break;
                 default:
                     break;
@@ -223,7 +312,7 @@ namespace Ruddat_NK
                     // Objekte dazu holen
 
                     // SqlSelect Objekte
-                    lsSql = getSql("obj", 3, liId);
+                    lsSql = getSql(3, liId);
                     // Daten Firmen holen
                     liRows = fetchData(lsSql, 3);
                 }
@@ -246,14 +335,11 @@ namespace Ruddat_NK
                  dgrStContract.ItemsSource = null;
 
                 DataRowView rowview = dgrStObj.SelectedItem as DataRowView;
-
                 if ((rowview.Row[0] != DBNull.Value))
                 {
-
                     liId = Int32.Parse(rowview.Row[0].ToString());
-
                     // SqlSelect erstellen
-                    lsSql = getSql("objteil", 4, liId);
+                    lsSql = getSql(4, liId);
                     // Daten holen
                     liRows = fetchData(lsSql, 4);
                 }
@@ -278,7 +364,7 @@ namespace Ruddat_NK
                     liId = Int32.Parse(rowview.Row[0].ToString());
 
                     // SqlSelect erstellen
-                    lsSql = getSql("vertrag", 21, liId);
+                    lsSql = getSql( 21, liId);
                     // Daten holen
                     liRows = fetchData(lsSql, 2);
                 }
@@ -290,78 +376,54 @@ namespace Ruddat_NK
         // Speichern und löschen (nur, wenn keine Zahlung auf den Vertrag gebucht sind)
         private void btnSave_Click(object sender, RoutedEventArgs e)
         {
-                int liId = 0;
-                int liSel = dgrStContract.SelectedIndex;
-                int liRows = 0;
-                string lsSql2 = "";
+            int liId = 0;
+            int liOk = 0;
+            int liSel = dgrStContract.SelectedIndex;
+            int liRows = 0;
+            string lsSql = "";
 
-                btnSave.IsEnabled = false;
-                btnAdd.IsEnabled = true;
+            btnSave.IsEnabled = false;
+            btnAdd.IsEnabled = true;
 
-                if (btnSave.Content.ToString() == "Speichern")
-                {
-                    SqlCommandBuilder commandBuilder = new SqlCommandBuilder(sdContract);
-
-                    sdContract.UpdateCommand = commandBuilder.GetUpdateCommand();
-                    sdContract.InsertCommand = commandBuilder.GetInsertCommand();
-                }
-                else  // Löschen
-                {
-                    if (liSel >= 0)
-                    {
-                        DataRowView rowview = dgrStContract.SelectedItem as DataRowView;
-                        if ((rowview.Row[0] != DBNull.Value))
-                        {
-                            liId = Int32.Parse(rowview.Row[0].ToString());
-
-                            if (liId >= 0)
-                            {
-                                // Den Vertrag löschen
-                                String lsSql = "Delete from vertrag Where id_vertrag = " + liId.ToString();
-
-                                SqlConnection connect;
-                                connect = new SqlConnection(gsConnect);
-                                SqlCommand command = new SqlCommand(lsSql, connect);
-
-                                try
-                                {
-                                    // Db open
-                                    connect.Open();
-                                    SqlDataReader queryCommandReader = command.ExecuteReader();
-                                    connect.Close();
-                                }
-                                catch
-                                {
-                                    MessageBox.Show("In Tabelle Vertrag konnte nicht gelöscht werden\n" +
-                                            "Prüfen Sie bitte die Datenbankverbindung\n",
-                                            "Achtung WndStammContract.Contract.del",
-                                                MessageBoxButton.OK);
-                                }
-                            }
-                        }
-                    }
-                }
-
-                sdContract.Update(tableContract);
-
-                // Daten Vertrag neu holen
+            if (btnSave.Content.ToString() == "Speichern")
+            {
+                liOk = fetchData("", 7);
+            }
+            else  // Löschen
+            {
                 if (liSel >= 0)
                 {
-                    // Das gewählte Teilobjekt
                     DataRowView rowview = dgrStContract.SelectedItem as DataRowView;
-
                     if ((rowview.Row[0] != DBNull.Value))
                     {
                         liId = Int32.Parse(rowview.Row[0].ToString());
 
-                        // SqlSelect erstellen
-                        lsSql2 = getSql("contract", 22, liId);
-                        // Daten holen
-                        liRows = fetchData(lsSql2, 2);
+                        if (liId >= 0)
+                        {
+                            // Den Vertrag löschen
+                            lsSql = getSql(8, liId);
+                            liOk = fetchData(lsSql, 8);
+                        }
                     }
                 }
+            }
+            // Daten Vertrag neu holen
+            // Todo Verträge nach löschen neu holen
+            if (liSel >= 0)
+            {
+                // Das gewählte Teilobjekt
+                DataRowView rowview = dgrStContract.SelectedItem as DataRowView;
 
-                btnSave.Content = "Speichern";
+                if ((rowview.Row[0] != DBNull.Value))
+                {
+                    liId = Int32.Parse(rowview.Row[0].ToString());
+                    // SqlSelect erstellen
+                    lsSql = getSql(22, liId);
+                    // Daten holen
+                    liRows = fetchData(lsSql, 2);
+                }
+            }
+            btnSave.Content = "Speichern";
             }
 
         // Dgr wurde bearbeitet
@@ -403,37 +465,9 @@ namespace Ruddat_NK
             int liId = 0;
             String lsSql = "";
 
-            lsSql = @"Select id_mieter from zahlungen where id_mieter = " + aiId.ToString();
+            lsSql = getSql(9, aiId);
+            liId = fetchData(lsSql, 9);
 
-            SqlConnection connect;
-            connect = new SqlConnection(gsConnect);
-            SqlCommand command = new SqlCommand(lsSql, connect);
-
-            // art_day
-            try
-            {
-                // Db open
-                connect.Open();
-                var lvId = command.ExecuteScalar();
-
-                if (lvId != DBNull.Value)
-                {
-                    liId = Convert.ToInt32(lvId);
-                }
-                else
-                {
-                    liId = 0;
-                }
-
-                connect.Close();
-            }
-            catch
-            {
-                MessageBox.Show("Es wurden keine Informationen für das Löschen eines Objekts gefunden\n" +
-                        "Prüfen Sie bitte die Datenbankverbindung\n",
-                        "Achtung (WndStammObj.getdelInfo)",
-                         MessageBoxButton.OK);
-            }
             return liId;
         }
 
