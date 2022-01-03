@@ -2483,7 +2483,7 @@ namespace Ruddat_NK
             gdtZahlung = ldtZlg;
         }
 
-        // Menü Rechnungen importieren noch nicht TODO Ulf!
+        // Todo Menü Rechnungen importieren noch nicht TODO Ulf!
         private void mnImpRg_Click(object sender, RoutedEventArgs e)
         {
 
@@ -2494,6 +2494,8 @@ namespace Ruddat_NK
         {
             // Import der Ascii Datei 
             WndZlgImport frmZlgImp = new WndZlgImport(this);
+            DelPassDataArt delegt = new DelPassDataArt(frmZlgImp.getDb);
+            delegt(giDb);
             frmZlgImp.ShowDialog();
         }
 
@@ -2505,10 +2507,8 @@ namespace Ruddat_NK
             updateAllDataGrids(3);
             
             WndRep frmRep = new WndRep(this);
-
             DelPassDataArt delegt = new DelPassDataArt(frmRep.getDb);
             delegt(giDb);
-
             frmRep.ShowDialog();
         }
 
@@ -2601,10 +2601,8 @@ namespace Ruddat_NK
         private void mnMasterKsa_Click(object sender, RoutedEventArgs e)
         {
             WndKsa frmKsa = new WndKsa(this);
-
             DelPassDataArt delegt = new DelPassDataArt(frmKsa.getDb);
             delegt(giDb);
-
             frmKsa.ShowDialog();
         }
 
@@ -2612,6 +2610,8 @@ namespace Ruddat_NK
         private void mnMasterCounter_Click(object sender, RoutedEventArgs e)
         {
             WndStammZaehler frmStZl = new WndStammZaehler(this);
+            DelPassDataArt delegt = new DelPassDataArt(frmStZl.getDb);
+            delegt(giDb);
             frmStZl.ShowDialog();
         }
 
@@ -2620,12 +2620,9 @@ namespace Ruddat_NK
         {
 
             WndCompanies frmCmp = new WndCompanies(this);
-
             DelPassDataArt delegt = new DelPassDataArt(frmCmp.getDb);
             delegt(giDb);
-
             frmCmp.ShowDialog();
-
             // Update der Daten nach Firmenwechsel
             updateAllDataGrids(1);
             tvMain.Items.Clear();

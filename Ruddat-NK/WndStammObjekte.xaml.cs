@@ -332,7 +332,6 @@ namespace Ruddat_NK
                     }
 
                     // Adressen dazu holen
-                    // SqlSelect erstellen
                     lsSql2 = getSql( 3, liId);
                     // Daten holen
                     liRows = fetchData(lsSql2, 3);
@@ -485,8 +484,10 @@ namespace Ruddat_NK
                         {
                             // Adresse löschen
                             lsSql = getSql(9, liId);
-                            liOk = fetchData(lsSql, 9);     
-                            // Todo Adressen neu holen 
+                            liOk = fetchData(lsSql, 9);
+                            // Adressen neu holen
+                            lsSql = getSql(3, liId);
+                            liOk = fetchData(lsSql, 3);
                         }
                     }
                 }

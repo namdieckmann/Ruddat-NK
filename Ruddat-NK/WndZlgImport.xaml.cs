@@ -36,6 +36,7 @@ namespace Ruddat_NK
         public String gsDlgFileName;
         public int      giLocationId = 0;
         public int      giImpId = 0;
+        public int giDb;
         public string gsMonth = "";
         public string gsYear = "";
         public DateTime gdtStart = DateTime.Today;
@@ -45,10 +46,12 @@ namespace Ruddat_NK
         DataTable tableHeader;
         DataTable tableFiliale;
         DataTable tableInfo;
+
         SqlDataAdapter sdDirty;
         SqlDataAdapter sdHeader;
         SqlDataAdapter sdFiliale;
         SqlDataAdapter sdInfo;
+
         BackgroundWorker worker;
         BackgroundWorker worker2;
 
@@ -60,10 +63,6 @@ namespace Ruddat_NK
             String lsConnect;
             String UPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
             gsPath = UPath;             // Pfad der Konfigurationsdatei global verfügbar machen
-
-            string lsTop = "";
-            string lsSql = "";
-            int liRows = 0;
 
             this.mainWindow = mainWindow;
             InitializeComponent();
@@ -78,22 +77,30 @@ namespace Ruddat_NK
 
             // ConnectString aus Mainwindow
             lsConnect = this.mainWindow.psConnect;
-
             // Globaler ConnectString
             gsConnect = lsConnect;
+
+        }
+
+        internal void getDb(int aiDb)
+        {
+            string lsTop = "";
+            string lsSql = "";
+            int liRows = 0;
+
+            giDb = aiDb;
 
             // SqlSelects erstellen
             // Daten für listbox Firma holen
             lsTop = "";
-            lsSql = getSql(lsTop, "filiale");
+            lsSql = getSql(lsTop, "filiale", DateTime.MinValue, "", 0);
             liRows = fetchData(lsSql, "filiale");
 
             // Daten von Import Info
             lsTop = "200";
-            lsSql = getSql(lsTop, "import_info");
+            lsSql = getSql(lsTop, "import_info", DateTime.MinValue, "", 0);
             // Daten der ImportTabelle holen
             liRows = fetchData(lsSql, "import_info");
-
         }
 
         // Funktionen für den Backgroundworker
@@ -162,7 +169,6 @@ namespace Ruddat_NK
                 {
                     MessageBox.Show("Eine Timeline konnte nicht erzeugt werden", "Achtung Fehler worker2_DoWork");
                 }
-
             }
         }
 
@@ -199,13 +205,13 @@ namespace Ruddat_NK
 
             // Daten neu holen von Import Info
             lsTop = "200";
-            lsSql2 = getSql(lsTop, "import_info");
+            lsSql2 = getSql(lsTop, "import_info", DateTime.MinValue, "", 0);
             // Daten der ImportTabelle holen
             liRows = fetchData(lsSql2, "import_info");
         }
 
         // Sql Statements zusasmmenbauen
-        private string getSql(String asTop, String asDb)
+        private string getSql(String asTop, String asDb, DateTime adtToday, string asUserName, int aiId)
         {
             String lsSql = "";
 
@@ -235,7 +241,33 @@ namespace Ruddat_NK
                 lsSql = "SELECT COUNT(1) AS Expr1 FROM x_import_dirty";                
             }
 
-
+            // Todo Date für Mysql
+            if (asDb == "header")
+            {
+                lsSql = @"insert into x_import_info (import_date,import_flag,import_user,import_descr) values (Convert(DateTime," + "\'"
+                + adtToday.ToString("dd.MM.yyyy HH:mm:ss") + "\',104),9,\'"
+                + asUserName + "\',\'" + gsYear + " | " + gsMonth + " | Datei=" + gsDlgFileName + "\')";
+            }
+            if (asDb == "delImport")
+            {
+                lsSql = "Delete from x_import_dirty";
+            }
+            if (asDb == "delTrace")
+            {
+                lsSql = "Delete from zahlungen_trace";
+            }
+            if (asDb == "delTime")
+            {
+                lsSql = "Delete from timeline Where id_vorauszahlung = " + aiId.ToString();
+            }
+            if (asDb == "delZl")
+            {
+                lsSql = "Delete from zahlungen Where id_import = " + aiId.ToString();
+            }
+            if (asDb == "getTimeLine")
+            {
+                lsSql = @"Select id_extern_timeline from zahlungen where id_import = " + aiId.ToString();
+            }
             return (lsSql);
         }
 
@@ -243,44 +275,76 @@ namespace Ruddat_NK
         private Int32 fetchData(string asSql, string asDataBase)
         {
             Int32 liRows = 0;
-            SqlConnection connect;
 
+            SqlConnection connect;
+            connect = new SqlConnection(gsConnect);
+            connect.Open();
             try
             {
                 // Befüllen der Listbox location
                 if (asDataBase == "filiale")
                 {
-
-                    DataTable tableFiliale = new DataTable();       // Grid
-                    connect = new SqlConnection(gsConnect);
-                    // Pass both strings to a new SqlCommand object.
-                    SqlCommand command = new SqlCommand(asSql, connect);
-                    // Db open
-                    connect.Open();
-                    // Create a SqlDataReader
-                    SqlDataReader queryCommandReader = command.ExecuteReader();
-                    // Create a DataTable object to hold all the data returned by the query.
-                    tableFiliale.Load(queryCommandReader);
+                    tableFiliale = new DataTable();       // Grid
+                    SqlCommand command1 = new SqlCommand(asSql, connect);
+                    sdFiliale = new SqlDataAdapter(command1);
+                    sdFiliale.Fill(tableFiliale);
                     lbLocation.ItemsSource = tableFiliale.DefaultView;
-                    // db close
-                    connect.Close();
                 }
 
                 // Verbinden mit dem DataGridview WtImport
                 if (asDataBase == "import_info")
                 {
                     DataTable tableInfo = new DataTable();       // Grid
-                    connect = new SqlConnection(gsConnect);
-                    // Pass both strings to a new SqlCommand object.
-                    SqlCommand command = new SqlCommand(asSql, connect);
-                    // Db open
-                    connect.Open();
-                    // Create a SqlDataReader
-                    SqlDataReader queryCommandReader = command.ExecuteReader();
-                    tableInfo.Load(queryCommandReader);
+                    SqlCommand command2 = new SqlCommand(asSql, connect);
+                    sdInfo = new SqlDataAdapter(command2);
+                    sdInfo.Fill(tableInfo);
                     WtImport.ItemsSource = tableInfo.DefaultView;
-                    // db close
-                    connect.Close();
+                }
+                if (asDataBase == "header")
+                {
+                    SqlCommand command3 = new SqlCommand(asSql, connect);
+                    SqlDataReader queryCommandReader3 = command3.ExecuteReader();
+                }
+                if (asDataBase == "delImport")
+                {
+                    SqlCommand command4 = new SqlCommand(asSql, connect);
+                    SqlDataReader queryCommandReader4 = command4.ExecuteReader();
+                }
+                if (asDataBase == "delTrace")
+                {
+                    SqlCommand command5 = new SqlCommand(asSql, connect);
+                    SqlDataReader queryCommandReader = command5.ExecuteReader();
+                }
+                if (asDataBase == "x_import_dirty")
+                {
+                    // TableDirty ist für das Zufügen von Datensätzen Timeline
+                    SqlCommand cmdDirty = new SqlCommand(asSql, connect);
+                    tableDirty = new DataTable();
+                    sdDirty = new SqlDataAdapter(cmdDirty);
+                    sdDirty.Fill(tableDirty);
+                }
+                if (asDataBase == "impUpdate")
+                {
+                    SqlCommandBuilder commandBuilder = new SqlCommandBuilder(sdDirty);
+                    sdDirty.Update(tableDirty);
+                }
+                if (asDataBase == "delRollBack")
+                {
+                    SqlCommand command6 = new SqlCommand(asSql, connect);
+                    SqlDataReader queryCommandReader = command6.ExecuteReader();
+                }
+                if (asDataBase == "getTimeLIne")
+                {
+                    SqlCommand command7 = new SqlCommand(asSql, connect);
+                    var lvId = command7.ExecuteScalar();
+                    if (lvId != DBNull.Value)
+                    {
+                        liRows = Convert.ToInt32(lvId);
+                    }
+                    else
+                    {
+                        liRows = 0;
+                    }
                 }
             }
             catch
@@ -289,6 +353,8 @@ namespace Ruddat_NK
                 MessageBox.Show("Verarbeitungsfehler WndZlgImport " + asDataBase + "\n",
                         "Achtung");
             }
+            connect.Close();
+
             return (liRows);
         }
 
@@ -296,35 +362,14 @@ namespace Ruddat_NK
         private int CreateImportHeader(string asUserName, DateTime adtToday)
         {
             int liOk = 0;
+            string lsSql;
 
             // Hier wird als ImportKennung eine 9 eingesetzt. Daran kann erkannt werden, welche ID zu importieren ist
             // Nach dem Import ist die Kennung dann 1
             // Bei Rollback wird sie null
-            String lsSql = @"insert into x_import_info (import_date,import_flag,import_user,import_descr) values (Convert(DateTime," + "\'"
-                            + adtToday.ToString("dd.MM.yyyy HH:mm:ss") + "\',104),9,\'"
-                            + asUserName + "\',\'" + gsYear + " | " + gsMonth + " | Datei=" + gsDlgFileName + "\')";
+            lsSql = getSql("", "header", adtToday, asUserName, 0);
+            liOk = fetchData(lsSql, "header");
 
-            SqlConnection connect;
-            connect = new SqlConnection(gsConnect);
-
-            SqlCommand command = new SqlCommand(lsSql, connect);
-
-            // import_file
-            try
-            {
-                // Db open
-                connect.Open();
-                SqlDataReader queryCommandReader = command.ExecuteReader();
-                liOk = 1;
-                connect.Close();
-            }
-            catch
-            {
-                MessageBox.Show("Verarbeitungsfehler ERROR WndZlgImport CreateImportHeader\n",
-                        "Achtung",
-                         MessageBoxButton.OK);
-                liOk = 0;
-            }
             return liOk;
         }
 
@@ -332,31 +377,11 @@ namespace Ruddat_NK
         private int DelImportDirty()
         {
             int liOk = 0;
+            string lsSql = "";
             // Die import_dirty kann schonmal gelöscht werden
-            String lsSql = "Delete from x_import_dirty";
+            lsSql = getSql("", "delImport", DateTime.MinValue, "", 0);
+            liOk = fetchData(lsSql, "delImport");
 
-            SqlConnection connect;
-            connect = new SqlConnection(gsConnect);
-
-            SqlCommand command = new SqlCommand(lsSql, connect);
-
-            // import_file
-            try
-            {
-                // Db open
-                connect.Open();
-                SqlDataReader queryCommandReader = command.ExecuteReader();
-                liOk = 1;
-                connect.Close();
-            }
-            catch
-            {
-                MessageBox.Show("Tabelle x_import_dirty konnte nicht geleert werden\n" +
-                        "Prüfen Sie bitte die Datenbankverbindung\n",
-                        "Achtung",
-                         MessageBoxButton.OK);
-                liOk = 0;
-            }
             return liOk;
         }
 
@@ -364,31 +389,11 @@ namespace Ruddat_NK
         private int DelImportTrace()
         {
             int liOk = 0;
+            string lsSql = "";
             // Die import_dirty kann schonmal gelöscht werden
-            String lsSql = "Delete from zahlungen_trace";
+            lsSql = getSql("", "delTrace", DateTime.MinValue, "", 0);
+            liOk = fetchData(lsSql, "delTrace");
 
-            SqlConnection connect;
-            connect = new SqlConnection(gsConnect);
-
-            SqlCommand command = new SqlCommand(lsSql, connect);
-
-            // import_file
-            try
-            {
-                // Db open
-                connect.Open();
-                SqlDataReader queryCommandReader = command.ExecuteReader();
-                liOk = 1;
-                connect.Close();
-            }
-            catch
-            {
-                MessageBox.Show("Tabelle zahlungen_trace konnte nicht geleert werden\n" +
-                        "Prüfen Sie bitte die Datenbankverbindung\n",
-                        "Achtung",
-                         MessageBoxButton.OK);
-                liOk = 0;
-            }
             return liOk;
         }
 
@@ -430,16 +435,10 @@ namespace Ruddat_NK
             string lsSql = "";
             string lsCell = "";
 
-            lsSql = getSql("", "x_import_dirty");
+            lsSql = getSql("", "x_import_dirty", DateTime.MinValue, "", 0);
+            liOk = fetchData(lsSql, "x_import_dirty");
 
-            SqlConnection connect;
-            connect = new SqlConnection(gsConnect);
-
-            // TableDirty ist für das Zufügen von Datensätzen Timeline
-            SqlCommand cmdDirty = new SqlCommand(lsSql, connect);
-            tableDirty = new DataTable();
-            sdDirty = new SqlDataAdapter(cmdDirty);
-            sdDirty.Fill(tableDirty);
+            if(liOk == 1)
             {
                 Excel.Application xlApp = new Excel.Application();
                 Excel.Workbook xlWorkBook;
@@ -492,13 +491,7 @@ namespace Ruddat_NK
                 finally
                 {
                     // und alles ab in die Datenbank
-                    SqlCommandBuilder commandBuilder = new SqlCommandBuilder(sdDirty);
-                    sdDirty.UpdateCommand = commandBuilder.GetUpdateCommand();
-                    sdDirty.InsertCommand = commandBuilder.GetInsertCommand();
-
-                    sdDirty.Update(tableDirty);
-
-                    connect.Close();
+                    int LiOk = fetchData("", "impUpdate");
 
                     // So muss Excel beendet werden; alles andere hakt immer
                     xlApp.DisplayAlerts = false;
@@ -506,7 +499,6 @@ namespace Ruddat_NK
                     xlApp.Quit();
                 }
             }
-
             return liOk;
         }
 
@@ -588,7 +580,7 @@ namespace Ruddat_NK
                
                 // Daten neu holen von Import Info
                 lsTop = "200";
-                lsSql = getSql(lsTop, "import_info");
+                lsSql = getSql(lsTop, "import_info", DateTime.MinValue, "", 0);
                 // Daten der ImportTabelle holen
                 liRows = fetchData(lsSql, "import_info");
 
@@ -600,92 +592,31 @@ namespace Ruddat_NK
         private int importRollBackZahlungen(int giImpId)
         {
             int liOk = 0;
-            string lsSql = "";
+            string lsSql1 = "";
+            string lsSql2 = "";
             int liIdTimeline = 0;
 
             // ermitteln der Timeline ID (id_vorauszahlung) aus der Import ID
             liIdTimeline = getTimelineId(giImpId);
 
-            SqlConnection connect;
-            connect = new SqlConnection(gsConnect);
+            lsSql1 = getSql("", "delTime", DateTime.MinValue, "", liIdTimeline);
+            lsSql2 = getSql("", "delZl", DateTime.MinValue, "", giImpId);
 
-            for (int i = 1; i < 3; i++)
-            {
-                switch (i)
-                {
-                    case 1:
-                        // Import Timeline löschen
-                        lsSql = "Delete from timeline Where id_vorauszahlung = " + liIdTimeline.ToString();
-                        break;
-                    case 2:
-                        // Import Zahlungen löschen
-                        lsSql = "Delete from zahlungen Where id_import = " + giImpId.ToString();
-                        break;
-                    default:
-                        break;
-                }
-
-                SqlCommand command = new SqlCommand(lsSql, connect);
-
-                // import_file
-                try
-                {
-                    // Db open
-                    connect.Open();
-                    SqlDataReader queryCommandReader = command.ExecuteReader();
-                    liOk = 1;
-                    connect.Close();
-                }
-                catch
-                {
-                    MessageBox.Show("In Tabelle Zahlungen konnte nicht gelöscht werden\n" +
-                            "WndZlgImport.importRollBackZahlungen\n",
-                            "Achtung",
-                             MessageBoxButton.OK);
-                    liOk = 0;
-                }                
-            }
-
+            liOk = fetchData(lsSql1, "delRollBack");
+            liOk = fetchData(lsSql2, "delRollBack");
 
             return liOk;
         }
 
         private int getTimelineId(int giImpId)
         {
-            {
-                int liTimelineId = 0;
-                string lsSql = @"Select id_extern_timeline from zahlungen where id_import = " + giImpId.ToString();
-                               
-                SqlConnection connect;
+            string lsSql = "";
+            int liTimelineId = 0;
 
-                connect = new SqlConnection(gsConnect);
-                SqlCommand cmd = connect.CreateCommand();
+            lsSql = getSql("", "getTimeLine", DateTime.MinValue, "", giImpId);
+            liTimelineId = fetchData(lsSql, "getTimeLine");
 
-                cmd.CommandText = lsSql;
-
-                SqlCommand command = new SqlCommand(lsSql, connect);
-
-                // import_file
-                try
-                {
-                    // Db open
-                    connect.Open();
-
-                    liTimelineId = ((int)command.ExecuteScalar());
-
-                    connect.Close();
-                }
-                catch
-                {
-                    //MessageBox.Show("Es wurden kein Header-Datensatz erzeugt\n" +
-                    //        "Prüfen Sie bitte die Datenbankverbindung\n",
-                    //        "Achtung",
-                    //         MessageBoxButton.OK);
-                    liTimelineId = 0;
-                }
-
-                return liTimelineId;
-            }
+            return liTimelineId;
         }
 
         // Das Flag im ImportInfoDatensatz auf 0 setzen
@@ -734,13 +665,11 @@ namespace Ruddat_NK
                 gsMonth = ldtStart.ToString("MMMM");
                 gsYear = ldtStart.Year.ToString();
                 gdtStart = ldtStart;
-
             }
-
             btnFind.IsEnabled = true;
-
         }
 
+        // Todo hier weiter
         // Die ID des Import Headers besorgen (flag = 9), um sie in jeden Datesatz einzubauen
         // Das ist für ein Rollback erforderlich
         private int getImportHeaderId()

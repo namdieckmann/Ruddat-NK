@@ -1,24 +1,9 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Xml;
-
+using MySql.Data.MySqlClient;
 
 namespace Ruddat_NK
 {
@@ -29,25 +14,29 @@ namespace Ruddat_NK
     {
         private MainWindow mainWindow;
         public String gsConnect;
+        public int giDb;
 
         // ConnectString übernehmen
         public string psConnect { get; set; }
 
         DataTable tableCmp;
-        SqlDataAdapter sdCmp;
         DataTable tableObj;
-        SqlDataAdapter sdObj;
         DataTable tableTeil;
+
+        SqlDataAdapter sdObj;
+        SqlDataAdapter sdCmp;
         SqlDataAdapter sdTeil;
+
+        MySqlDataAdapter mysdObj;
+        MySqlDataAdapter mysdCmp;
+        MySqlDataAdapter mysdTeil;
+
         // DataTable tableAda;
         // SqlDataAdapter sdAda;
 
         // Hier Übergabe des Mainwindows für Übergabe des ConnectStrings
         public WndStammObjTeile(MainWindow mainWindow)
         {
-            String lsSql = "";
-            int liRows = 0;
-
             this.mainWindow = mainWindow;
             InitializeComponent();
 
@@ -58,6 +47,16 @@ namespace Ruddat_NK
             this.btnSave.IsEnabled = false;
             this.btnDel.IsEnabled = false;
             this.btnAdd.IsEnabled = false;
+
+        }
+
+        // Datenbankart
+        internal void getDb(int aiArt)
+        {
+            String lsSql = "";
+            int liRows = 0;
+
+            giDb = aiArt;
 
             // SqlSelect Firmen erstellen
             lsSql = getSql("cmp", 1, 0);
@@ -101,11 +100,15 @@ namespace Ruddat_NK
                                 from objekt_teil
                                 where id_objekt = " + aiId.ToString() + " Order by geschoss,lage";
                     break;
-
+                case 6:         // Löschen
+                    lsSql = "Delete from objekt_teil Where id_objekt_teil = " + aiId.ToString();
+                    break;
+                case 7:         // Prüfen auf Löschen
+                    lsSql = @"Select id_objekt_teil from vertrag where id_objekt_teil = " + aiId.ToString();
+                    break;
                 //case 4:         // Adressarten
                 //    lsSql = @"Select id_art_adresse,bez from art_adresse Order by sort";
                 //    break;
-
                 default:
                     break;
             }
@@ -121,44 +124,128 @@ namespace Ruddat_NK
             btnSave.IsEnabled = false;
             btnAdd.IsEnabled = false;
 
-            SqlConnection connect;
-            connect = new SqlConnection(gsConnect);
-
-            switch (aiArt)
+            switch (giDb)
             {
-                case 1: // Firmen
-                    tableCmp = new DataTable();
-                    SqlCommand command = new SqlCommand(asSql, connect);
-                    sdCmp = new SqlDataAdapter(command);
-                    sdCmp.Fill(tableCmp);
-                    dgrStCmp.ItemsSource = tableCmp.DefaultView;
+                case 1:
+                    SqlConnection connect;
+                    connect = new SqlConnection(gsConnect);
+                    connect.Open();
 
+                    switch (aiArt)
+                    {
+                        case 1: // Firmen
+                            tableCmp = new DataTable();
+                            SqlCommand command = new SqlCommand(asSql, connect);
+                            sdCmp = new SqlDataAdapter(command);
+                            sdCmp.Fill(tableCmp);
+                            dgrStCmp.ItemsSource = tableCmp.DefaultView;
+                            break;
+                        case 2: // Objekte
+                            tableObj = new DataTable();
+                            SqlCommand command2 = new SqlCommand(asSql, connect);
+                            sdObj = new SqlDataAdapter(command2);
+                            sdObj.Fill(tableObj);
+                            dgrStObj.ItemsSource = tableObj.DefaultView;
+                            break;
+                        case 3: // Teile
+                            tableTeil = new DataTable();
+                            SqlCommand command3 = new SqlCommand(asSql, connect);
+                            sdTeil = new SqlDataAdapter(command3);
+                            sdTeil.Fill(tableTeil);
+                            dgrObjTeil.ItemsSource = tableTeil.DefaultView;
+                            break;
+                        case 5:     // Speichern
+                            SqlCommandBuilder commandBuilder5 = new SqlCommandBuilder(sdTeil);
+                            sdTeil.Update(tableTeil);
+                            break;
+                        case 6:
+                            SqlCommand command6 = new SqlCommand(asSql, connect);
+                            SqlDataReader queryCommandReader7 = command6.ExecuteReader();
+                            break;
+                        case 7:
+                            SqlCommand command7 = new SqlCommand(asSql, connect);
+                            var lvId = command7.ExecuteScalar();
+                            if (lvId != DBNull.Value)
+                            {
+                                liRows = Convert.ToInt32(lvId);     // LiRows als Id verwendet
+                            }
+                            else
+                            {
+                                liRows = 0;
+                            }
+                            break;
+                        //case 4: // Adressarten
+                        //    tableAda = new DataTable();
+                        //    SqlCommand command4 = new SqlCommand(asSql, connect);
+                        //    sdAda = new SqlDataAdapter(command4);
+                        //    sdAda.Fill(tableAda);
+                        //    adressenart.ItemsSource = tableAda.DefaultView;
+                        //    break;
+                        default:
+                            break;
+                    }
+                    connect.Close();
                     break;
-                case 2: // Objekte
-                    tableObj = new DataTable();
-                    SqlCommand command2 = new SqlCommand(asSql, connect);
-                    sdObj = new SqlDataAdapter(command2);
-                    sdObj.Fill(tableObj);
-                    dgrStObj.ItemsSource = tableObj.DefaultView;
+                case 2:
+                    MySqlConnection myConnect;
+                    myConnect = new MySqlConnection(gsConnect);
+                    myConnect.Open();
 
+                    switch (aiArt)
+                    {
+                        case 1: // Firmen
+                            tableCmp = new DataTable();
+                            MySqlCommand command = new MySqlCommand(asSql, myConnect);
+                            mysdCmp = new MySqlDataAdapter(command);
+                            mysdCmp.Fill(tableCmp);
+                            dgrStCmp.ItemsSource = tableCmp.DefaultView;
+                            break;
+                        case 2: // Objekte
+                            tableObj = new DataTable();
+                            MySqlCommand command2 = new MySqlCommand(asSql, myConnect);
+                            mysdObj = new MySqlDataAdapter(command2);
+                            mysdObj.Fill(tableObj);
+                            dgrStObj.ItemsSource = tableObj.DefaultView;
+                            break;
+                        case 3: // Teile
+                            tableTeil = new DataTable();
+                            MySqlCommand command3 = new MySqlCommand(asSql, myConnect);
+                            mysdTeil = new MySqlDataAdapter(command3);
+                            mysdTeil.Fill(tableTeil);
+                            dgrObjTeil.ItemsSource = tableTeil.DefaultView;
+                            break;
+                        case 5:     // Speichern
+                            MySqlCommandBuilder commandBuilder5 = new MySqlCommandBuilder(mysdTeil);
+                            mysdTeil.Update(tableTeil);
+                            break;
+                        case 6:
+                            MySqlCommand command6 = new MySqlCommand(asSql, myConnect);
+                            MySqlDataReader queryCommandReader7 = command6.ExecuteReader();
+                            break;
+                        case 7:
+                            MySqlCommand command7 = new MySqlCommand(asSql, myConnect);
+                            var lvId = command7.ExecuteScalar();
+                            if (lvId != DBNull.Value)
+                            {
+                                liRows = Convert.ToInt32(lvId);     // LiRows als Id verwendet
+                            }
+                            else
+                            {
+                                liRows = 0;
+                            }
+                            break;
+                        //case 4: // Adressarten
+                        //    tableAda = new DataTable();
+                        //    MySqlCommand command4 = new MySqlCommand(asSql, myConnect);
+                        //    sdAda = new MySqlDataAdapter(command4);
+                        //    sdAda.Fill(tableAda);
+                        //    adressenart.ItemsSource = tableAda.DefaultView;
+                        //    break;
+                        default:
+                            break;
+                    }
+                    myConnect.Close();
                     break;
-                case 3: // Teile
-                    tableTeil = new DataTable();
-                    SqlCommand command3 = new SqlCommand(asSql, connect);
-                    sdTeil = new SqlDataAdapter(command3);
-                    sdTeil.Fill(tableTeil);
-                    dgrObjTeil.ItemsSource = tableTeil.DefaultView;
-
-                    break;
-
-                //case 4: // Adressarten
-                //    tableAda = new DataTable();
-                //    SqlCommand command4 = new SqlCommand(asSql, connect);
-                //    sdAda = new SqlDataAdapter(command4);
-                //    sdAda.Fill(tableAda);
-                //    adressenart.ItemsSource = tableAda.DefaultView;
-
-                //    break;
                 default:
                     break;
             }
@@ -263,7 +350,7 @@ namespace Ruddat_NK
         // Teil speichern, löschen
         private void btnSave_Click(object sender, RoutedEventArgs e)
         {
-
+            int liOk = 0;
             int liId = 0;
             int liSel = dgrStObj.SelectedIndex;
             int liRows = 0;
@@ -274,10 +361,7 @@ namespace Ruddat_NK
 
             if (btnSave.Content.ToString() == "Speichern")
             {
-                SqlCommandBuilder commandBuilder = new SqlCommandBuilder(sdTeil);
-
-                sdTeil.UpdateCommand = commandBuilder.GetUpdateCommand();
-                sdTeil.InsertCommand = commandBuilder.GetInsertCommand();
+                liOk = fetchData("", 5);
             }
             else  // Löschen
             {
@@ -287,36 +371,15 @@ namespace Ruddat_NK
                     if ((rowview.Row[0] != DBNull.Value))
                     {
                         liId = Int32.Parse(rowview.Row[0].ToString());
-
                         if (liId >= 0)
                         {
                             // Den Import aus wt_hours_add löschen
                             lsSql = "Delete from objekt_teil Where id_objekt_teil = " + liId.ToString();
-
-                            SqlConnection connect;
-                            connect = new SqlConnection(gsConnect);
-                            SqlCommand command = new SqlCommand(lsSql, connect);
-
-                            try
-                            {
-                                // Db open
-                                connect.Open();
-                                SqlDataReader queryCommandReader = command.ExecuteReader();
-                                connect.Close();
-                            }
-                            catch
-                            {
-                                MessageBox.Show("In Tabelle Objekte konnte nicht gelöscht werden\n" +
-                                        "Prüfen Sie bitte die Datenbankverbindung\n",
-                                        "Achtung WndStammObjekte.Obj.del",
-                                            MessageBoxButton.OK);
-                            }
+                            fetchData(lsSql, 6);
                         }
                     }
                 }
             }
-
-            sdTeil.Update(tableTeil);
 
             // Neu holen
             DataRowView rowview2 = dgrStObj.SelectedItem as DataRowView;
@@ -371,7 +434,6 @@ namespace Ruddat_NK
             btnDel.IsEnabled = false;
         }
 
-
         // Existiert eine Rechnung oder Zahlung zu dem TeilObjekt mit der gewählten ID?
         // Dann nicht löschen
         private int getDelInfo(int aiId)
@@ -379,43 +441,10 @@ namespace Ruddat_NK
             int liId = 0;
             String lsSql = "";
 
-            lsSql = @"Select id_objekt_teil from vertrag where id_objekt_teil = " + aiId.ToString();
+            lsSql = getSql("", 7, aiId);
+            liId = fetchData(lsSql, 7);
 
-            SqlConnection connect;
-            connect = new SqlConnection(gsConnect);
-            SqlCommand command = new SqlCommand(lsSql, connect);
-
-            // art_day
-            try
-            {
-                // Db open
-                connect.Open();
-                var lvId = command.ExecuteScalar();
-
-                if (lvId != DBNull.Value)
-                {
-                    liId = Convert.ToInt32(lvId);
-                }
-                else
-                {
-                    liId = 0;
-                }
-
-                connect.Close();
-            }
-            catch
-            {
-                MessageBox.Show("Es wurden keine Informationen für das Löschen eines Objekts gefunden\n" +
-                        "Prüfen Sie bitte die Datenbankverbindung\n",
-                        "Achtung (WndStammObjTeil.getdelInfo)",
-                         MessageBoxButton.OK);
-            }
             return liId;
-        }
-
-        internal void getDb(int Art)
-        {
-            throw new NotImplementedException();
         }
     }
 }
