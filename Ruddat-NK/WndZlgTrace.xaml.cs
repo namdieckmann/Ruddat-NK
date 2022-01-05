@@ -1,23 +1,8 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Xml;
+using MySql.Data.MySqlClient;
 
 namespace Ruddat_NK
 {
@@ -28,24 +13,32 @@ namespace Ruddat_NK
     {
         private MainWindow mainWindow;
         public String gsConnect;
+        public int giDb;
 
         DataTable tableZlg;
+
         SqlDataAdapter sdZlg;
+        MySqlDataAdapter mysdZlg;
 
         // ConnectString übernehmen
         public string psConnect { get; set; }
 
         public WndZlgTrace(MainWindow mainWindow    )
         {
-            string lsSql = "";
-            int liRows = 0;
-
             this.mainWindow = mainWindow;
             InitializeComponent();
 
             // ConnectString global
             gsConnect = this.mainWindow.psConnect;
+        }
 
+        // Welche Datenbank
+        internal void getDb(int aiDb)
+        {
+            string lsSql = "";
+            int liRows = 0;
+
+            giDb = aiDb;
             // SqlSelect Firmen erstellen
             lsSql = getSql("zlg", 1, 0);
             // Daten Firmen holen
@@ -72,39 +65,58 @@ namespace Ruddat_NK
 	                                    left join objekt_teil on objekt_teil.id_objekt_teil = zahlungen_trace.id_objekt_teil
 		                                left join mieter on mieter.Id_mieter = zahlungen_trace.id_mieter";
                     break;
-
                 default:
                     break;
             }
-
             return lsSql;
         }
 
         // Daten holen
         private int fetchData(string asSql, int aiArt)
         {
-                      int liRows = 0;
+            int liRows = 0;
 
-            // Buttons
-            // btnSave.IsEnabled = false;
-            // btnAdd.IsEnabled = true;
-
-            SqlConnection connect;
-            connect = new SqlConnection(gsConnect);
-
-            switch (aiArt)
+            switch (giDb)
             {
-                case 1: // Firmen
-                    tableZlg = new DataTable();         
-                    SqlCommand command = new SqlCommand(asSql, connect);
-                    sdZlg = new SqlDataAdapter(command);
-                    sdZlg.Fill(tableZlg);
-                    dgrZlg.ItemsSource = tableZlg.DefaultView;
+                case 1:
+                    SqlConnection connect;
+                    connect = new SqlConnection(gsConnect);
 
+                    switch (aiArt)
+                    {
+                        case 1: // Firmen
+                            tableZlg = new DataTable();
+                            SqlCommand command = new SqlCommand(asSql, connect);
+                            sdZlg = new SqlDataAdapter(command);
+                            sdZlg.Fill(tableZlg);
+                            dgrZlg.ItemsSource = tableZlg.DefaultView;
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
+                case 2:
+                    MySqlConnection myConnect;
+                    myConnect = new MySqlConnection(gsConnect);
+
+                    switch (aiArt)
+                    {
+                        case 1: // Firmen
+                            tableZlg = new DataTable();
+                            MySqlCommand command = new MySqlCommand(asSql, myConnect);
+                            mysdZlg = new MySqlDataAdapter(command);
+                            mysdZlg.Fill(tableZlg);
+                            dgrZlg.ItemsSource = tableZlg.DefaultView;
+                            break;
+                        default:
+                            break;
+                    }
                     break;
                 default:
                     break;
             }
+
+
             return liRows;
         }
     }

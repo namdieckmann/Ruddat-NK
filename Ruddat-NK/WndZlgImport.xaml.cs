@@ -1,25 +1,11 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Reflection; 
-using System.Xml;
 using System.ComponentModel;
+using MySql.Data.MySqlClient;
 using Excel = Microsoft.Office.Interop.Excel;
 
 
@@ -36,7 +22,7 @@ namespace Ruddat_NK
         public String gsDlgFileName;
         public int      giLocationId = 0;
         public int      giImpId = 0;
-        public int giDb;
+        public int      giDb;
         public string gsMonth = "";
         public string gsYear = "";
         public DateTime gdtStart = DateTime.Today;
@@ -46,11 +32,23 @@ namespace Ruddat_NK
         DataTable tableHeader;
         DataTable tableFiliale;
         DataTable tableInfo;
+        DataTable table_dirty;
+        DataTable table_zlg;
+        DataTable table_trace;
 
         SqlDataAdapter sdDirty;
         SqlDataAdapter sdHeader;
         SqlDataAdapter sdFiliale;
         SqlDataAdapter sdInfo;
+        SqlDataAdapter sdZlg;
+        SqlDataAdapter sdTrace;
+
+        MySqlDataAdapter mysdDirty;
+        MySqlDataAdapter mysdHeader;
+        MySqlDataAdapter mysdFiliale;
+        MySqlDataAdapter mysdInfo;
+        MySqlDataAdapter mysdZlg;
+        MySqlDataAdapter mysdTrace;
 
         BackgroundWorker worker;
         BackgroundWorker worker2;
@@ -204,8 +202,7 @@ namespace Ruddat_NK
             pbExec.Value = 0;
 
             // Daten neu holen von Import Info
-            lsTop = "200";
-            lsSql2 = getSql(lsTop, "import_info", DateTime.MinValue, "", 0);
+            lsSql2 = getSql("", "import_info", DateTime.MinValue, "", 0);
             // Daten der ImportTabelle holen
             liRows = fetchData(lsSql2, "import_info");
         }
@@ -217,7 +214,7 @@ namespace Ruddat_NK
 
             if (asDb == "import_info")
             {
-                lsSql = "Select " + "Top " + asTop + @" x_import_info.import_date,
+                lsSql = @"Select x_import_info.import_date,
                     x_import_info.import_user,
                     x_import_info.import_flag,
                     x_import_info.id_import_info,
@@ -268,83 +265,323 @@ namespace Ruddat_NK
             {
                 lsSql = @"Select id_extern_timeline from zahlungen where id_import = " + aiId.ToString();
             }
+            if (asDb == "flag")
+            {
+                lsSql = @"Select id_import_info From x_import_info Where import_flag = 9";
+            }
+            if (asDb == "impInfo")
+            {
+                lsSql = @"Update x_import_info Set import_flag = 0 Where Id_import_info = " + aiId.ToString();
+            }
+            if (asDb == "dirty")
+            {
+                lsSql = "Select iid,a,b,c,d,e,f,g,h,i,j,k,l,m,n,o from x_import_dirty";
+            }
+            if (asDb == "zlg")
+            {
+                lsSql = @"select id_vz,id_mieter,id_objekt,id_objekt_teil,datum_von,datum_bis,
+                                betrag_netto,betrag_brutto,betrag_netto_soll,betrag_brutto_soll,
+                                id_extern_timeline,flag_timeline,id_ksa,id_import 
+                            from zahlungen";
+            }
+            if (asDb == "trace")
+            {
+                lsSql = @"select id_vz,id_mieter,id_objekt,id_objekt_teil,datum_von,datum_bis,
+                            betrag_netto,betrag_brutto,betrag_netto_soll,betrag_brutto_soll,
+                            id_extern_timeline,flag_timeline,id_ksa,id_import,bez 
+                        from zahlungen_trace";
+            }
+
             return (lsSql);
         }
 
         // Daten aus der Datenbank holen und zeigen 
         private Int32 fetchData(string asSql, string asDataBase)
         {
-            Int32 liRows = 0;
+            Int32 liValue = 0;
 
-            SqlConnection connect;
-            connect = new SqlConnection(gsConnect);
-            connect.Open();
             try
             {
-                // Befüllen der Listbox location
-                if (asDataBase == "filiale")
+                switch (giDb)
                 {
-                    tableFiliale = new DataTable();       // Grid
-                    SqlCommand command1 = new SqlCommand(asSql, connect);
-                    sdFiliale = new SqlDataAdapter(command1);
-                    sdFiliale.Fill(tableFiliale);
-                    lbLocation.ItemsSource = tableFiliale.DefaultView;
-                }
+                    case 1:
+                        SqlConnection connect;
+                        connect = new SqlConnection(gsConnect);
+                        connect.Open();
 
-                // Verbinden mit dem DataGridview WtImport
-                if (asDataBase == "import_info")
-                {
-                    DataTable tableInfo = new DataTable();       // Grid
-                    SqlCommand command2 = new SqlCommand(asSql, connect);
-                    sdInfo = new SqlDataAdapter(command2);
-                    sdInfo.Fill(tableInfo);
-                    WtImport.ItemsSource = tableInfo.DefaultView;
-                }
-                if (asDataBase == "header")
-                {
-                    SqlCommand command3 = new SqlCommand(asSql, connect);
-                    SqlDataReader queryCommandReader3 = command3.ExecuteReader();
-                }
-                if (asDataBase == "delImport")
-                {
-                    SqlCommand command4 = new SqlCommand(asSql, connect);
-                    SqlDataReader queryCommandReader4 = command4.ExecuteReader();
-                }
-                if (asDataBase == "delTrace")
-                {
-                    SqlCommand command5 = new SqlCommand(asSql, connect);
-                    SqlDataReader queryCommandReader = command5.ExecuteReader();
-                }
-                if (asDataBase == "x_import_dirty")
-                {
-                    // TableDirty ist für das Zufügen von Datensätzen Timeline
-                    SqlCommand cmdDirty = new SqlCommand(asSql, connect);
-                    tableDirty = new DataTable();
-                    sdDirty = new SqlDataAdapter(cmdDirty);
-                    sdDirty.Fill(tableDirty);
-                }
-                if (asDataBase == "impUpdate")
-                {
-                    SqlCommandBuilder commandBuilder = new SqlCommandBuilder(sdDirty);
-                    sdDirty.Update(tableDirty);
-                }
-                if (asDataBase == "delRollBack")
-                {
-                    SqlCommand command6 = new SqlCommand(asSql, connect);
-                    SqlDataReader queryCommandReader = command6.ExecuteReader();
-                }
-                if (asDataBase == "getTimeLIne")
-                {
-                    SqlCommand command7 = new SqlCommand(asSql, connect);
-                    var lvId = command7.ExecuteScalar();
-                    if (lvId != DBNull.Value)
-                    {
-                        liRows = Convert.ToInt32(lvId);
-                    }
-                    else
-                    {
-                        liRows = 0;
-                    }
+                        // Befüllen der Listbox location
+                        if (asDataBase == "filiale")
+                        {
+                            tableFiliale = new DataTable();       // Grid
+                            SqlCommand command1 = new SqlCommand(asSql, connect);
+                            sdFiliale = new SqlDataAdapter(command1);
+                            sdFiliale.Fill(tableFiliale);
+                            lbLocation.ItemsSource = tableFiliale.DefaultView;
+                        }
+
+                        // Verbinden mit dem DataGridview WtImport
+                        if (asDataBase == "import_info")
+                        {
+                            DataTable tableInfo = new DataTable();       // Grid
+                            SqlCommand command2 = new SqlCommand(asSql, connect);
+                            sdInfo = new SqlDataAdapter(command2);
+                            sdInfo.Fill(tableInfo);
+                            WtImport.ItemsSource = tableInfo.DefaultView;
+                        }
+                        if (asDataBase == "header")
+                        {
+                            SqlCommand command3 = new SqlCommand(asSql, connect);
+                            SqlDataReader queryCommandReader3 = command3.ExecuteReader();
+                        }
+                        if (asDataBase == "delImport")
+                        {
+                            SqlCommand command4 = new SqlCommand(asSql, connect);
+                            SqlDataReader queryCommandReader4 = command4.ExecuteReader();
+                        }
+                        if (asDataBase == "delTrace")
+                        {
+                            SqlCommand command5 = new SqlCommand(asSql, connect);
+                            SqlDataReader queryCommandReader = command5.ExecuteReader();
+                        }
+                        if (asDataBase == "x_import_dirty")
+                        {
+                            // TableDirty ist für das Zufügen von Datensätzen Timeline
+                            SqlCommand cmdDirty = new SqlCommand(asSql, connect);
+                            tableDirty = new DataTable();
+                            sdDirty = new SqlDataAdapter(cmdDirty);
+                            sdDirty.Fill(tableDirty);
+                        }
+                        if (asDataBase == "impUpdate")
+                        {
+                            SqlCommandBuilder commandBuilder = new SqlCommandBuilder(sdDirty);
+                            sdDirty.Update(tableDirty);
+                        }
+                        if (asDataBase == "delRollBack")
+                        {
+                            SqlCommand command6 = new SqlCommand(asSql, connect);
+                            SqlDataReader queryCommandReader = command6.ExecuteReader();
+                        }
+                        if (asDataBase == "getTimeLIne")
+                        {
+                            SqlCommand command7 = new SqlCommand(asSql, connect);
+                            var lvId = command7.ExecuteScalar();
+                            if (lvId != DBNull.Value)
+                            {
+                                liValue = Convert.ToInt32(lvId);
+                            }
+                            else
+                            {
+                                liValue = 0;
+                            }
+                        }
+                        if (asDataBase == "flag")
+                        {
+                            SqlCommand command8 = new SqlCommand(asSql, connect);
+                            var lvId = command8.ExecuteScalar();
+                            if (lvId != DBNull.Value)
+                            {
+                                liValue = Convert.ToInt32(lvId);
+                            }
+                            else
+                            {
+                                liValue = 0;
+                            }
+                        }
+                        if (asDataBase == "tobj")
+                        {
+
+                            SqlCommand command = new SqlCommand(asSql, connect);
+                            var lvGetId = command.ExecuteScalar();
+
+                            if (lvGetId != null)
+                            {
+                                liValue = (int)lvGetId;
+                            }
+                            else
+                            {
+                                liValue = 0;
+                            }
+                        }
+                        if (asDataBase == "impInfo")
+                        {
+                            SqlCommand command9 = new SqlCommand(asSql, connect);
+                            SqlDataReader queryCommandReader9 = command9.ExecuteReader();
+                        }
+                        if (asDataBase == "dirty")
+                        {
+                            table_dirty = new DataTable();
+                            SqlCommand command10 = new SqlCommand(asSql, connect);
+                            SqlDataReader queryCommandReader10 = command10.ExecuteReader();
+                            table_dirty.Load(queryCommandReader10);
+                        }
+                        if (asDataBase == "zlg")
+                        {
+                            table_zlg = new DataTable();
+                            SqlCommand command11 = new SqlCommand(asSql, connect);
+                            sdZlg = new SqlDataAdapter(command11);
+                            SqlDataReader queryCommandReader11 = command11.ExecuteReader();
+                            table_zlg.Load(queryCommandReader11);
+                        }
+                        if (asDataBase == "trace")
+                        {
+                            table_trace = new DataTable();
+                            SqlCommand command12 = new SqlCommand(asSql, connect);
+                            sdTrace = new SqlDataAdapter(command12);
+                            SqlDataReader queryCommandReader12 = command12.ExecuteReader();
+                            table_trace.Load(queryCommandReader12);
+                        }
+                        if (asDataBase == "zlgSave")
+                        {
+                            SqlCommandBuilder commandBuilder = new SqlCommandBuilder(sdZlg);
+                            sdZlg.Update(table_zlg);
+                        }
+                        if (asDataBase == "traceSave")
+                        {
+                            SqlCommandBuilder commandBuilder = new SqlCommandBuilder(sdTrace);
+                            sdTrace.Update(table_trace);
+                        }
+                        connect.Close();
+                        break;
+                    case 2:
+                        MySqlConnection myConnect;
+                        myConnect = new MySqlConnection(gsConnect);
+                        myConnect.Open();
+
+                        // Befüllen der Listbox location
+                        if (asDataBase == "filiale")
+                        {
+                            tableFiliale = new DataTable();       // Grid
+                            MySqlCommand command1 = new MySqlCommand(asSql, myConnect);
+                            mysdFiliale = new MySqlDataAdapter(command1);
+                            mysdFiliale.Fill(tableFiliale);
+                            lbLocation.ItemsSource = tableFiliale.DefaultView;
+                        }
+
+                        // Verbinden mit dem DataGridview WtImport
+                        if (asDataBase == "import_info")
+                        {
+                            DataTable tableInfo = new DataTable();       // Grid
+                            MySqlCommand command2 = new MySqlCommand(asSql, myConnect);
+                            mysdInfo = new MySqlDataAdapter(command2);
+                            mysdInfo.Fill(tableInfo);
+                            WtImport.ItemsSource = tableInfo.DefaultView;
+                        }
+                        if (asDataBase == "header")
+                        {
+                            MySqlCommand command3 = new MySqlCommand(asSql, myConnect);
+                            MySqlDataReader queryCommandReader3 = command3.ExecuteReader();
+                        }
+                        if (asDataBase == "delImport")
+                        {
+                            MySqlCommand command4 = new MySqlCommand(asSql, myConnect);
+                            MySqlDataReader queryCommandReader4 = command4.ExecuteReader();
+                        }
+                        if (asDataBase == "delTrace")
+                        {
+                            MySqlCommand command5 = new MySqlCommand(asSql, myConnect);
+                            MySqlDataReader queryCommandReader = command5.ExecuteReader();
+                        }
+                        if (asDataBase == "x_import_dirty")
+                        {
+                            // TableDirty ist für das Zufügen von Datensätzen Timeline
+                            MySqlCommand cmdDirty = new MySqlCommand(asSql, myConnect);
+                            tableDirty = new DataTable();
+                            mysdDirty = new MySqlDataAdapter(cmdDirty);
+                            mysdDirty.Fill(tableDirty);
+                        }
+                        if (asDataBase == "impUpdate")
+                        {
+                            MySqlCommandBuilder commandBuilder = new MySqlCommandBuilder(mysdDirty);
+                            mysdDirty.Update(tableDirty);
+                        }
+                        if (asDataBase == "delRollBack")
+                        {
+                            MySqlCommand command6 = new MySqlCommand(asSql, myConnect);
+                            MySqlDataReader queryCommandReader = command6.ExecuteReader();
+                        }
+                        if (asDataBase == "getTimeLIne")
+                        {
+                            MySqlCommand command7 = new MySqlCommand(asSql, myConnect);
+                            var lvId = command7.ExecuteScalar();
+                            if (lvId != DBNull.Value)
+                            {
+                                liValue = Convert.ToInt32(lvId);
+                            }
+                            else
+                            {
+                                liValue = 0;
+                            }
+                        }
+                        if (asDataBase == "flag")
+                        {
+                            MySqlCommand command8 = new MySqlCommand(asSql, myConnect);
+                            var lvId = command8.ExecuteScalar();
+                            if (lvId != DBNull.Value)
+                            {
+                                liValue = Convert.ToInt32(lvId);
+                            }
+                            else
+                            {
+                                liValue = 0;
+                            }
+                        }
+                        if (asDataBase == "tobj")
+                        {
+
+                            MySqlCommand command = new MySqlCommand(asSql, myConnect);
+                            var lvGetId = command.ExecuteScalar();
+
+                            if (lvGetId != null)
+                            {
+                                liValue = (int)lvGetId;
+                            }
+                            else
+                            {
+                                liValue = 0;
+                            }
+                        }
+                        if (asDataBase == "impInfo")
+                        {
+                            MySqlCommand command9 = new MySqlCommand(asSql, myConnect);
+                            MySqlDataReader queryCommandReader9 = command9.ExecuteReader();
+                        }
+                        if (asDataBase == "dirty")
+                        {
+                            table_dirty = new DataTable();
+                            MySqlCommand command10 = new MySqlCommand(asSql, myConnect);
+                            MySqlDataReader queryCommandReader10 = command10.ExecuteReader();
+                            table_dirty.Load(queryCommandReader10);
+                        }
+                        if (asDataBase == "zlg")
+                        {
+                            table_zlg = new DataTable();
+                            MySqlCommand command11 = new MySqlCommand(asSql, myConnect);
+                            mysdZlg = new MySqlDataAdapter(command11);
+                            MySqlDataReader queryCommandReader11 = command11.ExecuteReader();
+                            table_zlg.Load(queryCommandReader11);
+                        }
+                        if (asDataBase == "trace")
+                        {
+                            table_trace = new DataTable();
+                            MySqlCommand command12 = new MySqlCommand(asSql, myConnect);
+                            mysdTrace = new MySqlDataAdapter(command12);
+                            MySqlDataReader queryCommandReader12 = command12.ExecuteReader();
+                            table_trace.Load(queryCommandReader12);
+                        }
+                        if (asDataBase == "zlgSave")
+                        {
+                            MySqlCommandBuilder commandBuilder = new MySqlCommandBuilder(mysdZlg);
+                            mysdZlg.Update(table_zlg);
+                        }
+                        if (asDataBase == "traceSave")
+                        {
+                            MySqlCommandBuilder commandBuilder = new MySqlCommandBuilder(mysdTrace);
+                            mysdTrace.Update(table_trace);
+                        }
+                        myConnect.Close();
+                        break;
+                    default:
+                        break;
                 }
             }
             catch
@@ -353,9 +590,8 @@ namespace Ruddat_NK
                 MessageBox.Show("Verarbeitungsfehler WndZlgImport " + asDataBase + "\n",
                         "Achtung");
             }
-            connect.Close();
 
-            return (liRows);
+            return (liValue);
         }
 
         // Den header für den Import erzeugen
@@ -623,33 +859,11 @@ namespace Ruddat_NK
         private int importDeleted(int aiImpId)
         {
             int liOk = 0;
-            // Das ImportFlag rücksetzen
-            String lsSql = @"Update x_import_info 
-                                Set import_flag = 0 
-                                Where Id_import_info = " + aiImpId.ToString();
+            String lsSql = "";
 
-            SqlConnection connect;
-            connect = new SqlConnection(gsConnect);
+            lsSql = getSql("", "impInfo", DateTime.MinValue, "", aiImpId);
+            liOk = fetchData(lsSql, "impInfo");
 
-            SqlCommand command = new SqlCommand(lsSql, connect);
-
-            // import_file
-            try
-            {
-                // Db open
-                connect.Open();
-                SqlDataReader queryCommandReader = command.ExecuteReader();
-                liOk = 1;
-                connect.Close();
-            }
-            catch
-            {
-                MessageBox.Show("Tabelle import_info konnte nicht geändert werden\n" +
-                        "ImportDeleted\n",
-                        "Achtung",
-                         MessageBoxButton.OK);
-                liOk = 0;
-            }
             return liOk;
         }
 
@@ -669,48 +883,18 @@ namespace Ruddat_NK
             btnFind.IsEnabled = true;
         }
 
-        // Todo hier weiter
         // Die ID des Import Headers besorgen (flag = 9), um sie in jeden Datesatz einzubauen
         // Das ist für ein Rollback erforderlich
         private int getImportHeaderId()
         {
             int liHeaderId = 0;
+            string lsSql = "";
 
-            String lsSql = @"Select id_import_info 
-                                From x_import_info 
-                                Where import_flag = 9";
-
-            SqlConnection connect;
-
-            connect = new SqlConnection(gsConnect);
-            SqlCommand cmd = connect.CreateCommand();
-
-            cmd.CommandText = lsSql;
-
-            SqlCommand command = new SqlCommand(lsSql, connect);
-
-            // import_file
-            try
-            {
-                // Db open
-                connect.Open();
-
-                liHeaderId = ((int)command.ExecuteScalar());
-
-                connect.Close();
-            }
-            catch
-            {
-                //MessageBox.Show("Es wurden kein Header-Datensatz erzeugt\n" +
-                //        "Prüfen Sie bitte die Datenbankverbindung\n",
-                //        "Achtung",
-                //         MessageBoxButton.OK);
-                liHeaderId = 0;
-            }
+            lsSql = getSql("", "flag", DateTime.MinValue, "", 0);
+            liHeaderId = fetchData(lsSql, "flag");
 
             return liHeaderId;
         }
-
 
         // Teilobjekt ID aus der Kostenstelle ermitteln    
         private int getObjektTeilId(string lsKstObjTeil, string lsKstObj)
@@ -719,41 +903,11 @@ namespace Ruddat_NK
 
             String lsSql = @"Select Id_objekt_teil from objekt_teil 
 	                            Right join objekt on objekt_teil.id_objekt = objekt.Id_objekt
-	                            Where objekt.kst = '" + lsKstObj + "' and objekt_teil.kst = '" + lsKstObjTeil + "'"; 
+	                            Where objekt.kst = '" + lsKstObj + "' and objekt_teil.kst = '" + lsKstObjTeil + "'";
+            liObjTeilId = fetchData(lsSql, "tobj");
 
-            SqlConnection connect;
-            connect = new SqlConnection(gsConnect);
-            SqlCommand command = new SqlCommand(lsSql, connect);
-
-            // Db open
-            connect.Open();
-
-            try
-            {
-               
-                var lvGetId = command.ExecuteScalar();
-
-                if (lvGetId != null)
-                {
-                    liObjTeilId = (int)lvGetId;
-                }
-                else
-                {
-                    liObjTeilId = 0;
-                }
-
-                connect.Close();
-            }
-            catch
-            {
-                MessageBox.Show("Es wurden keine TeilobjektId gefunden\n" +
-                        "WndZlgImport.getObjektTeilId \n",
-                        "Achtung (Timeline.getObjektFlaeche)",
-                         MessageBoxButton.OK);
-            }
             return liObjTeilId;
         }
-
 
         // Hier werden die Daten von import_dirty nach zahlungen umkopiert
         private int TableCopy()
@@ -765,6 +919,7 @@ namespace Ruddat_NK
             int liTest = 0;
             int liTraceFlag = 0;
             int liMieter = 0;
+            int liOk = 0;
             String lsSqlDirty = "";
             String lsSqlZlg = "";
             string lsSqlTrace = "";
@@ -782,202 +937,149 @@ namespace Ruddat_NK
             decimal ldN2 = 0;
             decimal ldB2 = 0;
 
-            SqlConnection connect;
+            lsSqlDirty = getSql("", "dirty", DateTime.MinValue, "", 0);
+            lsSqlZlg = getSql("", "zlg", DateTime.MinValue, "", 0);
+            lsSqlTrace = getSql("", "trace", DateTime.MinValue, "", 0);
 
-            DataTable table_dirty = new DataTable();
-            DataTable table_zlg = new DataTable();
-            DataTable table_trace = new DataTable();
+            liOk = fetchData(lsSqlDirty, "dirty");
+            liOk = fetchData(lsSqlZlg, "zlg");
+            liOk = fetchData(lsSqlTrace, "trace");
 
-            connect = new SqlConnection(gsConnect);
+            // Import ID holen
+            liHeaderId = getImportHeaderId();
 
-            lsSqlDirty = "Select iid,a,b,c,d,e,f,g,h,i,j,k,l,m,n,o from x_import_dirty";
-            lsSqlZlg = @"select id_vz,id_mieter,id_objekt,id_objekt_teil,datum_von,datum_bis,
-                            betrag_netto,betrag_brutto,betrag_netto_soll,betrag_brutto_soll,
-                            id_extern_timeline,flag_timeline,id_ksa,id_import 
-                        from zahlungen";
-            lsSqlTrace = @"select id_vz,id_mieter,id_objekt,id_objekt_teil,datum_von,datum_bis,
-                            betrag_netto,betrag_brutto,betrag_netto_soll,betrag_brutto_soll,
-                            id_extern_timeline,flag_timeline,id_ksa,id_import,bez 
-                        from zahlungen_trace";
-            try
+            // Kalender in lokale Variable
+            ldtStart = gdtStart;
+
+            // Neue Timeline Id holen Art 2 = Zahlungen
+            liTimelineId = Timeline.getTimelineId(gsConnect,2) + 1;
+
+            // Mehrwertsteuersatz für normal holen
+            liMwstSatz = Timeline.getMwstFromBez("normal", gsConnect);
+
+            // Fortschrittsanzeige > Maximum übermitteln = 10000 dazuaddieren
+            worker2.ReportProgress(table_dirty.Rows.Count + 10000);
+
+            // Dann alles in datatable zahlungen kopieren und entsprechend umwandeln
+            for (int i = 2; i < table_dirty.Rows.Count; i++)
             {
-                // Db open
-                connect.Open();
+                // Teilobjekt ID holen
+                lsKstObj        = table_dirty.Rows[i].ItemArray.GetValue(10).ToString();
+                lsKstObjTeil    = table_dirty.Rows[i].ItemArray.GetValue(11).ToString();
 
-                // dateTable import_dirty
-                SqlCommand command = new SqlCommand(lsSqlDirty, connect);
-                SqlDataReader queryCommandReader = command.ExecuteReader();
-                table_dirty.Load(queryCommandReader);
+                ldKaltmiete = 0;
+                ldNk = 0;
+                ldMwst = 0;
+                ldBruttoSoll = 0;
+                ldBruttoIst = 0;
+                ldNkNetto = 0;
+                ldNkBrutto = 0;
 
-                // DataTable  import Clock
-                SqlCommand command2 = new SqlCommand(lsSqlZlg, connect);
-                SqlDataReader queryCommandReader2 = command2.ExecuteReader();
-                table_zlg.Load(queryCommandReader2); 
-
-                // DataTable  import Trace
-                SqlCommand command3 = new SqlCommand(lsSqlTrace, connect);
-                SqlDataReader queryCommandReader3 = command3.ExecuteReader();
-                table_trace.Load(queryCommandReader3);
-
-                // Import ID holen
-                liHeaderId = getImportHeaderId();
-
-                // Kalender in lokale Variable
-                ldtStart = gdtStart;
-
-                // Neue Timeline Id holen Art 2 = Zahlungen
-                liTimelineId = Timeline.getTimelineId(gsConnect,2) + 1;
-
-                // Mehrwertsteuersatz für normal holen
-                liMwstSatz = Timeline.getMwstFromBez("normal", gsConnect);
-
-                // Fortschrittsanzeige > Maximum übermitteln = 10000 dazuaddieren
-                worker2.ReportProgress(table_dirty.Rows.Count + 10000);
-
-                // Dann alles in datatable zahlungen kopieren und entsprechend umwandeln
-                for (int i = 2; i < table_dirty.Rows.Count; i++)
+                if (lsKstObj.Length > 0 && lsKstObjTeil.Length > 0 && liHeaderId > 0)
                 {
-                    // Teilobjekt ID holen
-                    lsKstObj        = table_dirty.Rows[i].ItemArray.GetValue(10).ToString();
-                    lsKstObjTeil    = table_dirty.Rows[i].ItemArray.GetValue(11).ToString();
-
-                    ldKaltmiete = 0;
-                    ldNk = 0;
-                    ldMwst = 0;
-                    ldBruttoSoll = 0;
-                    ldBruttoIst = 0;
-                    ldNkNetto = 0;
-                    ldNkBrutto = 0;
-
-                    if (lsKstObj.Length > 0 && lsKstObjTeil.Length > 0 && liHeaderId > 0)
+                    liObjTeilId = getObjektTeilId(lsKstObjTeil.Trim(),lsKstObj.Trim());
+                    // Die Zahlung konnte zugeordnet werden > 0
+                    if (liObjTeilId > 0)
                     {
-                        liObjTeilId = getObjektTeilId(lsKstObjTeil.Trim(),lsKstObj.Trim());
-                        // Die Zahlung konnte zugeordnet werden > 0
-                        if (liObjTeilId > 0)
+                        decimal.TryParse(table_dirty.Rows[i].ItemArray.GetValue(3).ToString(), out ldKaltmiete);  // Kaltmiete soll
+                        decimal.TryParse(table_dirty.Rows[i].ItemArray.GetValue(4).ToString(), out ldNk);         // Nebenkosten soll
+                        decimal.TryParse(table_dirty.Rows[i].ItemArray.GetValue(6).ToString(), out ldMwst);       // Mwst
+                        decimal.TryParse(table_dirty.Rows[i].ItemArray.GetValue(7).ToString(), out ldBruttoSoll); // Zahlung sollBrutto
+                        decimal.TryParse(table_dirty.Rows[i].ItemArray.GetValue(9).ToString(), out ldBruttoIst);  // Zahlung Brutto
+
+                        // Mieter eintragen
+                        liMieter = Timeline.getAktMieter(liObjTeilId, ldtStart, gsConnect);
+
+                        if (ldBruttoIst  > 0 && liMieter > 0)           // Nur wenn in den Nebenkosten ein Betrag steht
                         {
-                            decimal.TryParse(table_dirty.Rows[i].ItemArray.GetValue(3).ToString(), out ldKaltmiete);  // Kaltmiete soll
-                            decimal.TryParse(table_dirty.Rows[i].ItemArray.GetValue(4).ToString(), out ldNk);         // Nebenkosten soll
-                            decimal.TryParse(table_dirty.Rows[i].ItemArray.GetValue(6).ToString(), out ldMwst);       // Mwst
-                            decimal.TryParse(table_dirty.Rows[i].ItemArray.GetValue(7).ToString(), out ldBruttoSoll); // Zahlung sollBrutto
-                            decimal.TryParse(table_dirty.Rows[i].ItemArray.GetValue(9).ToString(), out ldBruttoIst);  // Zahlung Brutto
+                            // Id bleibt frei dr[0] = XX;
+                            DataRow dr = table_zlg.NewRow();
 
-                            // Mieter eintragen
-                            liMieter = Timeline.getAktMieter(liObjTeilId, ldtStart, gsConnect);
-
-                            if (ldBruttoIst  > 0 && liMieter > 0)           // Nur wenn in den Nebenkosten ein Betrag steht
+                            if (ldMwst > 0)  // Mit Mwst: Nettobetrag wird eingetragen
                             {
-                                // Id bleibt frei dr[0] = XX;
-                                DataRow dr = table_zlg.NewRow();
-
-                                if (ldMwst > 0)  // Mit Mwst: Nettobetrag wird eingetragen
-                                {
-                                    ldN2 = ldBruttoIst - ldMwst - ldKaltmiete;
-                                    ldB2 = ldN2 + ((ldN2 / 100) * liMwstSatz);
-                                    ldNkNetto = ldNk;
-                                }
-                                else // Keine Mwst: Bruttobetrag wird eingetragen
-                                {
-                                    ldB2 = ldBruttoIst - ldKaltmiete;
-                                    ldN2 = (ldB2 / (100 + liMwstSatz)) * 100;
-                                    ldNkBrutto = ldNk;
-                                }
-
-                                // nur positive Zahlen eintragen
-                                if (ldN2 <= 0)
-                                {
-                                    ldN2 = 0;
-                                }
-
-                                if (ldB2 <= 0)
-                                {
-                                    ldB2 = 0;
-                                }
-
-
-                                dr[1] = liMieter;               // Mieter Id
-                                // dr[3] = liObjTeilId;         // ObjektTeil ID
-                                dr[4] = ldtStart;               // Datum
-                                dr[6] = ldN2;                   // Netto
-                                dr[7] = ldB2;                   // Brutto
-                                dr[8] = ldNkNetto;              // Netto Soll
-                                dr[9] = ldNkBrutto;             // Brutto Soll
-                                dr[10] = liTimelineId;          // Timeline ID
-                                dr[11] = 1;                     // Timelineflag
-                                dr[12] = Timeline.getKsaId(1,gsConnect);  // Kostenart Vorrauszahlung Nebenkosten
-                                dr[13] = liHeaderId;            // Import ID
-
-                                // Timeline schreiben
-                                Timeline.editTimeline(liTimelineId, 11, gsConnect);
-
-                                liTimelineId++;
-                                table_zlg.Rows.Add(dr);
+                                ldN2 = ldBruttoIst - ldMwst - ldKaltmiete;
+                                ldB2 = ldN2 + ((ldN2 / 100) * liMwstSatz);
+                                ldNkNetto = ldNk;
+                            }
+                            else // Keine Mwst: Bruttobetrag wird eingetragen
+                            {
+                                ldB2 = ldBruttoIst - ldKaltmiete;
+                                ldN2 = (ldB2 / (100 + liMwstSatz)) * 100;
+                                ldNkBrutto = ldNk;
                             }
 
+                            // nur positive Zahlen eintragen
+                            if (ldN2 <= 0)
+                            {
+                                ldN2 = 0;
+                            }
+
+                            if (ldB2 <= 0)
+                            {
+                                ldB2 = 0;
+                            }
+
+                            dr[1] = liMieter;               // Mieter Id
+                            // dr[3] = liObjTeilId;         // ObjektTeil ID
+                            dr[4] = ldtStart;               // Datum
+                            dr[6] = ldN2;                   // Netto
+                            dr[7] = ldB2;                   // Brutto
+                            dr[8] = ldNkNetto;              // Netto Soll
+                            dr[9] = ldNkBrutto;             // Brutto Soll
+                            dr[10] = liTimelineId;          // Timeline ID
+                            dr[11] = 1;                     // Timelineflag
+                            dr[12] = Timeline.getKsaId(1,gsConnect);  // Kostenart Vorrauszahlung Nebenkosten
+                            dr[13] = liHeaderId;            // Import ID
+
+                            // Timeline schreiben
+                            Timeline.editTimeline(liTimelineId, 11, gsConnect);
+
+                            liTimelineId++;
+                            table_zlg.Rows.Add(dr);
                         }
-                        else    // Die Zahlung aus Excel konnte nicht verbucht werden, kommt in die TraceTabelle Zahlungen
+
+                    }
+                    else    // Die Zahlung aus Excel konnte nicht verbucht werden, kommt in die TraceTabelle Zahlungen
+                    {
+                        decimal.TryParse(table_dirty.Rows[i].ItemArray.GetValue(4).ToString(), out ldKaltmiete);
+                        decimal.TryParse(table_dirty.Rows[i].ItemArray.GetValue(4).ToString(), out ldNk);
+                        decimal.TryParse(table_dirty.Rows[i].ItemArray.GetValue(5).ToString(), out ldMwst);
+                        decimal.TryParse(table_dirty.Rows[i].ItemArray.GetValue(6).ToString(), out ldBruttoSoll);
+
+                        liTraceFlag = 1;
+
+                        if (ldNk > 0)           // Nur wenn in den Nebenkosten ein Betrag steht
                         {
-                            decimal.TryParse(table_dirty.Rows[i].ItemArray.GetValue(4).ToString(), out ldKaltmiete);
-                            decimal.TryParse(table_dirty.Rows[i].ItemArray.GetValue(4).ToString(), out ldNk);
-                            decimal.TryParse(table_dirty.Rows[i].ItemArray.GetValue(5).ToString(), out ldMwst);
-                            decimal.TryParse(table_dirty.Rows[i].ItemArray.GetValue(6).ToString(), out ldBruttoSoll);
+                            DataRow drt = table_trace.NewRow();
 
-                            liTraceFlag = 1;
+                            // Id bleibt frei dr[0] = XX;
+                            drt[3] = liObjTeilId;            // ObjektTeil ID
+                            drt[4] = ldtStart;               // Datum
+                            drt[6] = ldNk;                   // Netto
+                            drt[10] = liTimelineId;
+                            drt[11] = 1;                     // Timelineflag
+                            drt[12] = Timeline.getKsaId(1,gsConnect);  // Kostenart Vorrauszahlung Nebenkosten
+                            drt[13] = liHeaderId;            // Import ID
+                            drt[14] = "Kostenst: " + lsKstObj.Trim() + "/" + lsKstObjTeil.Trim() + "/" +liObjTeilId.ToString();
 
-                            if (ldNk > 0)           // Nur wenn in den Nebenkosten ein Betrag steht
-                            {
-                                DataRow drt = table_trace.NewRow();
-
-                                // Id bleibt frei dr[0] = XX;
-                                drt[3] = liObjTeilId;            // ObjektTeil ID
-                                drt[4] = ldtStart;               // Datum
-                                drt[6] = ldNk;                   // Netto
-                                drt[10] = liTimelineId;
-                                drt[11] = 1;                     // Timelineflag
-                                drt[12] = Timeline.getKsaId(1,gsConnect);  // Kostenart Vorrauszahlung Nebenkosten
-                                drt[13] = liHeaderId;            // Import ID
-                                drt[14] = "Kostenst: " + lsKstObj.Trim() + "/" + lsKstObjTeil.Trim() + "/" +liObjTeilId.ToString();
-
-
-                                liTimelineId++;
-                                liTest = i;
-                                table_trace.Rows.Add(drt);
-                            }
+                            liTimelineId++;
+                            liTest = i;
+                            table_trace.Rows.Add(drt);
                         }
                     }
-                    // Fortschrittsanzeige
-                    worker2.ReportProgress(i);
                 }
-
-                SqlDataAdapter adp = new SqlDataAdapter(command2);
-                SqlCommandBuilder commandBuilder = new SqlCommandBuilder(adp);
-
-                adp.UpdateCommand = commandBuilder.GetUpdateCommand();
-                adp.InsertCommand = commandBuilder.GetInsertCommand();
-
-                adp.Update(table_zlg);
-
-                if (liTraceFlag==1)
-                {
-                    SqlDataAdapter adp1 = new SqlDataAdapter(command3);
-                    SqlCommandBuilder commandBuilder3 = new SqlCommandBuilder(adp1);
-
-                    adp1.UpdateCommand = commandBuilder3.GetUpdateCommand();
-                    adp1.InsertCommand = commandBuilder3.GetInsertCommand();
-
-                    adp1.Update(table_trace);
-                    liTraceFlag = 0;
-                }
-
-                connect.Close();
-
+                // Fortschrittsanzeige
+                worker2.ReportProgress(i);
             }
-            catch
+            // Zahlungen sichern
+            liOk = fetchData("", "zlgSave");
+
+            if (liTraceFlag == 1)
             {
-                // Die Anwendung anhalten
-                MessageBox.Show("Verarbeitungsfehler ERROR WndZlgImport.TableCopy \n Zeile " + liTest + " von " + table_dirty.Rows.Count + "\n " + gdtStart.ToString(),
-                        "Achtung");
+                // Trace sichern
+                liOk = fetchData("", "traceSave");
+                liTraceFlag = 0;
             }
-
             return liHeaderId;
         }
     }

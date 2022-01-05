@@ -2632,6 +2632,8 @@ namespace Ruddat_NK
         private void mnInfoZahlungenTrace_Click(object sender, RoutedEventArgs e)
         {
             WndZlgTrace frmZlgTrace = new WndZlgTrace(this);
+            DelPassDataArt delegt = new DelPassDataArt(frmZlgTrace.getDb);
+            delegt(giDb);
             frmZlgTrace.ShowDialog();
         }
 
