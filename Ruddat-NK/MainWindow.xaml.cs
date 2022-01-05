@@ -2483,7 +2483,7 @@ namespace Ruddat_NK
             gdtZahlung = ldtZlg;
         }
 
-        // Todo Menü Rechnungen importieren noch nicht TODO Ulf!
+        // Todo Menü Rechnungen importieren
         private void mnImpRg_Click(object sender, RoutedEventArgs e)
         {
 
@@ -2557,7 +2557,6 @@ namespace Ruddat_NK
             DelPassDataArt delegt = new DelPassDataArt(frmRep.getDb);
             delegt(giDb);
             frmRep.ShowDialog();
-            // Todo Delegates weiterführen
         }
 
         // STAMMDATEN -----------------------------------------------------------

@@ -44,7 +44,6 @@ namespace Ruddat_NK
 
         public WndRep(MainWindow mainWindow)
         {
-            // TODO: Complete member initialization
             this.mainWindow = mainWindow;
             InitializeComponent();
         }

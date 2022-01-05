@@ -18,7 +18,6 @@ namespace Ruddat_NK
             String lsWhereAdd3 = "";
             String lsWhereAdd4 = "";
             String lsField = "";
-            String lsFieldTo = "";  
             String lsAnd = " Where ";
             String lsOrder = "";
             String lsGroup = "";

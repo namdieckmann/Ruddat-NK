@@ -77,7 +77,7 @@ namespace Ruddat_NK
         static MySqlDataAdapter myadp;
 
         static string lsSql = "";
-        static int giDb = 2;                    // TODO Welche Datenbank 
+        static int giDb = 2;                    // TODO Art Datenbank aus Xml-Config holen
 
         // Bisher höchste Id für Timeline ermitteln
         public static int getTimelineId(string asConnect, int asArt)
@@ -1370,8 +1370,6 @@ namespace Ruddat_NK
                 default:
                     break;
             }
-
-
         }
 
         // Datenbankaktionen nach fetchdata
@@ -1444,14 +1442,14 @@ namespace Ruddat_NK
 
                                     // Weiterleitung an ObjektTeil aus der Kostenart ermitteln
                                     // 1 = Weiterleitung an Teilobjekt
-                                    if (getWtl(1, liExternId, asConnect)==1)   // Todo ist jetzt int funktion testen
+                                    if (getWtl(1, liExternId, asConnect)==1)
                                     {
                                         liObjektTeil = 0;
                                         // Timeline neu erzeugen für Relationen
                                         liOk = TimelineCreateRelations(liExternId, liObjekt, liObjektTeil, liMieter, asConnect);
 
                                         // 2 = Weiterleitung an Mieter
-                                        if (getWtl(2, liExternId, asConnect) ==1)   // Todo ist jetzt int funktion testen
+                                        if (getWtl(2, liExternId, asConnect) ==1)   
                                         {
                                             liObjekt = 0;
                                             liObjektTeil = 1;   // Auslöser für das Weiterleiten an Mieter
@@ -1470,7 +1468,7 @@ namespace Ruddat_NK
                                     liOk = TimelineCreate(liExternId, "id_rechnung", asConnect);
                                     // Weiterleitung an ObjektTeil aus der Kostenart ermitteln
                                     // 2 = Weiterleitung an Mieter
-                                    if (getWtl(2, liExternId, asConnect) == 1) // Todo wurde int, testen
+                                    if (getWtl(2, liExternId, asConnect) == 1)
                                     {
                                         // Timeline neu erzeugen für Relationen
                                         liOk = TimelineCreateRelations(liExternId, liObjekt, liObjektTeil, liMieter, asConnect);
@@ -1483,7 +1481,7 @@ namespace Ruddat_NK
                                 {
                                     liMieter = (int)tableOne.Rows[i].ItemArray.GetValue(10);
                                     // Timeline neu erzeugen Mieter aus Rechnungen
-                                    // TODO hier Kontrolle einbauen, ob Mietvertrag gültig ist ULF
+                                    // TODO hier Kontrolle einbauen, ob Mietvertrag gültig ist
                                     liOk = TimelineCreate(liExternId, "id_rechnung", asConnect);
                                 }
                         }
@@ -1600,7 +1598,6 @@ namespace Ruddat_NK
 
                                     } while (zl <= liMonths);
 
-                                    // TODO Die Variable GiDb erstmal holen evtl aus xml Datei??
                                     // und alles ab in die Datenbank
                                     MakeCommand(giDb, 1);
                                 }

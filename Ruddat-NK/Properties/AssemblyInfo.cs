@@ -7,13 +7,13 @@ using System.Windows;
 // Allgemeine Informationen über eine Assembly werden über die folgenden 
 // Attribute gesteuert. Ändern Sie diese Attributwerte, um die Informationen zu ändern,
 // die mit einer Assembly verknüpft sind.
-[assembly: AssemblyTitle("Ruddat-NK")]
-[assembly: AssemblyDescription("Nebenkostenabrechnung Fa. Ruddat")]
+[assembly: AssemblyTitle("Kman Nebenkosten")]
+[assembly: AssemblyDescription("Nebenkostenabrechnung")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Ulf Dieckmann")]
-[assembly: AssemblyProduct("Ruddat-NK")]
-[assembly: AssemblyCopyright("Copyright ©  2018")]
-[assembly: AssemblyTrademark("Wfs")]
+[assembly: AssemblyProduct("Kman NBK")]
+[assembly: AssemblyCopyright("Copyright ©  2022")]
+[assembly: AssemblyTrademark("Kman")]
 [assembly: AssemblyCulture("")]
 
 // Durch Festlegen von ComVisible auf "false" werden die Typen in dieser Assembly unsichtbar 

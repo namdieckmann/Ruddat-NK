@@ -408,7 +408,6 @@ namespace Ruddat_NK
                 }
             }
             // Daten Vertrag neu holen
-            // Todo Verträge nach löschen neu holen
             if (liSel >= 0)
             {
                 // Das gewählte Teilobjekt
@@ -494,10 +493,9 @@ namespace Ruddat_NK
                     liIdObjTeil = Int32.Parse(rowviewOt.Row[0].ToString());
                     liIdObj = Int32.Parse(rowviewObj.Row[0].ToString());
 
-                    // Todo Ulf !!
-                    //// Die Combobox einschränken (nur Mieter des Teilobjektes)
+                    // Todo Die Combobox einschränken (nur Mieter des Teilobjektes)
                     //lsSql = getSql("mieter", 51, liIdObj);
-                    //// Daten Firmen holen
+                    // Daten Firmen holen
                     //liRows = FetchData(lsSql, 5);
 
                     DataRow dr = tableContract.NewRow();

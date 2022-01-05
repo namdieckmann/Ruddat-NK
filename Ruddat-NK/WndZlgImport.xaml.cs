@@ -238,12 +238,23 @@ namespace Ruddat_NK
                 lsSql = "SELECT COUNT(1) AS Expr1 FROM x_import_dirty";                
             }
 
-            // Todo Date für Mysql
             if (asDb == "header")
             {
-                lsSql = @"insert into x_import_info (import_date,import_flag,import_user,import_descr) values (Convert(DateTime," + "\'"
-                + adtToday.ToString("dd.MM.yyyy HH:mm:ss") + "\',104),9,\'"
-                + asUserName + "\',\'" + gsYear + " | " + gsMonth + " | Datei=" + gsDlgFileName + "\')";
+                switch (giDb)
+                {
+                    case 1:
+                        lsSql = @"insert into x_import_info (import_date,import_flag,import_user,import_descr) values (Convert(DateTime," + "\'"
+                        + adtToday.ToString("dd.MM.yyyy HH:mm:ss") + "\',104),9,\'"
+                        + asUserName + "\',\'" + gsYear + " | " + gsMonth + " | Datei=" + gsDlgFileName + "\')";
+                        break;
+                    case 2:
+                        lsSql = @"insert into x_import_info (import_date,import_flag,import_user,import_descr) values "
+                            +" date_format(\"" + adtToday.ToString("dd.MM.yyyy") + "\",\"%d.%m.%y\") "
+                            + asUserName + "\',\'" + gsYear + " | " + gsMonth + " | Datei=" + gsDlgFileName + "\')";
+                        break;
+                    default:
+                        break;
+                }
             }
             if (asDb == "delImport")
             {
