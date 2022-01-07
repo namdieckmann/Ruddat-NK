@@ -65,7 +65,8 @@
 
         <TreeView x:Name="tvMain" HorizontalAlignment="Left" Width="297" Margin="10,112,0,37.857" SelectedItemChanged="tvMain_SelectedItemChanged" Grid.ColumnSpan="2">
         </TreeView>
-        <ListBox x:Name="lbFiliale" SelectedValuePath="id_filiale" DisplayMemberPath="name" HorizontalAlignment="Left" VerticalAlignment="Top" Height="77" Width="297" Margin="10,30,0,0" SelectionChanged="lbFiliale_SelectionChanged" ToolTip="Anwahl der Filiale" Grid.ColumnSpan="2" />
+        <ListBox x:Name="lbFiliale" SelectedValuePath="id_filiale" DisplayMemberPath="name" HorizontalAlignment="Left" VerticalAlignment="Top" Height="77" Width="297" Margin="10,30,0,0" 
+                 SelectionChanged="lbFiliale_SelectionChanged" ToolTip="Anwahl der Filiale" Grid.ColumnSpan="2" />
 
         <TabControl x:Name="tb1" Margin="113,30,10,172.857" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Stretch" Grid.Column="1" >
             <TabItem x:Name="tbKosten" Header="Kosten">
@@ -238,56 +239,37 @@
                             <ColumnDefinition Width="40*"/>
                             <ColumnDefinition Width="983*"/>
                         </Grid.ColumnDefinitions>
-                        <DataGrid x:Name="DgrCounters" Margin="10,101,10,37" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" ToolTip="Zählerstände" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" ColumnWidth="*" Grid.ColumnSpan="3" SelectionChanged="DgrCounters_SelectionChanged" RowEditEnding="DgrCounters_RowEditEnding" BeginningEdit="DgrCounters_BeginningEdit" CellEditEnding="DgrCounters_CellEditEnding" >
+                        <DataGrid x:Name="DgrCounters" Margin="10,101,10,37" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" ToolTip="Zählerstände" 
+                                  RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" ColumnWidth="*" Grid.ColumnSpan="3" 
+                                  SelectionChanged="DgrCounters_SelectionChanged" RowEditEnding="DgrCounters_RowEditEnding" 
+                                  BeginningEdit="DgrCounters_BeginningEdit" CellEditEnding="DgrCounters_CellEditEnding" >
                             <DataGrid.Columns>
-
-                                <!--<DataGridTemplateColumn Header="Datum">
-                                    <DataGridTemplateColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <TextBlock Text="{Binding von, StringFormat ={}{0:dd.MM.yyyy}}"/>
-                                        </DataTemplate>
-                                    </DataGridTemplateColumn.CellTemplate>
-                                    <DataGridTemplateColumn.CellEditingTemplate>
-                                        <DataTemplate>
-                                            <DatePicker SelectedDate="{Binding von}" />
-                                        </DataTemplate>
-                                    </DataGridTemplateColumn.CellEditingTemplate>
-                                </DataGridTemplateColumn>-->
-
-                                <DataGridComboBoxColumn x:Name="zlNummer" Header="Zählernummer"
+                                <DataGridComboBoxColumn x:Name="zlNummer" Header="Zählernummer" 
                                     DisplayMemberPath="zn"
                                     SelectedValuePath="id_zl"
                                     SelectedValueBinding="{Binding id_zaehler}" />
-
                                 <DataGridComboBoxColumn x:Name="kostenvertZl" Header="Kostenverteilung"
                                     DisplayMemberPath="b"
                                     SelectedValuePath="id_verteilung"
                                     SelectedValueBinding="{Binding id_verteilung_zl}" />
-
                                 <DataGridTextColumn Header="Datum"
                                     Binding="{Binding von, StringFormat ={}{0:dd.MM.yyyy}}"/>
-
                                 <DataGridTextColumn Header="Zählerstand" CellStyle="{StaticResource NameCellStyle}"
             			            Binding="{Binding zs, ConverterCulture='de-DE', StringFormat=N2}"/>
                                 <DataGridTextColumn Header="Verbrauch" CellStyle="{StaticResource NameCellStyle}"
             			            Binding="{Binding verb, ConverterCulture='de-DE', StringFormat=N2}"/>
-
                                 <DataGridComboBoxColumn x:Name="zleh" Header="Einheit"
                                     DisplayMemberPath="zleh"
                                     SelectedValuePath="id_zl"
-                                    SelectedValueBinding="{Binding id_zaehler}" IsReadOnly="True" />
-
+                                    SelectedValueBinding="{Binding id_zaehler}"/>
                                 <DataGridTextColumn x:Name="prNetto" Header="Betrag/Einheit Netto" CellStyle="{StaticResource NameCellStyle}" 
             			            Binding="{Binding prnetto, StringFormat ={}{0:c},ConverterCulture=de-DE}"/>
-
                                 <DataGridTextColumn x:Name="prBrutto" Header="Betrag/Einheit Brutto" CellStyle="{StaticResource NameCellStyle}" 
             			            Binding="{Binding prbrutto, StringFormat ={}{0:c},ConverterCulture=de-DE}"/>
-
                                 <DataGridComboBoxColumn x:Name="zlmw" Header="Mwst (%)"
                                     DisplayMemberPath="zlmw"
                                     SelectedValuePath="id_zl"
-                                    SelectedValueBinding="{Binding id_zaehler}" IsReadOnly="True" />
-
+                                    SelectedValueBinding="{Binding id_zaehler}"/>
                             </DataGrid.Columns>
                         </DataGrid>
                         <TextBox x:Name="tbCntObjekt" HorizontalAlignment="Left" Height="23" Margin="104,7,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="235" IsEnabled="False" Grid.ColumnSpan="3"/>

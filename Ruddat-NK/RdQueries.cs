@@ -350,10 +350,13 @@ namespace Ruddat_NK
                 lsSql = lsSql + lsWhereAdd + lsWhereAdd2 + lsWhereAdd3 + lsOrder;
             }
 
-            // Combobox Verteilungsarten
+            // Combobox Kosten Verteilungsarten
             if (piArt == 16)
             {
-                lsSql = " Select id_verteilung,bez as b,kb from art_verteilung";
+                lsSql = @" Select id_verteilung
+                                ,bez as b
+                                ,kb 
+                            from art_verteilung";
             }
 
             // InfoTablelle für den Druck der Abrechnungen
@@ -382,8 +385,11 @@ namespace Ruddat_NK
                     default:
                         break;
                 }
-
-                lsSql = @" Select id_zaehler as id_zl, zaehlernummer as zn, art_einheit.bez as zleh, art_mwst.mwst as zlmw from zaehler
+                lsSql = @" Select id_zaehler as id_zl
+                                , zaehlernummer as zn
+                                , art_einheit.bez as zleh
+                                , art_mwst.mwst as zlmw 
+                                from zaehler
                         left join art_mwst on zaehler.id_mwst_art = art_mwst.Id_mwst_art
                         left join art_einheit on zaehler.id_einheit = art_einheit.id_einheit";
                 lsSql = lsSql + lsWhereAdd;
@@ -495,7 +501,7 @@ namespace Ruddat_NK
                         zaehlerstaende.id_objekt_teil,
                         zaehlerstaende.id_zaehler,
                         zaehlerstaende.id_ksa,
-                        zaehlerstaende.id_verteilung as id_verteilung
+                        zaehlerstaende.id_verteilung as id_verteilung_zl
 				from zaehlerstaende
 				where zaehlerstaende.id_objekt_teil = " + piId.ToString() + lsWhereAdd2;
                 }

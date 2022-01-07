@@ -500,7 +500,7 @@ namespace Ruddat_NK
                 DataRowView rowview = dgrStZaehler.SelectedItem as DataRowView;
 
                 //  Zähler ID holen
-                if ((rowview.Row[3] != DBNull.Value))
+                if ((rowview.Row[0] != DBNull.Value))
                 {
                     liZaehlerId = Int32.Parse(rowview.Row[0].ToString());
                     // Prüfen 

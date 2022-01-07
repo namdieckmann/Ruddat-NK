@@ -534,7 +534,7 @@ namespace Ruddat_NK
                     lsSql = "delete from x_abr_content;";
                     break;
                 case 37:        // Zähler Id
-                    lsSql = @"select id_zaehler from zaehler where zaehlernummer = '" + piId.ToString().Trim() + "\'";
+                    lsSql = @"select id_zaehler from zaehler where zaehlernummer = '" + ps2.Trim() + "\'";
                     break;
                 case 38:        // Mwst Satz Zähler
                     lsSql = @"Select art_mwst.mwst from zaehler 
@@ -3015,8 +3015,9 @@ namespace Ruddat_NK
             } 
         }
 
-        //// Erste Tabelle Timeline holen
+        // Erste Tabelle Timeline holen
         liOk = fetchData(asSql, "", 28, asConnect, giDb);
+        // TODO Reports Zählerstände
         // Zweite Tabelle Timeline ObjektKostendarstellung (Zähler)
         liOk = fetchData(asSql2, "", 29, asConnect, giDb);
         // Dritte Tabelle x_abr_content

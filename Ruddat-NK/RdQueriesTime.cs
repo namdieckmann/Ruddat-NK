@@ -19,9 +19,9 @@ namespace Ruddat_NK
                     LsSql = asField + " >= Convert(DateTime, " + "\'" + adtStart + "', 104) AND "
                                           + asField +" <= Convert(DateTime," + "\'" + adtEnd + "',104)";
                     break;
-                case 2:         // MySql
-                    LsSql = asField + " >= date_format(\"" + adtStart.ToString("dd.MM.yyyy") + "\",\"%d.%m.%y\") AND "
-                                          + asField + " <= date_format(\"" + adtEnd.ToString("dd.MM.yyyy") + "\",\"%d.%m.%y\")";
+                case 2:         // MySql   AAACCHTUNG Format ist %Y   großes Y
+                    LsSql = asField + " >= str_to_date(\"" + adtStart.ToString("dd.MM.yyyy") + "\",\"%d.%m.%Y %H:%i:%s\") AND "
+                                          + asField + " <= str_to_date(\"" + adtEnd.ToString("dd.MM.yyyy") + "\",\"%d.%m.%Y %H:%i:%s\")";
                     break;
                 default:
                     break;
@@ -40,7 +40,7 @@ namespace Ruddat_NK
                     LsSql = asFieldOne + " >= Convert(DateTime, " + "\'" + adtStart + "', 104) ";
                     break;
                 case 2:         // MySql
-                    LsSql = asFieldOne + " >= date_format(\"" + adtStart.ToString("dd.MM.yyyy") + "\",\"%d.%m.%y\") ";
+                    LsSql = asFieldOne + " >= str_to_date(\"" + adtStart.ToString("dd.MM.yyyy") + "\",\"%d.%m.%Y %H:%i:%s\") ";
                     break;
                 default:
                     break;
@@ -148,22 +148,22 @@ namespace Ruddat_NK
                             lsSql = @"Delete from x_abr_info Where Id_info > 0;
                                         Insert into x_abr_info (id_filiale,id_objekt,abr_dat_von,abr_dat_bis) 
                                         values (" + aiFiliale + "," + liIdObj.ToString() + ", " +
-                                        "date_format(\"" + ldtStartTmp.ToString("dd.MM.yyyy") + "\",\"%d.%m.%y\"), " +
-                                        "date_format(\"" + ldtEndTmp.ToString("dd.MM.yyyy") + "\",\"%d.%m.%y\"))";
+                                        "str_to_date(\"" + ldtStartTmp.ToString("dd.MM.yyyy") + "\",\"%d.%m.%Y %H:%i:%s\"), " +
+                                        "str_to_date(\"" + ldtEndTmp.ToString("dd.MM.yyyy") + "\",\"%d.%m.%Y %H:%i:%s\"))";
                             break;
                         case 202:           // ObjektTeil
                             lsSql = @"Delete from x_abr_info Where Id_info > 0;
                                         Insert into x_abr_info (id_filiale,id_objekt,id_objekt_teil,abr_dat_von,abr_dat_bis) 
                                         values(" + aiFiliale + ", " + liIdObj.ToString() + ", " + liIdObjTeil.ToString() + ", " +
-                                        "date_format(\"" + ldtStartTmp.ToString("dd.MM.yyyy") + "\",\"%d.%m.%y\"), " +
-                                        "date_format(\"" +ldtEndTmp.ToString("dd.MM.yyyy") + "\",\"%d.%m.%y\"))";
+                                        "str_to_date(\"" + ldtStartTmp.ToString("dd.MM.yyyy") + "\",\"%d.%m.%Y %H:%i:%s\"), " +
+                                        "str_to_date(\"" + ldtEndTmp.ToString("dd.MM.yyyy") + "\",\"%d.%m.%Y %H:%i:%s\"))";
                                                         break;
                         case 203:           // Mieter
                             lsSql = @"Delete from x_abr_info Where Id_info > 0;
                                         Insert into x_abr_info (id_filiale,id_mieter,id_objekt,id_objekt_teil,abr_dat_von,abr_dat_bis) 
                                         values (" + aiFiliale + "," + liMieterId.ToString() + "," + liIdObj.ToString() + "," + liIdObjTeil.ToString() + ", " +
-                                        "date_format(\"" + ldtStartTmp.ToString("dd.MM.yyyy") + "\",\"%d.%m.%y\"), " +
-                                        "date_format(\"" + ldtEndTmp.ToString("dd.MM.yyyy") + "\",\"%d.%m.%y\"))";
+                                        "str_to_date(\"" + ldtStartTmp.ToString("dd.MM.yyyy") + "\",\"%d.%m.%Y %H:%i:%s\"), " +
+                                        "str_to_date(\"" + ldtEndTmp.ToString("dd.MM.yyyy") + "\",\"%d.%m.%Y %H:%i:%s\"))";
                             break;
                         default:
                             break;
@@ -186,7 +186,7 @@ namespace Ruddat_NK
                     LsWhereAdd = lsAnd + asField + " <= Convert(DateTime, " + "\'" + adtStart + "', 104) ";
                     break;
                 case 2:
-                    LsWhereAdd = lsAnd + asField + " <= date_format(\"" + adtStart.ToString("dd.MM.yyyy") + "\",\"%d.%m.%y\") ";
+                    LsWhereAdd = lsAnd + asField + " <= str_to_date(\"" + adtStart.ToString("dd.MM.yyyy") + "\",\"%d.%m.%Y %H:%i:%s %H:%i:%s\") ";
                                           
                     break;
                 default:

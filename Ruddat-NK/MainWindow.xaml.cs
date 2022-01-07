@@ -489,7 +489,6 @@ namespace Ruddat_NK
                             sdAbrInfo = new SqlDataAdapter(command);
                             sdAbrInfo.Fill(tableAbrInfo);
                         }
-
                         // Tabelle Leerstände
                         if (piArt == 18)
                         {
@@ -499,7 +498,6 @@ namespace Ruddat_NK
                             DgrLeer.ItemsSource = tableLeerstand.DefaultView;
                             liRows = DgrLeer.Items.Count;
                         }
-
                         // Tabelle Zählerwerte
                         if (piArt == 21)
                         {
@@ -509,7 +507,6 @@ namespace Ruddat_NK
                             DgrCounters.ItemsSource = tableZlWert.DefaultView;
                             liRows = DgrCounters.Items.Count;
                         }
-
                         // Combobox Zählernummern
                         if (piArt == 22)
                         {
@@ -1085,7 +1082,7 @@ namespace Ruddat_NK
             string lsSqlZahlungen = "";
             string lsSqlSumme = "";
             string lsSqlRechnungen = "";
-            string lsSqlZaehlerstd = "";        // Wird noch für Report Zählerstände benötigt
+            string lsSqlZaehlerstd = "";        // Todo Wird noch für Report Zählerstände benötigt
             string lsSqlTimeline = "";
             string lsSqlTimeline2 = "";
             string lsSqlTimeline3 = "";         // Für das Einsetzen der Rg Nummer in die Timeline
@@ -1135,7 +1132,6 @@ namespace Ruddat_NK
                 lsSql = RdQueries.GetSqlSelect(2, giFiliale, "", "", DateTime.Today, DateTime.Today, giFiliale, gsConnect, giDb);
                 liRows = FetchData(lsSql, 2, giDb, gsConnect);
             }
-
             //  Änderung: Anwahl nur aktive Mieter zeigen
             if (asArt == 11)
             {
@@ -1167,6 +1163,17 @@ namespace Ruddat_NK
                 btnCntAdd.IsEnabled = true;
             }
 
+            // ID Unabhängige Daten 
+            // Combobox Mwst in Rechnungen befüllen Art = 11
+            lsSql = RdQueries.GetSqlSelect(12, 0, "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
+            liRows = FetchData(lsSql, 12, giDb, gsConnect);
+            // Combobox Kostenverteilung in Rechnungen befüllen Art = 16
+            lsSql = RdQueries.GetSqlSelect(16, 0, "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
+            liRows = FetchData(lsSql, 16, giDb, gsConnect);
+            // Combobox Kostenart in Zahlungen befüllen Art = 11/15 Objekt Kennung 4
+            lsSql = RdQueries.GetSqlSelect(11, 4, "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
+            liRows = FetchData(lsSql, 15, giDb, gsConnect);
+
             // Die Ebene der TreeViewanwahl
             switch (liIndex)
             {
@@ -1195,6 +1202,14 @@ namespace Ruddat_NK
                     lsSql = RdQueries.GetSqlSelect(3, giFiliale, words[1], "1", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
                     liId = FetchData(lsSql, 3, giDb, gsConnect);
 
+                    // Combobox Kostenart in rechnungen befüllen Art = 11 Objekt Kennung 1
+                    lsSql = RdQueries.GetSqlSelect(11, liIndex, "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
+                    liRows = FetchData(lsSql, 11, giDb, gsConnect);
+
+                    // Combobox Zählernummern und Mwst in Zähler
+                    lsSql = RdQueries.GetSqlSelect(22, liId, "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
+                    liRows = FetchData(lsSql, 22, giDb, gsConnect);
+
                     // TimeLine holen für Objekte
                     lsSql = RdQueries.GetSqlSelect(5, liId, "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
                     liRows = FetchData(lsSql, 8, giDb, gsConnect);
@@ -1204,10 +1219,6 @@ namespace Ruddat_NK
                     lsSql = RdQueries.GetSqlSelect(8, liId, "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
                     liRows = FetchData(lsSql, 9, giDb, gsConnect);
                     lsSqlRechnungen = RdQueries.GetSqlSelect(108, liId, "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);  // Report
-
-                    // Combobox Kostenart in rechnungen befüllen Art = 11 Objekt Kennung 1
-                    lsSql = RdQueries.GetSqlSelect(11, liIndex, "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
-                    liRows = FetchData(lsSql, 11, giDb, gsConnect);                        
 
                     // Zahlungen zeigen Art 14 Zahlungen für Objekte
                     lsSql = RdQueries.GetSqlSelect(24, liId, "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
@@ -1227,10 +1238,6 @@ namespace Ruddat_NK
                     // Db Header für Report befüllen für Objekte x_abr_info
                     lsSqlHeader = RdQueries.GetSqlSelect(201, liId, "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
                     liRows = FetchData(lsSqlHeader, 17, giDb, gsConnect);
-
-                    // Combobox Zählernummern in Zähler
-                    lsSql = RdQueries.GetSqlSelect(22, liId, "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
-                    liRows = FetchData(lsSql, 22, giDb, gsConnect);
 
                     // Global Objekt Id
                     giObjekt = liId;
@@ -1257,9 +1264,17 @@ namespace Ruddat_NK
                     tbCntObjektTeil.Text = lsTmp;
                     tbCntMieter.Text = "";
 
+                    // Combobox Kostenart in rechnungen befüllen Art = 11 ObjektTeil Kennung 2
+                    lsSql = RdQueries.GetSqlSelect(11, liIndex, "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
+                    liRows = FetchData(lsSql, 11, giDb, gsConnect);
+
                     // Die TeilObjekt ID ermitteln
                     lsSql = RdQueries.GetSqlSelect(3, giFiliale, gsItemHeader, "2", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
                     liId = FetchData(lsSql, 4, giDb, gsConnect);
+
+                    // Combobox Zählernummern und mwst in Zähler
+                    lsSql = RdQueries.GetSqlSelect(222, liId, "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
+                    liRows = FetchData(lsSql, 22, giDb, gsConnect);
 
                     // TimeLine holen für ObjektTeile
                     lsSql = RdQueries.GetSqlSelect(6, liId, "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
@@ -1290,14 +1305,6 @@ namespace Ruddat_NK
                     lsSql = RdQueries.GetSqlSelect(213, liId, "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
                     liRows = FetchData(lsSql, 18, giDb, gsConnect);
 
-                    // Combobox Kostenart in rechnungen befüllen Art = 11 ObjektTeil Kennung 2
-                    lsSql = RdQueries.GetSqlSelect(11, liIndex, "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
-                    liRows = FetchData(lsSql, 11, giDb, gsConnect);                        
-
-                    // Combobox Zählernummern in Zähler
-                    lsSql = RdQueries.GetSqlSelect(222, liId, "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
-                    liRows = FetchData(lsSql, 22, giDb, gsConnect);
-
                     // Global TeilObjekt Id
                     giObjekt = 0;
                     giObjektTeil = liId;
@@ -1317,6 +1324,10 @@ namespace Ruddat_NK
                     // In Zählerständen
                     tbCntMieter.Text = lsTmp;
 
+                    // Combobox Kostenart in rechnungen befüllen Art = 11
+                    lsSql = RdQueries.GetSqlSelect(11, liIndex, "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
+                    liRows = FetchData(lsSql, 11, giDb, gsConnect);
+
                     // Die Mieter ID ermitteln
                     lsSql = RdQueries.GetSqlSelect(3, giFiliale, gsItemHeader, "3", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
                     liId = FetchData(lsSql, 5, giDb, gsConnect);
@@ -1330,6 +1341,7 @@ namespace Ruddat_NK
                     lsSqlTimeline = RdQueries.GetSqlSelect(107, liId, "", "", ldtFrom, ldtTo,giFiliale,gsConnect, giDb);               // Report Nebenkosten Hauptteil
                     lsSqlTimeline2 = RdQueries.GetSqlSelect(116, liObjektIdTmp, "", "", ldtFrom, ldtTo,giFiliale,gsConnect, giDb);     // Darstellung der ObjektKosten in der NKA
                     lsSqlTimeline3 = RdQueries.GetSqlSelect(140, liId, "" , "", ldtFrom,ldtTo,giFiliale,gsConnect, giDb);              // Für das Einsetzen der Rechnungsnummer in die Timeline
+
                     // Rechnungen zeigen  Art 10 = Rechungen zeigen für Mieter Datum aktiv
                     lsSql = RdQueries.GetSqlSelect(10, liId, "", "", ldtFrom, ldtTo,giFiliale,gsConnect, giDb);
                     liRows = FetchData(lsSql, 9, giDb, gsConnect);
@@ -1353,10 +1365,6 @@ namespace Ruddat_NK
                     lsSqlHeader = RdQueries.GetSqlSelect(203, liId, "", "", ldtFrom, ldtTo,giFiliale,gsConnect, giDb);        // Header
                     liRows = FetchData(lsSqlHeader, 17, giDb, gsConnect);
 
-                    // Combobox Kostenart in rechnungen befüllen Art = 11
-                    lsSql = RdQueries.GetSqlSelect(11, liIndex, "", "", ldtFrom, ldtTo,giFiliale,gsConnect, giDb);
-                    liRows = FetchData(lsSql, 11, giDb, gsConnect);		 
-
                     // Global Mieter Id
                     giObjekt = 0;
                     giObjektTeil = 0;
@@ -1365,17 +1373,6 @@ namespace Ruddat_NK
                 default:
                     break;
             }
-
-            // ID Unabhängige Daten 
-            // Combobox Mwst in Rechnungen befüllen Art = 11
-            lsSql = RdQueries.GetSqlSelect(12, 0, "", "", ldtFrom, ldtTo,giFiliale,gsConnect, giDb);
-            liRows = FetchData(lsSql, 12, giDb, gsConnect);
-            // Combobox Kostenverteilung in Rechnungen befüllen Art = 16
-            lsSql = RdQueries.GetSqlSelect(16, 0, "", "", ldtFrom, ldtTo,giFiliale,gsConnect, giDb);
-            liRows = FetchData(lsSql, 16, giDb, gsConnect);
-            // Combobox Kostenart in Zahlungen befüllen Art = 11/15 Objekt Kennung 4
-            lsSql = RdQueries.GetSqlSelect(11, 4, "", "", ldtFrom, ldtTo,giFiliale,gsConnect, giDb);
-            liRows = FetchData(lsSql, 15, giDb, gsConnect);
 
             // hier die Where Klausel vom Sql-Statement für Reports speichern
             switch (asArt)
@@ -1482,7 +1479,6 @@ namespace Ruddat_NK
                             } 
                         }
 
-
                         // Start und EndeDatum angegeben
                         if (clFrom.SelectedDate != null && clTo.SelectedDate != null)
                         {
@@ -1506,11 +1502,9 @@ namespace Ruddat_NK
 
                     // Der Index wird nochmal bei TimeLine Details benötigt
                     giIndex = index;
-
                     // MessageBox.Show("Verarbeitungsfehler ERROR fetchdata fetchdata RdFunctions 0003\n piArt = " + index.ToString(),
                     //          "Achtung");
                     /// Ulf!
-
                     gsItemHeader = item.Header.ToString().Trim();
 
                     if (gsItemHeader != "Kein Mieter")
@@ -2310,6 +2304,9 @@ namespace Ruddat_NK
                 {
                     lsZlName = getCurrentCellValue((ComboBox)e.EditingElement);
                     liZlId = Timeline.getZlId(lsZlName, gsConnect);
+                    // Das Feld Zähler Id befüllen
+                    tableZlWert.Rows[liSel][10] = liZlId;
+
                     giZlId = liZlId;
                 }
 
