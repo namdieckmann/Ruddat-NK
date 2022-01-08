@@ -625,7 +625,6 @@ namespace Ruddat_NK
                         default:
                             break;
                     }
-
                     lsField = "timeline.dt_monat";
                     liOne = 2;
                     lsWhereAdd2 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsField, lsAnd, liOne, aiDb);
@@ -924,14 +923,14 @@ namespace Ruddat_NK
                         ldtStartTmp = adtWtStart;
                         ldtEndTmp = adtWtEnd;
                         liObjTeilId = piId;
-                        liObjId = Timeline.getIdObj(piId, asConnectString, 2);
+                        liObjId = Timeline.getIdObj(piId, asConnectString, 2, aiDb);
                         break;
                     case 203:       // Mieter Id übergeben
                         ldtStartTmp = ldtStart;
                         ldtEndTmp = ldtEnd;
                         liMieterId = piId;
-                        liObjTeilId = Timeline.getIdObjTeil(piId, asConnectString);
-                        liObjId = Timeline.getIdObj(piId, asConnectString, 1);
+                        liObjTeilId = Timeline.getIdObjTeil(piId, asConnectString, aiDb);
+                        liObjId = Timeline.getIdObj(piId, asConnectString, 1, aiDb);
                         break;
                     default:
                         break;

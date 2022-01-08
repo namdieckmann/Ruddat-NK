@@ -161,7 +161,7 @@ namespace Ruddat_NK
                 if (liImportId > 0)
                 {
                     // Timeline erzeugen
-                    Timeline.editTimeline(liImportId, 13, gsConnect);
+                    Timeline.editTimeline(liImportId, 13, gsConnect, giDb);
                 }
                 else
                 {
@@ -963,10 +963,10 @@ namespace Ruddat_NK
             ldtStart = gdtStart;
 
             // Neue Timeline Id holen Art 2 = Zahlungen
-            liTimelineId = Timeline.getTimelineId(gsConnect,2) + 1;
+            liTimelineId = Timeline.getTimelineId(gsConnect,2, giDb) + 1;
 
             // Mehrwertsteuersatz für normal holen
-            liMwstSatz = Timeline.getMwstFromBez("normal", gsConnect);
+            liMwstSatz = Timeline.getMwstFromBez("normal", gsConnect, giDb);
 
             // Fortschrittsanzeige > Maximum übermitteln = 10000 dazuaddieren
             worker2.ReportProgress(table_dirty.Rows.Count + 10000);
@@ -999,7 +999,7 @@ namespace Ruddat_NK
                         decimal.TryParse(table_dirty.Rows[i].ItemArray.GetValue(9).ToString(), out ldBruttoIst);  // Zahlung Brutto
 
                         // Mieter eintragen
-                        liMieter = Timeline.getAktMieter(liObjTeilId, ldtStart, gsConnect);
+                        liMieter = Timeline.getAktMieter(liObjTeilId, ldtStart, gsConnect, giDb);
 
                         if (ldBruttoIst  > 0 && liMieter > 0)           // Nur wenn in den Nebenkosten ein Betrag steht
                         {
@@ -1039,11 +1039,11 @@ namespace Ruddat_NK
                             dr[9] = ldNkBrutto;             // Brutto Soll
                             dr[10] = liTimelineId;          // Timeline ID
                             dr[11] = 1;                     // Timelineflag
-                            dr[12] = Timeline.getKsaId(1,gsConnect);  // Kostenart Vorrauszahlung Nebenkosten
+                            dr[12] = Timeline.getKsaId(1,gsConnect, giDb);  // Kostenart Vorrauszahlung Nebenkosten
                             dr[13] = liHeaderId;            // Import ID
 
                             // Timeline schreiben
-                            Timeline.editTimeline(liTimelineId, 11, gsConnect);
+                            Timeline.editTimeline(liTimelineId, 11, gsConnect, giDb);
 
                             liTimelineId++;
                             table_zlg.Rows.Add(dr);
@@ -1069,7 +1069,7 @@ namespace Ruddat_NK
                             drt[6] = ldNk;                   // Netto
                             drt[10] = liTimelineId;
                             drt[11] = 1;                     // Timelineflag
-                            drt[12] = Timeline.getKsaId(1,gsConnect);  // Kostenart Vorrauszahlung Nebenkosten
+                            drt[12] = Timeline.getKsaId(1,gsConnect, giDb);  // Kostenart Vorrauszahlung Nebenkosten
                             drt[13] = liHeaderId;            // Import ID
                             drt[14] = "Kostenst: " + lsKstObj.Trim() + "/" + lsKstObjTeil.Trim() + "/" +liObjTeilId.ToString();
 

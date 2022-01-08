@@ -35,7 +35,7 @@ namespace Ruddat_NK
         int giIndex = 0;                    // Index > Objekt, Teil oder Mieter 1,2,3
         int giMwstSatz = 99;                // Mwst Satz ! Null > 0 gibs ja
         int giMwstSatzZl = 99;              // Für Zähler
-        int giDb = 2;                       // Datenbank 1 = MsqSql 2= Mysql
+        int giDb = 1;                       // Datenbank 1 = MsqSql 2= Mysql
         DateTime gdtZahlung = DateTime.MinValue; // Zahlungsdatum aus Datepicker DataGrid Zahlungen
 
         // Daten
@@ -1333,7 +1333,7 @@ namespace Ruddat_NK
                     liId = FetchData(lsSql, 5, giDb, gsConnect);
 
                     // Die Objekt Id für die Darstellung der ObjektKosten besorgen
-                    liObjektIdTmp = Timeline.getIdObj(liId, gsConnect, 1);
+                    liObjektIdTmp = Timeline.getIdObj(liId, gsConnect, 1, giDb);
 
                     // TimeLine holen für Mieter
                     lsSql = RdQueries.GetSqlSelect(7, liId, "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
@@ -1542,7 +1542,7 @@ namespace Ruddat_NK
             liOk = FetchData("", 35, giDb, gsConnect);
 
             // Timeline bearbeiten    Art 1 = Rechnungen
-            Timeline.editTimeline(giTimelineId, giFlagTimeline, gsConnect);
+            Timeline.editTimeline(giTimelineId, giFlagTimeline, gsConnect, giDb);
 
             // Delete Kommando muss extra erzeugt werden
             // Gibt es eine Datensatz ID zum Löschen (button btnRgDel)
@@ -1597,7 +1597,7 @@ namespace Ruddat_NK
             int liRows = tableOne.Rows.Count;
 
             // ID für Timeline ermitteln Art 1 = Rechnungs ID
-            liTimelineId = Timeline.getTimelineId(gsConnect,1) + 1;
+            liTimelineId = Timeline.getTimelineId(gsConnect,1, giDb) + 1;
 
             DataRow dr = tableOne.NewRow();
             dr[8] = giObjekt;
@@ -1660,7 +1660,7 @@ namespace Ruddat_NK
             liOk = FetchData(lsSql, 37, giDb, gsConnect);
             
             // Timeline bearbeiten Art 2 = Zahlungen   
-            Timeline.editTimeline(giTimelineId, giFlagTimeline, gsConnect);
+            Timeline.editTimeline(giTimelineId, giFlagTimeline, gsConnect, giDb);
 
             // Delete Kommando muss extra erzeugt werden
             // Gibt es eine Datensatz ID zum Löschen (button btnRgDel)
@@ -1692,10 +1692,10 @@ namespace Ruddat_NK
             DateTime ldtZlg = DateTime.MinValue;
 
             // ID für Timeline ermitteln Art 2 = Zahlungs ID
-            liTimelineId = Timeline.getTimelineId(gsConnect,2) + 1;
+            liTimelineId = Timeline.getTimelineId(gsConnect,2, giDb) + 1;
 
             // Kostenart ID ermitteln Art 1 = Nebenkostenzahlungen
-            liNkId = Timeline.getKsaId(1,gsConnect);
+            liNkId = Timeline.getKsaId(1,gsConnect, giDb);
 
             DataRow dr = tableZlg.NewRow();
             dr[2] = giObjekt;
@@ -1800,9 +1800,9 @@ namespace Ruddat_NK
             int liKsaId = 0;
 
             // ID für Timeline ermitteln Art
-            liTimelineId = Timeline.getTimelineId(gsConnect, 3) + 1;
+            liTimelineId = Timeline.getTimelineId(gsConnect, 3, giDb) + 1;
             // KostenstellenartId Zähler ermitteln
-            liKsaId = Timeline.getKsaId(2, gsConnect);
+            liKsaId = Timeline.getKsaId(2, gsConnect, giDb);
 
             // Nur wenn das Grid DgrCounters erzeugt wurde
             // Zählerstand ermöglichen
@@ -1834,7 +1834,7 @@ namespace Ruddat_NK
             liOk = FetchData("", 39, giDb, gsConnect);
 
             // Timeline bearbeiten Art 21 = Zähler   
-            Timeline.editTimeline(giTimelineId, giFlagTimeline, gsConnect);
+            Timeline.editTimeline(giTimelineId, giFlagTimeline, gsConnect, giDb);
 
             // Delete Kommando muss extra erzeugt werden
             // Gibt es eine Datensatz ID zum Löschen (button btnCntDel)
@@ -1887,12 +1887,12 @@ namespace Ruddat_NK
                 {
                     lsArtVerteilung = getCurrentCellValue((ComboBox)e.EditingElement);
                     // Verteilung Kurzzeichen ermitteln
-                    lsArtVertKurz = Timeline.getVerteilungFromString(gsConnect, lsArtVerteilung);
+                    lsArtVertKurz = Timeline.getVerteilungFromString(gsConnect, lsArtVerteilung, giDb);
                     // Wurde eine Bedingte Verteilung gewählt? Auswahlformular öffnen?
                     if (lsArtVertKurz == "fa")
                     {
                         // Objekt Mix neu anlegen mit Objekt ID und 
-                        liOk = Timeline.makeChoose(giObjekt,giTimelineId,gsConnect);
+                        liOk = Timeline.makeChoose(giObjekt,giTimelineId,gsConnect, giDb);
                         // Objekt Mix Parts auswählen
                         WndChooseSet frmChooseSet = new WndChooseSet(this);
                         // Welche Datenbank
@@ -1931,7 +1931,7 @@ namespace Ruddat_NK
                         if (giMwstSatz == 99)
                         {
                             liMwstArt = Int32.Parse((DgrRechnungen.Items[liSel] as DataRowView).Row.ItemArray[7].ToString()); // Art Mehrwertsteuer
-                            liMwstSatz = Timeline.getMwstSatz(liMwstArt, gsConnect);
+                            liMwstSatz = Timeline.getMwstSatz(liMwstArt, gsConnect, giDb);
                         }
                         else
                         {
@@ -1963,7 +1963,7 @@ namespace Ruddat_NK
                         if (giMwstSatz == 99)
                         {
                             liMwstArt = Int32.Parse((DgrRechnungen.Items[liSel] as DataRowView).Row.ItemArray[7].ToString()); // Art Mehrwertsteuer                            
-                            liMwstSatz = Timeline.getMwstSatz(liMwstArt, gsConnect);
+                            liMwstSatz = Timeline.getMwstSatz(liMwstArt, gsConnect, giDb);
                         }
                         else
                         {
@@ -2143,7 +2143,7 @@ namespace Ruddat_NK
                 // DGR und nicht die Itemliste
                 {
                     // MwstSatz holen
-                    liMwstSatz = Timeline.getMwstFromBez("normal", gsConnect);
+                    liMwstSatz = Timeline.getMwstFromBez("normal", gsConnect, giDb);
                     // Element holen
                     TextBox t1 = e.EditingElement as TextBox;
                     lsNetto = t1.Text.ToString();
@@ -2162,7 +2162,7 @@ namespace Ruddat_NK
                 {
                     // Hier wird die Zelle des DataGrid ausgelesen, oder bei NewRow der Wert aus der globalen Variablen geholt
                     // MwstSatz holen
-                    liMwstSatz = Timeline.getMwstFromBez("normal", gsConnect);
+                    liMwstSatz = Timeline.getMwstFromBez("normal", gsConnect, giDb);
                     // Element holen
                     TextBox t2 = e.EditingElement as TextBox;
                     lsBrutto = t2.Text.ToString();
@@ -2182,7 +2182,7 @@ namespace Ruddat_NK
                 // DGR und nicht die Itemliste
                 {
                     // MwstSatz holen
-                    liMwstSatz = Timeline.getMwstFromBez("normal", gsConnect);
+                    liMwstSatz = Timeline.getMwstFromBez("normal", gsConnect, giDb);
                     // Element holen
                     TextBox t1 = e.EditingElement as TextBox;
                     lsNetto = t1.Text.ToString();
@@ -2202,7 +2202,7 @@ namespace Ruddat_NK
                 {
                     // Hier wird die Zelle des DataGrid ausgelesen, oder bei NewRow der Wert aus der globalen Variablen geholt
                     // MwstSatz holen
-                    liMwstSatz = Timeline.getMwstFromBez("normal", gsConnect);
+                    liMwstSatz = Timeline.getMwstFromBez("normal", gsConnect, giDb);
                     // Element holen
                     TextBox t2 = e.EditingElement as TextBox;
                     lsBrutto = t2.Text.ToString();
@@ -2303,7 +2303,7 @@ namespace Ruddat_NK
                 if (x == 0)       // Gewählter Zähler Id ermitteln
                 {
                     lsZlName = getCurrentCellValue((ComboBox)e.EditingElement);
-                    liZlId = Timeline.getZlId(lsZlName, gsConnect);
+                    liZlId = Timeline.getZlId(lsZlName, gsConnect, giDb);
                     // Das Feld Zähler Id befüllen
                     tableZlWert.Rows[liSel][10] = liZlId;
 
@@ -2330,7 +2330,7 @@ namespace Ruddat_NK
 
                         if (liZlId > 0)
                         {
-                            ldVerbrauch = Timeline.getZlVerbrauch(ldZlStand, liZlId, gsConnect, liFlagNew);
+                            ldVerbrauch = Timeline.getZlVerbrauch(ldZlStand, liZlId, gsConnect, liFlagNew, giDb);
                             tableZlWert.Rows[liSel][3] = ldVerbrauch;                            
                         }
                     }
@@ -2344,11 +2344,11 @@ namespace Ruddat_NK
                     // MwstSatz holen
                     if (tableZlWert.Rows[liSel][10] == DBNull.Value && giZlId >= 0)
                     {
-                        liMwstSatz = Timeline.getMwstSatzZaehler(giZlId, gsConnect);
+                        liMwstSatz = Timeline.getMwstSatzZaehler(giZlId, gsConnect, giDb);
                     }
                     else
                     {
-                        liMwstSatz = Timeline.getMwstSatzZaehler(Convert.ToInt32(tableZlWert.Rows[liSel][10]), gsConnect);
+                        liMwstSatz = Timeline.getMwstSatzZaehler(Convert.ToInt32(tableZlWert.Rows[liSel][10]), gsConnect, giDb);
                     }
                     // Element holen
                     TextBox t1 = e.EditingElement as TextBox;
@@ -2369,11 +2369,11 @@ namespace Ruddat_NK
                     // MwstSatz holen
                     if (tableZlWert.Rows[liSel][10] == DBNull.Value && giZlId >= 0)
                     {
-                        liMwstSatz = Timeline.getMwstSatzZaehler(giZlId, gsConnect);
+                        liMwstSatz = Timeline.getMwstSatzZaehler(giZlId, gsConnect, giDb);
                     }
                     else
                     {
-                        liMwstSatz = Timeline.getMwstSatzZaehler(Convert.ToInt32(tableZlWert.Rows[liSel][10]), gsConnect);
+                        liMwstSatz = Timeline.getMwstSatzZaehler(Convert.ToInt32(tableZlWert.Rows[liSel][10]), gsConnect, giDb);
                     }
                     // Element holen
                     TextBox t2 = e.EditingElement as TextBox;
