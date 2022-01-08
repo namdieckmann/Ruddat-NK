@@ -569,6 +569,9 @@ namespace Ruddat_NK
                 case 46:
                     lsSql = @"Update timeline Set timeline.id_rg_nr = " + piId.ToString() + ps2;
                     break;
+                case 47:
+                    lsSql = "Select Id_verteilung from art_verteilung Where kb = '" + ps2 + "' ";
+                    break;
                 default:
                     break;
             }
@@ -814,7 +817,7 @@ namespace Ruddat_NK
                                 tableTimeline.Load(queryCommandReader28);
                                 break;
                             case 29:
-                                // Zweite Tabelle Timeline ObjektKostendarstellung (Zähler)
+                                // Zweite Tabelle Timeline ObjektKostendarstellung 
                                 tableTimeline1 = new DataTable();
                                 SqlCommand command29 = new SqlCommand(psSql, connect);
                                 SqlDataReader queryCommandReader29 = command29.ExecuteReader();
@@ -3046,7 +3049,6 @@ namespace Ruddat_NK
                 {
                     dr[3] = Convert.ToInt16(tableTimeline.Rows[i].ItemArray.GetValue(7).ToString());        //  Id Vorrauszahlung
                 }
-
             }
             if (tableTimeline.Rows[i].ItemArray.GetValue(18) != DBNull.Value)                            // Id Zählerstand
             {
@@ -3054,10 +3056,9 @@ namespace Ruddat_NK
                 {
                     dr[4] = Convert.ToInt16(tableTimeline.Rows[i].ItemArray.GetValue(18).ToString());         // Id Zählerstand
                     liIdZaehlerstand = Convert.ToInt16(tableTimeline.Rows[i].ItemArray.GetValue(18).ToString());
-                    dr[13] = Convert.ToDecimal(tableTimeline.Rows[i].ItemArray.GetValue(12).ToString());         // Zählerstand
+                    // dr[13] = Convert.ToDecimal(tableTimeline.Rows[i].ItemArray.GetValue(12).ToString());         // Zählerstand wird hier nicht genutzt auf null prüfen
                 }
             }
-
             if (tableTimeline.Rows[i].ItemArray.GetValue(8) != DBNull.Value)
             {
                 dr[5] = Convert.ToInt16(tableTimeline.Rows[i].ItemArray.GetValue(8).ToString());        //  Id Objekt
@@ -3212,7 +3213,7 @@ namespace Ruddat_NK
             tableContent.Rows.Add(dr);
         }
 
-        // Zweiter Teil, nur ObjektKosten darstellen ( im Moment nur Zähler)
+        // Zweiter Teil, nur ObjektKosten darstellen (im Moment nur Zähler)
         // Schleife durch Timeline1 asSql2 und erstmal stumpf an Tabelle Content übertragen
         // Achtung rows.count -1, weil i bei 0 anfängt
         for (int i = 0; i < tableTimeline1.Rows.Count; i++)
@@ -3234,7 +3235,7 @@ namespace Ruddat_NK
                 {
                     dr[4] = Convert.ToInt16(tableTimeline1.Rows[i].ItemArray.GetValue(18).ToString());         // Id Zählerstand
                     liIdZaehlerstand = Convert.ToInt16(tableTimeline1.Rows[i].ItemArray.GetValue(18).ToString());
-                    // dr[13] = Convert.ToDecimal(tableTimeline1.Rows[i].ItemArray.GetValue(12).ToString());         // Zählerstand
+                    // dr[13] = Convert.ToDecimal(tableTimeline1.Rows[i].ItemArray.GetValue(12).ToString());   // Zählerstand wird hier nicht genutzt auf null prüfen
                 }
 
                 if (tableTimeline1.Rows[i].ItemArray.GetValue(8) != DBNull.Value)
@@ -3836,6 +3837,17 @@ namespace Ruddat_NK
             liOk = fetchData(lsSql, "", 26, asConnect, aiDb);
 
             return liOk;
+        }
+
+        // Aus dem String der Bezeichnung die VerteilungsId holen
+        internal static int getVertId(string asBez, string asConnect, int aiDb)
+        {
+            int liId;
+
+            lsSql = getSql(47, 0, asBez, "", 0);
+            liId = fetchData(lsSql, "", 26, asConnect, aiDb);
+
+            return (liId);
         }
 
     }

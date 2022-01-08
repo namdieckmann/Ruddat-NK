@@ -578,8 +578,8 @@ namespace Ruddat_NK
                     timeline.id_rg_nr
                 from timeline
 				Left Join rechnungen on rechnungen.id_extern_timeline = timeline.id_rechnung
-				Right Join art_kostenart on timeline.id_ksa = art_kostenart.id_ksa
-                Right Join art_verteilung on rechnungen.id_verteilung = art_verteilung.Id_verteilung";
+                Left Join zaehlerstaende on zaehlerstaende.id_extern_timeline = timeline.id_zaehlerstand				
+				Right Join art_kostenart on timeline.id_ksa = art_kostenart.id_ksa";
                 lsGroup = @" Group by timeline.id_rechnung,timeline.id_vorauszahlung,timeline.id_objekt,
 					timeline.id_objekt_teil,timeline.id_mieter,rechnungen.Rg_nr,art_kostenart.bez,
 					rechnungen.betrag_netto,rechnungen.betrag_brutto,art_kostenart.sort,timeline.wtl_aus_objekt,
@@ -611,12 +611,16 @@ namespace Ruddat_NK
                             lsWhereAdd4 = lsAnd + " (timeline.id_rechnung > 0 or timeline.id_zaehlerstand > 0) ";     // nur Rechnungen und Zählerstände
                             break;
                         case 116:                   // Jetzt wird es kompliziert > Objekt
+                            // id der Verteilung ermitteln, dann wird kein Join benötigt
+                            int liId = Timeline.getVertId("nl", asConnectString, aiDb);
                             lsWhereAdd1 = " Where timeline.Id_objekt = " + piId.ToString() + " ";                     // Nur Zählerstände für das Objekt darstellen  
                             lsSql = lsSql + lsWhereAdd1;                                                              // Es sollen nur ObjektKosten in der Nebenkostenabrechnung dargestellt werden
                             lsAnd = " And ";
-                            lsWhereAdd4 = lsAnd + @" (timeline.id_zaehlerstand > 0 or (timeline.id_rechnung > 0)) 
-                                        And art_verteilung.kb = 'nl'";    // nur Rechnungen und Zählerstände und keine Verteilung
-                            break;                                                        // ACHTUNG Ulf TODO wenn weitere Kosten gezeigt werden sollen, id Rechnung > 0 einfügen
+                            lsWhereAdd4 = lsAnd + " (timeline.id_zaehlerstand > 0 or (timeline.id_rechnung > 0)) "
+                                                    + " And (rechnungen.Id_verteilung = " + liId.ToString()
+                                                    + " Or zaehlerstaende.id_verteilung = " + liId.ToString() + ") ";                       
+                                                                                                // nur Rechnungen und Zählerstände und keine Verteilung
+                            break;                                                              // ACHTUNG Ulf TODO wenn weitere Kosten gezeigt werden sollen, id Rechnung > 0 einfügen
                         case 115:                      // Mieter Kosten und Vorrauszahlungen für Summendarstellung
                             lsWhereAdd1 = " Where timeline.Id_mieter = " + piId.ToString() + " ";
                             lsSql = lsSql + lsWhereAdd1;

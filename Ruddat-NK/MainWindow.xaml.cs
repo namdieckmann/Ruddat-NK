@@ -35,7 +35,7 @@ namespace Ruddat_NK
         int giIndex = 0;                    // Index > Objekt, Teil oder Mieter 1,2,3
         int giMwstSatz = 99;                // Mwst Satz ! Null > 0 gibs ja
         int giMwstSatzZl = 99;              // Für Zähler
-        int giDb = 1;                       // Datenbank 1 = MsqSql 2= Mysql
+        int giDb = 2;                       // Datenbank 1 = MsqSql 2= Mysql
         DateTime gdtZahlung = DateTime.MinValue; // Zahlungsdatum aus Datepicker DataGrid Zahlungen
 
         // Daten
