@@ -470,7 +470,6 @@ namespace Ruddat_NK
                             sde.Fill(tableFive);
                             kostenartZlg.ItemsSource = tableFive.DefaultView;
                         }
-
                         // Combobox Verteilung in Rechnungen und Zähler
                         if (piArt == 16)
                         {
@@ -480,8 +479,6 @@ namespace Ruddat_NK
                             kostenvert.ItemsSource = tableVert.DefaultView;
                             kostenvertZl.ItemsSource = tableVert.DefaultView;
                         }
-
-
                         // Tabelle Infos für Abrechnung
                         if (piArt == 17)
                         {
@@ -642,7 +639,6 @@ namespace Ruddat_NK
                                 liRows = Convert.ToInt16(tableFour.Rows[0].ItemArray.GetValue(5).ToString());
                             }
                         }
-
                         // Die Id aus Teilobjekt holen
                         if (piArt == 4)
                         {
@@ -654,7 +650,6 @@ namespace Ruddat_NK
                                 liRows = Convert.ToInt16(tableFour.Rows[0].ItemArray.GetValue(6).ToString());
                             }
                         }
-
                         // Die Id aus Mieter holen
                         if (piArt == 5)
                         {
@@ -666,7 +661,6 @@ namespace Ruddat_NK
                                 liRows = Convert.ToInt16(tableFour.Rows[0].ItemArray.GetValue(7).ToString());
                             }
                         }
-
                         // DataGrid Timline Summen
                         if (piArt == 8)
                         {
@@ -676,7 +670,6 @@ namespace Ruddat_NK
                             DgrCost.ItemsSource = tableSeven.DefaultView;
                             liRows = DgrCost.Items.Count;
                         }
-
                         // Datagrid für Rechnungen
                         if (piArt == 9)
                         {
@@ -686,7 +679,6 @@ namespace Ruddat_NK
                             DgrRechnungen.ItemsSource = tableOne.DefaultView;
                             liRows = DgrRechnungen.Items.Count;
                         }
-
                         // ListBox Filiale befüllen
                         if (piArt == 10)
                         {
@@ -695,7 +687,6 @@ namespace Ruddat_NK
                             mysdc.Fill(tableThree);
                             lbFiliale.ItemsSource = tableThree.DefaultView;
                         }
-
                         // Combobox Kostenart in Rechnungen
                         if (piArt == 11)
                         {
@@ -704,7 +695,6 @@ namespace Ruddat_NK
                             mysde.Fill(tableFive);
                             kostenart.ItemsSource = tableFive.DefaultView;
                         }
-
                         // Combobox mwst in Rechnungen
                         if (piArt == 12)
                         {
@@ -713,7 +703,6 @@ namespace Ruddat_NK
                             mysdf.Fill(tableSix);
                             mwst.ItemsSource = tableSix.DefaultView;                // Rechnungen
                         }
-
                         // DataGrid Timline Detail
                         if (piArt == 13)
                         {
@@ -723,7 +712,6 @@ namespace Ruddat_NK
                             DgrCostDetail.ItemsSource = tableTwo.DefaultView;
                             liRows = DgrCostDetail.Items.Count;
                         }
-
                         // DataGrid Zahlungen
                         if (piArt == 14)
                         {
@@ -733,7 +721,6 @@ namespace Ruddat_NK
                             DgrZahlungen.ItemsSource = tableZlg.DefaultView;
                             liRows = DgrZahlungen.Items.Count;
                         }
-
                         // DataGrid Leerstand Detail
                         if (piArt == 19)
                         {
@@ -743,7 +730,6 @@ namespace Ruddat_NK
                             DgrLeerDetail.ItemsSource = tableLeerstand.DefaultView;
                             liRows = DgrLeerDetail.Items.Count;
                         }
-
                         // Combobox Kostenart in Zahlungen
                         if (piArt == 15)
                         {
@@ -752,7 +738,6 @@ namespace Ruddat_NK
                             mysde.Fill(tableFive);
                             kostenartZlg.ItemsSource = tableFive.DefaultView;
                         }
-
                         // Combobox Verteilung in Rechnungen und Zähler
                         if (piArt == 16)
                         {
@@ -762,7 +747,6 @@ namespace Ruddat_NK
                             kostenvert.ItemsSource = tableVert.DefaultView;
                             kostenvertZl.ItemsSource = tableVert.DefaultView;
                         }
-
                         // Tabelle Infos für Abrechnung
                         if (piArt == 17)
                         {
@@ -770,7 +754,6 @@ namespace Ruddat_NK
                             mysdAbrInfo = new MySqlDataAdapter(com);
                             mysdAbrInfo.Fill(tableAbrInfo);
                         }
-
                         // Tabelle Leerstände
                         if (piArt == 18)
                         {
@@ -779,7 +762,6 @@ namespace Ruddat_NK
                             mysdLeerstand.Fill(tableLeerstand);
                             DgrLeer.ItemsSource = tableLeerstand.DefaultView;
                         }
-
                         // Tabelle Zählerwerte
                         if (piArt == 21)
                         {
@@ -788,7 +770,6 @@ namespace Ruddat_NK
                             mysdZlWert.Fill(tableZlWert);
                             DgrCounters.ItemsSource = tableZlWert.DefaultView;
                         }
-
                         // Combobox Zählernummern
                         if (piArt == 22)
                         {
@@ -839,7 +820,7 @@ namespace Ruddat_NK
                     catch (MySqlException myex)
                     {
                         // Die Anwendung anhalten 
-                        MessageBox.Show("Verarbeitungsfehler ERROR fetchdata main MySql \n piArt = " + piArt.ToString(),
+                        MessageBox.Show("Verarbeitungsfehler ERROR fetchdata main MySQL \n piArt = " + piArt.ToString(),
                                  "Achtung");
                         throw;
                     }
