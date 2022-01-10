@@ -911,11 +911,6 @@ namespace Ruddat_NK
                 DateTime ldtStartTmp = DateTime.MinValue;
                 DateTime ldtEndTmp = DateTime.MinValue;
 
-                //lsAnd = " Where ";
-                //lsField = "vorrauszahlungen.datum_von";
-                //liOne = 2;
-                //lsWhereAdd2 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsField, lsAnd, liOne, aiDb);
-
                 switch (piArt)
                 {
                     case 201:       // Objekt ID übergeben
@@ -930,8 +925,8 @@ namespace Ruddat_NK
                         liObjId = Timeline.getIdObj(piId, asConnectString, 2, aiDb);
                         break;
                     case 203:       // Mieter Id übergeben
-                        ldtStartTmp = ldtStart;
-                        ldtEndTmp = ldtEnd;
+                        ldtStartTmp = adtWtStart;
+                        ldtEndTmp = adtWtEnd;
                         liMieterId = piId;
                         liObjTeilId = Timeline.getIdObjTeil(piId, asConnectString, aiDb);
                         liObjId = Timeline.getIdObj(piId, asConnectString, 1, aiDb);
