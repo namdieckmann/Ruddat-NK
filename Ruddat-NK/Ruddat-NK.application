@@ -7,14 +7,14 @@
     <framework targetVersion="4.6" profile="Full" supportedRuntime="4.0.30319" />
   </compatibleFrameworks>
   <dependency>
-    <dependentAssembly dependencyType="install" codebase="Ruddat-NK.exe.manifest" size="14364">
+    <dependentAssembly dependencyType="install" codebase="Ruddat-NK.exe.manifest" size="14360">
       <assemblyIdentity name="Ruddat-NK.exe" version="1.0.1.113" publicKeyToken="0000000000000000" language="neutral" processorArchitecture="x86" type="win32" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>RXXl44Uh5m5MAPvncyqZZ8XXBd6nLg2Jw5zGx6FbJs8=</dsig:DigestValue>
+        <dsig:DigestValue>eFyayB4CQXkqwFc7HY9/qGTAOkJmW3Uf7BBr4n+yAHI=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>

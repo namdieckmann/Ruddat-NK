@@ -36,6 +36,8 @@ namespace Ruddat_NK
             if (piArt == 1)
             {
                 lsSql = "Select id_filiale,name from filiale order by id_filiale";
+                // Todo Erweiterung für mehrere Mandanten; Mandant in das XML schreiben
+                // lsWhereAdd = " Where id_mandant = " + piId.ToString();
             }
 
             // Sql für Treeview komplett
@@ -47,7 +49,7 @@ namespace Ruddat_NK
                 // ein Vertrag existieren
 
                 // lsWhereAdd = " and  vertrag.vertrag_aktiv = 1";
-                // lsWhereAdd = "";
+
                 lsSql = @"Select    objekt.bez as obj,
 				            objekt_teil.bez as objteil,
 				            mieter.bez as mieter, 
