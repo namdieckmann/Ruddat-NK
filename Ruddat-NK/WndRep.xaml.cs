@@ -28,19 +28,19 @@ namespace Ruddat_NK
     /// </summary>
     public partial class WndRep : Window
     {
-        public String gsConnect;
-        public String gsFileName;
-        public String gsUserName;
-        public String gsReportName = "";
-        public String gsPath;
-        public String gsSql;
-        public string gsSqlWhere = "";
-        public int giHeaderId;
-        public int giDb;
+        private String gsConnect;
+        private String gsFileName;
+        private String gsUserName;
+        private String gsReportName = "";
+        private String gsPath;
+        private String gsSql;
+        private string gsSqlWhere = "";
+        private int giHeaderId;
+        private int giDb;
 
         private MainWindow mainWindow;
         // ConnectString übernehmen
-        public string psConnect { get; set; }
+        private string psConnect { get; set; }
 
         public WndRep(MainWindow mainWindow)
         {

@@ -80,13 +80,13 @@ namespace Ruddat_NK
         MySqlDataAdapter mysdZlNummer;
 
         // Datenübergabe an WndChooseSet
-        public delegate void delPassData(int giTimelineId);
+        private delegate void delPassData(int giTimelineId);
         // Übergabe an Reports und Stammdaten
-        public delegate void DelPassDataSql(string Sql);
-        public delegate void DelPassDataArt(int Art);
-        public delegate void DelPassConnect(string Connect);
-        public delegate void DelPassShowArt(int show);
-        public delegate void DelPassDb(int giDb);
+        private delegate void DelPassDataSql(string Sql);
+        private delegate void DelPassDataArt(int Art);
+        private delegate void DelPassConnect(string Connect);
+        private delegate void DelPassShowArt(int show);
+        private delegate void DelPassDb(int giDb);
 
         public MainWindow()
         {

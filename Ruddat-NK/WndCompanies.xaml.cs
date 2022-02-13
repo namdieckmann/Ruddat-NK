@@ -16,8 +16,8 @@ namespace Ruddat_NK
         public String gsConnect;
 
         // ConnectString übernehmen
-        public string psConnect { get; set; }
-        public int giDb = 0;
+        private string psConnect { get; set; }
+        private int giDb = 0;
 
         DataTable tableCmp;
         DataTable tableAda;

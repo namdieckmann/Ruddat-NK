@@ -13,12 +13,12 @@ namespace Ruddat_NK
     public partial class WndStammContract : Window
     {
         private MainWindow mainWindow;
-        public String gsConnect;
-        public int giDb;
+        private String gsConnect;
+        private int giDb;
 
         // ConnectString übernehmen
-        public string psConnect { get; set; }
-        public int giObjId = 0;
+        private string psConnect { get; set; }
+        private int giObjId = 0;
 
         SqlDataAdapter sdCmp;
         SqlDataAdapter sdContract;

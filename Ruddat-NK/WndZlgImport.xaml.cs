@@ -8,7 +8,6 @@ using System.ComponentModel;
 using MySql.Data.MySqlClient;
 using Excel = Microsoft.Office.Interop.Excel;
 
-
 namespace Ruddat_NK
 {
     /// <summary>
@@ -16,16 +15,16 @@ namespace Ruddat_NK
     /// </summary>
     public partial class WndZlgImport : Window
     {
-        public String gsConnect;
-        public String gsPath;
-        public String gsFileName;
-        public String gsDlgFileName;
-        public int      giLocationId = 0;
-        public int      giImpId = 0;
-        public int      giDb;
-        public string gsMonth = "";
-        public string gsYear = "";
-        public DateTime gdtStart = DateTime.Today;
+        private String gsConnect;
+        private String gsPath;
+        private String gsFileName;
+        private String gsDlgFileName;
+        private int      giLocationId = 0;
+        private int      giImpId = 0;
+        private int      giDb;
+        private string gsMonth = "";
+        private string gsYear = "";
+        private DateTime gdtStart = DateTime.Today;
         private MainWindow mainWindow;
 
         DataTable tableDirty;

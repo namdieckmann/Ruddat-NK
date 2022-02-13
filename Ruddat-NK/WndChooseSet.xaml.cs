@@ -14,12 +14,12 @@ namespace Ruddat_NK
     {
 
         private MainWindow mainWindow;
-        public String gsConnect;
-        public int giTimeLineId = 0;
-        public int giObjektId = 0;
-        public int giArt = 0;
-        public int giFlBehalten = 0;
-        public int giDb = 0;
+        private String gsConnect;
+        private int giTimeLineId = 0;
+        private int giObjektId = 0;
+        private int giArt = 0;
+        private int giFlBehalten = 0;
+        private int giDb = 0;
 
         // ConnectString übernehmen
         public string psConnect { get; set; }

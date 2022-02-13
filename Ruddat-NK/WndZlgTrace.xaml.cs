@@ -12,8 +12,8 @@ namespace Ruddat_NK
     public partial class WndZlgTrace : Window
     {
         private MainWindow mainWindow;
-        public String gsConnect;
-        public int giDb;
+        private String gsConnect;
+        private int giDb;
 
         DataTable tableZlg;
 
@@ -21,7 +21,7 @@ namespace Ruddat_NK
         MySqlDataAdapter mysdZlg;
 
         // ConnectString übernehmen
-        public string psConnect { get; set; }
+        private string psConnect { get; set; }
 
         public WndZlgTrace(MainWindow mainWindow    )
         {

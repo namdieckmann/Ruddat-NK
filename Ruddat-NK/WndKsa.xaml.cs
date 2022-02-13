@@ -14,11 +14,11 @@ namespace Ruddat_NK
     public partial class WndKsa : Window
     {
         private MainWindow mainWindow;
-        public String gsConnect;
-        public int giDb;
+        private String gsConnect;
+        private int giDb;
 
         // ConnectString übernehmen
-        public string psConnect { get; set; }
+        private string psConnect { get; set; }
 
         DataTable tableKsa;
         SqlDataAdapter sdKsa;
