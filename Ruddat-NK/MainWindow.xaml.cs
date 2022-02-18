@@ -321,7 +321,7 @@ namespace Ruddat_NK
                                 tvMain.Items.Clear();
 
                                 //  Eine Schleife durch die Tabelle, um das Treview zu befüllen
-                                foreach (DataRow dr in tableFour.Rows)
+                                for (i = 0; i < tableFour.Rows.Count; i++)
                                 {
                                     lsObjektBez = tableFour.Rows[i].ItemArray.GetValue(4).ToString().Trim() + ":" + tableFour.Rows[i].ItemArray.GetValue(0).ToString().Trim();
                                     lsObjektTeilBez = tableFour.Rows[i].ItemArray.GetValue(1).ToString();
@@ -600,7 +600,7 @@ namespace Ruddat_NK
                                 tvMain.Items.Clear();
 
                                 //  Eine Schleife durch die Tabelle, um das Treview zu befüllen
-                                foreach (DataRow dr in tableFour.Rows)
+                                for ( i = 0;  i < tableFour.Rows.Count;  i++)
                                 {
                                     lsObjektBez = tableFour.Rows[i].ItemArray.GetValue(4).ToString().Trim() + ":" + tableFour.Rows[i].ItemArray.GetValue(0).ToString().Trim();
                                     lsObjektTeilBez = tableFour.Rows[i].ItemArray.GetValue(1).ToString();

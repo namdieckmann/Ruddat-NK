@@ -13,7 +13,7 @@ namespace Ruddat_NK
     public partial class WndCompanies : Window
     {
         private MainWindow mainWindow;
-        public String gsConnect;
+        private String gsConnect;
 
         // ConnectString übernehmen
         private string psConnect { get; set; }
