@@ -1,11 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <asmv1:assembly xsi:schemaLocation="urn:schemas-microsoft-com:asm.v1 assembly.adaptive.xsd" manifestVersion="1.0" xmlns:asmv1="urn:schemas-microsoft-com:asm.v1" xmlns="urn:schemas-microsoft-com:asm.v2" xmlns:asmv2="urn:schemas-microsoft-com:asm.v2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:co.v1="urn:schemas-microsoft-com:clickonce.v1" xmlns:asmv3="urn:schemas-microsoft-com:asm.v3" xmlns:dsig="http://www.w3.org/2000/09/xmldsig#" xmlns:co.v2="urn:schemas-microsoft-com:clickonce.v2">
-  <asmv1:assemblyIdentity name="Ruddat-NK.exe" version="1.0.1.114" publicKeyToken="0000000000000000" language="neutral" processorArchitecture="x86" type="win32" />
+  <asmv1:assemblyIdentity name="Kman-NK.exe" version="1.0.1.115" publicKeyToken="0000000000000000" language="neutral" processorArchitecture="x86" type="win32" />
   <description asmv2:iconFile="kmanhouse.ico" xmlns="urn:schemas-microsoft-com:asm.v1" />
   <application />
   <entryPoint>
-    <assemblyIdentity name="Ruddat-NK" version="18.9.28.1" language="neutral" processorArchitecture="x86" />
-    <commandLine file="Ruddat-NK.exe" parameters="" />
+    <assemblyIdentity name="Kman-NK" version="18.9.28.1" language="neutral" processorArchitecture="x86" />
+    <commandLine file="Kman-NK.exe" parameters="" />
   </entryPoint>
   <trustInfo>
     <security>
@@ -103,6 +103,18 @@
     </dependentAssembly>
   </dependency>
   <dependency>
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Kman-NK.exe" size="1838592">
+      <assemblyIdentity name="Kman-NK" version="18.9.28.1" language="neutral" processorArchitecture="x86" />
+      <hash>
+        <dsig:Transforms>
+          <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+        </dsig:Transforms>
+        <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+        <dsig:DigestValue>m8ZivrlIM5znXrX2aHCiSyui4ox12NbhDhEX1/R2aFs=</dsig:DigestValue>
+      </hash>
+    </dependentAssembly>
+  </dependency>
+  <dependency>
     <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="MySql.Data.dll" size="1428480">
       <assemblyIdentity name="MySql.Data" version="8.0.28.0" publicKeyToken="C5687FC88969C44D" language="neutral" processorArchitecture="msil" />
       <hash>
@@ -111,18 +123,6 @@
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
         <dsig:DigestValue>7uI3SYjr06kcH8pKYS2vUjk2Egikqew1HxgksvNHMWU=</dsig:DigestValue>
-      </hash>
-    </dependentAssembly>
-  </dependency>
-  <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Ruddat-NK.exe" size="1839104">
-      <assemblyIdentity name="Ruddat-NK" version="18.9.28.1" language="neutral" processorArchitecture="x86" />
-      <hash>
-        <dsig:Transforms>
-          <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
-        </dsig:Transforms>
-        <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>AOa7an2+HvkTrJHIHUCsB2KPb59vWbP8LydwpG8MK6g=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -207,7 +207,7 @@
       <dsig:DigestValue>yMfTncHRI5/7n1E3+lriqzgn/jgZpQ3C3nUdbxq0xVY=</dsig:DigestValue>
     </hash>
   </file>
-  <file name="Ruddat-NK.exe.config" size="2886">
+  <file name="Kman-NK.exe.config" size="2886">
     <hash>
       <dsig:Transforms>
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
