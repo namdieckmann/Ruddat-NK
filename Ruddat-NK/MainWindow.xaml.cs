@@ -253,7 +253,10 @@ namespace Ruddat_NK
                     break;
                 case 2:
                     // MySql Testverbindung
+                    // Lokal
                     MySqlConnectionString = @"server=localhost;userid=rdnk;password=r1d8n9k4!;database=dbo";
+                    // FreeMySQLhosting.net
+                    // MySqlConnectionString = @"Data Source=sql11.freemysqlhosting.net;PORT=3306;USERID=sql11526937;PASSWORD=r8CTb6dfhG1;DATABASE=sql11526937;Connect Timeout = 20";
                     // MessageBox.Show("Lokale Datenbank MySql wird verwendet", "Achtung! ", MessageBoxButton.OK);
                     break;
                 default:

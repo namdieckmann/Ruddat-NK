@@ -35,7 +35,7 @@ namespace Ruddat_NK
 
             if (piArt == 1)
             {
-                lsSql = "Select id_filiale,name from filiale order by id_filiale";
+                lsSql = "Select id_filiale,name from filiale order by name";
                 // Todo Erweiterung für mehrere Mandanten; Mandant in das XML schreiben
                 // lsWhereAdd = " Where id_mandant = " + piId.ToString();
             }

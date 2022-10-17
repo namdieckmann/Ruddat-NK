@@ -74,7 +74,7 @@ namespace Ruddat_NK
             switch (aiArt)
             {
                 case 1:         // Gesellschaft
-                    lsSql = "select id_filiale,name,name_2,bez from filiale Order by id_filiale";
+                    lsSql = "select id_filiale,name,name_2,bez from filiale Order by name";
                     break;
                 case 2:         // Adressen
                     lsSql = @"select id_adressen, id_art_adresse, id_objekt, id_objekt_teil, id_filiale, Id_mieter, anrede, name, vorname, 
