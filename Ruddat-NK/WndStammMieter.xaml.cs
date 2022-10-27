@@ -20,6 +20,7 @@ namespace Ruddat_NK
         // ConnectString übernehmen
         private string psConnect { get; set; }
         private int giObjId = 0;
+        private int giFiliale = 0;
 
         DataTable tableCmp;
         DataTable tableMieter;
@@ -363,7 +364,7 @@ namespace Ruddat_NK
                 {
                     liId = Int32.Parse(rowview.Row[0].ToString());
                     // Objekte dazu holen
-
+                    giFiliale = liId;
                     // SqlSelect Objekte
                     lsSql = getSql(5, liId);
                     // Daten Firmen holen
@@ -576,6 +577,7 @@ namespace Ruddat_NK
                     // den Objekten verbunden sind
                     dr[1] = liId;
                     dr[2] = "NEUER MIETER";
+                    dr[5] = giFiliale;
 
                     tableMieter.Rows.InsertAt(dr,0);
                 }

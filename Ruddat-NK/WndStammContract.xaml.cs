@@ -19,6 +19,7 @@ namespace Ruddat_NK
         // ConnectString übernehmen
         private string psConnect { get; set; }
         private int giObjId = 0;
+        private int giFiliale = 0;
 
         SqlDataAdapter sdCmp;
         SqlDataAdapter sdContract;
@@ -63,9 +64,9 @@ namespace Ruddat_NK
             // Daten Firmen holen
             liRows = fetchData(lsSql, 1);
 
-            // SqlSelect Mieter (alle) Combobox Vertrage
+            // SqlSelect Mieter (gewählte Filiale) Combobox Verträge
             lsSql = getSql(52, 0);
-            // Daten Firmen holen
+            // Daten Mieter holen
             liRows = fetchData(lsSql, 5);
 
             // SqlSelect Verträge
@@ -125,8 +126,9 @@ namespace Ruddat_NK
                     lsSql = @"Select Id_mieter,bez,nr from mieter
                                 where id_objekt = " + aiId.ToString() + " Order by bez";
                     break;
-                case 52:         // Mieter (alle)
-                    lsSql = @"Select id_mieter,bez,nr from mieter Order by bez";
+                case 52:         // Mieter (gewählte Filiale)
+                    lsSql = @"Select id_mieter,bez,nr from mieter 
+                                where id_filiale = " +aiId.ToString() + " Order by bez";
                     break;
                 case 8:         // Vertrag löschen
                     lsSql = "Delete from vertrag Where id_vertrag = " + aiId.ToString();
@@ -297,6 +299,7 @@ namespace Ruddat_NK
             int liId = 0;
             int liSel = dgrStCmp.SelectedIndex;
             int liRows = 0;
+            int liFiliale = 0;
             string lsSql = "";
 
             if (liSel >= 0)
@@ -309,8 +312,13 @@ namespace Ruddat_NK
                 if ((rowview.Row[0] != DBNull.Value))
                 {
                     liId = Int32.Parse(rowview.Row[0].ToString());
-                    // Objekte dazu holen
+                    // ComboBoxMieter dazu holen
+                    // SqlSelect Mieter (gewählte Filiale) Combobox Verträge
+                    lsSql = getSql(52, liId);
+                    // Daten Mieter holen
+                    liRows = fetchData(lsSql, 5);
 
+                    // Objekte dazu holen
                     // SqlSelect Objekte
                     lsSql = getSql(3, liId);
                     // Daten Firmen holen
@@ -387,7 +395,7 @@ namespace Ruddat_NK
 
             if (btnSave.Content.ToString() == "Speichern")
             {
-                liOk = fetchData("", 7);
+                liOk = fetchData("", 6);
             }
             else  // Löschen
             {
@@ -506,7 +514,7 @@ namespace Ruddat_NK
                     dr[1] = liIdObj;
                     dr[2] = liIdObjTeil;
                     dr[4] = DateTime.Now;
-                    dr[5] = DateTime.MaxValue;
+                    dr[5] = DateTime.Now.AddYears(50);
                     // dr[2] = "NEUER VERTRAG";
 
                     tableContract.Rows.InsertAt(dr, 0);
