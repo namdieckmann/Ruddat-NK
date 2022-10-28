@@ -66,7 +66,7 @@ namespace Ruddat_NK
 					left Join vertrag on vertrag.id_objekt_teil = objekt_teil.Id_objekt_teil
 					left Join mieter on mieter.Id_Mieter = vertrag.id_mieter
 	                    where filiale.Id_Filiale = " + piId.ToString() +
-                                    lsWhereAdd + " Order by id_objekt,id_objekt_teil";
+                                    lsWhereAdd + " Order by objekt.kst,objekt_teil.kst";
             }
 
             // Sql für Treeview Objekte und Teilobjekte
