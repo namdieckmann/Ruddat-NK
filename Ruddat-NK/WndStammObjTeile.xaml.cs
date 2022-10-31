@@ -98,7 +98,7 @@ namespace Ruddat_NK
                     lsSql = @"Select Id_objekt_teil,id_objekt,Id_Adresse,bez,geschoss,
                                     lage,flaeche_anteil,prozent_anteil,personen_anteil_flag,nr_obj_teil,kst
                                 from objekt_teil
-                                where id_objekt = " + aiId.ToString() + " Order by geschoss,lage";
+                                where id_objekt = " + aiId.ToString() + " Order by kst";
                     break;
                 case 6:         // Löschen
                     lsSql = "Delete from objekt_teil Where id_objekt_teil = " + aiId.ToString();
