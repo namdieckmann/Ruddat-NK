@@ -422,6 +422,7 @@ namespace Ruddat_NK
                     dr[1] = liId;
                     dr[3] = "NEUE MIETFLÄCHE";
                     tableTeil.Rows.InsertAt(dr,0);
+                    dgrStObj.SelectedIndex = 0;
                 }
             }
         }

@@ -580,6 +580,7 @@ namespace Ruddat_NK
                     dr[5] = giFiliale;
 
                     tableMieter.Rows.InsertAt(dr,0);
+                    dgrStObj.SelectedIndex = 0;
                 }
             }
             else
@@ -598,6 +599,7 @@ namespace Ruddat_NK
                         dr[2] = "Mieter für Leerstand";
 
                         tableMieter.Rows.InsertAt(dr, 0);
+                        dgrStObj.SelectedIndex = 0;
                     }
                 }
             }

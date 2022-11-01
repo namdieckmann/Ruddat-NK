@@ -431,6 +431,7 @@ namespace Ruddat_NK
                     dr[3] = liId;
                     dr[1] = "NEUES OBJEKT";
                     tableObj.Rows.InsertAt(dr,0);
+                    dgrStCmp.SelectedIndex = 0;
                 }
             }
         }

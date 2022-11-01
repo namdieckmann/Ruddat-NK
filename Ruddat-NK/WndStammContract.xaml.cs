@@ -518,6 +518,7 @@ namespace Ruddat_NK
                     // dr[2] = "NEUER VERTRAG";
 
                     tableContract.Rows.InsertAt(dr, 0);
+                    dgrStContract.SelectedIndex = 0;
                 }
             }
         }
