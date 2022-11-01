@@ -37,6 +37,8 @@ namespace Ruddat_NK
         int giMwstSatzZl = 99;              // Für Zähler
         int giDb = 2;                       // Datenbank 1 = MsqSql 2= Mysql
         DateTime gdtZahlung = DateTime.MinValue; // Zahlungsdatum aus Datepicker DataGrid Zahlungen
+        DateTime gdtFrom = DateTime.MinValue;
+        DateTime gdtTo = DateTime.MinValue;
 
         // Daten
         DataTable tableOne;
@@ -91,6 +93,7 @@ namespace Ruddat_NK
         public MainWindow()
         {
             int liRows = 0;
+            int LiOk = 0;
             String lsSql = "";
             String UPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
             string lsConnect = "";
@@ -138,7 +141,7 @@ namespace Ruddat_NK
             lsSql = RdQueries.GetSqlSelect(2, giFiliale, "", "", DateTime.Today, DateTime.Today, giFiliale, lsConnect, giDb);
             liRows = FetchData(lsSql, 2, giDb, lsConnect);                                                       
 
-            int liYear = DateTime.Now.Year - 1;
+            int liYear = DateTime.Now.Year - 3;
             string dt = (liYear.ToString()) + "-01-01";
             ldtFrom = DateTime.Parse(dt);                 // Jahresanfang
             tbDateFrom.Text = ldtFrom.ToString("dd-MM-yyyy HH:mm");
@@ -151,6 +154,16 @@ namespace Ruddat_NK
             ldtTo = ldtTo.AddSeconds(59);
 
             tbDateTo.Text = ldtTo.ToString("dd-MM-yyyy HH:mm");
+
+            // clFrom.DisplayDate = ldtFrom;
+            clFrom.SelectedDate = ldtFrom;
+            clFrom.DisplayDate = ldtFrom;
+            gdtFrom = ldtFrom;
+
+            // clTo.DisplayDate = ldtTo;
+            clTo.SelectedDate = ldtTo;
+            clTo.DisplayDate = ldtTo;
+            gdtTo = ldtTo;
 
             Mouse.OverrideCursor = null;
         }
@@ -1036,9 +1049,9 @@ namespace Ruddat_NK
 
                 ldtTo = clTo.SelectedDate.Value;
                 // Enddatum bis 23:59:59
-                ldtTo = ldtTo.AddHours(23);
-                ldtTo = ldtTo.AddMinutes(59);
-                ldtTo = ldtTo.AddSeconds(59);
+                //ldtTo = ldtTo.AddHours(23);
+                //ldtTo = ldtTo.AddMinutes(59);
+                //ldtTo = ldtTo.AddSeconds(59);
                 lsDateTo = ldtTo.ToString("dd-MM-yyyy HH:mm");
                 tbDateTo.Text = lsDateTo;
 
@@ -1096,11 +1109,14 @@ namespace Ruddat_NK
             else
             {
                 // Startdatum ist Jahresbeginn
-                int liYear = DateTime.Now.Year - 1;
-                string lsStart = (liYear.ToString()) + "-01-01";
-                string lsEnd = (liYear.ToString()) + "-12-31";
-                ldtFrom = DateTime.Parse(lsStart);                    // Jahresanfang VorJahr
-                ldtTo = DateTime.Parse(lsEnd);                        // Jahresende Vorjahr
+                //int liYear = DateTime.Now.Year - 1;
+                //string lsStart = (liYear.ToString()) + "-01-01";
+                //string lsEnd = (liYear.ToString()) + "-12-31";
+                //ldtFrom = DateTime.Parse(lsStart);                    // Jahresanfang VorJahr
+                //ldtTo = DateTime.Parse(lsEnd);                        // Jahresende Vorjahr
+                ldtFrom = gdtFrom;
+                ldtTo = gdtTo;
+
             }
 
             if (asArt == 1)

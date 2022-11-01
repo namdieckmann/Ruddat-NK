@@ -236,11 +236,12 @@
                     <Grid Background="#FFE5E5E5">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="129*"/>
-                            <ColumnDefinition Width="40*"/>
+                            <ColumnDefinition Width="11*"/>
+                            <ColumnDefinition Width="29*"/>
                             <ColumnDefinition Width="983*"/>
                         </Grid.ColumnDefinitions>
                         <DataGrid x:Name="DgrCounters" Margin="10,101,10,37" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" ToolTip="Zählerstände" 
-                                  RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" ColumnWidth="*" Grid.ColumnSpan="3" 
+                                  RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" ColumnWidth="*" Grid.ColumnSpan="4" 
                                   SelectionChanged="DgrCounters_SelectionChanged" RowEditEnding="DgrCounters_RowEditEnding" 
                                   BeginningEdit="DgrCounters_BeginningEdit" CellEditEnding="DgrCounters_CellEditEnding" >
                             <DataGrid.Columns>
@@ -272,18 +273,18 @@
                                     SelectedValueBinding="{Binding id_zaehler}"/>
                             </DataGrid.Columns>
                         </DataGrid>
-                        <TextBox x:Name="tbCntObjekt" HorizontalAlignment="Left" Height="23" Margin="104,7,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="235" IsEnabled="False" Grid.ColumnSpan="3"/>
+                        <TextBox x:Name="tbCntObjekt" HorizontalAlignment="Left" Height="23" Margin="104,7,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="235" IsEnabled="False" Grid.ColumnSpan="4"/>
                         <TextBlock x:Name="txCntObjekt" HorizontalAlignment="Left" Margin="10,14,0,0" TextWrapping="Wrap" Text="Objekt:" VerticalAlignment="Top"/>
-                        <TextBox x:Name="tbCntObjektTeil" HorizontalAlignment="Left" Height="23" Margin="104,35,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="235" IsEnabled="False" Grid.ColumnSpan="3"/>
-                        <TextBox x:Name="tbCntMieter" HorizontalAlignment="Left" Height="23" Margin="104,63,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="235" IsEnabled="False" Grid.ColumnSpan="3"/>
+                        <TextBox x:Name="tbCntObjektTeil" HorizontalAlignment="Left" Height="23" Margin="104,35,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="235" IsEnabled="False" Grid.ColumnSpan="4"/>
+                        <TextBox x:Name="tbCntMieter" HorizontalAlignment="Left" Height="23" Margin="104,63,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="235" IsEnabled="False" Grid.ColumnSpan="4"/>
                         <TextBlock x:Name="txCntObjektTeil" HorizontalAlignment="Left" Margin="10,42,0,0" TextWrapping="Wrap" Text="Objekt-Teil:" VerticalAlignment="Top"/>
                         <TextBlock x:Name="txCntObjektTeil_Copy" HorizontalAlignment="Left" Margin="10,70,0,0" TextWrapping="Wrap" Text="Mieter:" VerticalAlignment="Top"/>
-                        <TextBox x:Name="tbCntObjektId" HorizontalAlignment="Left" Height="23" Margin="175,7,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="235" IsEnabled="False" Visibility="Hidden" Grid.Column="2"/>
-                        <TextBox x:Name="tbCntObjektTeilId" HorizontalAlignment="Left" Height="23" Margin="175,35,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="235" IsEnabled="False" Visibility="Hidden" Grid.Column="2"/>
-                        <TextBox x:Name="tbCntMieterId" HorizontalAlignment="Left" Height="23" Margin="175,63,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="235" IsEnabled="False" Visibility="Hidden" Grid.Column="2"/>
-                        <Button x:Name="btnCntSave" Content="Speichern" Margin="0,0,10,10" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="134" RenderTransformOrigin="0.538,0.909" Grid.Column="2" Click="btnCntSave_Click"/>
-                        <Button x:Name="btnCntAdd" Content="Zufügen" HorizontalAlignment="Right" Margin="0,0,149,10" VerticalAlignment="Bottom" Width="75" Click="btnCntAdd_Click" Grid.Column="2" />
-                        <Button x:Name="btnCntDel" Content="Löschen" HorizontalAlignment="Right" Margin="0,0,229,10" VerticalAlignment="Bottom" Width="75" Click="btnCntDel_Click" Grid.Column="2" />
+                        <TextBox x:Name="tbCntObjektId" HorizontalAlignment="Left" Height="23" Margin="175,7,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="235" IsEnabled="False" Visibility="Hidden" Grid.Column="3"/>
+                        <TextBox x:Name="tbCntObjektTeilId" HorizontalAlignment="Left" Height="23" Margin="175,35,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="235" IsEnabled="False" Visibility="Hidden" Grid.Column="3"/>
+                        <TextBox x:Name="tbCntMieterId" HorizontalAlignment="Left" Height="23" Margin="175,63,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="235" IsEnabled="False" Visibility="Hidden" Grid.Column="3"/>
+                        <Button x:Name="btnCntSave" Content="Speichern" Margin="0,0,10,10" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="134" RenderTransformOrigin="0.538,0.909" Grid.Column="3" Click="btnCntSave_Click"/>
+                        <Button x:Name="btnCntAdd" Content="Zufügen" HorizontalAlignment="Right" Margin="0,0,149,10" VerticalAlignment="Bottom" Width="75" Click="btnCntAdd_Click" Grid.Column="3" />
+                        <Button x:Name="btnCntDel" Content="Löschen" HorizontalAlignment="Right" Margin="0,0,229,10" VerticalAlignment="Bottom" Width="75" Click="btnCntDel_Click" Grid.Column="3" />
                     </Grid>
                 </TabItem.Content>
             </TabItem>

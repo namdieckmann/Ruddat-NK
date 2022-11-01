@@ -114,7 +114,7 @@ namespace Ruddat_NK
                     break;
                 case 2:
                     // Rechnung Timeline löschen
-                    liOk = Timeline.TimelineDelete(liTimelineId, asConnect, aiDb);
+                    liOk = Timeline.TimelineDelete(liTimelineId, "R", asConnect, aiDb);
                     break;
                 case 11:
                     // Zahlungen Daten holen mit id extern timeline
@@ -124,7 +124,7 @@ namespace Ruddat_NK
                     break;
                 case 12:
                     // Zahlungen Timeline löschen 
-                    liOk = Timeline.TimelineDelete(liTimelineId, asConnect, aiDb);
+                    liOk = Timeline.TimelineDelete(liTimelineId, "A", asConnect, aiDb);
                     break;
                 case 13:
                     // Zahlungen importieren. Nur anderes SQL Statement, sonst wie Case 11
@@ -140,7 +140,7 @@ namespace Ruddat_NK
                     break;
                 case 22:
                     // Zählerstände Timeline löschen
-                    liOk = Timeline.TimelineDelete(liTimelineId, asConnect, aiDb);
+                    liOk = Timeline.TimelineDelete(liTimelineId, "Z", asConnect, aiDb);
                     break;
                 default:
                     break;
@@ -187,12 +187,26 @@ namespace Ruddat_NK
 					        where id_extern_timeline = " + lsWhereAdd +
                           " Order by rechnungen.datum_rechnung desc";
                     break;
-                case 2:
-                    // Timeline löschen
+                case 200:
+                    // Timeline löschen Rechnung
                     lsWhereAdd = piId.ToString() + " ";
 
                     lsSql = @"delete from timeline
-					        where id_rechnung = " + lsWhereAdd + " or id_vorauszahlung = " + lsWhereAdd + " or id_zaehlerstand = " + lsWhereAdd;
+					        where id_rechnung = " + lsWhereAdd;
+                    break;
+                case 201:
+                    // Timeline löschen Zahlung
+                    lsWhereAdd = piId.ToString() + " ";
+
+                    lsSql = @"delete from timeline
+					        where id_vorauszahlung = " + lsWhereAdd;
+                    break;
+                case 202:
+                    // Timeline löschen Zählerstand
+                    lsWhereAdd = piId.ToString() + " ";
+
+                    lsSql = @"delete from timeline
+					        where id_zaehlerstand = " + lsWhereAdd;
                     break;
                 case 3:
                     // Timeline neu erzeugen in ps2 steht, welches Feld beschrieben werden soll
@@ -273,11 +287,69 @@ namespace Ruddat_NK
                             from timeline
                                 where " + lsWhereAdd + " and " + lsWhereAdd2 + " order by dt_monat";
                     break;
-                case 5:
+                case 50:                // Rechnungen
                     // TimelineRelations sollen geschrieben werden
                     // Hier auf Grundlage des ObjektTeils
                     // Beschrieben werden die Kosten für Mieter
-                    lsWhereAdd = " (id_rechnung = " + piId.ToString() + " or id_vorauszahlung = " + piId.ToString() + " or id_zaehlerstand = " + piId.ToString() + ") ";
+                    lsWhereAdd = " id_rechnung = " + piId.ToString() + " ";
+                    lsWhereAdd2 = " id_objekt_teil > 0 "; // + ps2 + " ";
+
+                    lsSql = @"select 
+                                id_timeline,     
+                                id_rechnung,     
+                                id_vorauszahlung,
+                                id_zaehlerstand, 
+                                id_objekt,       
+                                id_objekt_teil,  
+                                id_mieter,       
+                                id_ksa,          
+                                betrag_netto,          
+                                betrag_soll_netto,     
+                                betrag_brutto,          
+                                betrag_soll_brutto,     
+                                zs,              
+                                dt_monat,
+                                wtl_aus_objekt,
+                                wtl_aus_objteil,
+                                leerstand,
+                                id_import
+                            from timeline
+                                where " + lsWhereAdd + " and " + lsWhereAdd2 + "order by dt_monat";
+                    break;
+                case 51:            // Zahlungen
+                    // TimelineRelations sollen geschrieben werden
+                    // Hier auf Grundlage des ObjektTeils
+                    // Beschrieben werden die Kosten für Mieter
+                    lsWhereAdd = " id_vorauszahlung = " + piId.ToString() + " ";
+                    lsWhereAdd2 = " id_objekt_teil > 0 "; // + ps2 + " ";
+
+                    lsSql = @"select 
+                                id_timeline,     
+                                id_rechnung,     
+                                id_vorauszahlung,
+                                id_zaehlerstand, 
+                                id_objekt,       
+                                id_objekt_teil,  
+                                id_mieter,       
+                                id_ksa,          
+                                betrag_netto,          
+                                betrag_soll_netto,     
+                                betrag_brutto,          
+                                betrag_soll_brutto,     
+                                zs,              
+                                dt_monat,
+                                wtl_aus_objekt,
+                                wtl_aus_objteil,
+                                leerstand,
+                                id_import
+                            from timeline
+                                where " + lsWhereAdd + " and " + lsWhereAdd2 + "order by dt_monat";
+                    break;
+                case 52:        // Zähler
+                    // TimelineRelations sollen geschrieben werden
+                    // Hier auf Grundlage des ObjektTeils
+                    // Beschrieben werden die Kosten für Mieter
+                    lsWhereAdd = " id_zaehlerstand = " + piId.ToString() + " ";
                     lsWhereAdd2 = " id_objekt_teil > 0 "; // + ps2 + " ";
 
                     lsSql = @"select 
@@ -1389,7 +1461,8 @@ namespace Ruddat_NK
             int liDaysStart = 0; // Anzahl der Tages Startmonats
             int liDaysEnd = 0; // Anzahl der Tages EndMonats
             // int liDaysInMonth = 0; // Tage im Monat aus Vertrag
-            int liSave = 1;  // Freigabe 
+            int liSave = 1;  // Freigabe
+            int liArtRelation = 0;      // 1= Rechnung, 2=Zahlung, 3=Zähler
 
             decimal ldBetragNetto = 0;
             decimal ldBetragSollNetto = 0;
@@ -1431,7 +1504,7 @@ namespace Ruddat_NK
                         {
                             liExternId = (int)tableOne.Rows[i].ItemArray.GetValue(14);
                             // Timeline löschen
-                            liOk = TimelineDelete(liExternId, asConnect, aiDb);
+                            liOk = TimelineDelete(liExternId, "R" ,asConnect, aiDb);
 
                             // Objekt
                             if (tableOne.Rows[i].ItemArray.GetValue(8) != DBNull.Value)
@@ -1446,16 +1519,18 @@ namespace Ruddat_NK
                                     if (getWtl(1, liExternId, asConnect,aiDb)==1)
                                     {
                                         liObjektTeil = 0;
+                                        liArtRelation = 1;
                                         // Timeline neu erzeugen für Relationen
-                                        liOk = TimelineCreateRelations(liExternId, liObjekt, liObjektTeil, liMieter, asConnect, aiDb);
+                                        liOk = TimelineCreateRelations(liExternId, liObjekt, liObjektTeil, liMieter, liArtRelation, asConnect, aiDb);
 
                                         // 2 = Weiterleitung an Mieter
                                         if (getWtl(2, liExternId, asConnect, aiDb) ==1)   
                                         {
                                             liObjekt = 0;
                                             liObjektTeil = 1;   // Auslöser für das Weiterleiten an Mieter
+                                            liArtRelation = 1;
                                                                 // Timeline neu erzeugen für Relationen
-                                            liOk = TimelineCreateRelations(liExternId, liObjekt, liObjektTeil, liMieter, asConnect, aiDb);
+                                            liOk = TimelineCreateRelations(liExternId, liObjekt, liObjektTeil, liMieter, liArtRelation ,asConnect, aiDb);
                                         }
                                     }
                                 }
@@ -1471,8 +1546,9 @@ namespace Ruddat_NK
                                     // 2 = Weiterleitung an Mieter
                                     if (getWtl(2, liExternId, asConnect, aiDb) == 1)
                                     {
+                                        liArtRelation = 1;
                                         // Timeline neu erzeugen für Relationen
-                                        liOk = TimelineCreateRelations(liExternId, liObjekt, liObjektTeil, liMieter, asConnect, aiDb);
+                                        liOk = TimelineCreateRelations(liExternId, liObjekt, liObjektTeil, liMieter, liArtRelation , asConnect, aiDb);
                                     }
                                 }
 
@@ -2004,7 +2080,7 @@ namespace Ruddat_NK
                         {
                             liExternId = (int)tableZlg.Rows[i].ItemArray.GetValue(10);
                             // Timeline löschen
-                            liOk = TimelineDelete(liExternId, asConnect, aiDb);
+                            liOk = TimelineDelete(liExternId, "A", asConnect, aiDb);
 
                             // Objekt
                             if (tableZlg.Rows[i].ItemArray.GetValue(2) != DBNull.Value)
@@ -2029,8 +2105,9 @@ namespace Ruddat_NK
 
                                     if (liMieter > 0)
                                     {
+                                        liArtRelation = 2;
                                         // Timeline neu erzeugen für Relationen
-                                        liOk = TimelineCreateRelations(liExternId, liObjekt, liObjektTeil, liMieter, asConnect, aiDb);
+                                        liOk = TimelineCreateRelations(liExternId, liObjekt, liObjektTeil, liMieter, liArtRelation, asConnect, aiDb);
                                     }
                                 }
 
@@ -2170,7 +2247,7 @@ namespace Ruddat_NK
                         {
                             liExternId = (int)tableCnt.Rows[i].ItemArray.GetValue(8);
                             // Timeline löschen
-                            liOk = TimelineDelete(liExternId, asConnect, aiDb);
+                            liOk = TimelineDelete(liExternId, "Z", asConnect, aiDb);
 
                             // Objekt
                             if (tableCnt.Rows[i].ItemArray.GetValue(9) != DBNull.Value)
@@ -2195,8 +2272,9 @@ namespace Ruddat_NK
 
                                     if (liMieter > 0)
                                     {
+                                        liArtRelation = 3;
                                         // Timeline neu erzeugen für Relationen
-                                        liOk = TimelineCreateRelations(liExternId, liObjekt, liObjektTeil, liMieter, asConnect, aiDb);
+                                        liOk = TimelineCreateRelations(liExternId, liObjekt, liObjektTeil, liMieter, liArtRelation, asConnect, aiDb);
                                     }
                                 }
 
@@ -2375,7 +2453,7 @@ namespace Ruddat_NK
         }
 
         // Timeline für Relationen erzeugen
-        private static int TimelineCreateRelations(int liExternId, int liObjekt, int liObjektTeil, int liMieter, string asConnect, int aiDb)
+        private static int TimelineCreateRelations(int liExternId, int liObjekt, int liObjektTeil, int liMieter, int aiArt, string asConnect, int aiDb)
         {
             int liOk = 0;
             string lsSql = "";
@@ -2397,7 +2475,21 @@ namespace Ruddat_NK
             {
                 // In Timeline Mieter werden alle umlagefähigen Kosten auf den 
                 // zu dem TimeLineMonat wohnenden Mieter geschrieben
-                lsSql = Timeline.getSql(5, liExternId, liObjektTeil.ToString(), "",0);
+                switch (aiArt)
+                {
+                    case 1:         // Rechnung 
+                        lsSql = Timeline.getSql(50, liExternId, liObjektTeil.ToString(), "", 0);
+                        break;
+                    case 2:         // Zahlung
+                        lsSql = Timeline.getSql(51, liExternId, liObjektTeil.ToString(), "", 0);
+                        break;
+                    case 3:         //Zähler
+                        lsSql = Timeline.getSql(52, liExternId, liObjektTeil.ToString(), "", 0);
+                        break;
+                    default:
+                        break;
+                }
+
                 liOk = Timeline.fetchData(lsSql,"", 5, asConnect, aiDb);
             }
 
@@ -2490,13 +2582,26 @@ namespace Ruddat_NK
         }
 
         // Alle Datensätze der Timeline ID zunächst löschen
-        private static int TimelineDelete(int liExternId, string asConnect, int aiDb)
+        private static int TimelineDelete(int liExternId, string asArt, string asConnect, int aiDb)
         {
             int liOk = 0;
             string lsSql = "";
 
             // SqlStatement für Timeline löschen
-            lsSql = Timeline.getSql(2,liExternId, "", "",0);
+            switch (asArt)
+            {
+                case "R":   // Rechnung
+                    lsSql = Timeline.getSql(200, liExternId, "", "", 0);
+                    break;
+                case "A":   // Zahlung
+                    lsSql = Timeline.getSql(201, liExternId, "", "", 0);
+                    break;
+                case "Z":   // Zählerstand
+                    lsSql = Timeline.getSql(202, liExternId, "", "", 0);
+                    break;
+                default:
+                    break;
+            }
             liOk = Timeline.fetchData(lsSql,"", 2, asConnect, aiDb); 
 
             // Info: hier werden auch alle Datensätze evtl untergeordneter Rubriken 
