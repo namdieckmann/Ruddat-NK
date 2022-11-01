@@ -2061,7 +2061,7 @@ namespace Ruddat_NK
                     if (liExternId > 0)
                     {
                         // Daten für Details zeigen
-                        lsSql = RdQueries.GetSqlSelect(13, liExternId, giIndex.ToString(), lsIdObj, ldtFrom, ldtTo, giFiliale,gsConnect, giDb);
+                        lsSql = RdQueries.GetSqlSelect(130, liExternId, giIndex.ToString(), lsIdObj, ldtFrom, ldtTo, giFiliale,gsConnect, giDb);
                         liOk = FetchData(lsSql, 13, giDb, gsConnect);
                     }
                 }
@@ -2072,7 +2072,7 @@ namespace Ruddat_NK
                     if (liExternId > 0)
                     {
                         // Daten für Deatils zeigen
-                        lsSql = RdQueries.GetSqlSelect(13, liExternId, giIndex.ToString(), lsIdObj, ldtFrom, ldtTo,giFiliale,gsConnect, giDb);
+                        lsSql = RdQueries.GetSqlSelect(131, liExternId, giIndex.ToString(), lsIdObj, ldtFrom, ldtTo,giFiliale,gsConnect, giDb);
                         liOk = FetchData(lsSql, 13, giDb, gsConnect);
                     }
                 }
@@ -2083,7 +2083,7 @@ namespace Ruddat_NK
                     if (liExternId > 0)
                     {
                         // Daten für Deatils zeigen
-                        lsSql = RdQueries.GetSqlSelect(13, liExternId, giIndex.ToString(), lsIdObj, ldtFrom, ldtTo,giFiliale,gsConnect, giDb);
+                        lsSql = RdQueries.GetSqlSelect(132, liExternId, giIndex.ToString(), lsIdObj, ldtFrom, ldtTo,giFiliale,gsConnect, giDb);
                         liOk = FetchData(lsSql, 13, giDb, gsConnect);
                     }
                 }

@@ -309,7 +309,7 @@ namespace Ruddat_NK
 
             // SQL für die Timeline Detaildarstellung Objekte, TeilObjekte oder Mieter
             // Zufügen einer Where-Klausel für die externe TimeLine ID
-            if (piArt == 13)
+            if (piArt == 130)       // Rechnungen
             {
                 switch (ps2)
                 {
@@ -343,7 +343,7 @@ namespace Ruddat_NK
                 from timeline
                 Right Join art_kostenart on timeline.id_ksa = art_kostenart.id_ksa ";
 
-                lsWhereAdd = " Where ( timeline.Id_rechnung = " + piId.ToString() + " or timeline.Id_vorauszahlung = " + piId.ToString() + " or timeline.Id_zaehlerstand = " + piId.ToString() + " )";
+                lsWhereAdd = " Where  timeline.Id_rechnung = " + piId.ToString() + " ";
                 lsOrder = " Order by art_kostenart.sort, timeline.dt_monat ";
                 lsAnd = " And ";
                 lsField = "timeline.dt_monat";
@@ -351,7 +351,91 @@ namespace Ruddat_NK
                 lsWhereAdd3 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsField, lsAnd, liOne, aiDb);
                 lsSql = lsSql + lsWhereAdd + lsWhereAdd2 + lsWhereAdd3 + lsOrder;
             }
+            if (piArt == 131)       // Zahlung
+            {
+                switch (ps2)
+                {
+                    case "1":       // Objekt
+                        lsWhereAdd2 = " And timeline.id_objekt = " + ps3 + " ";
+                        break;
+                    case "2":       // Teil
+                        lsWhereAdd2 = " And timeline.id_objekt_teil = " + ps3 + " ";
+                        break;
+                    case "3":       // Mieter
+                        lsWhereAdd2 = " And timeline.id_mieter = " + ps3 + " ";
+                        break;
+                    case "4":
+                        lsWhereAdd2 = " And timeline.leerstand = " + ps3 + " ";
+                        break;
+                    default:
+                        lsWhereAdd2 = "";
+                        break;
+                }
 
+                lsSql = @"Select                  
+                    timeline.Id_timeline,
+                    art_kostenart.bez as ksa_bez,
+                    timeline.betrag_netto,
+					timeline.betrag_brutto,
+                    timeline.betrag_soll_netto,
+                    timeline.betrag_soll_brutto,
+                    timeline.dt_monat as monat,
+                    timeline.wtl_aus_objekt,
+                    timeline.wtl_aus_objteil
+                from timeline
+                Right Join art_kostenart on timeline.id_ksa = art_kostenart.id_ksa ";
+
+                lsWhereAdd = " Where timeline.Id_vorauszahlung = " + piId.ToString() + " ";
+                lsOrder = " Order by art_kostenart.sort, timeline.dt_monat ";
+                lsAnd = " And ";
+                lsField = "timeline.dt_monat";
+                liOne = 2;
+                lsWhereAdd3 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsField, lsAnd, liOne, aiDb);
+                lsSql = lsSql + lsWhereAdd + lsWhereAdd2 + lsWhereAdd3 + lsOrder;
+            }
+            if (piArt == 132) // Zähler
+            {
+                switch (ps2)
+                {
+                    case "1":       // Objekt
+                        lsWhereAdd2 = " And timeline.id_objekt = " + ps3 + " ";
+                        break;
+                    case "2":       // Teil
+                        lsWhereAdd2 = " And timeline.id_objekt_teil = " + ps3 + " ";
+                        break;
+                    case "3":       // Mieter
+                        lsWhereAdd2 = " And timeline.id_mieter = " + ps3 + " ";
+                        break;
+                    case "4":
+                        lsWhereAdd2 = " And timeline.leerstand = " + ps3 + " ";
+                        break;
+                    default:
+                        lsWhereAdd2 = "";
+                        break;
+                }
+
+                lsSql = @"Select                  
+                    timeline.Id_timeline,
+                    art_kostenart.bez as ksa_bez,
+                    timeline.betrag_netto,
+					timeline.betrag_brutto,
+                    timeline.betrag_soll_netto,
+                    timeline.betrag_soll_brutto,
+                    timeline.dt_monat as monat,
+                    timeline.wtl_aus_objekt,
+                    timeline.wtl_aus_objteil
+                from timeline
+                Right Join art_kostenart on timeline.id_ksa = art_kostenart.id_ksa ";
+
+                // Todo aua, das tut weh
+                lsWhereAdd = " Where timeline.Id_zaehlerstand = " + piId.ToString() + " ";
+                lsOrder = " Order by art_kostenart.sort, timeline.dt_monat ";
+                lsAnd = " And ";
+                lsField = "timeline.dt_monat";
+                liOne = 2;
+                lsWhereAdd3 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsField, lsAnd, liOne, aiDb);
+                lsSql = lsSql + lsWhereAdd + lsWhereAdd2 + lsWhereAdd3 + lsOrder;
+            }
             // Combobox Kosten Verteilungsarten
             if (piArt == 16)
             {
