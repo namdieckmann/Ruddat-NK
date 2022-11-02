@@ -141,7 +141,7 @@ namespace Ruddat_NK
             lsSql = RdQueries.GetSqlSelect(2, giFiliale, "", "", DateTime.Today, DateTime.Today, giFiliale, lsConnect, giDb);
             liRows = FetchData(lsSql, 2, giDb, lsConnect);                                                       
 
-            int liYear = DateTime.Now.Year - 3;
+            int liYear = DateTime.Now.Year - 2;
             string dt = (liYear.ToString()) + "-01-01";
             ldtFrom = DateTime.Parse(dt);                 // Jahresanfang
             tbDateFrom.Text = ldtFrom.ToString("dd-MM-yyyy HH:mm");
