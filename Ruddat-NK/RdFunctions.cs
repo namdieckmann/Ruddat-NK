@@ -2011,22 +2011,20 @@ namespace Ruddat_NK
                                 dr[16] = liObjektTeil;         // Auf Leerstand wird die TeilObjekt ID geschrieben
                             }
                             dr[7] = liKsa;
-                            if (ldBetragNetto > 0)
+
+
+
+
+                            if (ldBetragNetto > 0 || ldBetragBrutto > 0)
                             {
                                 dr[8] = ldBetragNetto;          // Netto                                        
-                            }
-                            else
-                            {
-                                liSave = 0;
-                            }
-                            if (ldBetragBrutto > 0)
-                            {
                                 dr[10] = ldBetragBrutto;        // Brutto                                                                                    
                             }
                             else
                             {
                                 liSave = 0;
                             }
+
                             dr[12] = ldZs;                  // Zählerstand
                             dr[13] = ldtMonat;              // Der TimelineMonat
 

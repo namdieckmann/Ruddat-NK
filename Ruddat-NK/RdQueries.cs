@@ -62,7 +62,7 @@ namespace Ruddat_NK
         		from filiale 
 	                join objekt on objekt.id_filiale = filiale.id_filiale 
 	                join objekt_teil on objekt_teil.id_objekt = objekt.Id_objekt
-					Join Adressen on adressen.Id_objekt = objekt.Id_objekt
+					Join adressen on adressen.Id_objekt = objekt.Id_objekt
 					left Join vertrag on vertrag.id_objekt_teil = objekt_teil.Id_objekt_teil
 					left Join mieter on mieter.Id_Mieter = vertrag.id_mieter
 	                    where filiale.Id_Filiale = " + piId.ToString() +
@@ -115,7 +115,7 @@ namespace Ruddat_NK
         		from filiale 
 	                join objekt on objekt.id_filiale = filiale.id_filiale 
 	                join objekt_teil on objekt_teil.id_objekt = objekt.Id_objekt
-					Join Adressen on adressen.Id_objekt = objekt.Id_objekt
+					Join adressen on adressen.Id_objekt = objekt.Id_objekt
 					left Join vertrag on vertrag.id_objekt_teil = objekt_teil.Id_objekt_teil
 					left Join mieter on mieter.Id_Mieter = vertrag.id_mieter
 	                    where filiale.Id_Filiale = " + piId.ToString() +
@@ -612,8 +612,10 @@ namespace Ruddat_NK
             }   // Mieter Id aus Vertrag ermitteln
             if (piArt == 41)
             {
+                //lsSql = @"Select id_mieter from vertrag
+                //        Where id_objekt_teil = " + piId.ToString() + " AND vertrag_aktiv = 1 ";
                 lsSql = @"Select id_mieter from vertrag
-                        Where id_objekt_teil = " + piId.ToString() + " AND vertrag_aktiv = 1 " ;
+                        Where id_objekt_teil = " + piId.ToString();
                 lsField = "vertrag.datum_von";
                 lsWhereAdd2 = RdQueriesTime.GetDateQueryResultVertrag(adtWtStart, lsField, liOne, aiDb);
                 lsSql = lsSql + lsWhereAdd2;
@@ -623,10 +625,12 @@ namespace Ruddat_NK
                 switch (aiFiliale)      // Filiale wird hier verwendet, um Vetragsbeginn oder -ende zu ermitteln
                 {
                     case 1:
-                        lsSql = @"Select datum_von from vertrag where vertrag.id_mieter = " + piId.ToString() + " AND vertrag_aktiv = 1 ";
+                        // lsSql = @"Select datum_von from vertrag where vertrag.id_mieter = " + piId.ToString() + " AND vertrag_aktiv = 1 ";
+                        lsSql = @"Select datum_von from vertrag where vertrag.id_mieter = " + piId.ToString();
                         break;
                     case 2:
-                        lsSql = @"Select datum_bis from vertrag where vertrag.id_mieter = " + piId.ToString() + " AND vertrag_aktiv = 1 ";
+                        // lsSql = @"Select datum_bis from vertrag where vertrag.id_mieter = " + piId.ToString() + " AND vertrag_aktiv = 1 ";
+                        lsSql = @"Select datum_von from vertrag where vertrag.id_mieter = " + piId.ToString();
                         break;
                     default:
                         break;
