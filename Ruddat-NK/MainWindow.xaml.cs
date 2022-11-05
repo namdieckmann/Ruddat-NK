@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Data;
 using System.Data.SqlClient;
 using System.IO;
@@ -265,11 +266,10 @@ namespace Ruddat_NK
                     MessageBox.Show("Lokale Datenbank MsSql Express wird verwendet", "Achtung! ", MessageBoxButton.OK);
                     break;
                 case 2:
-                    // MySql Testverbindung
                     // Lokal
                     MySqlConnectionString = @"server=localhost;userid=rdnk;password=r1d8n9k4!;database=dbo";
                     // Google Server von Frank
-                    // MySqlConnectionString = @"Data Source=34.171.27.53;PORT=3306;USERID=ulf;PASSWORD=2ndfloorwednesday;database=dbo; Connect Timeout = 20";
+                    // MySqlConnectionString = @"Data Source=uql.ddnss.de;PORT=3306;USERID=ulf;PASSWORD=2ndfloorwednesday;database=dbo; Connect Timeout = 20";
                     // MessageBox.Show("Lokale Datenbank MySql wird verwendet", "Achtung! ", MessageBoxButton.OK);
                     break;
                 default:
@@ -1654,20 +1654,30 @@ namespace Ruddat_NK
         private void btnZlSave_Click(object sender, RoutedEventArgs e)
         {
             int liOk = 0;
+            int liRows = 0;
+            int liNkId = 0;
+            int liTimelineId = 0;
             string lsSql = "";
 
             // Datenverbindung
             liOk = FetchData(lsSql, 37, giDb, gsConnect);
-            
-            // Timeline bearbeiten Art 2 = Zahlungen   
-            Timeline.editTimeline(giTimelineId, giFlagTimeline, gsConnect, giDb);
 
-            // Delete Kommando muss extra erzeugt werden
-            // Gibt es eine Datensatz ID zum Löschen (button btnRgDel)
-            if (giDelZlId > 0)
+            // Timeline bearbeiten Art 11 = Zahlungen ändern
+            int liFlagTimeline = 11;
+            // Timeline.editTimeline(giTimelineId, giFlagTimeline, gsConnect, giDb);
+            liRows = tableZlg.Rows.Count;
+
+            if (liRows > 0)
             {
-                lsSql = RdQueries.GetSqlSelect(38, giDelZlId, "", "", DateTime.MinValue, DateTime.MinValue, giFiliale, gsConnect, giDb);
-                liOk = FetchData(lsSql, 38, giDb, gsConnect);
+                for (int i = 0; i < liRows; i++)           // Ende bei 12 Monate
+                {
+                    if (tableZlg.Rows[i][0] == DBNull.Value)        // Id ist noch leer
+                    {
+                        Int32.TryParse(tableZlg.Rows[i][10].ToString(),out liTimelineId);       // Timeline Id holen
+
+                        Timeline.editTimeline(liTimelineId, liFlagTimeline, gsConnect, giDb);   // Timeline aktualisieren
+                    }
+                }
             }
 
             // Update der Daten
@@ -1732,33 +1742,105 @@ namespace Ruddat_NK
             btnZlAdd.IsEnabled = false;
         }
 
+        // Hier sollen Zahlungen automatisch erzeugt werden
+        private void DgrZahlungen_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            int liTimelineId = 0;
+            int liNkId = 0;
+            int liRows = tableZlg.Rows.Count;
+            DateTime ldtZlg = DateTime.MinValue;
+
+            // Datum vorbelegen erst ab dem 2 ten Datensatz
+            // Der neueste ist immer der oberste 0
+            if (liRows > 0 && tableZlg.Rows[0][4] != DBNull.Value && DgrZahlungen.SelectedIndex != 0)
+            {
+                // Kostenart ID ermitteln Art 1 = Nebenkostenzahlungen
+                liNkId = Timeline.getKsaId(1, gsConnect, giDb);
+
+                // ID für Timeline ermitteln Art 2 = Zahlungs ID
+                liTimelineId = Timeline.getTimelineId(gsConnect, 2, giDb) + 1;
+
+                // Monat der vorhandenen Zahlung
+                ldtZlg = Convert.ToDateTime(tableZlg.Rows[0][4]);
+
+                for (int i = liRows; i < 12; i++)           // Ende bei 12 Monate
+                {
+                    DataRow dr = tableZlg.NewRow();
+                    dr[2] = giObjekt;
+                    dr[3] = giObjektTeil;
+                    dr[1] = giMieter;
+                    dr[10] = liTimelineId;      // ID für Timeline
+                    dr[11] = 1;                 // Flag für Timelinebearbeitung erzeugen
+                    dr[12] = liNkId;            // Kostenart Nebenkosten
+                    dr[4] = ldtZlg.AddMonths(i);       // Datum
+
+                    if (tableZlg.Rows[0][6] != DBNull.Value)   // Netto
+                    {
+                        dr[6] = tableZlg.Rows[0][6];
+                    }
+
+                    if (tableZlg.Rows[0][7] != DBNull.Value)   // Brutto
+                    {
+                        dr[7] = tableZlg.Rows[0][7];
+                    }
+
+                    tableZlg.Rows.Add(dr);
+
+                    liTimelineId++;
+                }
+
+                giTimelineId = liTimelineId;
+                giFlagTimeline = 11;                                         // 11 = Zahlung bearbeiten
+                btnZlSave.IsEnabled = true;
+            }
+
+        }
+
         // Zahlung löschen
         private void btnZlDel_Click(object sender, RoutedEventArgs e)
         {
             int liTimelineId = 0;
 
-            int liSel = DgrZahlungen.SelectedIndex;
-            if (liSel >= 0)
+            giFlagTimeline = 12;                // 12 = Zahlung löschen
+
+            // Durch alle zum Löschen gewählten Datensätze
+            do
             {
+                DataRow dr = tableZlg.Rows[0];
 
-                DataRow dr = tableZlg.Rows[liSel];
-                giDelZlId = (int)(dr[0]);                // Id des zu löschenden Datensatzes
-
-
-                if (dr[10] != DBNull.Value)
+                if (dr[10] != DBNull.Value)        // Nur, wenn Datensatz in tableZlg vorhanden ist
                 {
+                    if (dr[0] != DBNull.Value)
+                    {
+                        giDelZlId = (int)(dr[0]);                // Id des zu löschenden Datensatzes
+                    }
+
                     liTimelineId = (int)dr[10];          // TimeLine ID holen                    
-                    giTimelineId = liTimelineId;
                     tableZlg.Rows.Remove(dr);
 
-                    btnZlSave.Content = "wirklich löschen?";
-                    btnZlSave.IsEnabled = true;
-                    btnZlAdd.IsEnabled = false;
+                    // Timeline bearbeiten Art 12 = Zahlungen löschen
+                    Timeline.editTimeline(liTimelineId, giFlagTimeline, gsConnect, giDb);
 
-                    giFlagTimeline = 12;                // 12 = Zahlung löschen
-                    // delete Button zu
-                    btnZlDel.IsEnabled = false;
-                }
+                    // Delete Kommando muss extra erzeugt werden
+                    // Gibt es eine Datensatz ID zum Löschen (button btnRgDel)
+                    if (giDelZlId > 0)
+                    {
+                        string lsSql = RdQueries.GetSqlSelect(38, giDelZlId, "", "", DateTime.MinValue, DateTime.MinValue, giFiliale, gsConnect, giDb);
+                        int liOk = FetchData(lsSql, 38, giDb, gsConnect);
+                    }
+                } 
+            } while (DgrZahlungen.SelectedItems.Count > 0);
+            // Update der Daten
+            int liOk1 = updateAllDataGrids(0);
+        }
+
+        // Falls Zahlung angewählt ist, mit einem Click wegnehmen
+        private void DgrZahlungen_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            // Falls ein Datensatz angewählt ist, Anwahl wegnehmen
+            if (DgrZahlungen.SelectedIndex >= 0)
+            {
+                DgrZahlungen.SelectedIndex = -1;
             }
         }
 
@@ -2472,12 +2554,12 @@ namespace Ruddat_NK
         // Zahlungen vom Datepicker wird das Datum benötigt, um nach der Eingabe den aktuellen Mieter zu ermitteln
         private void dpkZlg_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
         {
-            DateTime ldtZlg = DateTime.MinValue;
+            //DateTime ldtZlg = DateTime.MinValue;
 
-            ldtZlg =  (DateTime)e.AddedItems[0];
+            //ldtZlg =  (DateTime)e.AddedItems[0];
 
-            // Globale Variable für Event DgrZahlungen_CellEditEnding
-            gdtZahlung = ldtZlg;
+            //// Globale Variable für Event DgrZahlungen_CellEditEnding
+            //gdtZahlung = ldtZlg;
         }
 
         // Todo Menü Rechnungen importieren
@@ -2693,7 +2775,9 @@ namespace Ruddat_NK
             updateAllDataGrids(11);
             // updateAllDataGrids(111);
         }
+    }
 
-
+    internal class Zahlungen
+    {
     }
 }

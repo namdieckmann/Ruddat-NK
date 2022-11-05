@@ -109,13 +109,17 @@
                             <ColumnDefinition Width="133*"/>
                             <ColumnDefinition Width="251*"/>
                         </Grid.ColumnDefinitions>
-                        <DataGrid x:Name="DgrZahlungen" Margin="10,91,474,37" AutoGenerateColumns="False" CanUserAddRows="False" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" ColumnWidth="*" ToolTip="Zahlungen" RenderTransformOrigin="0.5,0.5" SelectionChanged="DgrZahlungen_SelectionChanged" CellEditEnding="DgrZahlungen_CellEditEnding" BeginningEdit="DgrZahlungen_BeginningEdit" Grid.ColumnSpan="2">
+                        <DataGrid x:Name="DgrZahlungen" Margin="10,91,474,37" AutoGenerateColumns="False" CanUserAddRows="False" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" 
+                                  ColumnWidth="*" ToolTip="Zahlungen automatisch erzeugen mit Doppelklick" RenderTransformOrigin="0.5,0.5" SelectionChanged="DgrZahlungen_SelectionChanged" 
+                                  CellEditEnding="DgrZahlungen_CellEditEnding" BeginningEdit="DgrZahlungen_BeginningEdit" Grid.ColumnSpan="2" 
+                                  MouseDoubleClick="DgrZahlungen_MouseDoubleClick" MouseLeftButtonDown="DgrZahlungen_MouseLeftButtonDown">
                             <DataGrid.Columns>
                                 <DataGridComboBoxColumn x:Name="kostenartZlg" Header="Kostenart"
-                        DisplayMemberPath="bez"
-                        SelectedValuePath="id_ksa"
-                        SelectedValueBinding="{Binding id_ksa}" />
-                                <!--<DataGridTemplateColumn Header="Zahlungsdatum">
+                                                        IsReadOnly="True"
+                                                        DisplayMemberPath="bez"
+                                                        SelectedValuePath="id_ksa"
+                                                        SelectedValueBinding="{Binding id_ksa}" />              
+                                <DataGridTemplateColumn Header="Zahlungsdatum">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <TextBlock Text="{Binding datum_von, StringFormat ={}{0:dd.MM.yyyy}}"/>
@@ -126,9 +130,9 @@
                                             <DatePicker x:Name="dpkZlg" SelectedDate="{Binding datum_von}" SelectedDateChanged="dpkZlg_SelectedDateChanged" />
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellEditingTemplate>
-                                </DataGridTemplateColumn>-->
-                                <DataGridTextColumn Header="Zahlungsdatum"
-                                    Binding="{Binding datum_von, StringFormat ={}{0:dd.MM.yyyy}}"/>
+                                </DataGridTemplateColumn>
+                                <!--<DataGridTextColumn Header="Zahlungsdatum"
+                                    Binding="{Binding datum_von, StringFormat ={}{0:dd.MM.yyyy}}"/>-->
                                 <DataGridTextColumn Header="Betrag netto" 
             			            Binding="{Binding betrag_netto, StringFormat ={}{0:c},ConverterCulture=de-DE}"/>
                                 <DataGridTextColumn Header="Betrag brutto" 
@@ -152,7 +156,6 @@
                         <Button x:Name="btnZlSave" Content="Speichern" Margin="0,0,474,10" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="134" RenderTransformOrigin="0.538,0.909" Click="btnZlSave_Click" Grid.Column="1"/>
                         <Button x:Name="btnZlAdd" Content="Zufügen" HorizontalAlignment="Right" Margin="0,0,613,10" VerticalAlignment="Bottom" Width="75" Click="btnZlAdd_Click" Grid.Column="1" />
                         <Button x:Name="btnZlDel" Content="Löschen" HorizontalAlignment="Right" Margin="0,0,693,10" VerticalAlignment="Bottom" Width="75" Click="btnZlDel_Click" Grid.ColumnSpan="2" />
-
                     </Grid>
                 </TabItem.Content>
             </TabItem>
