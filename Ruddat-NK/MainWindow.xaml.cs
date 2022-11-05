@@ -2026,14 +2026,14 @@ namespace Ruddat_NK
                 }
 
                 // Steht etwas im Feld Mehrwertsteuer?
-                if (((DgrRechnungen.Items[liSel] as DataRowView).Row.ItemArray[7] != DBNull.Value) || giMwstSatz != 99 )
+                if (((DgrRechnungen.Items[liSel] as DataRowView).Row.ItemArray[7] != DBNull.Value) || liMwstSatz != 99 )
                 {
 
                     if (x == 8)     // NettoPreis !! Achtung: Der Displayindex ist die Darstellung im 
                                                         // DGR und nicht die Itemliste
                     {
                         // Hier wird die Zelle des DataGrid ausgelesen, oder bei NewRow der Wert aus der globalen Variablen geholt
-                        if (giMwstSatz == 99)
+                        if (liMwstSatz == 99)
                         {
                             liMwstArt = Int32.Parse((DgrRechnungen.Items[liSel] as DataRowView).Row.ItemArray[7].ToString()); // Art Mehrwertsteuer
                             liMwstSatz = Timeline.getMwstSatz(liMwstArt, gsConnect, giDb);
@@ -2054,7 +2054,7 @@ namespace Ruddat_NK
                         if (lsNetto.Length > 0)
                         {
                             ldNetto = Convert.ToDecimal(lsNetto);
-                            ldBrutto = ldNetto + (ldNetto / 100) * liMwstSatz;                                          // Bruttobetrag
+                            ldBrutto = ldNetto + (ldNetto / 100) * liMwstSatz;                                          // Netto
                             if (ldNetto > 0)
                             {
                                 tableOne.Rows[liSel][6] = ldBrutto;                                                                
@@ -2065,7 +2065,7 @@ namespace Ruddat_NK
                     if (x == 9)     // Brutto
                     {
                         // Hier wird die Zelle des DataGrid ausgelesen, oder bei NewRow der Wert aus der globalen Variablen geholt
-                        if (giMwstSatz == 99)
+                        if (liMwstSatz == 99)
                         {
                             liMwstArt = Int32.Parse((DgrRechnungen.Items[liSel] as DataRowView).Row.ItemArray[7].ToString()); // Art Mehrwertsteuer                            
                             liMwstSatz = Timeline.getMwstSatz(liMwstArt, gsConnect, giDb);

@@ -797,7 +797,7 @@ namespace Ruddat_NK
                                 sdg = new SqlDataAdapter(command);
                                 tableSeven = new DataTable();
                                 sdg.Fill(tableSeven);
-                                liOk = MakeAfterFetch(piArt, 0, 0, 0, asConnect, aiDb);
+                                liReturn = MakeAfterFetch(piArt, 0, 0, 0, asConnect, aiDb);
                                 break;
                             case 11:    // Zahlungen > Timeline erzeugen bearbeiten
                                 tableZlg = new DataTable();         // Zahlungen
@@ -1003,7 +1003,7 @@ namespace Ruddat_NK
                                 mysdg = new MySqlDataAdapter(command);
                                 tableSeven = new DataTable();
                                 mysdg.Fill(tableSeven);
-                                liOk = MakeAfterFetch(piArt, 0, 0, 0, asConnect, aiDb);
+                                liReturn = MakeAfterFetch(piArt, 0, 0, 0, asConnect, aiDb);
                                 break;
                             case 11:    // Zahlungen > Timeline erzeugen bearbeiten
                                 tableZlg = new DataTable();         // Zahlungen
@@ -2066,7 +2066,7 @@ namespace Ruddat_NK
                         {
                             // Hier wird liRows ausnahmsweise mit dem Mwst-Satz belegt
                             decimal ldMwst = (decimal)tableSeven.Rows[0].ItemArray.GetValue(2);
-                            liRows = (int)ldMwst;
+                            LiReturn = (int)ldMwst;
                         }
                     }
                     break;
