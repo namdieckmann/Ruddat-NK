@@ -118,7 +118,7 @@
                                                         IsReadOnly="True"
                                                         DisplayMemberPath="bez"
                                                         SelectedValuePath="id_ksa"
-                                                        SelectedValueBinding="{Binding id_ksa}" />              
+                                                        SelectedValueBinding="{Binding id_ksa}" />
                                 <DataGridTemplateColumn Header="Zahlungsdatum">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
@@ -328,17 +328,19 @@
         </TabControl>
         <Calendar x:Name="clFrom" HorizontalAlignment="Left" Margin="113,0,0,-0.143" VerticalAlignment="Bottom" SelectedDatesChanged="clFrom_SelectedDatesChanged" Grid.Column="1"/>
         <Calendar x:Name="clTo" HorizontalAlignment="Left" Margin="297,0,0,-0.143" VerticalAlignment="Bottom" SelectedDatesChanged="clTo_SelectedDatesChanged" Grid.Column="1"/>
+        <Calendar x:Name="clYear" HorizontalAlignment="Left" Margin="1078,0,0,4.857" VerticalAlignment="Bottom" Grid.Column="1" DisplayMode="Decade"  SelectedDatesChanged="ClYear_SelectedDatesChanged"/>
         <Label x:Name="lbl2" Content="Gewählt:" HorizontalAlignment="Left" Margin="10,0,0,9.857" RenderTransformOrigin="-8.353,3.03" Width="60" Height="23" VerticalAlignment="Bottom"/>
         <TextBox x:Name="tbNameSearch" HorizontalAlignment="Left" Height="23" Margin="75,0,0,9.857" TextWrapping="Wrap" Width="232" VerticalAlignment="Bottom" Grid.ColumnSpan="2"/>
         <CheckBox x:Name="cbCal" Content="Kalender anwählen" Margin="481,0,0,144.857" VerticalAlignment="Bottom" HorizontalAlignment="Left" Checked="cbCal_Checked" Unchecked="cbCal_Unchecked" Grid.Column="1"/>
         <CheckBox x:Name="cbObj" Content="Objekt angewählt" Margin="481,0,0,123.857" VerticalAlignment="Bottom" HorizontalAlignment="Left" Grid.Column="1"/>
         <CheckBox x:Name="cbObjTeil" Content="Mietfläche angewählt" Margin="481,0,0,102.857" VerticalAlignment="Bottom" HorizontalAlignment="Left" Grid.Column="1"/>
         <CheckBox x:Name="cbName" Content="Mieter angewählt" Margin="481,0,0,82.857" VerticalAlignment="Bottom" HorizontalAlignment="Left" RenderTransformOrigin="0.569,0.606" Grid.Column="1"/>
+        <CheckBox x:Name="cbYear" Content="Abrechnungsjahr anwählen" Margin="909,0,0,144.857"  VerticalAlignment="Bottom" HorizontalAlignment="Left" Grid.Column="1" Checked="CbYear_Checked" Unchecked="CbYear_Unchecked"/>
         <TextBox x:Name="tbDateFrom" Margin="520,0,0,44.857" Height="23" VerticalAlignment="Bottom" HorizontalAlignment="Left" TextWrapping="Wrap" Width="134" RenderTransformOrigin="0.519,-1.211" IsEnabled="False" Grid.Column="1"/>
         <TextBox x:Name="tbDateTo" Margin="520,0,0,12.857" Height="23" VerticalAlignment="Bottom" HorizontalAlignment="Left" TextWrapping="Wrap" Width="134" IsEnabled="False" Grid.Column="1"/>
         <TextBox HorizontalAlignment="Left" Height="23" Margin="481,0,0,12.857" TextWrapping="Wrap" Text="bis:" VerticalAlignment="Bottom" Width="34" IsEnabled="False" Grid.Column="1"/>
         <TextBox HorizontalAlignment="Left" Height="23" Margin="481,0,0,44.857" TextWrapping="Wrap" Text="vom:" VerticalAlignment="Bottom" Width="34" RenderTransformOrigin="0.655,1.6" IsEnabled="False" Grid.Column="1"/>
-        <RadioButton x:Name="rbAktEmps" GroupName="Mieter" Height="23" Margin="705.8,0,0,143.257" VerticalAlignment="Bottom" HorizontalAlignment="Left" Content="Aktive Mieter zeigen" Grid.Column="1" Width="150" Grid.ColumnSpan="2" Checked="rbAktEmps_Checked"/>
-        <RadioButton x:Name="rbAllEmps" GroupName="Mieter" Height="23" Margin="705.8,0,0,123.257" VerticalAlignment="Bottom" HorizontalAlignment="Left" Content="Alle Mieter zeigen" Grid.Column="1" Width="150" Grid.ColumnSpan="2" Checked="rbAllEmps_Checked"/>
+        <RadioButton x:Name="rbAktEmps" GroupName="Mieter" Height="23" Margin="704,0,0,136.857" VerticalAlignment="Bottom" HorizontalAlignment="Left" Content="Aktive Mieter zeigen" Grid.Column="1" Width="150" Checked="rbAktEmps_Checked"/>
+        <RadioButton x:Name="rbAllEmps" GroupName="Mieter" Height="23" Margin="704,0,0,116.857" VerticalAlignment="Bottom" HorizontalAlignment="Left" Content="Alle Mieter zeigen" Grid.Column="1" Width="150" Checked="rbAllEmps_Checked"/>
     </Grid>
 </Window>

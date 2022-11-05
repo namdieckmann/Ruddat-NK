@@ -3953,5 +3953,23 @@ namespace Ruddat_NK
             return (liId);
         }
 
+        // Ermitteln des Start und Endedatum eenes Jahres
+        internal static DateTime GetYear(DateTime adtYear, int aiArt)
+        {
+            int liYear = adtYear.Year;
+            switch (aiArt)
+            {
+                case 1:
+                    adtYear = new DateTime(liYear, 1, 1);
+                    break;
+                case 2:
+                    adtYear = new DateTime(liYear, 12, 31, 23, 59, 59);
+                    break;
+                default:
+                    break;
+            }
+            return adtYear;
+        }
+
     }
 }

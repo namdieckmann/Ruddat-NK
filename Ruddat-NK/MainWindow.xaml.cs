@@ -40,6 +40,7 @@ namespace Ruddat_NK
         DateTime gdtZahlung = DateTime.MinValue; // Zahlungsdatum aus Datepicker DataGrid Zahlungen
         DateTime gdtFrom = DateTime.MinValue;
         DateTime gdtTo = DateTime.MinValue;
+        DateTime gdtYear = DateTime.MinValue;
 
         // Daten
         DataTable tableOne;
@@ -101,6 +102,7 @@ namespace Ruddat_NK
             DateTime ldtWtStart = DateTime.MinValue;
             DateTime ldtWtEnd = DateTime.MinValue;
             DateTime ldtFrom = DateTime.MinValue;
+            DateTime ldtYear = DateTime.MinValue;
             DateTime ldtTo = DateTime.Today;
             gsPath = UPath;                         // Pfad der Konfigurationsdatei global verfügbar machen
 
@@ -116,6 +118,7 @@ namespace Ruddat_NK
             // Kalender erstmal aus
             clFrom.IsEnabled = false;
             clTo.IsEnabled = false;
+            clYear.IsEnabled = false;
             // restliche Checkboxen erstmal aus
             cbObj.IsEnabled = false;
             cbObjTeil.IsEnabled = false;
@@ -142,18 +145,14 @@ namespace Ruddat_NK
             lsSql = RdQueries.GetSqlSelect(2, giFiliale, "", "", DateTime.Today, DateTime.Today, giFiliale, lsConnect, giDb);
             liRows = FetchData(lsSql, 2, giDb, lsConnect);                                                       
 
-            int liYear = DateTime.Now.Year - 2;
-            string dt = (liYear.ToString()) + "-01-01";
-            ldtFrom = DateTime.Parse(dt);                 // Jahresanfang
+            // Standard ist Jahr -1
+            ldtYear = DateTime.Now.AddYears(-1);
+            gdtYear = ldtYear;
+
+            ldtFrom = Timeline.GetYear(ldtYear,1);
+            ldtTo = Timeline.GetYear(ldtYear, 2);
+
             tbDateFrom.Text = ldtFrom.ToString("dd-MM-yyyy HH:mm");
-
-            string sdte = (liYear.ToString()) + "-12-31";
-            ldtTo = DateTime.Parse(sdte);
-            // Enddatum bis 23:59:59
-            ldtTo = ldtTo.AddHours(23);
-            ldtTo = ldtTo.AddMinutes(59);
-            ldtTo = ldtTo.AddSeconds(59);
-
             tbDateTo.Text = ldtTo.ToString("dd-MM-yyyy HH:mm");
 
             // clFrom.DisplayDate = ldtFrom;
@@ -165,6 +164,10 @@ namespace Ruddat_NK
             clTo.SelectedDate = ldtTo;
             clTo.DisplayDate = ldtTo;
             gdtTo = ldtTo;
+
+            // Abrechnungsjahr zeigen
+            clYear.SelectedDate = ldtYear;
+            clYear.DisplayDate = ldtYear;
 
             Mouse.OverrideCursor = null;
         }
@@ -989,6 +992,9 @@ namespace Ruddat_NK
         // Kalender sperren und Rücksetzen
         private void cbCal_Unchecked(object sender, RoutedEventArgs e)
         {
+            DateTime ldtYear = DateTime.MinValue;
+            DateTime ldtFrom = DateTime.MinValue;
+            DateTime ldtTo = DateTime.MinValue;
 
             cbCal.Content = "Kalender anwählen";
             clFrom.IsEnabled = false;
@@ -996,19 +1002,40 @@ namespace Ruddat_NK
             clFrom.SelectedDate = null;
             clTo.SelectedDate = null;
 
-            int liYear = DateTime.Now.Year - 1;
-            string dt = (liYear.ToString()) + "-01-01";
-            DateTime ldtFrom = DateTime.Parse(dt);                 // Jahresanfang
-            tbDateFrom.Text = ldtFrom.ToString("dd-MM-yyyy HH:mm");
+            ldtYear = gdtYear;
 
-            string sdte = (liYear.ToString()) + "-12-31";
-            DateTime ldtTo = DateTime.Parse(sdte);
-            // Enddatum bis 23:59:59
-            ldtTo = ldtTo.AddHours(23);
-            ldtTo = ldtTo.AddMinutes(59);
-            ldtTo = ldtTo.AddSeconds(59);
+            ldtFrom = Timeline.GetYear(ldtYear, 1);
+            ldtTo = Timeline.GetYear(ldtYear, 2);
+
+            tbDateFrom.Text = ldtFrom.ToString("dd-MM-yyyy HH:mm");
+            tbDateTo.Text = ldtTo.ToString("dd-MM-yyyy HH:mm");
+
+            // clFrom.DisplayDate = ldtFrom;
+            clFrom.SelectedDate = ldtFrom;
+            clFrom.DisplayDate = ldtFrom;
+            gdtFrom = ldtFrom;
+
+            // clTo.DisplayDate = ldtTo;
+            clTo.SelectedDate = ldtTo;
+            clTo.DisplayDate = ldtTo;
+            gdtTo = ldtTo;
+
+            // Abrechnungsjahr zeigen
+            clYear.SelectedDate = ldtYear;
+            clYear.DisplayDate = ldtYear;
 
             tbDateTo.Text = ldtTo.ToString("dd-MM-yyyy HH:mm");
+        }
+
+        // Abrechnungsjahr ein
+        private void CbYear_Checked(object sender, RoutedEventArgs e)
+        {
+            clYear.IsEnabled = true;
+        }
+        // Abrechnungsjahr aus
+        private void CbYear_Unchecked(object sender, RoutedEventArgs e)
+        {
+            clYear.IsEnabled = false;
         }
 
         // Datum gewählt Kalender From
@@ -1048,10 +1075,6 @@ namespace Ruddat_NK
                 tbDateFrom.Text = lsDateFrom;
 
                 ldtTo = clTo.SelectedDate.Value;
-                // Enddatum bis 23:59:59
-                //ldtTo = ldtTo.AddHours(23);
-                //ldtTo = ldtTo.AddMinutes(59);
-                //ldtTo = ldtTo.AddSeconds(59);
                 lsDateTo = ldtTo.ToString("dd-MM-yyyy HH:mm");
                 tbDateTo.Text = lsDateTo;
 
@@ -2560,6 +2583,34 @@ namespace Ruddat_NK
 
             //// Globale Variable für Event DgrZahlungen_CellEditEnding
             //gdtZahlung = ldtZlg;
+        }
+
+        // Das Abrechnungsjahr kann gewählt werden
+        private void ClYear_SelectedDatesChanged(object sender, SelectionChangedEventArgs e)
+        {
+            DateTime ldtYear = DateTime.MinValue;
+            DateTime ldtFrom = DateTime.MinValue;
+            DateTime ldtTo = DateTime.MinValue;
+
+            ldtYear = clYear.SelectedDate.Value;
+
+            gdtYear = ldtYear;      // Clobal
+
+            ldtFrom = Timeline.GetYear(ldtYear, 1);
+            ldtTo = Timeline.GetYear(ldtYear, 2);
+
+            tbDateFrom.Text = ldtFrom.ToString("dd-MM-yyyy HH:mm");
+            tbDateTo.Text = ldtTo.ToString("dd-MM-yyyy HH:mm");
+
+            // clFrom.DisplayDate = ldtFrom;
+            clFrom.SelectedDate = ldtFrom;
+            clFrom.DisplayDate = ldtFrom;
+            gdtFrom = ldtFrom;
+
+            // clTo.DisplayDate = ldtTo;
+            clTo.SelectedDate = ldtTo;
+            clTo.DisplayDate = ldtTo;
+            gdtTo = ldtTo;
         }
 
         // Todo Menü Rechnungen importieren
