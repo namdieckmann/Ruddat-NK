@@ -2609,6 +2609,11 @@ namespace Ruddat_NK
             // clTo.DisplayDate = ldtTo;
             clTo.SelectedDate = ldtTo;
             clTo.DisplayDate = ldtTo;
+
+            // Calender Year aus
+            clYear.IsEnabled = false;
+            cbYear.IsChecked = false;
+            
             gdtTo = ldtTo;
         }
 
