@@ -1666,7 +1666,8 @@ namespace Ruddat_NK
                                             dr[13] = ldtEnd;
                                         else
                                             dr[13] = ldtMonat;      // Der Timelinemonat
-
+                                        dr[14] = 0;
+                                        dr[15] = 0;
                                         tableThree.Rows.Add(dr);
                                         // + Monat 
                                         ldtMonat = ldtMonat.AddMonths(1);
@@ -1881,10 +1882,18 @@ namespace Ruddat_NK
                                     {
                                         dr[14] = 1;
                                     }
+                                    else
+                                    {
+                                        dr[14] = 0;
+                                    }
                                     // Kennzeichnen der Timeline, ob es eine Weiterleitung vom ObjektTeil ist
                                     if (liObjektTeil > 0)
                                     {
                                         dr[15] = 1;
+                                    }
+                                    else
+                                    {
+                                        dr[15] = 0;
                                     }
                                     // Import ID schreiben
                                     dr[17] = liImportId;
@@ -2033,10 +2042,18 @@ namespace Ruddat_NK
                             {
                                 dr[14] = 1;
                             }
+                            else
+                            {
+                                dr[14] = 0;
+                            }
                             // Kennzeichnen der Timeline, ob es eine Weiterleitung vom ObjektTeil ist
                             if (liObjektTeil > 0)
                             {
                                 dr[15] = 1;
+                            }
+                            else
+                            {
+                                dr[15] = 0;
                             }
                             // Import ID schreiben
                             dr[17] = liImportId;
@@ -2198,6 +2215,8 @@ namespace Ruddat_NK
                                         dr[11] = ldBetragSollBrutto * -1;
                                         dr[12] = ldZs;                          // Zählerstand
                                         dr[13] = ldtStart;
+                                        dr[14] = 0;
+                                        dr[15] = 0;
                                         dr[17] = liImportId;
 
                                         tableTml.Rows.Add(dr);
@@ -2329,6 +2348,8 @@ namespace Ruddat_NK
                             dr[8] = ldBetragNetto * ldVerbrauch;
                             dr[10] = ldBetragBrutto * ldVerbrauch;
                             dr[13] = ldtStart;
+                            dr[14] = 0;
+                            dr[15] = 0;
                             // dr[17] = 99; für Testzwecke, um Zählerdaten wiederzufinden
 
                             tableTml.Rows.Add(dr);
@@ -2573,7 +2594,7 @@ namespace Ruddat_NK
             {
                 lsSql = Timeline.getSql(31, liExternId, asField, "",0);               // Timeline
                 lsSql2 = Timeline.getSql(21, liExternId, asField, "",0);              // Zählerstande mit extern Timeline Id
-                liOk = Timeline.fetchData(lsSql, lsSql2, 23, asConnect, aiDb);      //          
+                liOk = Timeline.fetchData(lsSql, lsSql2, 23, asConnect, aiDb);        
             }
 
             return liOk;

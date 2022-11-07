@@ -166,7 +166,8 @@
                             <ColumnDefinition Width="69*"/>
                             <ColumnDefinition Width="1082*"/>
                         </Grid.ColumnDefinitions>
-                        <DataGrid x:Name="DgrRechnungen" Margin="10,101,10.2,37.4" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" ToolTip="Rechnungen" RenderTransformOrigin="0.5,0.5" HorizontalContentAlignment="Stretch" SelectionChanged="DgrRechnungen_SelectionChanged" RowEditEnding="DgrRechnungen_RowEditEnding" 
+                        <DataGrid x:Name="DgrRechnungen" Margin="10,101,10.2,37.4" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" ToolTip="Rechnungen" RenderTransformOrigin="0.5,0.5" 
+                                  HorizontalContentAlignment="Stretch" SelectionChanged="DgrRechnungen_SelectionChanged" RowEditEnding="DgrRechnungen_RowEditEnding" 
                                   BeginningEdit="DgrRechnungen_BeginningEdit" CellEditEnding="DgrRechnungen_CellEditEnding" VerticalScrollBarVisibility="Visible" MinColumnWidth="50" MaxColumnWidth="500" Grid.ColumnSpan="2" >
                             <DataGrid.Columns>
                                 <DataGridComboBoxColumn x:Name="kostenart" Header="Kostenart"
@@ -328,7 +329,8 @@
         </TabControl>
         <Calendar x:Name="clFrom" HorizontalAlignment="Left" Margin="113,0,0,-0.143" VerticalAlignment="Bottom" SelectedDatesChanged="clFrom_SelectedDatesChanged" Grid.Column="1"/>
         <Calendar x:Name="clTo" HorizontalAlignment="Left" Margin="297,0,0,-0.143" VerticalAlignment="Bottom" SelectedDatesChanged="clTo_SelectedDatesChanged" Grid.Column="1"/>
-        <Calendar x:Name="clYear" HorizontalAlignment="Left" Margin="1078,0,0,4.857" VerticalAlignment="Bottom" Grid.Column="1" DisplayMode="Decade"  SelectedDatesChanged="ClYear_SelectedDatesChanged"/>
+        <Calendar x:Name="clYear" HorizontalAlignment="Left" Margin="1078,0,0,4.857" VerticalAlignment="Bottom" Grid.Column="1" DisplayMode="Decade"  
+                  SelectedDatesChanged="ClYear_SelectedDatesChanged"/>
         <Label x:Name="lbl2" Content="Gewählt:" HorizontalAlignment="Left" Margin="10,0,0,9.857" RenderTransformOrigin="-8.353,3.03" Width="60" Height="23" VerticalAlignment="Bottom"/>
         <TextBox x:Name="tbNameSearch" HorizontalAlignment="Left" Height="23" Margin="75,0,0,9.857" TextWrapping="Wrap" Width="232" VerticalAlignment="Bottom" Grid.ColumnSpan="2"/>
         <CheckBox x:Name="cbCal" Content="Kalender anwählen" Margin="481,0,0,144.857" VerticalAlignment="Bottom" HorizontalAlignment="Left" Checked="cbCal_Checked" Unchecked="cbCal_Unchecked" Grid.Column="1"/>

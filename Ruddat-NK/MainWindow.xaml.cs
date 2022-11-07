@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Data;
 using System.Data.SqlClient;
 using System.IO;
@@ -136,20 +135,20 @@ namespace Ruddat_NK
             rbAktEmps.IsChecked = true;
 
             // Daten für listbox Filiale holen
-            lsSql = RdQueries.GetSqlSelect(1, 0, "", "", DateTime.MinValue, DateTime.MinValue,giFiliale, lsConnect, giDb);
+            lsSql = RdQueries.GetSqlSelect(1, 0, "", "", DateTime.MinValue, DateTime.MinValue, giFiliale, lsConnect, giDb);
             // Daten holen für Listbox Filiale
             // Sql, Art
             liRows = FetchData(lsSql, 1, giDb, lsConnect);
 
             // Daten für Treeview holen
             lsSql = RdQueries.GetSqlSelect(2, giFiliale, "", "", DateTime.Today, DateTime.Today, giFiliale, lsConnect, giDb);
-            liRows = FetchData(lsSql, 2, giDb, lsConnect);                                                       
+            liRows = FetchData(lsSql, 2, giDb, lsConnect);
 
             // Standard ist Jahr -1
             ldtYear = DateTime.Now.AddYears(-1);
             gdtYear = ldtYear;
 
-            ldtFrom = Timeline.GetYear(ldtYear,1);
+            ldtFrom = Timeline.GetYear(ldtYear, 1);
             ldtTo = Timeline.GetYear(ldtYear, 2);
 
             tbDateFrom.Text = ldtFrom.ToString("dd-MM-yyyy HH:mm");
@@ -619,7 +618,7 @@ namespace Ruddat_NK
                                 tvMain.Items.Clear();
 
                                 //  Eine Schleife durch die Tabelle, um das Treview zu befüllen
-                                for ( i = 0;  i < tableFour.Rows.Count;  i++)
+                                for (i = 0; i < tableFour.Rows.Count; i++)
                                 {
                                     lsObjektBez = tableFour.Rows[i].ItemArray.GetValue(4).ToString().Trim() + ":" + tableFour.Rows[i].ItemArray.GetValue(0).ToString().Trim();
                                     lsObjektTeilBez = tableFour.Rows[i].ItemArray.GetValue(1).ToString();
@@ -870,7 +869,7 @@ namespace Ruddat_NK
 
                 // && liVertragAktiv == 1
 
-                if (lsObjektBezGet == lsObjektBez )   
+                if (lsObjektBezGet == lsObjektBez)
                 {
                     if (lsObjektTeilBez != lsObjektTeilBezS)
                     {
@@ -927,7 +926,7 @@ namespace Ruddat_NK
 
                             lsObjektTeilBezGet = lsObjektTeilBez;
                         }
-                    }                    
+                    }
                 }
 
                 if (rbAllEmps.IsChecked == true)    // Alle Mieter
@@ -1145,7 +1144,7 @@ namespace Ruddat_NK
             if (asArt == 1)
             {
                 // Daten für die Anwahl der Firma nur nach Filialänderungen durchführen
-                 // Datum ist egal
+                // Datum ist egal
                 // Daten für listbox Filiale holen
                 lsSql = RdQueries.GetSqlSelect(1, 0, "", "", DateTime.MinValue, DateTime.MinValue, giFiliale, gsConnect, giDb);
                 // Daten holen für Listbox Filiale
@@ -1174,7 +1173,7 @@ namespace Ruddat_NK
 
             // Timeline Detail leeren
             DgrCostDetail.ItemsSource = null;
-            
+
             // Index aus dem Treeview vorerst nur global
             liIndex = giIndex;
 
@@ -1361,20 +1360,20 @@ namespace Ruddat_NK
                     // TimeLine holen für Mieter
                     lsSql = RdQueries.GetSqlSelect(7, liId, "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
                     liRows = FetchData(lsSql, 8, giDb, gsConnect);
-                    lsSqlTimeline = RdQueries.GetSqlSelect(107, liId, "", "", ldtFrom, ldtTo,giFiliale,gsConnect, giDb);               // Report Nebenkosten Hauptteil
-                    lsSqlTimeline2 = RdQueries.GetSqlSelect(116, liObjektIdTmp, "", "", ldtFrom, ldtTo,giFiliale,gsConnect, giDb);     // Darstellung der ObjektKosten in der NKA
-                    lsSqlTimeline3 = RdQueries.GetSqlSelect(140, liId, "" , "", ldtFrom,ldtTo,giFiliale,gsConnect, giDb);              // Für das Einsetzen der Rechnungsnummer in die Timeline
+                    lsSqlTimeline = RdQueries.GetSqlSelect(107, liId, "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);               // Report Nebenkosten Hauptteil
+                    lsSqlTimeline2 = RdQueries.GetSqlSelect(116, liObjektIdTmp, "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);     // Darstellung der ObjektKosten in der NKA
+                    lsSqlTimeline3 = RdQueries.GetSqlSelect(140, liId, "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);              // Für das Einsetzen der Rechnungsnummer in die Timeline
 
                     // Rechnungen zeigen  Art 10 = Rechungen zeigen für Mieter Datum aktiv
-                    lsSql = RdQueries.GetSqlSelect(10, liId, "", "", ldtFrom, ldtTo,giFiliale,gsConnect, giDb);
+                    lsSql = RdQueries.GetSqlSelect(10, liId, "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
                     liRows = FetchData(lsSql, 9, giDb, gsConnect);
-                    lsSqlRechnungen = RdQueries.GetSqlSelect(110, liId, "", "", ldtFrom, ldtTo,giFiliale,gsConnect, giDb);  // Report
+                    lsSqlRechnungen = RdQueries.GetSqlSelect(110, liId, "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);  // Report
 
                     // Zahlungen zeigen Art 13 Zahlungen für Mieter
-                    lsSql = RdQueries.GetSqlSelect(23, liId, "", "", ldtFrom, ldtTo,giFiliale,gsConnect, giDb);
+                    lsSql = RdQueries.GetSqlSelect(23, liId, "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
                     liRows = FetchData(lsSql, 14, giDb, gsConnect);
-                    lsSqlZahlungen = RdQueries.GetSqlSelect(123, liId, "", "", ldtFrom, ldtTo,giFiliale,gsConnect, giDb);     // Report
-                    lsSqlSumme = RdQueries.GetSqlSelect(115, liId, "", "", ldtFrom, ldtTo,giFiliale,gsConnect, giDb);         // Report Summendarstellung Zahlbetrag
+                    lsSqlZahlungen = RdQueries.GetSqlSelect(123, liId, "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);     // Report
+                    lsSqlSumme = RdQueries.GetSqlSelect(115, liId, "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);         // Report Summendarstellung Zahlbetrag
 
                     // Tabelle Leerstand nicht befüllen, sondern leeren.
                     // Für Mieter gibt es keinen Leerstand
@@ -1385,7 +1384,7 @@ namespace Ruddat_NK
                     DgrCounters.ItemsSource = null;
 
                     // Db Header für Report befüllen für Mieter x_abr_info
-                    lsSqlHeader = RdQueries.GetSqlSelect(203, liId, "", "", ldtFrom, ldtTo,giFiliale,gsConnect, giDb);        // Header
+                    lsSqlHeader = RdQueries.GetSqlSelect(203, liId, "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);        // Header
                     liRows = FetchData(lsSqlHeader, 17, giDb, gsConnect);
 
                     // Global Mieter Id
@@ -1402,28 +1401,28 @@ namespace Ruddat_NK
             {
                 case 3:
                     // Rechnungen
-                    Timeline.saveLastSql(lsSqlRechnungen,"","","","","","","","rechnungen","");
+                    Timeline.saveLastSql(lsSqlRechnungen, "", "", "", "", "", "", "", "rechnungen", "");
                     break;
                 case 4:
                     // Zahlungen
-                    Timeline.saveLastSql(lsSqlZahlungen,"","","","","","","","zahlungen","");
+                    Timeline.saveLastSql(lsSqlZahlungen, "", "", "", "", "", "", "", "zahlungen", "");
                     break;
-                case 5: 
+                case 5:
                     // Nebenkostenabrechnung 
                     // SqlStatement für die Zieltabelle x_abr_content erzeugen Abrechnung
                     // Das Befüllen der Tabelle erfolgt dann in WndRep
-                    lsSqlAbrContent = RdQueries.GetSqlSelect(300, liId, "", "", ldtFrom, ldtTo,giFiliale,gsConnect, giDb);      // Abrechnung Content x_abr_content
+                    lsSqlAbrContent = RdQueries.GetSqlSelect(300, liId, "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);      // Abrechnung Content x_abr_content
                     // Abrechnungen (Kosten,Kostenverteilung,Kostenverteilung Summen,Zahlungen Summe,Personen,Zähler,Art)
-                    Timeline.saveLastSql(lsSqlTimeline,lsSqlAbrContent,"",
-                            "",lsSqlZahlungen,lsSqlSumme,"",lsSqlTimeline2,"kosten","");       // direkte Kosten
+                    Timeline.saveLastSql(lsSqlTimeline, lsSqlAbrContent, "",
+                            "", lsSqlZahlungen, lsSqlSumme, "", lsSqlTimeline2, "kosten", "");       // direkte Kosten
                     Timeline.saveLastVal(ldtFrom, ldtTo, "Datum");                          // Übergabe des Datumsbereiches 
                     break;
                 case 6:
                     // Anschreiben
                     // SqlStatement für die Zieltabelle x_abr_content erzeugen Abrechnung
                     // Das Befüllen der Tabelle erfolgt dann in WndRep
-                    lsSqlAbrContent = RdQueries.GetSqlSelect(300, liId, "", "", ldtFrom, ldtTo,giFiliale,gsConnect, giDb);      // Abrechnung Content x_abr_content
-                    lsSqlRgNrAnschreiben = RdQueries.GetSqlSelect(140, liId, "", "", ldtFrom, ldtTo,giFiliale,gsConnect, giDb); // Speichern der Rechnungsnummer Anschreiben
+                    lsSqlAbrContent = RdQueries.GetSqlSelect(300, liId, "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);      // Abrechnung Content x_abr_content
+                    lsSqlRgNrAnschreiben = RdQueries.GetSqlSelect(140, liId, "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb); // Speichern der Rechnungsnummer Anschreiben
                     // Abrechnungen (Kosten,Kostenverteilung,Kostenverteilung Summen,Zahlungen Summe,Personen,Zähler,Art, Rechnungsnummer Anschreiben)
                     Timeline.saveLastSql(lsSqlTimeline, lsSqlAbrContent, "",
                             "", lsSqlZahlungen, lsSqlSumme, "", lsSqlTimeline2, "anschreiben", lsSqlRgNrAnschreiben);  // direkte Kosten
@@ -1433,10 +1432,10 @@ namespace Ruddat_NK
                     // Nebenkostenabrechnung detailliert 
                     // SqlStatement für die Zieltabelle x_abr_content erzeugen Abrechnung
                     // Das Befüllen der Tabelle erfolgt dann in WndRep
-                    lsSqlAbrContent = RdQueries.GetSqlSelect(300, liId, "", "", ldtFrom, ldtTo,giFiliale,gsConnect, giDb);      // Abrechnung Content x_abr_content
+                    lsSqlAbrContent = RdQueries.GetSqlSelect(300, liId, "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);      // Abrechnung Content x_abr_content
                     // Abrechnungen (Kosten,Kostenverteilung,Kostenverteilung Summen,Zahlungen Summe,Personen,Zähler,Art)
                     Timeline.saveLastSql(lsSqlTimeline, lsSqlAbrContent, "",
-                            "", lsSqlZahlungen, lsSqlSumme, "", lsSqlTimeline2, "kostendetail","");       // direkte Kosten detailliert
+                            "", lsSqlZahlungen, lsSqlSumme, "", lsSqlTimeline2, "kostendetail", "");       // direkte Kosten detailliert
                     Timeline.saveLastVal(ldtFrom, ldtTo, "Datum");                                        // Übergabe des Datumsbereiches 
                     break;
                 default:
@@ -1499,7 +1498,7 @@ namespace Ruddat_NK
                             if (clFrom.SelectedDate.Value > DateTime.MinValue)
                             {
                                 ldtFrom = clFrom.SelectedDate.Value;
-                            } 
+                            }
                         }
 
                         // Start und EndeDatum angegeben
@@ -1511,7 +1510,7 @@ namespace Ruddat_NK
                                 ldtTo = clTo.SelectedDate.Value;
                             }
                         }
- 
+
                     }
                     else
                     {
@@ -1520,7 +1519,7 @@ namespace Ruddat_NK
                         string lsStart = (liYear.ToString()) + "-01-01";
                         string lsEnd = (liYear.ToString()) + "-12-31";
                         DateTime ldtStart = DateTime.Parse(lsStart);                 // Jahresanfang VorJahr
-                        DateTime ldtEnd = DateTime.Parse(lsEnd); 
+                        DateTime ldtEnd = DateTime.Parse(lsEnd);
                     }
 
                     // Der Index wird nochmal bei TimeLine Details benötigt
@@ -1620,7 +1619,7 @@ namespace Ruddat_NK
             int liRows = tableOne.Rows.Count;
 
             // ID für Timeline ermitteln Art 1 = Rechnungs ID
-            liTimelineId = Timeline.getTimelineId(gsConnect,1, giDb) + 1;
+            liTimelineId = Timeline.getTimelineId(gsConnect, 1, giDb) + 1;
 
             DataRow dr = tableOne.NewRow();
             dr[8] = giObjekt;
@@ -1632,9 +1631,9 @@ namespace Ruddat_NK
             // Datum vorbelegen erst ab dem 2 ten Datensatz
             if (liRows > 0)
             {
-                dr[2] = tableOne.Rows[liRows-1][2];       // Rechnungsdatum
-                dr[3] = tableOne.Rows[liRows-1][3];       // Start Datum
-                dr[4] = tableOne.Rows[liRows-1][4];       // Ende Datum
+                dr[2] = tableOne.Rows[liRows - 1][2];       // Rechnungsdatum
+                dr[3] = tableOne.Rows[liRows - 1][3];       // Start Datum
+                dr[4] = tableOne.Rows[liRows - 1][4];       // Ende Datum
             }
 
             tableOne.Rows.Add(dr);
@@ -1656,7 +1655,7 @@ namespace Ruddat_NK
                 giDelId = (int)(dr[0]);                // Id des zu löschenden Datensatzes
 
 
-                if ( dr[14] != DBNull.Value)
+                if (dr[14] != DBNull.Value)
                 {
                     liTimelineId = (int)dr[14];          // TimeLine ID holen                    
                     giTimelineId = liTimelineId;
@@ -1696,7 +1695,7 @@ namespace Ruddat_NK
                 {
                     if (tableZlg.Rows[i][0] == DBNull.Value)        // Id ist noch leer
                     {
-                        Int32.TryParse(tableZlg.Rows[i][10].ToString(),out liTimelineId);       // Timeline Id holen
+                        Int32.TryParse(tableZlg.Rows[i][10].ToString(), out liTimelineId);       // Timeline Id holen
 
                         Timeline.editTimeline(liTimelineId, liFlagTimeline, gsConnect, giDb);   // Timeline aktualisieren
                     }
@@ -1725,10 +1724,10 @@ namespace Ruddat_NK
             DateTime ldtZlg = DateTime.MinValue;
 
             // ID für Timeline ermitteln Art 2 = Zahlungs ID
-            liTimelineId = Timeline.getTimelineId(gsConnect,2, giDb) + 1;
+            liTimelineId = Timeline.getTimelineId(gsConnect, 2, giDb) + 1;
 
             // Kostenart ID ermitteln Art 1 = Nebenkostenzahlungen
-            liNkId = Timeline.getKsaId(1,gsConnect, giDb);
+            liNkId = Timeline.getKsaId(1, gsConnect, giDb);
 
             DataRow dr = tableZlg.NewRow();
             dr[2] = giObjekt;
@@ -1851,7 +1850,7 @@ namespace Ruddat_NK
                         string lsSql = RdQueries.GetSqlSelect(38, giDelZlId, "", "", DateTime.MinValue, DateTime.MinValue, giFiliale, gsConnect, giDb);
                         int liOk = FetchData(lsSql, 38, giDb, gsConnect);
                     }
-                } 
+                }
             } while (DgrZahlungen.SelectedItems.Count > 0);
             // Update der Daten
             int liOk1 = updateAllDataGrids(0);
@@ -1921,7 +1920,7 @@ namespace Ruddat_NK
                 dr[9] = giObjektTeil;       // Teilobjekt
                 dr[11] = liKsaId;           // Kostenstellenart einsetzen
 
-                btnCntAdd.IsEnabled = false;                
+                btnCntAdd.IsEnabled = false;
             }
             else
             {
@@ -1950,9 +1949,9 @@ namespace Ruddat_NK
                 liOk = FetchData(lsSql, 40, giDb, gsConnect);
 
             }
-             // Update der Daten
-             liOk = updateAllDataGrids(0);
-           
+            // Update der Daten
+            liOk = updateAllDataGrids(0);
+
             // Die IDs und Flags zurücksetzen
             giDelZlWertId = 0;
             giZlId = 0;                 // globale Zähler Id
@@ -1997,7 +1996,7 @@ namespace Ruddat_NK
                     if (lsArtVertKurz == "fa")
                     {
                         // Objekt Mix neu anlegen mit Objekt ID und 
-                        liOk = Timeline.makeChoose(giObjekt,giTimelineId,gsConnect, giDb);
+                        liOk = Timeline.makeChoose(giObjekt, giTimelineId, gsConnect, giDb);
                         // Objekt Mix Parts auswählen
                         WndChooseSet frmChooseSet = new WndChooseSet(this);
                         // Welche Datenbank
@@ -2013,7 +2012,7 @@ namespace Ruddat_NK
                         delPassData delegt3 = new delPassData(frmChooseSet.getArt);
                         delegt3(liOk);
 
-                        frmChooseSet.ShowDialog();                            
+                        frmChooseSet.ShowDialog();
                     }
                 }
 
@@ -2026,11 +2025,11 @@ namespace Ruddat_NK
                 }
 
                 // Steht etwas im Feld Mehrwertsteuer?
-                if (((DgrRechnungen.Items[liSel] as DataRowView).Row.ItemArray[7] != DBNull.Value) || liMwstSatz != 99 )
+                if (((DgrRechnungen.Items[liSel] as DataRowView).Row.ItemArray[7] != DBNull.Value) || liMwstSatz != 99)
                 {
 
                     if (x == 8)     // NettoPreis !! Achtung: Der Displayindex ist die Darstellung im 
-                                                        // DGR und nicht die Itemliste
+                                    // DGR und nicht die Itemliste
                     {
                         // Hier wird die Zelle des DataGrid ausgelesen, oder bei NewRow der Wert aus der globalen Variablen geholt
                         if (liMwstSatz == 99)
@@ -2047,7 +2046,7 @@ namespace Ruddat_NK
                         TextBox t1 = e.EditingElement as TextBox;
                         lsNetto = t1.Text.ToString();
 
-                        if (lsNetto.Length > 0 && lsNetto.Substring(lsNetto.Length-1,1) == "€")                             // Das Eurozeichen muss raus
+                        if (lsNetto.Length > 0 && lsNetto.Substring(lsNetto.Length - 1, 1) == "€")                             // Das Eurozeichen muss raus
                         {
                             lsNetto = lsNetto.Substring(0, lsNetto.Length - 2);
                         }
@@ -2057,7 +2056,7 @@ namespace Ruddat_NK
                             ldBrutto = ldNetto + (ldNetto / 100) * liMwstSatz;                                          // Netto
                             if (ldNetto > 0)
                             {
-                                tableOne.Rows[liSel][6] = ldBrutto;                                                                
+                                tableOne.Rows[liSel][6] = ldBrutto;
                             }
                         }
 
@@ -2089,7 +2088,7 @@ namespace Ruddat_NK
                             ldNetto = (ldBrutto / (100 + liMwstSatz)) * 100;                            // Nettobetrag
                             if (ldBrutto > 0)
                             {
-                                tableOne.Rows[liSel][5] = ldNetto;                                    
+                                tableOne.Rows[liSel][5] = ldNetto;
                             }
                         }
                     }
@@ -2109,7 +2108,7 @@ namespace Ruddat_NK
             string lsStart = (liYear.ToString()) + "-01-01";
             string lsEnd = (liYear.ToString()) + "-12-31";
             DateTime ldtFrom = DateTime.Parse(lsStart);                 // Jahresanfang VorJahr
-            DateTime ldtTo = DateTime.Parse(lsEnd); 
+            DateTime ldtTo = DateTime.Parse(lsEnd);
 
             String lsDateFrom = "";
             String lsDateTo = "";
@@ -2117,7 +2116,7 @@ namespace Ruddat_NK
 
             if (liSel >= 0)
             {
-                
+
                 // Start und Endedatum wurden gewählt
                 if (clTo.SelectedDate.HasValue && clFrom.SelectedDate.HasValue)
                 {
@@ -2166,7 +2165,7 @@ namespace Ruddat_NK
                     if (liExternId > 0)
                     {
                         // Daten für Details zeigen
-                        lsSql = RdQueries.GetSqlSelect(130, liExternId, giIndex.ToString(), lsIdObj, ldtFrom, ldtTo, giFiliale,gsConnect, giDb);
+                        lsSql = RdQueries.GetSqlSelect(130, liExternId, giIndex.ToString(), lsIdObj, ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
                         liOk = FetchData(lsSql, 13, giDb, gsConnect);
                     }
                 }
@@ -2177,7 +2176,7 @@ namespace Ruddat_NK
                     if (liExternId > 0)
                     {
                         // Daten für Deatils zeigen
-                        lsSql = RdQueries.GetSqlSelect(131, liExternId, giIndex.ToString(), lsIdObj, ldtFrom, ldtTo,giFiliale,gsConnect, giDb);
+                        lsSql = RdQueries.GetSqlSelect(131, liExternId, giIndex.ToString(), lsIdObj, ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
                         liOk = FetchData(lsSql, 13, giDb, gsConnect);
                     }
                 }
@@ -2188,7 +2187,7 @@ namespace Ruddat_NK
                     if (liExternId > 0)
                     {
                         // Daten für Deatils zeigen
-                        lsSql = RdQueries.GetSqlSelect(132, liExternId, giIndex.ToString(), lsIdObj, ldtFrom, ldtTo,giFiliale,gsConnect, giDb);
+                        lsSql = RdQueries.GetSqlSelect(132, liExternId, giIndex.ToString(), lsIdObj, ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
                         liOk = FetchData(lsSql, 13, giDb, gsConnect);
                     }
                 }
@@ -2243,7 +2242,7 @@ namespace Ruddat_NK
                     }
                 }
 
-                if (x == 2)     
+                if (x == 2)
                 // NettoPreis !! Achtung: Der Displayindex ist die Darstellung im 
                 // DGR und nicht die Itemliste
                 {
@@ -2259,7 +2258,7 @@ namespace Ruddat_NK
                     if (lsNetto.Length > 0)
                     {
                         ldNetto = Convert.ToDecimal(lsNetto);
-                        ldBrutto = ldNetto + ((ldNetto / 100) * liMwstSatz);                          // Bruttobetrag
+                        ldBrutto = ldNetto;                     // + ((ldNetto / 100) * liMwstSatz);                          // Bruttobetrag = Netto
                         tableZlg.Rows[liSel][7] = ldBrutto;
                     }
                 }
@@ -2278,8 +2277,8 @@ namespace Ruddat_NK
                     if (lsBrutto.Length > 0)
                     {
                         ldBrutto = Convert.ToDecimal(lsBrutto);
-                        ldNetto = (ldBrutto / (100 + liMwstSatz)) * 100;                            // Nettobetrag
-                        tableZlg.Rows[liSel][6] = ldNetto;                        
+                        ldNetto = ldBrutto;                       // (ldBrutto / (100 + liMwstSatz)) * 100;                            // Nettobetrag= Brutto
+                        tableZlg.Rows[liSel][6] = ldNetto;
                     }
                 }
 
@@ -2436,7 +2435,7 @@ namespace Ruddat_NK
                         if (liZlId > 0)
                         {
                             ldVerbrauch = Timeline.getZlVerbrauch(ldZlStand, liZlId, gsConnect, liFlagNew, giDb);
-                            tableZlWert.Rows[liSel][3] = ldVerbrauch;                            
+                            tableZlWert.Rows[liSel][3] = ldVerbrauch;
                         }
                     }
                 }
@@ -2510,7 +2509,7 @@ namespace Ruddat_NK
             string lsStart = (liYear.ToString()) + "-01-01";
             string lsEnd = (liYear.ToString()) + "-12-31";
             DateTime ldtFrom = DateTime.Parse(lsStart);                 // Jahresanfang VorJahr
-            DateTime ldtTo = DateTime.Parse(lsEnd); 
+            DateTime ldtTo = DateTime.Parse(lsEnd);
 
             String lsDateFrom = "";
             String lsDateTo = "";
@@ -2567,7 +2566,7 @@ namespace Ruddat_NK
                     if (liExternId > 0)
                     {
                         // Daten für Leerstand Details zeigen
-                        lsSql = RdQueries.GetSqlSelect(13, liExternId, "4", lsIdObj, ldtFrom, ldtTo,giFiliale,gsConnect, giDb);
+                        lsSql = RdQueries.GetSqlSelect(13, liExternId, "4", lsIdObj, ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
                         liOk = FetchData(lsSql, 19, giDb, gsConnect);
                     }
                 }
@@ -2635,7 +2634,7 @@ namespace Ruddat_NK
         {
             // Sql Statement für die Rechnungen in XML Datei speichern
             updateAllDataGrids(3);
-            
+
             WndRep frmRep = new WndRep(this);
             DelPassDataArt delegt = new DelPassDataArt(frmRep.getDb);
             delegt(giDb);
@@ -2826,9 +2825,5 @@ namespace Ruddat_NK
             updateAllDataGrids(11);
             // updateAllDataGrids(111);
         }
-    }
-
-    internal class Zahlungen
-    {
     }
 }
