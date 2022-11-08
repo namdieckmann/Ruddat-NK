@@ -268,9 +268,9 @@
                                     SelectedValuePath="id_zl"
                                     SelectedValueBinding="{Binding id_zaehler}"/>
                                 <DataGridTextColumn x:Name="prNetto" Header="Betrag/Einheit Netto" CellStyle="{StaticResource NameCellStyle}" 
-            			            Binding="{Binding prnetto, StringFormat ={}{0:c},ConverterCulture=de-DE}"/>
+            			            Binding="{Binding prnetto, StringFormat ={}{0:c4},ConverterCulture=de-DE}"/>
                                 <DataGridTextColumn x:Name="prBrutto" Header="Betrag/Einheit Brutto" CellStyle="{StaticResource NameCellStyle}" 
-            			            Binding="{Binding prbrutto, StringFormat ={}{0:c},ConverterCulture=de-DE}"/>
+            			            Binding="{Binding prbrutto, StringFormat ={}{0:c4},ConverterCulture=de-DE}"/>
                                 <DataGridComboBoxColumn x:Name="zlmw" Header="Mwst (%)"
                                     DisplayMemberPath="zlmw"
                                     SelectedValuePath="id_zl"

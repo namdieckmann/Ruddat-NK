@@ -2025,74 +2025,87 @@ namespace Ruddat_NK
                 }
 
                 // Steht etwas im Feld Mehrwertsteuer?
-                if (((DgrRechnungen.Items[liSel] as DataRowView).Row.ItemArray[7] != DBNull.Value) || liMwstSatz != 99)
+                // if (((DgrRechnungen.Items[liSel] as DataRowView).Row.ItemArray[7] != DBNull.Value) || liMwstSatz != 99)
+                //{
+
+                if (x == 8)     // NettoPreis !! Achtung: Der Displayindex ist die Darstellung im 
+                                // DGR und nicht die Itemliste
                 {
-
-                    if (x == 8)     // NettoPreis !! Achtung: Der Displayindex ist die Darstellung im 
-                                    // DGR und nicht die Itemliste
+                    // Hier wird die Zelle des DataGrid ausgelesen, oder bei NewRow der Wert aus der globalen Variablen geholt
+                    if (liMwstSatz == 99 && ((DgrRechnungen.Items[liSel] as DataRowView).Row.ItemArray[7] != DBNull.Value))
                     {
-                        // Hier wird die Zelle des DataGrid ausgelesen, oder bei NewRow der Wert aus der globalen Variablen geholt
-                        if (liMwstSatz == 99)
-                        {
-                            liMwstArt = Int32.Parse((DgrRechnungen.Items[liSel] as DataRowView).Row.ItemArray[7].ToString()); // Art Mehrwertsteuer
-                            liMwstSatz = Timeline.getMwstSatz(liMwstArt, gsConnect, giDb);
-                        }
-                        else
-                        {
-                            liMwstSatz = giMwstSatz;
-                        }
-
-                        // Element holen
-                        TextBox t1 = e.EditingElement as TextBox;
-                        lsNetto = t1.Text.ToString();
-
-                        if (lsNetto.Length > 0 && lsNetto.Substring(lsNetto.Length - 1, 1) == "€")                             // Das Eurozeichen muss raus
-                        {
-                            lsNetto = lsNetto.Substring(0, lsNetto.Length - 2);
-                        }
-                        if (lsNetto.Length > 0)
-                        {
-                            ldNetto = Convert.ToDecimal(lsNetto);
-                            ldBrutto = ldNetto + (ldNetto / 100) * liMwstSatz;                                          // Netto
-                            if (ldNetto > 0)
-                            {
-                                tableOne.Rows[liSel][6] = ldBrutto;
-                            }
-                        }
-
+                        liMwstArt = Int32.Parse((DgrRechnungen.Items[liSel] as DataRowView).Row.ItemArray[7].ToString()); // Art Mehrwertsteuer
+                        liMwstSatz = Timeline.getMwstSatz(liMwstArt, gsConnect, giDb);
                     }
-                    if (x == 9)     // Brutto
+                    else
                     {
-                        // Hier wird die Zelle des DataGrid ausgelesen, oder bei NewRow der Wert aus der globalen Variablen geholt
+                        liMwstSatz = giMwstSatz;
+                        liMwstSatz = giMwstSatz;
                         if (liMwstSatz == 99)
                         {
-                            liMwstArt = Int32.Parse((DgrRechnungen.Items[liSel] as DataRowView).Row.ItemArray[7].ToString()); // Art Mehrwertsteuer                            
-                            liMwstSatz = Timeline.getMwstSatz(liMwstArt, gsConnect, giDb);
+                            liMwstSatz = 0;
                         }
-                        else
-                        {
-                            liMwstSatz = giMwstSatz;
-                        }
+                    }
 
-                        // Element holen
-                        TextBox t2 = e.EditingElement as TextBox;
-                        lsBrutto = t2.Text.ToString();
+                    // Element holen
+                    TextBox t1 = e.EditingElement as TextBox;
+                    lsNetto = t1.Text.ToString();
 
-                        if (lsBrutto.Length > 0 && lsBrutto.Substring(lsBrutto.Length - 1, 1) == "€")
+                    if (lsNetto.Length > 0 && lsNetto.Substring(lsNetto.Length - 1, 1) == "€")                             
+                    {
+                        lsNetto = lsNetto.Substring(0, lsNetto.Length - 2);                     // Das Eurozeichen muss raus
+                    }
+                    if (lsNetto.Length > 0)
+                    {
+                        ldNetto = Convert.ToDecimal(lsNetto);
+                        ldBrutto = ldNetto + (ldNetto / 100) * liMwstSatz;                      // Netto
+                        if (ldNetto > 0)
                         {
-                            lsBrutto = lsBrutto.Substring(0, lsBrutto.Length - 2);                   // Das Eurozeichen muss raus                            
+                            DataRowView oDataRowView = DgrRechnungen.SelectedItem as DataRowView;
+                            oDataRowView.Row[6] = ldBrutto;                                     // Bruttowert schreiben
+
+                            // Todo Nettower in DataGrid schreiben
                         }
-                        if (lsBrutto.Length > 0)
+                    }
+
+                }
+                if (x == 9)     // Brutto
+                {
+                    // Hier wird die Zelle des DataGrid ausgelesen, oder bei NewRow der Wert aus der globalen Variablen geholt
+                    if (liMwstSatz == 99 && ((DgrRechnungen.Items[liSel] as DataRowView).Row.ItemArray[7] != DBNull.Value))
+                    {
+                        liMwstArt = Int32.Parse((DgrRechnungen.Items[liSel] as DataRowView).Row.ItemArray[7].ToString()); // Art Mehrwertsteuer                            
+                        liMwstSatz = Timeline.getMwstSatz(liMwstArt, gsConnect, giDb);
+                    }
+                    else
+                    {
+                        liMwstSatz = giMwstSatz;
+                        if (liMwstSatz == 99)
                         {
-                            ldBrutto = Convert.ToDecimal(lsBrutto);
-                            ldNetto = (ldBrutto / (100 + liMwstSatz)) * 100;                            // Nettobetrag
-                            if (ldBrutto > 0)
-                            {
-                                tableOne.Rows[liSel][5] = ldNetto;
-                            }
+                            liMwstSatz = 0;
+                        }
+                    }
+
+                    // Element holen
+                    TextBox t2 = e.EditingElement as TextBox;
+                    lsBrutto = t2.Text.ToString();
+
+                    if (lsBrutto.Length > 0 && lsBrutto.Substring(lsBrutto.Length - 1, 1) == "€")
+                    {
+                        lsBrutto = lsBrutto.Substring(0, lsBrutto.Length - 2);                  // Das Eurozeichen muss raus                            
+                    }
+                    if (lsBrutto.Length > 0)
+                    {
+                        ldBrutto = Convert.ToDecimal(lsBrutto);
+                        ldNetto = (ldBrutto / (100 + liMwstSatz)) * 100;                        // Nettobetrag
+                        if (ldBrutto > 0)
+                        {
+                            DataRowView oDataRowView = DgrRechnungen.SelectedItem as DataRowView;
+                            oDataRowView.Row[5] = ldNetto;                                      // Nettowert schreiben
                         }
                     }
                 }
+                //}
             }
         }
 
@@ -2259,7 +2272,8 @@ namespace Ruddat_NK
                     {
                         ldNetto = Convert.ToDecimal(lsNetto);
                         ldBrutto = ldNetto;                     // + ((ldNetto / 100) * liMwstSatz);                          // Bruttobetrag = Netto
-                        tableZlg.Rows[liSel][7] = ldBrutto;
+                        DataRowView oDataRowView = DgrZahlungen.SelectedItem as DataRowView;
+                        oDataRowView.Row[7] = ldBrutto;                                      
                     }
                 }
                 if (x == 3)     // Brutto
@@ -2278,7 +2292,8 @@ namespace Ruddat_NK
                     {
                         ldBrutto = Convert.ToDecimal(lsBrutto);
                         ldNetto = ldBrutto;                       // (ldBrutto / (100 + liMwstSatz)) * 100;                            // Nettobetrag= Brutto
-                        tableZlg.Rows[liSel][6] = ldNetto;
+                        DataRowView oDataRowView = DgrZahlungen.SelectedItem as DataRowView;
+                        oDataRowView.Row[6] = ldNetto;                                      // Nettowert schreiben
                     }
                 }
 
@@ -2298,7 +2313,8 @@ namespace Ruddat_NK
                     {
                         ldNetto = Convert.ToDecimal(lsNetto);
                         ldBrutto = ldNetto + (ldNetto / 100) * liMwstSatz;                          // Bruttobetrag
-                        tableZlg.Rows[liSel][9] = ldBrutto;
+                        DataRowView oDataRowView = DgrZahlungen.SelectedItem as DataRowView;
+                        oDataRowView.Row[9] = ldBrutto;                                
                     }
 
                 }
@@ -2318,7 +2334,8 @@ namespace Ruddat_NK
                     {
                         ldBrutto = Convert.ToDecimal(lsBrutto);
                         ldNetto = (ldBrutto / (100 + liMwstSatz)) * 100;                            // Nettobetrag
-                        tableZlg.Rows[liSel][8] = ldNetto;
+                        DataRowView oDataRowView = DgrZahlungen.SelectedItem as DataRowView;
+                        oDataRowView.Row[8] = ldNetto;
                     }
                 }
             }
@@ -2435,7 +2452,8 @@ namespace Ruddat_NK
                         if (liZlId > 0)
                         {
                             ldVerbrauch = Timeline.getZlVerbrauch(ldZlStand, liZlId, gsConnect, liFlagNew, giDb);
-                            tableZlWert.Rows[liSel][3] = ldVerbrauch;
+                            DataRowView oDataRowView = DgrCounters.SelectedItem as DataRowView;
+                            oDataRowView.Row[3] = ldVerbrauch;
                         }
                     }
                 }
@@ -2465,7 +2483,8 @@ namespace Ruddat_NK
                     {
                         ldNetto = Convert.ToDecimal(lsNetto);
                         ldBrutto = ldNetto + (ldNetto / 100) * liMwstSatz;                          // Bruttobetrag
-                        tableZlWert.Rows[liSel][6] = ldBrutto;
+                        DataRowView oDataRowView = DgrCounters.SelectedItem as DataRowView;
+                        oDataRowView.Row[6] = ldBrutto;
                     }
                 }
                 if (x == 7)     // Brutto
@@ -2490,7 +2509,8 @@ namespace Ruddat_NK
                     {
                         ldBrutto = Convert.ToDecimal(lsBrutto);
                         ldNetto = (ldBrutto / (100 + liMwstSatz)) * 100;                            // Nettobetrag
-                        tableZlWert.Rows[liSel][5] = ldNetto;
+                        DataRowView oDataRowView = DgrCounters.SelectedItem as DataRowView;
+                        oDataRowView.Row[5] = ldNetto;
                     }
                 }
             }
