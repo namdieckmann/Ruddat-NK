@@ -314,7 +314,7 @@ namespace Ruddat_NK
                                 leerstand,
                                 id_import
                             from timeline
-                                where " + lsWhereAdd + " and " + lsWhereAdd2 + "order by dt_monat";
+                                where " + lsWhereAdd + " and " + lsWhereAdd2 + "order by id_objekt_teil, dt_monat";
                     break;
                 case 51:            // Zahlungen
                     // TimelineRelations sollen geschrieben werden
@@ -1915,8 +1915,7 @@ namespace Ruddat_NK
                         }
                     }
                         break;
-                case 5:
-
+                case 5:         // Mieter schreiben
                     // Schleife durch Timeline
                     // Jeder Datensatz muss hier einen Datensatz für den Mieter erzeugen
                     for (int i = 0; tableEight.Rows.Count > i; i++)
@@ -2003,8 +2002,9 @@ namespace Ruddat_NK
                                 //    ldBetragNetto = (ldBetragNetto / liDaysInMonth) * liDaysStart;
                                 //    ldBetragBrutto = (ldBetragBrutto / liDaysInMonth) * liDaysStart;
                                 //}
-
+                               
                                 dr[6] = liMieter;
+                                
                             }
                             else // sonst auf Leerstand buchen
                             {
@@ -2012,17 +2012,15 @@ namespace Ruddat_NK
                                 // dr[5] = liObjektTeil; nicht eintragen
                                 // Mieter für Leerstand ermiteln und eintragen
                                 // ObjektTeil ist vorhanden 
-                                liMieter = getMieterLeerstand(liObjektTeil, asConnect, aiDb);
-                                if (liMieter > 0)
-                                {
-                                    dr[6] = liMieter;       // Mieter Leerstand existiert und wird genutzt
-                                }
-                                dr[16] = liObjektTeil;         // Auf Leerstand wird die TeilObjekt ID geschrieben
+                                // Todo Leerstand überarbeiteb
+                                //liMieter = getMieterLeerstand(liObjektTeil, asConnect, aiDb);
+                                //if (liMieter > 0)
+                                //{
+                                //    dr[6] = liMieter;       // Mieter Leerstand existiert und wird genutzt
+                                //}
+                                //dr[16] = liObjektTeil;         // Auf Leerstand wird die TeilObjekt ID geschrieben
                             }
                             dr[7] = liKsa;
-
-
-
 
                             if (ldBetragNetto > 0 || ldBetragBrutto > 0)
                             {
@@ -2064,8 +2062,7 @@ namespace Ruddat_NK
                             }
                             liSave = 1;
 
-                            // und alle TimelineEinträge ab in die Datenbank
-                            MakeCommand(aiDb, 3);
+
                         }
                         else
                         {
@@ -2074,6 +2071,10 @@ namespace Ruddat_NK
                             break;
                         }
                     }
+
+                    // und alle TimelineEinträge ab in die Datenbank
+                    MakeCommand(aiDb, 3);
+
                     break;
                 case 8:
                     // MwstSatz holen
@@ -2313,7 +2314,7 @@ namespace Ruddat_NK
                         }
                     }
                     break;
-                case 23:
+                case 23:            // Zähler
 
                     for (int i = 0; tableCntNew.Rows.Count > i; i++)
                     {
@@ -2815,17 +2816,9 @@ namespace Ruddat_NK
 
             if (aiObjektTeil > 0)
             {
-                lsSql = @"select mieter.Id_mieter as mid
-                            from objekt_teil
-                        join objekt on objekt_teil.id_objekt = objekt.Id_objekt
-                        Join filiale on filiale.id_filiale = objekt.Id_filiale
-                        join mieter on mieter.id_filiale = filiale.Id_Filiale
-                            where objekt_teil.Id_objekt_teil = " + aiObjektTeil.ToString();
-
                 lsSql = getSql(29, aiObjektTeil, "", "", 0);
                 liMieterId = fetchData(lsSql, "", 26, asConnect, aiDb);
             }
-
             return liMieterId;
         }
 

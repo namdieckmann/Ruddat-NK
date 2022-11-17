@@ -1570,7 +1570,7 @@ namespace Ruddat_NK
             // Gibt es eine Datensatz ID zum Löschen (button btnRgDel)
             if (giDelId > 0)
             {
-                // Rechnungen löschen
+                // Rechnung löschen
                 lsSql = RdQueries.GetSqlSelect(36, giDelId, "", "", DateTime.MinValue, DateTime.MinValue, giFiliale, gsConnect, giDb);
                 liOk = FetchData(lsSql, 36, giDb, gsConnect);
             }
