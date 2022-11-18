@@ -37,8 +37,8 @@ namespace Ruddat_NK
         int giMwstSatzZl = 99;              // Für Zähler
         int giDb = 2;                       // Datenbank 1 = MsqSql 2= Mysql
         DateTime gdtZahlung = DateTime.MinValue; // Zahlungsdatum aus Datepicker DataGrid Zahlungen
-        DateTime gdtFrom = DateTime.MinValue;
-        DateTime gdtTo = DateTime.MinValue;
+        // DateTime gdtFrom = DateTime.MinValue;
+        // DateTime gdtTo = DateTime.MinValue;
         DateTime gdtYear = DateTime.MinValue;
 
         // Daten
@@ -157,12 +157,12 @@ namespace Ruddat_NK
             // clFrom.DisplayDate = ldtFrom;
             clFrom.SelectedDate = ldtFrom;
             clFrom.DisplayDate = ldtFrom;
-            gdtFrom = ldtFrom;
+            // gdtFrom = ldtFrom;
 
             // clTo.DisplayDate = ldtTo;
             clTo.SelectedDate = ldtTo;
             clTo.DisplayDate = ldtTo;
-            gdtTo = ldtTo;
+            // gdtTo = ldtTo;
 
             // Abrechnungsjahr zeigen
             clYear.SelectedDate = ldtYear;
@@ -1012,12 +1012,12 @@ namespace Ruddat_NK
             // clFrom.DisplayDate = ldtFrom;
             clFrom.SelectedDate = ldtFrom;
             clFrom.DisplayDate = ldtFrom;
-            gdtFrom = ldtFrom;
+            // gdtFrom = ldtFrom;
 
             // clTo.DisplayDate = ldtTo;
             clTo.SelectedDate = ldtTo;
             clTo.DisplayDate = ldtTo;
-            gdtTo = ldtTo;
+            // gdtTo = ldtTo;
 
             // Abrechnungsjahr zeigen
             clYear.SelectedDate = ldtYear;
@@ -1111,34 +1111,17 @@ namespace Ruddat_NK
             DateTime ldtFrom = DateTime.MinValue;
             DateTime ldtTo = DateTime.MaxValue;
 
-            // gibt es gewählte Kalender, dann hier Daten einsetzen
-            // Sonst der Standardzeitraum
-            if (cbCal.IsChecked == true)
+            // nur StartDatum
+            if (clFrom.SelectedDate != null)
             {
-                // nur StartDatum
-                if (clFrom.SelectedDate != null)
-                {
-                    ldtFrom = clFrom.SelectedDate.Value;
-                }
-
-                // Start und EndeDatum angegeben
-                if (clFrom.SelectedDate != null && clTo.SelectedDate != null)
-                {
-                    ldtFrom = clFrom.SelectedDate.Value;
-                    ldtTo = clTo.SelectedDate.Value;
-                }
+                ldtFrom = clFrom.SelectedDate.Value;
             }
-            else
-            {
-                // Startdatum ist Jahresbeginn
-                //int liYear = DateTime.Now.Year - 1;
-                //string lsStart = (liYear.ToString()) + "-01-01";
-                //string lsEnd = (liYear.ToString()) + "-12-31";
-                //ldtFrom = DateTime.Parse(lsStart);                    // Jahresanfang VorJahr
-                //ldtTo = DateTime.Parse(lsEnd);                        // Jahresende Vorjahr
-                ldtFrom = gdtFrom;
-                ldtTo = gdtTo;
 
+            // Start und EndeDatum angegeben
+            if (clFrom.SelectedDate != null && clTo.SelectedDate != null)
+            {
+                ldtFrom = clFrom.SelectedDate.Value;
+                ldtTo = clTo.SelectedDate.Value;
             }
 
             if (asArt == 1)
@@ -2521,6 +2504,8 @@ namespace Ruddat_NK
         private void DgrLeer_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             int liExternId = 0;
+            int liMieter = 0;
+            int liObjekt = 0;
             int liSel = DgrLeer.SelectedIndex;
             int liOk = 0;
             String lsSql = "";
@@ -2566,29 +2551,44 @@ namespace Ruddat_NK
                 switch (giIndex)
                 {
                     case 1:
-                        lsIdObj = giObjekt.ToString();
+                        // Daten für Leerstand Details zeigen
+                        liObjekt = Int16.Parse(giObjekt.ToString());
+                        lsIdObj = liObjekt.ToString();
+                        // Mieter Leerstand ermitteln
+                        liMieter = Timeline.getMieterLeerstandObjekt(liObjekt,gsConnect,giDb);
+
+                        DataRowView rowview = DgrLeer.SelectedItem as DataRowView;
+                        // Es ist eine Leerstand gewählt
+                        if (rowview.Row[5] != DBNull.Value)
+                        {
+                            liExternId = Int32.Parse(rowview.Row[5].ToString());
+                            if (liExternId > 0)
+                            {
+                                lsSql = RdQueries.GetSqlSelect(130, liExternId, "5", lsIdObj, ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
+                                liOk = FetchData(lsSql, 19, giDb, gsConnect);
+                            }
+                        }
                         break;
                     case 2:
                         lsIdObj = giObjektTeil.ToString();
+                        DataRowView rowview1 = DgrLeer.SelectedItem as DataRowView;
+                        // Es ist eine Leerstand gewählt
+                        if (rowview1.Row[5] != DBNull.Value)
+                        {
+                            liExternId = Int32.Parse(rowview1.Row[5].ToString());
+                            if (liExternId > 0)
+                            {
+                                // Daten für Leerstand Details zeigen
+                                lsSql = RdQueries.GetSqlSelect(130, liExternId, "4", lsIdObj, ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
+                                liOk = FetchData(lsSql, 19, giDb, gsConnect);
+                            }
+                        }
                         break;
                     case 3:
                         lsIdObj = giMieter.ToString();
                         break;
                     default:
                         break;
-                }
-
-                DataRowView rowview = DgrLeer.SelectedItem as DataRowView;
-                // Es ist eine Leerstand gewählt
-                if (rowview.Row[5] != DBNull.Value)
-                {
-                    liExternId = Int32.Parse(rowview.Row[5].ToString());
-                    if (liExternId > 0)
-                    {
-                        // Daten für Leerstand Details zeigen
-                        lsSql = RdQueries.GetSqlSelect(13, liExternId, "4", lsIdObj, ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
-                        liOk = FetchData(lsSql, 19, giDb, gsConnect);
-                    }
                 }
             }
         }
@@ -2598,8 +2598,7 @@ namespace Ruddat_NK
         {
             //DateTime ldtZlg = DateTime.MinValue;
 
-            //ldtZlg =  (DateTime)e.AddedItems[0];
-
+            //ldtZlg = (DateTime)e.AddedItems[0];
             //// Globale Variable für Event DgrZahlungen_CellEditEnding
             //gdtZahlung = ldtZlg;
         }
@@ -2624,17 +2623,16 @@ namespace Ruddat_NK
             // clFrom.DisplayDate = ldtFrom;
             clFrom.SelectedDate = ldtFrom;
             clFrom.DisplayDate = ldtFrom;
-            gdtFrom = ldtFrom;
+            // gdtFrom = ldtFrom;          // Global
 
             // clTo.DisplayDate = ldtTo;
             clTo.SelectedDate = ldtTo;
             clTo.DisplayDate = ldtTo;
+            // gdtTo = ldtTo;              // Global
 
             // Calender Year aus
             clYear.IsEnabled = false;
             cbYear.IsChecked = false;
-            
-            gdtTo = ldtTo;
         }
 
         // Todo Menü Rechnungen importieren

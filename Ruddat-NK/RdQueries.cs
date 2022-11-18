@@ -189,7 +189,7 @@ namespace Ruddat_NK
 
                 // Rückgabe des ZeitQueries für Rechnungen
                 lsField = "rechnungen.datum_von";
-                liOne = 1;
+                liOne = 2;
                 lsWhereAdd2 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsField, lsAnd, liOne, aiDb);
 
                 lsSql = @"select id_rechnungen,
@@ -219,7 +219,7 @@ namespace Ruddat_NK
             {
                 lsAnd = " And ";
                 lsField = "rechnungen.datum_von";
-                liOne = 1;
+                liOne = 2;
                 lsWhereAdd2 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsField, lsAnd, liOne, aiDb);
                 
                 lsSql = @"select id_rechnungen,
@@ -309,7 +309,7 @@ namespace Ruddat_NK
 
             // SQL für die Timeline Detaildarstellung Objekte, TeilObjekte oder Mieter
             // Zufügen einer Where-Klausel für die externe TimeLine ID
-            if (piArt == 130)       // Rechnungen
+            if (piArt == 130)       // Rechnungen und Leerstand
             {
                 switch (ps2)
                 {
@@ -322,8 +322,11 @@ namespace Ruddat_NK
                     case "3":       // Mieter
                         lsWhereAdd2 = " And timeline.id_mieter = " + ps3 + " ";
                         break;
-                    case "4":
+                    case "4":       // Leerstand ObjTeile
                         lsWhereAdd2 = " And timeline.leerstand = " + ps3 + " ";
+                        break;
+                    case "5":       // Leerstand ganzes Objekt
+                        lsWhereAdd2 = " And timeline.leerstand > 0 ";
                         break;
                     default:
                         lsWhereAdd2 = "";

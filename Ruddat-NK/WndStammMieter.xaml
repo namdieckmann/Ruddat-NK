@@ -22,7 +22,9 @@
                 <DataGridTextColumn x:Name="bez"  Header="Name" 
                             Binding="{Binding bez}"/>
                 <DataGridCheckBoxColumn Header="Abrechnung Netto" 
-                            Binding="{Binding netto}"/>                
+                            Binding="{Binding netto}"/>
+                <DataGridCheckBoxColumn Header="Mieter Leerstand" 
+                            Binding="{Binding leerstand}"/>
             </DataGrid.Columns>
         </DataGrid>
         <DataGrid x:Name="dgrAdr" Margin="215,314,20,37" CanUserAddRows="False" CanUserDeleteRows="False" AutoGenerateColumns="False" ToolTip ="Adressen" HorizontalContentAlignment="Stretch" SelectionChanged="dgrAdr_SelectionChanged" CellEditEnding="dgrAdr_CellEditEnding" VerticalContentAlignment="Stretch">

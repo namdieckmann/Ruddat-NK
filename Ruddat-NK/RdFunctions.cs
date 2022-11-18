@@ -564,7 +564,15 @@ namespace Ruddat_NK
                         join objekt on objekt_teil.id_objekt = objekt.Id_objekt
                         Join filiale on filiale.id_filiale = objekt.Id_filiale
                         join mieter on mieter.id_filiale = filiale.Id_Filiale
-                            where objekt_teil.Id_objekt_teil = " + piId.ToString();
+                            where mieter.leerstand = 1 and objekt_teil.Id_objekt_teil = " + piId.ToString();
+                    break;
+                case 291:
+                    lsSql = @"select mieter.Id_mieter as mid
+                            from objekt_teil
+                        join objekt on objekt_teil.id_objekt = objekt.Id_objekt
+                        Join filiale on filiale.id_filiale = objekt.Id_filiale
+                        join mieter on mieter.id_filiale = filiale.Id_Filiale
+                            where mieter.leerstand = 1 and objekt.Id_objekt = " + piId.ToString();
                     break;
                 case 30:        // Kostenstellenart Zähler
                     switch (piId)
@@ -1473,7 +1481,6 @@ namespace Ruddat_NK
             decimal ldVerbrauch = 0;    // Zähler Verbrauch
             decimal[] ladBetraege = new decimal[12];
 
-            Int32 liRows = 0;
             int zl = 0;
             int liZlgOrRg = 0;
             int liExternId = 0;
@@ -2008,17 +2015,16 @@ namespace Ruddat_NK
                             }
                             else // sonst auf Leerstand buchen
                             {
-                                // dr[4] = liObjekt; nicht eintragen
-                                // dr[5] = liObjektTeil; nicht eintragen
+                                dr[4] = liObjekt;
+                                dr[5] = liObjektTeil;
                                 // Mieter für Leerstand ermiteln und eintragen
-                                // ObjektTeil ist vorhanden 
-                                // Todo Leerstand überarbeiteb
-                                //liMieter = getMieterLeerstand(liObjektTeil, asConnect, aiDb);
-                                //if (liMieter > 0)
-                                //{
-                                //    dr[6] = liMieter;       // Mieter Leerstand existiert und wird genutzt
-                                //}
-                                //dr[16] = liObjektTeil;         // Auf Leerstand wird die TeilObjekt ID geschrieben
+                                // ObjektTeil ist vorhanden
+                                liMieter = getMieterLeerstand(liObjektTeil, asConnect, aiDb);
+                                if (liMieter > 0)
+                                {
+                                    dr[6] = liMieter;       // Mieter Leerstand existiert und wird genutzt
+                                }
+                                dr[16] = liObjektTeil;         // Auf Leerstand wird die TeilObjekt ID geschrieben Feld 16
                             }
                             dr[7] = liKsa;
 
@@ -2807,9 +2813,9 @@ namespace Ruddat_NK
         }
 
         // Den Mieter für Leerstand ermitteln
-        // Aus Objekt oder ObjektTeil
+        // Aus ObjektTeil
         // Für Rechnungen zur Timeline, die nicht auf einen aktiven Mietvertrag gebucht werden können
-        private static int getMieterLeerstand( int aiObjektTeil, string asConnect, int aiDb)
+        public static int getMieterLeerstand( int aiObjektTeil, string asConnect, int aiDb)
         {
             String lsSql = "";
             int liMieterId = 0;
@@ -2817,6 +2823,22 @@ namespace Ruddat_NK
             if (aiObjektTeil > 0)
             {
                 lsSql = getSql(29, aiObjektTeil, "", "", 0);
+                liMieterId = fetchData(lsSql, "", 26, asConnect, aiDb);
+            }
+            return liMieterId;
+        }
+
+        // Den Mieter für Leerstand ermitteln
+        // Aus Objekt
+        // Für Rechnungen zur Timeline, die nicht auf einen aktiven Mietvertrag gebucht werden können
+        public static int getMieterLeerstandObjekt(int aiObjekt, string asConnect, int aiDb)
+        {
+            String lsSql = "";
+            int liMieterId = 0;
+
+            if (aiObjekt > 0)
+            {
+                lsSql = getSql(291, aiObjekt, "", "", 0);
                 liMieterId = fetchData(lsSql, "", 26, asConnect, aiDb);
             }
             return liMieterId;

@@ -100,15 +100,15 @@ namespace Ruddat_NK
                     lsSql = "select id_filiale,name,name_2,bez from filiale order by id_filiale";
                     break;
                 case 2:         // Mieter
-                    lsSql = @"Select Id_mieter,id_objekt,bez,nr,netto,id_filiale from mieter
+                    lsSql = @"Select Id_mieter,id_objekt,bez,nr,netto,id_filiale,leerstand from mieter
                                 Order by nr";
                     break;
                 case 21:         // Mieter mit objekt id
-                    lsSql = @"Select Id_mieter,id_objekt,bez,nr,netto,id_filiale from mieter
+                    lsSql = @"Select Id_mieter,id_objekt,bez,nr,netto,id_filiale,leerstand from mieter
                                 where id_objekt = " + aiId.ToString() + " Order by nr";
                     break;
                 case 22:         // Mieter nur mit Firmen ID id (Leerstand)
-                    lsSql = @"Select Id_mieter,id_objekt,bez,nr,netto,id_filiale from mieter
+                    lsSql = @"Select Id_mieter,id_objekt,bez,nr,netto,id_filiale,leerstand from mieter
                                 where id_filiale = " + aiId.ToString() + " Order by nr";
                     break;
                 case 3:         // Adressen
