@@ -342,12 +342,14 @@ namespace Ruddat_NK
                     timeline.betrag_soll_brutto,
                     timeline.dt_monat as monat,
                     timeline.wtl_aus_objekt,
-                    timeline.wtl_aus_objteil
+                    timeline.wtl_aus_objteil,
+                    objekt_teil.bez AS objt
                 from timeline
+                Right Join objekt_teil on timeline.id_objekt_teil = objekt_teil.id_objekt_teil
                 Right Join art_kostenart on timeline.id_ksa = art_kostenart.id_ksa ";
 
                 lsWhereAdd = " Where  timeline.Id_rechnung = " + piId.ToString() + " ";
-                lsOrder = " Order by art_kostenart.sort, timeline.dt_monat ";
+                lsOrder = " Order by art_kostenart.sort, objekt_teil.Id_objekt_teil ,timeline.dt_monat ";
                 lsAnd = " And ";
                 lsField = "timeline.dt_monat";
                 liOne = 2;

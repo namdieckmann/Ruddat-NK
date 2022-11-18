@@ -325,6 +325,8 @@
                                     Binding="{Binding betrag_netto, StringFormat ={}{0:c},ConverterCulture=de-DE}"/>
                                 <DataGridTextColumn Header="Betrag (Brutto)" 
                                     Binding="{Binding betrag_brutto, StringFormat ={}{0:c},ConverterCulture=de-DE}"/>
+                                <DataGridTextColumn Header="Objekt" 
+                                    Binding="{Binding objt }"/>
                             </DataGrid.Columns>
                         </DataGrid>
                     </Grid>
