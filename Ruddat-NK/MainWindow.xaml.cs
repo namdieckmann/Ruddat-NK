@@ -196,14 +196,24 @@ namespace Ruddat_NK
                 Server = xmlmarker.InnerText;
                 xmlmarker = xmldoc.SelectSingleNode("/Konfiguration/Datenbankverbindung/Datenbankname");
                 DbName = xmlmarker.InnerText;
-                xmlmarker = xmldoc.SelectSingleNode("/Konfiguration/Datenbankverbindung/Trust");
-                Trust = xmlmarker.InnerText;
+                //xmlmarker = xmldoc.SelectSingleNode("/Konfiguration/Datenbankverbindung/Trust");
+                //Trust = xmlmarker.InnerText;
                 xmlmarker = xmldoc.SelectSingleNode("/Konfiguration/Datenbankverbindung/Timeout");
                 Timeout = xmlmarker.InnerText;
 
                 // Datenbankconnect zusammenbauen
-                SqlConnectionString = Server + DbName + Trust + Timeout;
-
+                switch (giDb)
+                {
+                    case 1:
+                        // SqlConnectionString = Server + DbName + Trust + Timeout;
+                        SqlConnectionString = Server + DbName + Timeout;
+                        break;
+                    case 2:
+                        MySqlConnectionString = Server + DbName + Timeout;
+                        break;
+                    default:
+                        break;
+                }
                 //MessageBox.Show("SqlConnectionString \n" + SqlConnectionString + "\n" +
                 //                    "PDataPathFile\n" + PDataPathFile + "\n" +
                 //                    "PDataPath\n" + PDataPath,
@@ -226,22 +236,24 @@ namespace Ruddat_NK
                     xmlwriter.WriteStartElement("Konfiguration");
                     xmlwriter.WriteStartElement("Datenbankverbindung");
                     xmlwriter.WriteStartElement("Server");
-                    xmlwriter.WriteString("Data Source=server1\\rdnk;");
+                    xmlwriter.WriteString("Data Source=uql.ddnss.de;PORT=3306;USERID=ulf;PASSWORD=2ndfloorwednesday;");
                     xmlwriter.WriteEndElement();
                     xmlwriter.WriteStartElement("Datenbankname");
-                    xmlwriter.WriteString("Initial Catalog=rdnk;");
+                    xmlwriter.WriteString("database=dbo; ");
                     xmlwriter.WriteEndElement();
-                    xmlwriter.WriteStartElement("Trust");
-                    xmlwriter.WriteString("Integrated Security=True;");
-                    xmlwriter.WriteEndElement();
+                    //xmlwriter.WriteStartElement("Trust");
+                    //xmlwriter.WriteString("Integrated Security=True;");
+                    //xmlwriter.WriteEndElement();
                     xmlwriter.WriteStartElement("Timeout");
-                    xmlwriter.WriteString("Connect Timeout=60;");
+                    xmlwriter.WriteString("Connect Timeout=20 ");
                     xmlwriter.WriteEndElement();
                     xmlwriter.WriteEndElement();
                     xmlwriter.Close();
 
                     // Die hier eingetragene Db-Verbindung nehmen
-                    SqlConnectionString = "Data Source=server1\rdnk;Initial Catalog=rdnk;Integrated Security=True";
+                    // SqlConnectionString = "Data Source=server1\rdnk;Initial Catalog=rdnk;Integrated Security=True";
+                    // MySql 
+                    MySqlConnectionString = @"Data Source=uql.ddnss.de;PORT=3306;USERID=ulf;PASSWORD=2ndfloorwednesday;database=dbo;Connect Timeout = 20";
 
                     //MessageBox.Show("Es wurde eine Standardkonfiguration erzeugt.\n" +
                     //                "Die Serververbindung muss noch überprüft werden\n" +
@@ -269,9 +281,9 @@ namespace Ruddat_NK
                     break;
                 case 2:
                     // Lokal
-                    MySqlConnectionString = @"server=localhost;userid=rdnk;password=r1d8n9k4!;database=dbo";
+                    // MySqlConnectionString = @"server=localhost;userid=rdnk;password=r1d8n9k4!;database=dbo";
                     // Google Server von Frank
-                    // MySqlConnectionString = @"Data Source=uql.ddnss.de;PORT=3306;USERID=ulf;PASSWORD=2ndfloorwednesday;database=dbo; Connect Timeout = 20";
+                    // MySqlConnectionString = @"Data Source=uql.ddnss.de;PORT=3306;USERID=ulf;PASSWORD=2ndfloorwednesday;database=dbo;Connect Timeout = 20";
                     // MessageBox.Show("Lokale Datenbank MySql wird verwendet", "Achtung! ", MessageBoxButton.OK);
                     break;
                 default:
