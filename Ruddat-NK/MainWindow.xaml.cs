@@ -236,7 +236,7 @@ namespace Ruddat_NK
                     xmlwriter.WriteStartElement("Konfiguration");
                     xmlwriter.WriteStartElement("Datenbankverbindung");
                     xmlwriter.WriteStartElement("Server");
-                    xmlwriter.WriteString("Data Source=uql.ddnss.de;PORT=3306;USERID=ulf;PASSWORD=2ndfloorwednesday;");
+                    xmlwriter.WriteString("Data Source=197288c.online-server.cloud;PORT=3306;USERID=namdi;PASSWORD=7V7ADTqWqQPCf9Sge4PT;");
                     xmlwriter.WriteEndElement();
                     xmlwriter.WriteStartElement("Datenbankname");
                     xmlwriter.WriteString("database=dbo; ");
@@ -253,7 +253,7 @@ namespace Ruddat_NK
                     // Die hier eingetragene Db-Verbindung nehmen
                     // SqlConnectionString = "Data Source=server1\rdnk;Initial Catalog=rdnk;Integrated Security=True";
                     // MySql 
-                    MySqlConnectionString = @"Data Source=uql.ddnss.de;PORT=3306;USERID=ulf;PASSWORD=2ndfloorwednesday;database=dbo;Connect Timeout = 20";
+                    MySqlConnectionString = @"Data Source=197288c.online-server.cloud;PORT=3306;USERID=namdi;PASSWORD=7V7ADTqWqQPCf9Sge4PT;database=dbo;Connect Timeout = 20";
 
                     //MessageBox.Show("Es wurde eine Standardkonfiguration erzeugt.\n" +
                     //                "Die Serververbindung muss noch überprüft werden\n" +
@@ -281,9 +281,9 @@ namespace Ruddat_NK
                     break;
                 case 2:
                     // Lokal
-                    MySqlConnectionString = @"server=localhost;userid=rdnk;password=r1d8n9k4!;database=dbo";
-                    // Google Server von Frank
-                    // MySqlConnectionString = @"Data Source=uql.ddnss.de;PORT=3306;USERID=ulf;PASSWORD=2ndfloorwednesday;database=dbo;Connect Timeout = 20";
+                    // MySqlConnectionString = @"server=localhost;userid=rdnk;password=r1d8n9k4!;database=dbo";
+                    // Ionos Server 
+                    // MySqlConnectionString = @"Data Source=197288c.online-server.cloud;PORT=3306;USERID=namdi;PASSWORD=7V7ADTqWqQPCf9Sge4PT;database=dbo;Connect Timeout = 20";
                     // MessageBox.Show("Lokale Datenbank MySql wird verwendet", "Achtung! ", MessageBoxButton.OK);
                     break;
                 default:
