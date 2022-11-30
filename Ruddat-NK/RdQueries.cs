@@ -152,7 +152,7 @@ namespace Ruddat_NK
                             lsAnd = " And ";
                             break;
                         case 6:                     // TeilObjekt
-                            lsWhereAdd1 = " Where timeline.Id_objekt_teil = " + piId.ToString() + " ";
+                            lsWhereAdd1 = " Where timeline.Id_objekt_teil = " + piId.ToString() + " And timeline.Id_mieter = 0 ";
                             lsSql = lsSql + lsWhereAdd1;
                             lsAnd = " And ";
                             break;
@@ -314,18 +314,83 @@ namespace Ruddat_NK
                 switch (ps2)
                 {
                     case "1":       // Objekt
+                        lsSql = @"Select                  
+                                    timeline.Id_timeline,
+                                    art_kostenart.bez as ksa_bez,
+                                    timeline.betrag_netto,
+					                timeline.betrag_brutto,
+                                    timeline.betrag_soll_netto,
+                                    timeline.betrag_soll_brutto,
+                                    timeline.dt_monat as monat,
+                                    timeline.wtl_aus_objekt,
+                                    timeline.wtl_aus_objteil
+                                from timeline
+                                Right Join art_kostenart on timeline.id_ksa = art_kostenart.id_ksa ";
                         lsWhereAdd2 = " And timeline.id_objekt = " + ps3 + " ";
                         break;
                     case "2":       // Teil
-                        lsWhereAdd2 = " And timeline.id_objekt_teil = " + ps3 + " ";
+                        lsSql = @"Select                  
+                                    timeline.Id_timeline,
+                                    art_kostenart.bez as ksa_bez,
+                                    timeline.betrag_netto,
+					                timeline.betrag_brutto,
+                                    timeline.betrag_soll_netto,
+                                    timeline.betrag_soll_brutto,
+                                    timeline.dt_monat as monat,
+                                    timeline.wtl_aus_objekt,
+                                    timeline.wtl_aus_objteil,
+                                    objekt_teil.bez AS objt
+                                from timeline
+                                Right Join art_kostenart on timeline.id_ksa = art_kostenart.id_ksa 
+                                Right Join objekt_teil on timeline.id_objekt_teil = objekt_teil.id_objekt_teil ";
+                        lsWhereAdd2 = " And timeline.id_objekt_teil = " + ps3 + " AND timeline.id_mieter = 0 ";
                         break;
                     case "3":       // Mieter
+                        lsSql = @"Select                  
+                                    timeline.Id_timeline,
+                                    art_kostenart.bez as ksa_bez,
+                                    timeline.betrag_netto,
+					                timeline.betrag_brutto,
+                                    timeline.betrag_soll_netto,
+                                    timeline.betrag_soll_brutto,
+                                    timeline.dt_monat as monat,
+                                    timeline.wtl_aus_objekt
+                                from timeline
+                                Right Join art_kostenart on timeline.id_ksa = art_kostenart.id_ksa ";
                         lsWhereAdd2 = " And timeline.id_mieter = " + ps3 + " ";
                         break;
                     case "4":       // Leerstand ObjTeile
+                        lsSql = @"Select                  
+                                    timeline.Id_timeline,
+                                    art_kostenart.bez as ksa_bez,
+                                    timeline.betrag_netto,
+					                timeline.betrag_brutto,
+                                    timeline.betrag_soll_netto,
+                                    timeline.betrag_soll_brutto,
+                                    timeline.dt_monat as monat,
+                                    timeline.wtl_aus_objekt,
+                                    timeline.wtl_aus_objteil,
+                                    objekt_teil.bez AS objt
+                                from timeline
+                                Right Join art_kostenart on timeline.id_ksa = art_kostenart.id_ksa 
+                                Right Join objekt_teil on timeline.id_objekt_teil = objekt_teil.id_objekt_teil ";
                         lsWhereAdd2 = " And timeline.leerstand = " + ps3 + " ";
                         break;
                     case "5":       // Leerstand ganzes Objekt
+                        lsSql = @"Select                  
+                                    timeline.Id_timeline,
+                                    art_kostenart.bez as ksa_bez,
+                                    timeline.betrag_netto,
+					                timeline.betrag_brutto,
+                                    timeline.betrag_soll_netto,
+                                    timeline.betrag_soll_brutto,
+                                    timeline.dt_monat as monat,
+                                    timeline.wtl_aus_objekt,
+                                    timeline.wtl_aus_objteil,
+                                    objekt_teil.bez AS objt
+                                from timeline
+                                Right Join art_kostenart on timeline.id_ksa = art_kostenart.id_ksa 
+                                Right Join objekt_teil on timeline.id_objekt_teil = objekt_teil.id_objekt_teil ";
                         lsWhereAdd2 = " And timeline.leerstand > 0 ";
                         break;
                     default:
@@ -333,23 +398,8 @@ namespace Ruddat_NK
                         break;
                 }
 
-                lsSql = @"Select                  
-                    timeline.Id_timeline,
-                    art_kostenart.bez as ksa_bez,
-                    timeline.betrag_netto,
-					timeline.betrag_brutto,
-                    timeline.betrag_soll_netto,
-                    timeline.betrag_soll_brutto,
-                    timeline.dt_monat as monat,
-                    timeline.wtl_aus_objekt,
-                    timeline.wtl_aus_objteil,
-                    objekt_teil.bez AS objt
-                from timeline
-                Right Join objekt_teil on timeline.id_objekt_teil = objekt_teil.id_objekt_teil
-                Right Join art_kostenart on timeline.id_ksa = art_kostenart.id_ksa ";
-
                 lsWhereAdd = " Where  timeline.Id_rechnung = " + piId.ToString() + " ";
-                lsOrder = " Order by art_kostenart.sort, objekt_teil.Id_objekt_teil ,timeline.dt_monat ";
+                lsOrder = " Order by art_kostenart.sort, timeline.dt_monat ";
                 lsAnd = " And ";
                 lsField = "timeline.dt_monat";
                 liOne = 2;

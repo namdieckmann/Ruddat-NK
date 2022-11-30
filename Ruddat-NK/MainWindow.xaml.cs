@@ -281,7 +281,7 @@ namespace Ruddat_NK
                     break;
                 case 2:
                     // Lokal
-                    // MySqlConnectionString = @"server=localhost;userid=rdnk;password=r1d8n9k4!;database=dbo";
+                    MySqlConnectionString = @"server=localhost;userid=rdnk;password=r1d8n9k4!;database=dbo";
                     // Google Server von Frank
                     // MySqlConnectionString = @"Data Source=uql.ddnss.de;PORT=3306;USERID=ulf;PASSWORD=2ndfloorwednesday;database=dbo;Connect Timeout = 20";
                     // MessageBox.Show("Lokale Datenbank MySql wird verwendet", "Achtung! ", MessageBoxButton.OK);
@@ -1521,7 +1521,6 @@ namespace Ruddat_NK
                     giIndex = index;
                     // MessageBox.Show("Verarbeitungsfehler ERROR fetchdata fetchdata RdFunctions 0003\n piArt = " + index.ToString(),
                     //          "Achtung");
-                    /// Ulf!
                     gsItemHeader = item.Header.ToString().Trim();
 
                     if (gsItemHeader != "Kein Mieter")

@@ -1667,6 +1667,7 @@ namespace Ruddat_NK
                                         dr[9] = ladBetraege[3];
                                         dr[11] = ladBetraege[4];
                                         dr[12] = ldZs;                  // Zählerstand
+
                                         if (zl == 1)                    // erster Monat
                                             dr[13] = ldtStart;
                                         else if (zl == liMonths)        // letzter Monat
