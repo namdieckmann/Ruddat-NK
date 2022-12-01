@@ -26,7 +26,7 @@
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
     <WebPage>publish.htm</WebPage>
-    <ApplicationRevision>122</ApplicationRevision>
+    <ApplicationRevision>124</ApplicationRevision>
     <ApplicationVersion>1.0.1.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -199,6 +199,9 @@
     <Compile Include="WndKsa.xaml.cs">
       <DependentUpon>WndKsa.xaml</DependentUpon>
     </Compile>
+    <Compile Include="WndMandanten.xaml.cs">
+      <DependentUpon>WndMandanten.xaml</DependentUpon>
+    </Compile>
     <Compile Include="WndPoolRgNr.xaml.cs">
       <DependentUpon>WndPoolRgNr.xaml</DependentUpon>
     </Compile>
@@ -247,6 +250,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="WndKsa.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="WndMandanten.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

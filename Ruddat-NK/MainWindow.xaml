@@ -45,6 +45,7 @@
 
                     </MenuItem>
                     <MenuItem x:Name="mnMasterData" Header="_Stammdaten">
+                        <MenuItem x:Name="mnMasterMandanten" Header="_Mandanten" Click="MnMasterMandanten_Click" />
                         <MenuItem x:Name="mnMasterCompany" Header="_Gesellschaften" Click="mnMasterCompany_Click" />
                         <MenuItem x:Name="mnMasterObject" Header="_Objekte" Click="mnMasterObject_Click" />
                         <MenuItem x:Name="mnMasterObjPart" Header="_Mietfläche" Click="mnMasterObjPart_Click"/>

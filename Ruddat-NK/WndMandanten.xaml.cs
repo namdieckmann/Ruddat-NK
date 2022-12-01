@@ -4,13 +4,12 @@ using System.Data.SqlClient;
 using System.Windows;
 using System.Windows.Controls;
 using MySql.Data.MySqlClient;
-
 namespace Ruddat_NK
 {
     /// <summary>
-    /// Interaktionslogik für WndCompanies.xaml
+    /// Interaktionslogik für WndMandanten.xaml
     /// </summary>
-    public partial class WndCompanies : Window
+    public partial class WndMandanten : Window
     {
         private MainWindow mainWindow;
         private String gsConnect;
@@ -19,20 +18,20 @@ namespace Ruddat_NK
         private string psConnect { get; set; }
         private int giDb = 0;
 
-        DataTable tableCmp;
+        DataTable tableMnd;
         DataTable tableAda;
         DataTable tableAdr;
-        SqlDataAdapter sdCmp;
+        SqlDataAdapter sdMnd;
         SqlDataAdapter sdAdr;
         SqlDataAdapter sdAda;
-        MySqlDataAdapter mysdCmp;
+        MySqlDataAdapter mysdMnd;
         MySqlDataAdapter mysdAdr;
         MySqlDataAdapter mysdAda;
 
-        // Hier Übergabe des Mainwindows für Übergabe des ConnectStrings
-        public WndCompanies(MainWindow mainWindow)
+        public WndMandanten(MainWindow mainWindow)
         {
             this.mainWindow = mainWindow;
+
             InitializeComponent();
 
             // ConnectString global
@@ -44,6 +43,7 @@ namespace Ruddat_NK
             this.btnAdrSave.IsEnabled = false;
             this.btnAdrDel.IsEnabled = false;
             this.btnAdrAdd.IsEnabled = false;
+
         }
 
         // Welche Datenbank
@@ -51,53 +51,46 @@ namespace Ruddat_NK
         {
             String lsSql = "";
             int liRows = 0;
-            int liMandantId = 0;
 
             giDb = aiDb;
 
-            // aktiven Mandanten ermitteln
-            liMandantId = Timeline.getMandantId(gsConnect, giDb);
-
-            // SqlSelect Firmen erstellen
-            lsSql = getSql("cmp", 1, liMandantId);
-            // Daten Firmen holen
+            // SqlSelect Mandanten erstellen
+            lsSql = getSql("mnd", 1, 0);
+            // Daten andanten holen
             liRows = fetchData(lsSql, 1);
 
             // SqlSelect AdressArten
             lsSql = getSql("ada", 3, 0);
             // Daten Firmen holen
             liRows = fetchData(lsSql, 3);
+
         }
+
 
         // Sql zusammenstellen
         private string getSql(string asSql, int aiArt, int aiId)
         {
             string lsSql = "";
-            string lsOrder = "";
-            string lsWhereAdd = "";
 
             switch (aiArt)
             {
-                case 1:         // Gesellschaft
-                    lsSql = "select id_filiale,name,name_2,bez,id_mandant from filiale ";
-                    lsWhereAdd = " Where id_mandant = " + aiId.ToString();
-                    lsOrder = " Order by name ";
-                    lsSql = lsSql + lsWhereAdd + lsOrder;
+                case 1:         // Mandanten
+                    lsSql = "select id_mandant,name,name_2,bez,sel from mandanten Order by name";
                     break;
                 case 2:         // Adressen
                     lsSql = @"select id_adressen, id_art_adresse, id_objekt, id_objekt_teil, id_filiale, Id_mieter, anrede, name, vorname, 
-                                    firma, adresse, plz, ort, land, tel, mail, mobil, homepage   
+                                    firma, adresse, plz, ort, land, tel, mail, mobil, homepage, id_mandant   
                                 from adressen
-                                where id_filiale = " + aiId.ToString() + " Order by id_art_adresse";
+                                where id_mandant = " + aiId.ToString() + " Order by id_art_adresse";
                     break;
                 case 3:
                     lsSql = @"Select id_art_adresse,bez from art_adresse Order by sort";
                     break;
                 case 5:
-                    lsSql = "Delete from filiale Where id_filiale = " + aiId.ToString();
+                    lsSql = "Delete from mandanten Where id_mandant = " + aiId.ToString();
                     break;
                 case 6:
-                    lsSql = @"Select id_filiale from objekt where id_filiale = " + aiId.ToString();
+                    lsSql = @"Select id_mandant from filiale where id_mandant = " + aiId.ToString();
                     break;
                 case 8:
                     lsSql = "Delete from adressen Where id_adressen = " + aiId.ToString();
@@ -109,7 +102,6 @@ namespace Ruddat_NK
             return lsSql;
         }
 
-        // Daten holen
         private int fetchData(string asSql, int aiArt)
         {
             int liRows = 0;
@@ -127,12 +119,12 @@ namespace Ruddat_NK
 
                     switch (aiArt)
                     {
-                        case 1: // Firmen
-                            tableCmp = new DataTable();
+                        case 1: // Mandanten
+                            tableMnd = new DataTable();
                             SqlCommand command = new SqlCommand(asSql, connect);
-                            sdCmp = new SqlDataAdapter(command);
-                            sdCmp.Fill(tableCmp);
-                            dgrCmp.ItemsSource = tableCmp.DefaultView;
+                            sdMnd = new SqlDataAdapter(command);
+                            sdMnd.Fill(tableMnd);
+                            dgrMnd.ItemsSource = tableMnd.DefaultView;
                             break;
                         case 2: // Adressen
                             tableAdr = new DataTable();
@@ -149,8 +141,8 @@ namespace Ruddat_NK
                             adressenart.ItemsSource = tableAda.DefaultView;
                             break;
                         case 4:
-                            SqlCommandBuilder commandBuilder = new SqlCommandBuilder(sdCmp);
-                            sdCmp.Update(tableCmp);
+                            SqlCommandBuilder commandBuilder = new SqlCommandBuilder(sdMnd);
+                            sdMnd.Update(tableMnd);
                             break;
                         case 5:
                             SqlCommand command5 = new SqlCommand(asSql, connect);
@@ -189,11 +181,11 @@ namespace Ruddat_NK
                     switch (aiArt)
                     {
                         case 1: // Firmen
-                            tableCmp = new DataTable();
+                            tableMnd = new DataTable();
                             MySqlCommand command = new MySqlCommand(asSql, myConnect);
-                            mysdCmp = new MySqlDataAdapter(command);
-                            mysdCmp.Fill(tableCmp);
-                            dgrCmp.ItemsSource = tableCmp.DefaultView;
+                            mysdMnd = new MySqlDataAdapter(command);
+                            mysdMnd.Fill(tableMnd);
+                            dgrMnd.ItemsSource = tableMnd.DefaultView;
                             break;
                         case 2: // Adressen
                             tableAdr = new DataTable();
@@ -210,8 +202,8 @@ namespace Ruddat_NK
                             adressenart.ItemsSource = tableAda.DefaultView;
                             break;
                         case 4:
-                            MySqlCommandBuilder commandBuilder = new MySqlCommandBuilder(mysdCmp);
-                            mysdCmp.Update(tableCmp);
+                            MySqlCommandBuilder commandBuilder = new MySqlCommandBuilder(mysdMnd);
+                            mysdMnd.Update(tableMnd);
                             break;
                         case 5:
                             MySqlCommand command5 = new MySqlCommand(asSql, myConnect);
@@ -223,7 +215,7 @@ namespace Ruddat_NK
                             if (lvId != DBNull.Value)
                             {
                                 liRows = Convert.ToInt32(lvId);     // LiRows hier als Id genommen
-                            }   
+                            }
                             else
                             {
                                 liRows = 0;
@@ -248,29 +240,75 @@ namespace Ruddat_NK
             return liRows;
         }
 
-        // Datensatz zufügen
+
+        private void DgrMnd_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
+        {
+            btnSave.IsEnabled = true;
+        }
+
+        private void DgrMnd_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            int liId = 0;
+            int liSel = dgrMnd.SelectedIndex;
+            int liRows = 0;
+            string lsSql2 = "";
+
+            if (liSel >= 0)
+            {
+                DataRowView rowview = dgrMnd.SelectedItem as DataRowView;
+
+                if ((rowview.Row[0] != DBNull.Value))
+                {
+                    liId = Int32.Parse(rowview.Row[0].ToString());
+
+                    if (getDelInfo(liId) == 0)
+                    {
+                        btnDel.IsEnabled = true;
+                        btnAdrDel.IsEnabled = false;
+                        btnAdrAdd.IsEnabled = true;
+                    }
+                    else
+                    {
+                        btnDel.IsEnabled = false;
+                        btnAdrAdd.IsEnabled = true;
+                    }
+
+                    // Adressen dazu holen
+                    // SqlSelect erstellen
+                    lsSql2 = getSql("adr", 2, liId);
+                    // Daten holen
+                    liRows = fetchData(lsSql2, 2);
+
+                }
+            }
+        }
+
+        private void DgrAdr_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
+        {
+            btnAdrSave.IsEnabled = true;
+        }
+
+        private void DgrAdr_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            btnAdrDel.IsEnabled = true;
+        }
+
         private void btnAdd_Click(object sender, RoutedEventArgs e)
         {
             // Buttons 
             btnAdd.IsEnabled = false;
             btnSave.IsEnabled = true;
 
-            int liMandantId = Timeline.getMandantId(gsConnect, giDb);
+            DataRow dr = tableMnd.NewRow();
+            dr[4] = 0;
 
-            if (liMandantId > 0)
-            {
-                DataRow dr = tableCmp.NewRow();
-
-                dr[4] = liMandantId;            // Die richtige Mandanten Id einfügen
-                tableCmp.Rows.Add(dr);
-            }
+            tableMnd.Rows.Add(dr);
         }
 
-        // Änderung abspeichern
         private void btnSave_Click(object sender, RoutedEventArgs e)
         {
             int liId = 0;
-            int liSel = dgrCmp.SelectedIndex;
+            int liSel = dgrMnd.SelectedIndex;
             int liRows = 0;
             int liOk = 0;
             string lsSql = "";
@@ -287,14 +325,14 @@ namespace Ruddat_NK
             {
                 if (liSel >= 0)
                 {
-                    DataRowView rowview = dgrCmp.SelectedItem as DataRowView;
+                    DataRowView rowview = dgrMnd.SelectedItem as DataRowView;
                     if ((rowview.Row[0] != DBNull.Value))
                     {
                         liId = Int32.Parse(rowview.Row[0].ToString());
 
                         if (liId >= 0)
                         {
-                            lsSql = getSql("",5,liId);
+                            lsSql = getSql("", 5, liId);
                             liOk = fetchData(lsSql, 5);
                         }
                     }
@@ -302,7 +340,7 @@ namespace Ruddat_NK
             }
 
             // SqlSelect erstellen
-            lsSql2 = getSql("cmp", 1, 0);
+            lsSql2 = getSql("mnd", 1, 0);
             // Daten holen
             liRows = fetchData(lsSql2, 1);
 
@@ -310,65 +348,6 @@ namespace Ruddat_NK
             btnDel.IsEnabled = true;
         }
 
-        // Es wurde etwas geändert; speichern öffnen
-        private void dgrCmp_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
-        {
-            btnSave.IsEnabled = true;
-        }
-
-
-        // Prüfen, ob ein datensatz gelöscht werden darf
-        // Existiert die id_filiale in Objekten?
-        private void dgrCmp_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            int liId = 0;
-            int liSel = dgrCmp.SelectedIndex;
-            int liRows = 0;
-            string lsSql2 = "";
-
-            if (liSel >= 0)
-            {
-                DataRowView rowview = dgrCmp.SelectedItem as DataRowView;
-
-                if ((rowview.Row[0] != DBNull.Value))
-                {
-                    liId = Int32.Parse(rowview.Row[0].ToString());
-
-                    if (getDelInfo(liId) == 0)
-                    {
-                        btnDel.IsEnabled = true;
-                        btnAdrDel.IsEnabled = false;
-                        btnAdrAdd.IsEnabled = true;
-                    }
-                    else
-                    {
-                        btnDel.IsEnabled = false;
-                        btnAdrAdd.IsEnabled = true;
-                    }                     
-
-                    // Adressen dazu holen
-                    // SqlSelect erstellen
-                    lsSql2 = getSql("adr", 2, liId);
-                    // Daten holen
-                    liRows = fetchData(lsSql2, 2);
-
-                }
-            }
-        }
-
-        // Existiert ein Objekt zu der Firma mit der gewählten ID?
-        private int getDelInfo(int aiId)
-        {
-            int liId = 0;
-            string lsSql = "";
-
-            lsSql = getSql("", 6, aiId);
-            liId = fetchData(lsSql, 6);
-
-            return liId;
-        }
-
-        // Gesellschaft löschen ( nur offen, wenn sie nicht verwendet wird
         private void btnDel_Click(object sender, RoutedEventArgs e)
         {
             btnSave.IsEnabled = true;
@@ -376,13 +355,12 @@ namespace Ruddat_NK
             btnDel.IsEnabled = false;
         }
 
-        // Adresse speichern oder löschen
         private void btnAdrSave_Click(object sender, RoutedEventArgs e)
         {
             int liId = 0;
             int liOk = 0;
-            int liIdCmp = 0;
-            int liSelCmp = dgrCmp.SelectedIndex;
+            int liIdMnd = 0;
+            int liSelMnd = dgrMnd.SelectedIndex;
             int liSelAdr = dgrAdr.SelectedIndex;
             int liRows = 0;
             string lsSql = "";
@@ -414,16 +392,16 @@ namespace Ruddat_NK
             }
 
             // Daten Adresse neu holen
-            if (liSelCmp >= 0)
+            if (liSelMnd >= 0)
             {
-                DataRowView rowview = dgrCmp.SelectedItem as DataRowView;
+                DataRowView rowview = dgrMnd.SelectedItem as DataRowView;
 
                 if ((rowview.Row[0] != DBNull.Value))
                 {
-                    liIdCmp = Int32.Parse(rowview.Row[0].ToString());
+                    liIdMnd = Int32.Parse(rowview.Row[0].ToString());
 
                     // SqlSelect erstellen
-                    lsSql = getSql("adr", 2, liIdCmp);
+                    lsSql = getSql("adr", 2, liIdMnd);
                     // Daten holen
                     liRows = fetchData(lsSql, 2);
                 }
@@ -432,10 +410,21 @@ namespace Ruddat_NK
             btnAdrDel.IsEnabled = true;
         }
 
-        // Adresse zufügen
+        // Existiert eine Firma zu dem Mandanten mit der gewählten ID?
+        private int getDelInfo(int aiId)
+        {
+            int liId = 0;
+            string lsSql = "";
+
+            lsSql = getSql("", 6, aiId);
+            liId = fetchData(lsSql, 6);
+
+            return liId;
+        }
+
         private void btnAdrAdd_Click(object sender, RoutedEventArgs e)
         {
-            int liSel = dgrCmp.SelectedIndex;
+            int liSel = dgrMnd.SelectedIndex;
             int liId = 0;
 
             // Buttons 
@@ -444,40 +433,27 @@ namespace Ruddat_NK
 
             if (liSel >= 0)
             {
-                DataRowView rowview = dgrCmp.SelectedItem as DataRowView;
+                DataRowView rowview = dgrMnd.SelectedItem as DataRowView;
 
                 if ((rowview.Row[0] != DBNull.Value))
                 {
-                    // ID Filiale, Gesellschaft
+                    // ID Mandant
                     liId = Int32.Parse(rowview.Row[0].ToString());
 
                     DataRow dr = tableAdr.NewRow();
 
-                    // Vorgaben eintragen, hier Firmen ID id_filiale
-                    dr[4] = liId;
+                    // Vorgaben eintragen, hier mandanten ID
+                    dr[18] = liId;
                     tableAdr.Rows.Add(dr);
                 }
             }
         }
 
-        // Adresse löschen (nur, wenn sie nicht verwendet wird)
         private void btnAdrDel_Click(object sender, RoutedEventArgs e)
         {
             btnAdrSave.IsEnabled = true;
             btnAdrSave.Content = "Wirklich löschen?";
             btnAdrDel.IsEnabled = false;
-        }
-
-        // Adressen - Eingabe verändert
-        private void dgrAdr_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
-        {
-            btnAdrSave.IsEnabled = true;
-        }
-
-        // Andere Adresse angewählt
-        private void dgrAdr_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            btnAdrDel.IsEnabled = true;
         }
     }
 }

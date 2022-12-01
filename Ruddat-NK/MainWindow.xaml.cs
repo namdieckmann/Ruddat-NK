@@ -22,6 +22,7 @@ namespace Ruddat_NK
         string gsPath = "";                 // DataPath des xml
         String gsItemHeader = "";           // Gewähltes Item aus dem Treeview
         string gsConnect = "";
+        int giMandantId = 0;                  // Mandant        
         int giFiliale = 0;                  // Angewählte Firma (Aus xml Konfig, den letzten Wert holen)
         int giObjekt = 0;                   // Objekt global
         int giObjektTeil = 0;               // Objektteil global
@@ -134,10 +135,11 @@ namespace Ruddat_NK
             // Radiobutton Aktive Mieter setzen
             rbAktEmps.IsChecked = true;
 
-            // Daten für listbox Filiale holen
-            lsSql = RdQueries.GetSqlSelect(1, 0, "", "", DateTime.MinValue, DateTime.MinValue, giFiliale, lsConnect, giDb);
-            // Daten holen für Listbox Filiale
-            // Sql, Art
+            // Aktiven Mandanten ermitteln
+            giMandantId = Timeline.getMandantId(lsConnect,giDb);
+
+            // Daten für Listbox Filiale holen
+            lsSql = RdQueries.GetSqlSelect(1, giMandantId, "", "", DateTime.MinValue, DateTime.MinValue, giFiliale, lsConnect, giDb);
             liRows = FetchData(lsSql, 1, giDb, lsConnect);
 
             // Daten für Treeview holen
@@ -274,14 +276,14 @@ namespace Ruddat_NK
                     // Für Testzwewcke Firma lokale Db
                     // SqlConnectionString = "Data Source=(LocalDB)\\v11.0;AttachDbFilename=C:\\Users\\Ulf Dieckmann\\AppData\\Local\\Ruddat\\Nebenkosten\\rdnk.mdf;Integrated Security=True;Connect Timeout=5";
                     // Für Testzwecke Notebook lokale Db
-                    SqlConnectionString = "Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=C:\\Users\\udiec\\AppData\\Local\\Ruddat\\Nebenkosten\\rdnk.mdf;Integrated Security=True;Connect Timeout=5";
+                    // SqlConnectionString = "Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=C:\\Users\\udiec\\AppData\\Local\\Ruddat\\Nebenkosten\\rdnk.mdf;Integrated Security=True;Connect Timeout=5";
                     // Für Testzwecke Server Firma
                     // SqlConnectionString = "Data Source=(LocalDB)\\v11.0;AttachDbFilename=G:\\Software\\Ruddat-Nebenkosten\\DbOne\\rdnk.mdf;Integrated Security=True;Connect Timeout=20";
-                    MessageBox.Show("Lokale Datenbank MsSql Express wird verwendet", "Achtung! ", MessageBoxButton.OK);
+                    // MessageBox.Show("Lokale Datenbank MsSql Express wird verwendet", "Achtung! ", MessageBoxButton.OK);
                     break;
                 case 2:
                     // Lokal
-                    // MySqlConnectionString = @"server=localhost;userid=rdnk;password=r1d8n9k4!;database=dbo";
+                    MySqlConnectionString = @"server=localhost;userid=rdnk;password=r1d8n9k4!;database=dbo";
                     // Ionos Server 
                     // MySqlConnectionString = @"Data Source=197288c.online-server.cloud;PORT=3306;USERID=namdi;PASSWORD=7V7ADTqWqQPCf9Sge4PT;database=dbo;Connect Timeout = 20";
                     // MessageBox.Show("Lokale Datenbank MySql wird verwendet", "Achtung! ", MessageBoxButton.OK);
@@ -1122,6 +1124,7 @@ namespace Ruddat_NK
             string lsSqlRgNrAnschreiben = "";
             DateTime ldtFrom = DateTime.MinValue;
             DateTime ldtTo = DateTime.MaxValue;
+            DateTime ldtFromZaehler = DateTime.MinValue;
 
             // nur StartDatum
             if (clFrom.SelectedDate != null)
@@ -1134,6 +1137,7 @@ namespace Ruddat_NK
             {
                 ldtFrom = clFrom.SelectedDate.Value;
                 ldtTo = clTo.SelectedDate.Value;
+                ldtFromZaehler = ldtFrom.AddYears(-1);          //Zähler sollen ein Jahr Vergangenheit zeigen
             }
 
             if (asArt == 1)
@@ -1141,9 +1145,9 @@ namespace Ruddat_NK
                 // Daten für die Anwahl der Firma nur nach Filialänderungen durchführen
                 // Datum ist egal
                 // Daten für listbox Filiale holen
-                lsSql = RdQueries.GetSqlSelect(1, 0, "", "", DateTime.MinValue, DateTime.MinValue, giFiliale, gsConnect, giDb);
+                giMandantId = Timeline.getMandantId(gsConnect,giDb);
+                lsSql = RdQueries.GetSqlSelect(1, giMandantId, "", "", DateTime.MinValue, DateTime.MinValue, giFiliale, gsConnect, giDb);
                 // Daten holen für Listbox Filiale
-                // Sql, Art
                 liRows = FetchData(lsSql, 1, giDb, gsConnect);
                 // Daten für Treeview holen
                 lsSql = RdQueries.GetSqlSelect(2, giFiliale, "", "", DateTime.Today, DateTime.Today, giFiliale, gsConnect, giDb);
@@ -1243,9 +1247,10 @@ namespace Ruddat_NK
                     lsSqlZahlungen = RdQueries.GetSqlSelect(124, liId, "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);   // Report
 
                     // Zählerstände zeigen Art 34 Objekte
-                    lsSql = RdQueries.GetSqlSelect(34, liId, "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
+                    lsSql = RdQueries.GetSqlSelect(34, liId, "", "", ldtFromZaehler, ldtTo, giFiliale, gsConnect, giDb);
                     liRows = FetchData(lsSql, 21, giDb, gsConnect);
-                    // lsSqlZaehlerstd = RdQueries.GetSqlSelect(134, liId, "", "", ldtFrom, ldtTo,giFiliale,gsConnectString, giDb);   // Report  Ulf!
+                    // Todo Report  Ulf!
+                    // lsSqlZaehlerstd = RdQueries.GetSqlSelect(134, liId, "", "", ldtFrom, ldtTo,giFiliale,gsConnectString, giDb);   
 
                     // Tabelle Leerstand befüllen
                     DgrLeerDetail.ItemsSource = null;
@@ -1309,9 +1314,11 @@ namespace Ruddat_NK
                     lsSqlZahlungen = RdQueries.GetSqlSelect(125, liId, "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);     // Report
 
                     // Zählerstände zeigen Art 35 ObjektTeile
-                    lsSql = RdQueries.GetSqlSelect(35, liId, "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
+                    lsSql = RdQueries.GetSqlSelect(35, liId, "", "", ldtFromZaehler, ldtTo, giFiliale, gsConnect, giDb);
                     liRows = FetchData(lsSql, 21, giDb, gsConnect);
-                    lsSqlZaehlerstd = ""; //RdQueries.GetSqlSelect(135, liId, "", "", ldtFrom, ldtTo,giFiliale,gsConnectString, giDb);   // Report TODO Ulf!
+                    lsSqlZaehlerstd = "";
+                    // Report TODO Ulf!
+                    // RdQueries.GetSqlSelect(135, liId, "", "", ldtFrom, ldtTo,giFiliale,gsConnectString, giDb);   
 
                     // Db Header für Report befüllen für ObjektTeile x_abr_info
                     lsSqlHeader = RdQueries.GetSqlSelect(202, liId, "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
@@ -1509,18 +1516,17 @@ namespace Ruddat_NK
                     }
                     else
                     {
-                        // Startdatum ist Jahresbeginn
-                        int liYear = DateTime.Now.Year - 1;
-                        string lsStart = (liYear.ToString()) + "-01-01";
-                        string lsEnd = (liYear.ToString()) + "-12-31";
-                        DateTime ldtStart = DateTime.Parse(lsStart);                 // Jahresanfang VorJahr
-                        DateTime ldtEnd = DateTime.Parse(lsEnd);
+                        // Todo Ulf Testweise ausgeschaltet 221201
+                        //// Startdatum ist Jahresbeginn
+                        //int liYear = DateTime.Now.Year - 1;
+                        //string lsStart = (liYear.ToString()) + "-01-01";
+                        //string lsEnd = (liYear.ToString()) + "-12-31";
+                        //DateTime ldtStart = DateTime.Parse(lsStart);                 // Jahresanfang VorJahr
+                        //DateTime ldtEnd = DateTime.Parse(lsEnd);
                     }
 
                     // Der Index wird nochmal bei TimeLine Details benötigt
                     giIndex = index;
-                    // MessageBox.Show("Verarbeitungsfehler ERROR fetchdata fetchdata RdFunctions 0003\n piArt = " + index.ToString(),
-                    //          "Achtung");
                     gsItemHeader = item.Header.ToString().Trim();
 
                     if (gsItemHeader != "Kein Mieter")
@@ -2777,10 +2783,22 @@ namespace Ruddat_NK
             frmStZl.ShowDialog();
         }
 
+        // Dialog Mandanten
+
+        private void MnMasterMandanten_Click(object sender, RoutedEventArgs e)
+        {
+            WndMandanten frmMnd = new WndMandanten(this);
+            DelPassDataArt delegt = new DelPassDataArt(frmMnd.getDb);
+            delegt(giDb);
+            frmMnd.ShowDialog();
+            // Update der Daten nach Mandantenwechsel
+            updateAllDataGrids(1);
+            tvMain.Items.Clear();
+        }
+
         // Dialog Gesellschaften bearbeiten
         private void mnMasterCompany_Click(object sender, RoutedEventArgs e)
         {
-
             WndCompanies frmCmp = new WndCompanies(this);
             DelPassDataArt delegt = new DelPassDataArt(frmCmp.getDb);
             delegt(giDb);

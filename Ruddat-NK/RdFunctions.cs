@@ -641,7 +641,7 @@ namespace Ruddat_NK
                     lsSql = @"Select id_objekt_teil from vertrag where vertrag.id_mieter = " + piId.ToString();
                     break;
                 case 44:
-                    lsSql = "select id_rg_nr from rgnr Where flag_besetzt != 1 Order by id_rg_nr";
+                    lsSql = @"select id_rg_nr from rgnr Where flag_besetzt != 1 Order by id_rg_nr";
                     break;
                 case 45:
                     lsSql = @"Update rgnr Set rgnr.flag_besetzt = 1 where rgnr.id_rg_nr = " + piId.ToString();
@@ -650,7 +650,10 @@ namespace Ruddat_NK
                     lsSql = @"Update timeline Set timeline.id_rg_nr = " + piId.ToString() + ps2;
                     break;
                 case 47:
-                    lsSql = "Select Id_verteilung from art_verteilung Where kb = '" + ps2 + "' ";
+                    lsSql = @"Select Id_verteilung from art_verteilung Where kb = '" + ps2 + "' ";
+                    break;
+                case 48:
+                    lsSql = @"Select id_mandant,sel from mandanten Where sel = 1 ";
                     break;
                 default:
                     break;
@@ -3990,7 +3993,18 @@ namespace Ruddat_NK
             return (liId);
         }
 
-        // Ermitteln des Start und Endedatum eenes Jahres
+        // ermitteln des des aktuellen Mandanten
+        internal static int getMandantId(string asConnect, int aiDb)
+        {
+            int liId;
+
+            lsSql = getSql(48, 0, "", "", 0);
+            liId = fetchData(lsSql, "", 26, asConnect, aiDb);
+
+            return (liId);
+        }
+
+        // Ermitteln des Start und Endedatum eines Jahres
         internal static DateTime GetYear(DateTime adtYear, int aiArt)
         {
             int liYear = adtYear.Year;
