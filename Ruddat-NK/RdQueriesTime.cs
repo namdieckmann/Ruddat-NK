@@ -8,6 +8,27 @@ namespace Ruddat_NK
 {
     class RdQueriesTime
     {
+        // ZeitQuery von bis auf 2 Felder
+        private static string GetDateQueryThree(string asFieldFrom, string asFieldTo, DateTime adtStart, DateTime adtEnd, int aiDb)
+        {
+            String LsSql = "";
+
+            switch (aiDb)
+            {
+                case 1:         // MsSql
+                    LsSql = asFieldFrom + " >= Convert(DateTime, " + "\'" + adtStart + "', 104) AND "
+                                          + asFieldTo + " <= Convert(DateTime," + "\'" + adtEnd + "',104)";
+                    break;
+                case 2:         // MySql   AAACCHTUNG Format ist %Y   großes Y
+                    LsSql = asFieldFrom + " >= str_to_date(\"" + adtStart.ToString("dd.MM.yyyy") + "\",\"%d.%m.%Y %H:%i:%s\") AND "
+                                          + asFieldTo + " <= str_to_date(\"" + adtEnd.ToString("dd.MM.yyyy") + "\",\"%d.%m.%Y %H:%i:%s\")";
+                    break;
+                default:
+                    break;
+            }
+            return (LsSql);
+        }
+
         // ZeitQuery von bis
         internal static string GetDateQueryTwo(String asField, DateTime adtStart, DateTime adtEnd, int aiDb)
         {
@@ -49,7 +70,7 @@ namespace Ruddat_NK
         }
 
         // Komplettes Ermitteln des DateQueries
-        internal static string GetDateQueryResult(DateTime adtWtStart, DateTime adtWtEnd, DateTime adtStart, DateTime adtEnd, string asField, string asAnd, int aiOne, int aiDb)
+        internal static string GetDateQueryResult(DateTime adtWtStart, DateTime adtWtEnd, DateTime adtStart, DateTime adtEnd, string asFieldFrom, string asFieldTo, string asAnd, int aiOne, int aiDb)
         {
             string lsWhere = "";
             DateTime ldtAdd;
@@ -61,19 +82,19 @@ namespace Ruddat_NK
                     {
                         ldtAdd = adtWtStart.AddDays(1);
 
-                        lsWhere = RdQueriesTime.GetDateQueryOne(asField, adtWtStart, aiDb);
+                        lsWhere = RdQueriesTime.GetDateQueryOne(asFieldFrom, adtWtStart, aiDb);
                         lsWhere = asAnd + lsWhere;
                     }
                     // Start und EndeDatum 
                     if ((adtWtStart > DateTime.MinValue) && (adtWtEnd > DateTime.MinValue))
                     {
-                        lsWhere = RdQueriesTime.GetDateQueryOne(asField, adtWtStart, aiDb);
+                        lsWhere = RdQueriesTime.GetDateQueryOne(asFieldFrom, adtWtStart, aiDb);
                         lsWhere = asAnd + lsWhere;
                     }
                     // Wurde kein Datum gewählt, aktuelles Jahr zeigen
                     else
                     {
-                        lsWhere = RdQueriesTime.GetDateQueryOne(asField, adtStart, aiDb);
+                        lsWhere = RdQueriesTime.GetDateQueryOne(asFieldFrom, adtStart, aiDb);
                         lsWhere = asAnd + lsWhere;
                     }
                     break;
@@ -83,7 +104,7 @@ namespace Ruddat_NK
                     {
                         ldtAdd = adtWtStart.AddDays(1);
 
-                        lsWhere = RdQueriesTime.GetDateQueryTwo(asField, adtWtStart, ldtAdd, aiDb);
+                        lsWhere = RdQueriesTime.GetDateQueryTwo(asFieldFrom, adtWtStart, ldtAdd, aiDb);
                         lsWhere = asAnd + lsWhere;
                         //" timeline.dt_monat >= Convert(DateTime," + "\'" + adtWtStart + "',104) "
                         //            + "And timeline.dt_monat <= Convert(DateTime," + "\'" + ldtAdd + "',104)";
@@ -92,7 +113,7 @@ namespace Ruddat_NK
                     // Start und EndeDatum 
                     if ((adtWtStart > DateTime.MinValue) && (adtWtEnd > DateTime.MinValue))
                     {
-                        lsWhere = RdQueriesTime.GetDateQueryTwo(asField, adtWtStart, adtWtEnd, aiDb);
+                        lsWhere = RdQueriesTime.GetDateQueryTwo(asFieldFrom, adtWtStart, adtWtEnd, aiDb);
                         lsWhere = asAnd + lsWhere;
                         //    " timeline.dt_monat >= Convert(DateTime," + "\'" + adtWtStart + "',104) "
                         //+ "And timeline.dt_monat <= Convert(DateTime," + "\'" + adtWtEnd + "',104)";
@@ -100,11 +121,30 @@ namespace Ruddat_NK
                     // Wurde kein Datum gewählt, aktuelles Jahr zeigen
                     else
                     {
-                        lsWhere = RdQueriesTime.GetDateQueryTwo(asField, adtStart, adtEnd, aiDb);
+                        lsWhere = RdQueriesTime.GetDateQueryTwo(asFieldFrom, adtStart, adtEnd, aiDb);
                         lsWhere = asAnd + lsWhere;
                         //lsWhereAdd2 = lsAnd + " timeline.dt_monat >= Convert(DateTime," + "\'" + ldtStart + "',104) "
                         //    + "And timeline.dt_monat <= Convert(DateTime," + "\'" + ldtEnd + "',104)";
                     }
+                    break;
+                case 3:         // Es gibt das Feld from und To
+                                // Start und EndeDatum 
+                    if ((adtWtStart > DateTime.MinValue) && (adtWtEnd > DateTime.MinValue))
+                    {
+                        lsWhere = RdQueriesTime.GetDateQueryThree(asFieldFrom, asFieldTo, adtWtStart, adtWtEnd, aiDb);
+                        lsWhere = asAnd + lsWhere;
+                        //    " timeline.dt_monat >= Convert(DateTime," + "\'" + adtWtStart + "',104) "
+                        //+ "And timeline.dt_monat <= Convert(DateTime," + "\'" + adtWtEnd + "',104)";
+                    }
+                    // Wurde kein Datum gewählt, aktuelles Jahr zeigen
+                    else
+                    {
+                        lsWhere = RdQueriesTime.GetDateQueryThree(asFieldFrom, asFieldTo, adtStart, adtEnd, aiDb);
+                        lsWhere = asAnd + lsWhere;
+                        //lsWhereAdd2 = lsAnd + " timeline.dt_monat >= Convert(DateTime," + "\'" + ldtStart + "',104) "
+                        //    + "And timeline.dt_monat <= Convert(DateTime," + "\'" + ldtEnd + "',104)";
+                    }
+
                     break;
                 default:
                     break;

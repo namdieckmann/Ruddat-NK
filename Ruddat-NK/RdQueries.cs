@@ -17,7 +17,8 @@ namespace Ruddat_NK
             String lsWhereAdd2 = "";
             String lsWhereAdd3 = "";
             String lsWhereAdd4 = "";
-            String lsField = "";
+            String lsFieldFrom = "";
+            string lsFieldTo = "";
             String lsAnd = " Where ";
             String lsOrder = "";
             String lsGroup = "";
@@ -171,9 +172,9 @@ namespace Ruddat_NK
                             break;
                     }
                     // Rückgabe des ZeitQueries für TimeLine
-                    lsField = "timeline.dt_monat";
+                    lsFieldFrom = "timeline.dt_monat";
                     liOne = 2;
-                    lsWhereAdd2 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsField, lsAnd, liOne, aiDb);
+                    lsWhereAdd2 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsFieldFrom, lsFieldFrom, lsAnd, liOne, aiDb);
                     lsSql = lsSql + lsWhereAdd2;
                     lsSql = lsSql + lsGroup + lsOrder;
                 }
@@ -189,9 +190,10 @@ namespace Ruddat_NK
                 lsAnd = " And ";
 
                 // Rückgabe des ZeitQueries für Rechnungen
-                lsField = "rechnungen.datum_von";
-                liOne = 2;
-                lsWhereAdd2 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsField, lsAnd, liOne, aiDb);
+                lsFieldFrom = "rechnungen.datum_von";
+                lsFieldTo = "rechnungen.datum_bis";
+                liOne = 3;
+                lsWhereAdd2 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsFieldFrom, lsFieldTo, lsAnd, liOne, aiDb);
 
                 lsSql = @"select id_rechnungen,
                             id_ksa,
@@ -219,9 +221,10 @@ namespace Ruddat_NK
             if (piArt == 9)
             {
                 lsAnd = " And ";
-                lsField = "rechnungen.datum_von";
-                liOne = 2;
-                lsWhereAdd2 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsField, lsAnd, liOne, aiDb);
+                lsFieldFrom = "rechnungen.datum_von";
+                lsFieldTo = "rechnungen.datum_bis";
+                liOne = 3;      // rechnungen von bis
+                lsWhereAdd2 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsFieldFrom, lsFieldFrom, lsAnd, liOne, aiDb);
                 
                 lsSql = @"select id_rechnungen,
                             id_ksa,
@@ -249,9 +252,10 @@ namespace Ruddat_NK
             if (piArt == 10)
             {
                 lsAnd = " And ";
-                lsField = "rechnungen.datum_von";
-                liOne = 2;
-                lsWhereAdd2 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsField, lsAnd, liOne, aiDb);
+                lsFieldFrom = "rechnungen.datum_von";
+                lsFieldTo = "rechnungen.datum_bis";
+                liOne = 3;      // rechnungen von bis
+                lsWhereAdd2 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsFieldFrom, lsFieldFrom, lsAnd, liOne, aiDb);
                 
                 lsSql = @"select id_rechnungen,
                             id_ksa,
@@ -402,9 +406,9 @@ namespace Ruddat_NK
                 lsWhereAdd = " Where  timeline.Id_rechnung = " + piId.ToString() + " ";
                 lsOrder = " Order by art_kostenart.sort, timeline.dt_monat ";
                 lsAnd = " And ";
-                lsField = "timeline.dt_monat";
+                lsFieldFrom = "timeline.dt_monat";
                 liOne = 2;
-                lsWhereAdd3 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsField, lsAnd, liOne, aiDb);
+                lsWhereAdd3 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsFieldFrom, lsFieldFrom, lsAnd, liOne, aiDb);
                 lsSql = lsSql + lsWhereAdd + lsWhereAdd2 + lsWhereAdd3 + lsOrder;
             }
             if (piArt == 131)       // Zahlung
@@ -444,9 +448,9 @@ namespace Ruddat_NK
                 lsWhereAdd = " Where timeline.Id_vorauszahlung = " + piId.ToString() + " ";
                 lsOrder = " Order by art_kostenart.sort, timeline.dt_monat ";
                 lsAnd = " And ";
-                lsField = "timeline.dt_monat";
+                lsFieldFrom = "timeline.dt_monat";
                 liOne = 2;
-                lsWhereAdd3 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsField, lsAnd, liOne, aiDb);
+                lsWhereAdd3 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsFieldFrom, lsFieldFrom, lsAnd, liOne, aiDb);
                 lsSql = lsSql + lsWhereAdd + lsWhereAdd2 + lsWhereAdd3 + lsOrder;
             }
             if (piArt == 132) // Zähler
@@ -487,9 +491,9 @@ namespace Ruddat_NK
                 lsWhereAdd = " Where timeline.Id_zaehlerstand = " + piId.ToString() + " ";
                 lsOrder = " Order by art_kostenart.sort, timeline.dt_monat ";
                 lsAnd = " And ";
-                lsField = "timeline.dt_monat";
+                lsFieldFrom = "timeline.dt_monat";
                 liOne = 2;
-                lsWhereAdd3 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsField, lsAnd, liOne, aiDb);
+                lsWhereAdd3 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsFieldFrom, lsFieldFrom, lsAnd, liOne, aiDb);
                 lsSql = lsSql + lsWhereAdd + lsWhereAdd2 + lsWhereAdd3 + lsOrder;
             }
             // Combobox Kosten Verteilungsarten
@@ -541,9 +545,9 @@ namespace Ruddat_NK
             if (piArt == 23 || piArt == 24 || piArt == 25)
             {
                 lsAnd = " And ";
-                lsField = "zahlungen.datum_von";
+                lsFieldFrom = "zahlungen.datum_von";
                 liOne = 2;
-                lsWhereAdd2 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsField, lsAnd, liOne, aiDb);
+                lsWhereAdd2 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsFieldFrom, lsFieldFrom, lsAnd, liOne, aiDb);
 
                 if (piArt == 23)  // Zahlungen für Mieter
                 {
@@ -607,9 +611,9 @@ namespace Ruddat_NK
             if (piArt == 34 || piArt == 35)
             {
                 lsAnd = " And ";
-                lsField = "zaehlerstaende.datum_von";
+                lsFieldFrom = "zaehlerstaende.datum_von";
                 liOne = 2;
-                lsWhereAdd2 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsField, lsAnd, liOne, aiDb);
+                lsWhereAdd2 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsFieldFrom, lsFieldFrom, lsAnd, liOne, aiDb);
 
                 if (piArt == 34)  // Zählerstände für Objekte
                 {
@@ -672,8 +676,8 @@ namespace Ruddat_NK
                 //        Where id_objekt_teil = " + piId.ToString() + " AND vertrag_aktiv = 1 ";
                 lsSql = @"Select id_mieter from vertrag
                         Where id_objekt_teil = " + piId.ToString();
-                lsField = "vertrag.datum_von";
-                lsWhereAdd2 = RdQueriesTime.GetDateQueryResultVertrag(adtWtStart, lsField, liOne, aiDb);
+                lsFieldFrom = "vertrag.datum_von";
+                lsWhereAdd2 = RdQueriesTime.GetDateQueryResultVertrag(adtWtStart, lsFieldFrom, liOne, aiDb);
                 lsSql = lsSql + lsWhereAdd2;
             }   // Vertragsbeginn oder -ende
             if (piArt == 42)
@@ -775,9 +779,9 @@ namespace Ruddat_NK
                         default:
                             break;
                     }
-                    lsField = "timeline.dt_monat";
+                    lsFieldFrom = "timeline.dt_monat";
                     liOne = 2;
-                    lsWhereAdd2 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsField, lsAnd, liOne, aiDb);
+                    lsWhereAdd2 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsFieldFrom, lsFieldFrom, lsAnd, liOne, aiDb);
                     lsAnd = " AND ";
 
                     // Nur wenn Ausdruck gewünscht wird
@@ -796,9 +800,10 @@ namespace Ruddat_NK
             if (piArt == 108)   // Objekte
             {
                 lsAnd = " And ";
-                lsField = "rechnungen.datum_rechnung";
-                liOne = 2;
-                lsWhereAdd2 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsField, lsAnd, liOne, aiDb);
+                lsFieldFrom = "rechnungen.datum_von";
+                lsFieldTo = "rechnungen.datum_bis";
+                liOne = 3;              //Datum von bis
+                lsWhereAdd2 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsFieldFrom, lsFieldFrom, lsAnd, liOne, aiDb);
 
                 lsSql = @"select id_rechnungen,
                         art_kostenart.bez as kbez,
@@ -827,9 +832,10 @@ namespace Ruddat_NK
             if (piArt == 109)   // ObjektTeile
             {
                 lsAnd = " And ";
-                lsField = "rechnungen.datum_rechnung";
-                liOne = 2;
-                lsWhereAdd2 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsField, lsAnd, liOne, aiDb);
+                lsFieldFrom = "rechnungen.datum_von";
+                lsFieldTo = "rechnungen.datum_bis";
+                liOne = 3;      // Datum von bis
+                lsWhereAdd2 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsFieldFrom, lsFieldFrom, lsAnd, liOne, aiDb);
 
                 lsSql = @"select id_rechnungen,
                         art_kostenart.bez as kbez,
@@ -858,9 +864,10 @@ namespace Ruddat_NK
             if (piArt == 110)   // Mieter
             {
                 lsAnd = " And ";
-                lsField = "rechnungen.datum_rechnung";
-                liOne = 2;
-                lsWhereAdd2 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsField, lsAnd, liOne, aiDb);
+                lsFieldFrom = "rechnungen.datum_von";
+                lsFieldTo = "rechnungen.datum_bis";
+                liOne = 3;      // Rechnungen von bis
+                lsWhereAdd2 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsFieldFrom, lsFieldFrom, lsAnd, liOne, aiDb);
 
                 lsSql = @"select id_rechnungen,
                         art_kostenart.bez as kbez,
@@ -890,9 +897,9 @@ namespace Ruddat_NK
             if (piArt == 123 || piArt == 124 || piArt == 125)
             {
                 lsAnd = " And ";
-                lsField = "zahlungen.datum_von";
+                lsFieldFrom = "zahlungen.datum_von";
                 liOne = 2;
-                lsWhereAdd2 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsField, lsAnd, liOne, aiDb);
+                lsWhereAdd2 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsFieldFrom, lsFieldFrom, lsAnd, liOne, aiDb);
 
                 if (piArt == 124)   // Objekte
                 {
@@ -968,9 +975,9 @@ namespace Ruddat_NK
             if (piArt == 133 || piArt == 134 || piArt == 135)
             {
                 lsAnd = " And ";
-                lsField = "zaehlerstaende.datum_von";
+                lsFieldFrom = "zaehlerstaende.datum_von";
                 liOne = 2;
-                lsWhereAdd2 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsField, lsAnd, liOne, aiDb);
+                lsWhereAdd2 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsFieldFrom, lsFieldFrom, lsAnd, liOne, aiDb);
 
                 if (piArt == 134)   // Objekte
                 {
@@ -1035,9 +1042,9 @@ namespace Ruddat_NK
                 lsSql = lsWhereAdd1;    // nur Where
                 lsAnd = " And ";
                 lsWhereAdd4 = lsAnd + " (timeline.id_rechnung > 0 or timeline.id_zaehlerstand > 0) ";     // nur Rechnungen und Zählerstände
-                lsField = "timeline.dt_monat";
+                lsFieldFrom = "timeline.dt_monat";
                 liOne = 2;
-                lsWhereAdd2 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsField, lsAnd, liOne, aiDb);
+                lsWhereAdd2 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsFieldFrom, lsFieldFrom, lsAnd, liOne, aiDb);
 
                 lsSql = lsSql + lsWhereAdd2 + lsWhereAdd4;
                 lsSql = lsSql + lsGroup + lsOrder;
@@ -1131,9 +1138,9 @@ namespace Ruddat_NK
                             break;
                     }
 
-                    lsField = "timeline.dt_monat";
+                    lsFieldFrom = "timeline.dt_monat";
                     liOne = 2;
-                    lsWhereAdd2 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsField, lsAnd, liOne, aiDb);
+                    lsWhereAdd2 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsFieldFrom, lsFieldFrom, lsAnd, liOne, aiDb);
 
                     lsSql = lsSql + lsWhereAdd2;
                     lsSql = lsSql + lsGroup + lsOrder;
@@ -1155,9 +1162,9 @@ namespace Ruddat_NK
                 DateTime ldtEndTmp = DateTime.MinValue;
 
                 lsAnd = " And ";
-                lsField = "vorrauszahlungen.datum_von";
+                lsFieldFrom = "vorrauszahlungen.datum_von";
                 liOne = 2;
-                lsWhereAdd2 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsField, lsAnd, liOne, aiDb);
+                lsWhereAdd2 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsFieldFrom, lsFieldFrom, lsAnd, liOne, aiDb);
 
                 lsSql = @"Select Id_abr_content,
                             id_timeline,
