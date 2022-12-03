@@ -2139,9 +2139,9 @@ namespace Ruddat_NK
 
                     ldtTo = clTo.SelectedDate.Value;
                     // Enddatum bis 23:59:59
-                    ldtTo = ldtTo.AddHours(23);
-                    ldtTo = ldtTo.AddMinutes(59);
-                    ldtTo = ldtTo.AddSeconds(59);
+                    //ldtTo = ldtTo.AddHours(23);
+                    //ldtTo = ldtTo.AddMinutes(59);
+                    //ldtTo = ldtTo.AddSeconds(59);
                     lsDateTo = ldtTo.ToString("dd-MM-yyyy HH:mm");
                     tbDateTo.Text = lsDateTo;
 
@@ -2822,6 +2822,7 @@ namespace Ruddat_NK
         {
             WndAboutBox1 frmSoftware = new WndAboutBox1();
             frmSoftware.ShowDialog();
+            mnMasterMandanten.IsEnabled = true;
         }
 
         // Menü Eingaben Tab Kosten anwählen

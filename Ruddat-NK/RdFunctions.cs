@@ -655,6 +655,9 @@ namespace Ruddat_NK
                 case 48:
                     lsSql = @"Select id_mandant,sel from mandanten Where sel = 1 ";
                     break;
+                case 49:
+                    lsSql = @"Select id_filiale From filiale Where id_mandant = " + piId.ToString(); ;
+                    break;
                 default:
                     break;
             }
@@ -3999,6 +4002,17 @@ namespace Ruddat_NK
             int liId;
 
             lsSql = getSql(48, 0, "", "", 0);
+            liId = fetchData(lsSql, "", 26, asConnect, aiDb);
+
+            return (liId);
+        }
+
+        // Id der Filaile aus der Mandanten Id ermitteln
+        internal static int getFilialeId(int aiMandantId, string asConnect, int aiDb)
+        {
+            int liId;
+
+            lsSql = getSql(49, aiMandantId, "", "", 0);
             liId = fetchData(lsSql, "", 26, asConnect, aiDb);
 
             return (liId);

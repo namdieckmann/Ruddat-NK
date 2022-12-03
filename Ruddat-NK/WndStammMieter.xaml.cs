@@ -57,23 +57,29 @@ namespace Ruddat_NK
             this.btnAdrSave.IsEnabled = false;
             this.btnAdrDel.IsEnabled = false;
             this.btnAdrAdd.IsEnabled = false;
-
-
         }
 
         internal void getDb(int aiDb)
         {
             string lsSql = "";
             int liRows = 0;
+            int liMandantId = 0;
+            int liFiliale = 0;
 
             giDb = aiDb;
+
+            // Mandanten ID ermitteln
+            liMandantId = Timeline.getMandantId(gsConnect,giDb);
+            // Filiale Id ermitteln
+            liFiliale = Timeline.getFilialeId(liMandantId, gsConnect, giDb);
+
             // SqlSelect Firmen erstellen
-            lsSql = getSql(1, 0);
+            lsSql = getSql(1, liMandantId);
             // Daten Firmen holen
             liRows = fetchData(lsSql, 1);
 
             // SqlSelect Mieter
-            lsSql = getSql(2, 0);
+            lsSql = getSql(2, liFiliale);
             // Daten Firmen holen
             liRows = fetchData(lsSql, 2);
 
@@ -93,15 +99,22 @@ namespace Ruddat_NK
         private string getSql(int aiArt, int aiId)
         {
             string lsSql = "";
+            string lsOrder = "";
+            string lsWhereAdd = "";
 
             switch (aiArt)
             {
                 case 1:         // Gesellschaft
-                    lsSql = "select id_filiale,name,name_2,bez from filiale order by id_filiale";
+                    lsSql = "select id_filiale,name,name_2,bez, id_mandant from filiale ";
+                    lsWhereAdd = " where id_mandant = " + aiId.ToString();
+                    lsOrder = " order by id_filiale ";
+                    lsSql = lsSql + lsWhereAdd + lsOrder;
                     break;
                 case 2:         // Mieter
-                    lsSql = @"Select Id_mieter,id_objekt,bez,nr,netto,id_filiale,leerstand from mieter
-                                Order by nr";
+                    lsSql = @"Select Id_mieter,id_objekt,bez,nr,netto,id_filiale,leerstand from mieter ";
+                    lsWhereAdd = " where id_filiale = " + aiId.ToString();
+                    lsOrder = " Order by nr ";
+                    lsSql = lsSql + lsWhereAdd + lsOrder;
                     break;
                 case 21:         // Mieter mit objekt id
                     lsSql = @"Select Id_mieter,id_objekt,bez,nr,netto,id_filiale,leerstand from mieter
