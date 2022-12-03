@@ -176,6 +176,14 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>DataSetRechnungen.xsd</DependentUpon>
     </Compile>
+    <Compile Include="DataSetZaehler.cs">
+      <DependentUpon>DataSetZaehler.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="DataSetZaehler.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DataSetZaehler.xsd</DependentUpon>
+    </Compile>
     <Compile Include="DataSetZahlungen.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -374,6 +382,17 @@
     </None>
     <None Include="DataSetRechnungen.xss">
       <DependentUpon>DataSetRechnungen.xsd</DependentUpon>
+    </None>
+    <None Include="DataSetZaehler.xsc">
+      <DependentUpon>DataSetZaehler.xsd</DependentUpon>
+    </None>
+    <None Include="DataSetZaehler.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>DataSetZaehler.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="DataSetZaehler.xss">
+      <DependentUpon>DataSetZaehler.xsd</DependentUpon>
     </None>
     <None Include="DataSetZahlungen.xsc">
       <DependentUpon>DataSetZahlungen.xsd</DependentUpon>

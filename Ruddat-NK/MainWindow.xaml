@@ -38,10 +38,13 @@
                         <MenuItem x:Name="mnOutAnschreiben" Header="_Anschreiben Nebenkostenabrechnung" Click="mnOutAnschreiben_Click" />
                         <MenuItem x:Name="mnOutAbrechnungDetail" Header="Nebenkostenabrechnung _detailliert" Click="mnOutAbrechnungDetail_Click"  />
                         <Separator/>
-                        <MenuItem x:Name="mnOutKosten" Header="_Rechnungen" Click="mnOutKosten_Click" />
-                        <MenuItem x:Name="mnOutZahlungen" Header="_Zahlungen" Click="mnOutZahlungen_Click"  />
+                        <MenuItem x:Name="mnOutKosten" Header="Report _Rechnungen" Click="mnOutKosten_Click" />
+                        <MenuItem x:Name="mnOutZahlungen" Header="Report _Zahlungen" Click="mnOutZahlungen_Click"  />
+                        <MenuItem x:Name="mnOutZaehler" Header="Report _Zählerstände" Click="MnOutZaehler_Click" />
                         <Separator/>
-                        <MenuItem x:Name="mnInfoZahlungenTrace" Header="_Zahlungen nicht zugeordnet" Click="mnInfoZahlungenTrace_Click" />
+                        <MenuItem x:Name="mnOutLeerstaende" Header="Report _Leerstände" />
+                        <Separator/>
+                        <MenuItem x:Name="mnInfoZahlungenTrace" Header="Report _Zahlungen nicht zugeordnet" Click="mnInfoZahlungenTrace_Click" />
 
                     </MenuItem>
                     <MenuItem x:Name="mnMasterData" Header="_Stammdaten">

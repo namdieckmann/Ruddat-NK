@@ -1249,8 +1249,8 @@ namespace Ruddat_NK
                     // Zählerstände zeigen Art 34 Objekte
                     lsSql = RdQueries.GetSqlSelect(34, liId, "", "", ldtFromZaehler, ldtTo, giFiliale, gsConnect, giDb);
                     liRows = FetchData(lsSql, 21, giDb, gsConnect);
-                    // Todo Report  Ulf!
-                    // lsSqlZaehlerstd = RdQueries.GetSqlSelect(134, liId, "", "", ldtFrom, ldtTo,giFiliale,gsConnectString, giDb);   
+                    // Report  Zählerstände
+                    lsSqlZaehlerstd = RdQueries.GetSqlSelect(134, liId, "", "", ldtFrom, ldtTo,giFiliale,gsConnect, giDb);   
 
                     // Tabelle Leerstand befüllen
                     DgrLeerDetail.ItemsSource = null;
@@ -1317,8 +1317,8 @@ namespace Ruddat_NK
                     lsSql = RdQueries.GetSqlSelect(35, liId, "", "", ldtFromZaehler, ldtTo, giFiliale, gsConnect, giDb);
                     liRows = FetchData(lsSql, 21, giDb, gsConnect);
                     lsSqlZaehlerstd = "";
-                    // Report TODO Ulf!
-                    // RdQueries.GetSqlSelect(135, liId, "", "", ldtFrom, ldtTo,giFiliale,gsConnectString, giDb);   
+                    // Report Zählerstände
+                    RdQueries.GetSqlSelect(135, liId, "", "", ldtFrom, ldtTo,giFiliale,gsConnect, giDb);   
 
                     // Db Header für Report befüllen für ObjektTeile x_abr_info
                     lsSqlHeader = RdQueries.GetSqlSelect(202, liId, "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
@@ -1439,6 +1439,10 @@ namespace Ruddat_NK
                     Timeline.saveLastSql(lsSqlTimeline, lsSqlAbrContent, "",
                             "", lsSqlZahlungen, lsSqlSumme, "", lsSqlTimeline2, "kostendetail", "");       // direkte Kosten detailliert
                     Timeline.saveLastVal(ldtFrom, ldtTo, "Datum");                                        // Übergabe des Datumsbereiches 
+                    break;
+                case 8:
+                    // Zählerstände
+                    Timeline.saveLastSql(lsSqlZahlungen, "", "", "", "", "", "", "", "zaehler", "");
                     break;
                 default:
                     break;
@@ -2539,7 +2543,6 @@ namespace Ruddat_NK
 
             if (liSel >= 0)
             {
-
                 // Start und Endedatum wurden gewählt
                 if (clTo.SelectedDate.HasValue && clFrom.SelectedDate.HasValue)
                 {
@@ -2554,7 +2557,6 @@ namespace Ruddat_NK
                     ldtTo = ldtTo.AddSeconds(59);
                     lsDateTo = ldtTo.ToString("dd-MM-yyyy HH:mm");
                     tbDateTo.Text = lsDateTo;
-
                 }
                 // nur das Startdatum wurde gewählt; EndeDatum ist heutiger Tag
                 else if (clTo.SelectedDate.HasValue)
@@ -2722,6 +2724,17 @@ namespace Ruddat_NK
         {
             // Sql Statement für das Anschreiben in XML Datei speichern
             updateAllDataGrids(7);
+            WndRep frmRep = new WndRep(this);
+            DelPassDataArt delegt = new DelPassDataArt(frmRep.getDb);
+            delegt(giDb);
+            frmRep.ShowDialog();
+        }
+
+        // Report Zählerstände
+        private void MnOutZaehler_Click(object sender, RoutedEventArgs e)
+        {
+            // Sql Statement für das Anschreiben in XML Datei speichern
+            updateAllDataGrids(8);
             WndRep frmRep = new WndRep(this);
             DelPassDataArt delegt = new DelPassDataArt(frmRep.getDb);
             delegt(giDb);

@@ -332,6 +332,7 @@ namespace Ruddat_NK
                                 from timeline
                                 Right Join art_kostenart on timeline.id_ksa = art_kostenart.id_ksa ";
                         lsWhereAdd2 = " And timeline.id_objekt = " + ps3 + " ";
+                        lsOrder = " Order by art_kostenart.bez, timeline.dt_monat desc ";
                         break;
                     case "2":       // Teil
                         lsSql = @"Select                  
@@ -349,6 +350,7 @@ namespace Ruddat_NK
                                 Right Join art_kostenart on timeline.id_ksa = art_kostenart.id_ksa 
                                 Right Join objekt_teil on timeline.id_objekt_teil = objekt_teil.id_objekt_teil ";
                         lsWhereAdd2 = " And timeline.id_objekt_teil = " + ps3 + " AND timeline.id_mieter = 0 ";
+                        lsOrder = " Order by objekt_teil.bez, timeline.dt_monat desc";
                         break;
                     case "3":       // Mieter
                         lsSql = @"Select                  
@@ -363,6 +365,7 @@ namespace Ruddat_NK
                                 from timeline
                                 Right Join art_kostenart on timeline.id_ksa = art_kostenart.id_ksa ";
                         lsWhereAdd2 = " And timeline.id_mieter = " + ps3 + " ";
+                        lsOrder = " Order by objekt_teil.bez, timeline.dt_monat desc";
                         break;
                     case "4":       // Leerstand ObjTeile
                         lsSql = @"Select                  
@@ -380,6 +383,7 @@ namespace Ruddat_NK
                                 Right Join art_kostenart on timeline.id_ksa = art_kostenart.id_ksa 
                                 Right Join objekt_teil on timeline.id_objekt_teil = objekt_teil.id_objekt_teil ";
                         lsWhereAdd2 = " And timeline.leerstand = " + ps3 + " ";
+                        lsOrder = " Order by objekt_teil.bez, timeline.dt_monat desc";
                         break;
                     case "5":       // Leerstand ganzes Objekt
                         lsSql = @"Select                  
@@ -397,6 +401,7 @@ namespace Ruddat_NK
                                 Right Join art_kostenart on timeline.id_ksa = art_kostenart.id_ksa 
                                 Right Join objekt_teil on timeline.id_objekt_teil = objekt_teil.id_objekt_teil ";
                         lsWhereAdd2 = " And timeline.leerstand > 0 ";
+                        lsOrder = " Order by objekt_teil.bez, timeline.dt_monat desc";
                         break;
                     default:
                         lsWhereAdd2 = "";
@@ -404,7 +409,6 @@ namespace Ruddat_NK
                 }
 
                 lsWhereAdd = " Where  timeline.Id_rechnung = " + piId.ToString() + " ";
-                lsOrder = " Order by art_kostenart.sort, timeline.dt_monat ";
                 lsAnd = " And ";
                 lsFieldFrom = "timeline.dt_monat";
                 liOne = 2;

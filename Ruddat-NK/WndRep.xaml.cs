@@ -285,6 +285,22 @@ namespace Ruddat_NK
                                     RepView.LocalReport.ReportEmbeddedResource = "Ruddat_NK.ReportZahlungen.rdlc";
                                     RepView.RefreshReport();
                                 }
+
+                                if (asReportName == "zaehler")
+                                {
+                                    this.Title = "Report Zählerstände";
+                                    // Report befüllen
+                                    RepView.Reset();
+                                    ReportDataSource rds = new ReportDataSource("DataSet1", tableRep);
+                                    ReportDataSource rdsHd = new ReportDataSource("DataSetHeader", tableHeader);
+                                    ReportDataSource rdsFa = new ReportDataSource("DataSetFadr", tableFadr);
+                                    RepView.LocalReport.DataSources.Add(rds);
+                                    RepView.LocalReport.DataSources.Add(rdsHd);
+                                    RepView.LocalReport.DataSources.Add(rdsFa);
+                                    RepView.LocalReport.ReportEmbeddedResource = "Ruddat_NK.ReportZaehler.rdlc";
+                                    RepView.RefreshReport();
+                                }
+
                                 if (asReportName == "kosten")  // Nebenkostenabrecnung
                                 {
                                     // Die Tabelle x_abr_content muss befüllt werden
