@@ -121,7 +121,8 @@ namespace Ruddat_NK
 					left Join vertrag on vertrag.id_objekt_teil = objekt_teil.Id_objekt_teil
 					left Join mieter on mieter.Id_Mieter = vertrag.id_mieter
 	                    where filiale.Id_Filiale = " + piId.ToString() +
-                                    lsWhereAdd + lsWhereAdd2 + " Order by id_objekt,id_objekt_teil ";
+                lsWhereAdd + lsWhereAdd2 + " Order by id_objekt,id_objekt_teil ";
+                
             }
 
             // SQL für die Timeline Summendarstellung Objekte, TeilObjekte oder Mieter
@@ -365,7 +366,8 @@ namespace Ruddat_NK
                                 from timeline
                                 Right Join art_kostenart on timeline.id_ksa = art_kostenart.id_ksa ";
                         lsWhereAdd2 = " And timeline.id_mieter = " + ps3 + " ";
-                        lsOrder = " Order by objekt_teil.bez, timeline.dt_monat desc";
+                        //lsOrder = " Order by objekt_teil.bez, timeline.dt_monat desc";
+                        lsOrder = " Order by timeline.dt_monat desc";
                         break;
                     case "4":       // Leerstand ObjTeile
                         lsSql = @"Select                  
