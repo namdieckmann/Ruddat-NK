@@ -215,7 +215,8 @@ namespace Ruddat_NK
             return (lsSql);
         }
 
-        internal static string GetDateQueryResultVertrag(DateTime adtStart, string asField, int aiOne, int aiDb)
+        // Datumsstring zusammenbauen
+        internal static string GetDateQueryResultVertrag(DateTime adtStart, string AsFieldFrom, string AsFieldTo, int aiOne, int aiDb)
         {
             string LsWhereAdd = "";
             string lsAnd = " AND ";
@@ -223,11 +224,11 @@ namespace Ruddat_NK
             switch (aiDb)
             {
                 case 1:
-                    LsWhereAdd = lsAnd + asField + " <= Convert(DateTime, " + "\'" + adtStart + "', 104) ";
+                    LsWhereAdd = lsAnd + AsFieldFrom + " >= Convert(DateTime, " + "\'" + adtStart + "', 104) ";
                     break;
                 case 2:
-                    LsWhereAdd = lsAnd + asField + " <= str_to_date(\"" + adtStart.ToString("dd.MM.yyyy") + "\",\"%d.%m.%Y %H:%i:%s %H:%i:%s\") ";
-                                          
+                    LsWhereAdd = lsAnd + " (" + AsFieldFrom +     " <= str_to_date(\"" + adtStart.ToString("dd.MM.yyyy") + "\",\"%d.%m.%Y %H:%i:%s %H:%i:%s\") ";
+                    LsWhereAdd = LsWhereAdd + lsAnd + AsFieldTo + " >= str_to_date(\"" + adtStart.ToString("dd.MM.yyyy") + "\",\"%d.%m.%Y %H:%i:%s %H:%i:%s\") " + ") ";                      
                     break;
                 default:
                     break;

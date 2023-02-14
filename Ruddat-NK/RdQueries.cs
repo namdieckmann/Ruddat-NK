@@ -9,7 +9,7 @@ namespace Ruddat_NK
     public class RdQueries
     {
         // Sql-Statement erstellen
-        public static string GetSqlSelect(int piArt, int piId, string ps2, string ps3, DateTime adtWtStart, DateTime adtWtEnd, int aiFiliale, string asConnectString, int aiDb)
+        public static string GetSqlSelect(int piArt, int piId, string ps2, string ps3, string ps4, DateTime adtWtStart, DateTime adtWtEnd, int aiFiliale, string asConnectString, int aiDb)
         {
             String lsSql = "";
             String lsWhereAdd = "";
@@ -683,7 +683,8 @@ namespace Ruddat_NK
                 lsSql = @"Select id_mieter from vertrag
                         Where id_objekt_teil = " + piId.ToString();
                 lsFieldFrom = "vertrag.datum_von";
-                lsWhereAdd2 = RdQueriesTime.GetDateQueryResultVertrag(adtWtStart, lsFieldFrom, liOne, aiDb);
+                lsFieldTo = "vertrag.datum_bis";
+                lsWhereAdd2 = RdQueriesTime.GetDateQueryResultVertrag(adtWtStart, lsFieldFrom, lsFieldTo , liOne, aiDb);
                 lsSql = lsSql + lsWhereAdd2;
             }   // Vertragsbeginn oder -ende
             if (piArt == 42)

@@ -1979,10 +1979,20 @@ namespace Ruddat_NK
                             dr[2] = liZahlungId;
                             dr[3] = liZaehlerstandId;
                             // dr[4] = liObjekt; nicht eintragen
-                            // dr[5] = liObjektTeil; nicht eintragen
+                            // dr[5] = liObjektTeil; 
+
+                            //if (liObjektTeil == 97)
+                            //{
+                            //    int liTest = liObjektTeil;
+                            //}
 
                             // Aktuellen Mieter ermitteln
                             liMieter = getAktMieter(liObjektTeil, ldtMonat, asConnect, aiDb);
+
+                            if (liMieter == 107  && liObjektTeil == 97)
+                            {
+                                int liTest = liMieter;
+                            }
 
                             // Mieter gefunden
                             if (liMieter > 0)
@@ -1991,8 +2001,9 @@ namespace Ruddat_NK
                                 liDaysStart = 0;
                                 liDaysEnd = 0;
 
+                                // Hier nur, wenn ein Monat auch noch geteilt werden soll
                                 // Beginnt der Vertrag in diesem Monat?
-                                ldtVertrag = getVertragInfo(1, ldtMonat, liMieter, asConnect, aiDb);
+                                // ldtVertrag = getVertragInfo(1, ldtMonat, liMieter, asConnect, aiDb);
 
                                 // Todo Tage anteilig berechnen
                                 //// Tageszahl von Monatsbeginn an ermitteln
@@ -2813,7 +2824,7 @@ namespace Ruddat_NK
             // adtMonat umbauen soll immer den ersten des Monats zeigen
             adtMonat = adtMonat.AddDays(- (adtMonat.Day - 1));
 
-            lsSql = RdQueries.GetSqlSelect(41, aiObjektTeil, "", "", adtMonat, DateTime.MinValue, 0, asConnect, aiDb);
+            lsSql = RdQueries.GetSqlSelect(41, aiObjektTeil, "", "", "", adtMonat, DateTime.MinValue, 0, asConnect, aiDb);
             liMieterId = fetchData(lsSql, "", 26, asConnect, aiDb);
 
             return liMieterId;
@@ -3930,7 +3941,7 @@ namespace Ruddat_NK
             DateTime ldtVertrag = DateTime.MinValue;
             string lsSql = "";
 
-            lsSql = RdQueries.GetSqlSelect(42, aiMieter, "", "", adtMonat, DateTime.MinValue, aiArt, asConnect, aiDb);
+            lsSql = RdQueries.GetSqlSelect(42, aiMieter, "", "", "", adtMonat, DateTime.MinValue, aiArt, asConnect, aiDb);
             // Daten holen
             ldtVertrag = fetchDataDate(lsSql, "", 1, asConnect, aiDb);
 
