@@ -3,7 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Kostenarten" Height="683.5" Width="1057" WindowStartupLocation="CenterScreen">
     <Grid>
-        <DataGrid x:Name="dgrKsa" Margin="10,10,10,63" CanUserAddRows="False" CanUserDeleteRows="False" AutoGenerateColumns="False" ToolTip ="Kostenarten"  HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" ColumnWidth="*" CellEditEnding="dgrKsa_CellEditEnding" SelectionChanged="dgrKsa_SelectionChanged">
+        <DataGrid x:Name="dgrKsa" Margin="10,10,10,63" CanUserAddRows="False" CanUserDeleteRows="False" AutoGenerateColumns="False" ToolTip ="Kostenarten"  HorizontalAlignment="Stretch" 
+                  HorizontalContentAlignment="Stretch" ColumnWidth="*" CellEditEnding="dgrKsa_CellEditEnding" SelectionChanged="dgrKsa_SelectionChanged">
             <DataGrid.Columns>
                 <DataGridTextColumn x:Name="bez"  Header="Bezeichnung" 
                             Binding="{Binding bez}"/>

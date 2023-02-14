@@ -87,7 +87,7 @@ namespace Ruddat_NK
                     lsSql = "Delete from art_kostenart Where id_ksa = " + aiId.ToString();
                     break;
                 case 4:
-                    lsSql = @"Select id_ksa from Rechnungen where id_ksa = " + aiId.ToString();
+                    lsSql = @"Select id_ksa from rechnungen where id_ksa = " + aiId.ToString();
                     break;
                 default:
                     break;

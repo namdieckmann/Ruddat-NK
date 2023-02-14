@@ -2022,7 +2022,12 @@ namespace Ruddat_NK
 
                 if (x == 7)     // MwstFeld in globale Variable AUSNAHMSWEISE
                 {
+
                     lsMwstSatz = getCurrentCellValue((ComboBox)e.EditingElement);
+                    if (lsMwstSatz == "")
+                    {
+                        lsMwstSatz = "0";
+                    }
                     liMwstSatz = Convert.ToInt16(lsMwstSatz);
                     giMwstSatz = liMwstSatz;
 
