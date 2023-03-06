@@ -57,14 +57,23 @@ namespace Ruddat_NK
             // ConnectString global
             gsConnect = this.mainWindow.psConnect;
 
-            // SqlSelect Headerdaten holen
-            lsSqlHeader = getSql("", 1, 0);
             // SqlSelect Firmenadresse holen
             lsSqlFadr = getSql("", 2, 0);
 
             // Sql-Statement holen
-            lsSqlDirekt = DbReadSql(lsPath, 1);         // Art 1 = Erstes SQL Statement Rechungen,Zahlungen, Kosten Direkt Tabelle Timeline                
-            if (gsReportName == "kosten" || gsReportName == "kostendetail" || gsReportName == "anschreiben")
+            lsSqlDirekt = DbReadSql(lsPath, 1);         // Art 1 = Erstes SQL Statement Rechungen,Zahlungen, Kosten Direkt Tabelle Timeline    
+
+            // SqlSelect Headerdaten holen
+            if (gsReportName == "kostenteilobjekt")
+            {
+                lsSqlHeader = getSql("", 11, 0);
+            }
+            else
+            {
+                lsSqlHeader = getSql("", 1, 0);
+            }
+
+            if (gsReportName == "kosten" || gsReportName == "kostendetail" || gsReportName == "anschreiben" || gsReportName == "kostenteilobjekt")
             {
                 lsSqlContent = DbReadSql(lsPath, 2);        // Art 2 = Hauptinhalt der Abrechnung  Tabelle x_abr_content
                 lsSqlContent2 = DbReadSql(lsPath, 7);       // Art 7 = Hauptinhalt nur ObjektKosten 
@@ -123,6 +132,26 @@ namespace Ruddat_NK
 								left join objekt_teil on x_abr_info.id_objekt_teil = objekt_teil.Id_objekt_teil
 								left join filiale on x_abr_info.Id_filiale = filiale.Id_Filiale
                                 Where adressen.aktiv = 1";
+                    break;
+                case 11:
+                    lsSql = @"Select x_abr_info.id_filiale,
+                                x_abr_info.id_objekt as obj,
+                                x_abr_info.id_objekt_teil as objt,
+                                x_abr_info.id_mieter as mieter,
+                                x_abr_info.abr_dat_von as dvon,
+                                x_abr_info.abr_dat_bis as dbis,
+                                objekt.bez as obez,
+                                objekt.flaeche_gesamt as flg,
+                                objekt_teil.bez as otbez,
+                                objekt_teil.flaeche_anteil as fl,
+                                objekt_teil.prozent_anteil as pa,
+                                filiale.name as fname,
+                                objekt_teil.geschoss as otges,
+                                objekt_teil.lage as otlage
+                                from x_abr_info
+                                left join objekt on x_abr_info.id_objekt = objekt.Id_objekt
+                                left join objekt_teil on x_abr_info.id_objekt_teil = objekt_teil.Id_objekt_teil
+                                left join filiale on x_abr_info.Id_filiale = filiale.Id_Filiale";
                     break;
                 case 2:         // Adresse Filiale
                     lsSql = @"select x_abr_info.id_filiale,
@@ -301,7 +330,7 @@ namespace Ruddat_NK
                                     RepView.RefreshReport();
                                 }
 
-                                if (asReportName == "kosten")  // Nebenkostenabrecnung
+                                if (asReportName == "kosten" || asReportName == "kostenteilobjekt")  // Nebenkostenabrecnung
                                 {
                                     // Die Tabelle x_abr_content muss befüllt werden
                                     liOk = Timeline.fill_content(asSql, asSqlContent, asSqlContent2, asDatVon, asDatBis, gsConnect, "", 0, aiDb);
@@ -514,7 +543,7 @@ namespace Ruddat_NK
                                     RepView.LocalReport.ReportEmbeddedResource = "Ruddat_NK.ReportZahlungen.rdlc";
                                     RepView.RefreshReport();
                                 }
-                                if (asReportName == "kosten")  // Nebenkostenabrecnung
+                                if (asReportName == "kosten" || asReportName == "kostenteilobjekt")  // Nebenkostenabrecnung
                                 {
                                     // Die Tabelle x_abr_content muss befüllt werden
                                     liOk = Timeline.fill_content(asSql, asSqlContent, asSqlContent2, asDatVon, asDatBis, gsConnect, "", 0, aiDb);

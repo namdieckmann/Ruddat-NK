@@ -17,6 +17,7 @@ namespace Ruddat_NK
             String lsWhereAdd2 = "";
             String lsWhereAdd3 = "";
             String lsWhereAdd4 = "";
+            String lsWhereAdd5 = "";
             String lsFieldFrom = "";
             string lsFieldTo = "";
             String lsAnd = " Where ";
@@ -759,6 +760,7 @@ namespace Ruddat_NK
                             lsWhereAdd1 = " Where timeline.Id_objekt_teil = " + piId.ToString() + " ";
                             lsSql = lsSql + lsWhereAdd1;
                             lsAnd = " And ";
+                            lsWhereAdd3 = lsAnd + " timeline.id_mieter = 0 ";
                             lsWhereAdd4 = lsAnd + " (timeline.id_rechnung > 0 or timeline.id_zaehlerstand > 0) ";     // nur Rechnungen und Zählerstände
                             break;
                         case 107:                     // Mieter
@@ -792,9 +794,9 @@ namespace Ruddat_NK
                     lsAnd = " AND ";
 
                     // Nur wenn Ausdruck gewünscht wird
-                    lsWhereAdd3 = lsAnd + " art_kostenart.sort > 0";
+                    lsWhereAdd5 = lsAnd + " art_kostenart.sort > 0";
 
-                    lsSql = lsSql + lsWhereAdd2 + lsWhereAdd3 + lsWhereAdd4;
+                    lsSql = lsSql + lsWhereAdd2 + lsWhereAdd3 + lsWhereAdd4 + lsWhereAdd5;
                     lsSql = lsSql + lsGroup + lsOrder;
                 }
                 else

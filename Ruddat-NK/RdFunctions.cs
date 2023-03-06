@@ -3015,7 +3015,7 @@ namespace Ruddat_NK
                 xmlwriter.WriteEndElement();
             }
 
-            if (asSqlContent.Length > 0)
+            if (asSqlZaehler.Length > 0)
             {
                 xmlwriter.WriteStartElement("LastSqlContent2");
                 xmlwriter.WriteString(asSqlZaehler);     // Darstellung nur ObjektKosten Zähler
@@ -3026,7 +3026,7 @@ namespace Ruddat_NK
             if (asSqlContent.Length > 0)
             {
                 xmlwriter.WriteStartElement("LastSqlRgNr");
-                xmlwriter.WriteString(asSqlRgNr);     // Rechnungsnummer Anschreiben speichern
+                xmlwriter.WriteString(asSqlRgNr);       // Rechnungsnummer Anschreiben speichern
                 xmlwriter.WriteEndElement();
             }
 
