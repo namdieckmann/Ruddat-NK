@@ -1418,7 +1418,7 @@ namespace Ruddat_NK
                     if (liIndex == 3)       // Nebenkosten Mieter
                     {
                         Timeline.saveLastSql(lsSqlTimeline, lsSqlAbrContent, "",
-                                "", lsSqlZahlungen, lsSqlSumme, "", lsSqlTimeline2, "kosten", "");       // direkte Kosten Mieter 
+                                "", lsSqlZahlungen, lsSqlSumme, "", lsSqlTimeline2, "kosten", "");                  // direkte Kosten Mieter 
                     }
                     if (liIndex == 2)       // Nebenkosten Teilobjekt
                     {

@@ -697,13 +697,14 @@ namespace Ruddat_NK
                 switch (piArt)
                 {
                     case 14:
-                        lsWhereAdd = " Where timeline.id_rechnung = " + piId.ToString() + " and timeline.id_objekt > 0 ";         // Objekte
+                        lsWhereAdd = " Where timeline.id_rechnung = " + piId.ToString() + " and timeline.id_objekt > 0 ";                           // Objekte
                         break;
                     case 15:
-                        lsWhereAdd = " Where timeline.id_rechnung = " + piId.ToString() + " and timeline.id_objekt_teil = " + piId2.ToString() ;    // Teilobjekte
+                        lsWhereAdd = @" Where timeline.id_rechnung = " + piId.ToString() + " and timeline.id_objekt_teil = " + piId2.ToString() 
+                                        + " And timeline.id_mieter = 0 ";                                                                           // Teilobjekte
                         break;
                     case 16:
-                        lsWhereAdd = " Where timeline.id_zaehlerstand = " + piId.ToString() + " and timeline.id_objekt > 0 ";         // Objekte
+                        lsWhereAdd = " Where timeline.id_zaehlerstand = " + piId.ToString() + " and timeline.id_objekt > 0 ";                       // Objekte
                         break;
                     case 17:
                         lsWhereAdd = " Where timeline.id_zaehlerstand = " + piId.ToString() + " and timeline.id_objekt_teil = " + piId2.ToString();    // Teilobjekte
@@ -3204,14 +3205,14 @@ namespace Ruddat_NK
             {
                 if (Convert.ToInt16(tableTimeline.Rows[i].ItemArray.GetValue(7).ToString()) > 0)
                 {
-                    dr[3] = Convert.ToInt16(tableTimeline.Rows[i].ItemArray.GetValue(7).ToString());        //  Id Vorrauszahlung
+                    dr[3] = Convert.ToInt16(tableTimeline.Rows[i].ItemArray.GetValue(7).ToString());            //  Id Vorrauszahlung
                 }
             }
-            if (tableTimeline.Rows[i].ItemArray.GetValue(18) != DBNull.Value)                            // Id Zählerstand
+            if (tableTimeline.Rows[i].ItemArray.GetValue(18) != DBNull.Value)                                   // Id Zählerstand
             {
                 if (Convert.ToInt16(tableTimeline.Rows[i].ItemArray.GetValue(18).ToString()) > 0)
                 {
-                    dr[4] = Convert.ToInt16(tableTimeline.Rows[i].ItemArray.GetValue(18).ToString());         // Id Zählerstand
+                    dr[4] = Convert.ToInt16(tableTimeline.Rows[i].ItemArray.GetValue(18).ToString());           // Id Zählerstand
                     liIdZaehlerstand = Convert.ToInt16(tableTimeline.Rows[i].ItemArray.GetValue(18).ToString());
                     // dr[13] = Convert.ToDecimal(tableTimeline.Rows[i].ItemArray.GetValue(12).ToString());         // Zählerstand wird hier nicht genutzt auf null prüfen
                 }

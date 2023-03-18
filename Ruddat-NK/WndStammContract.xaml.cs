@@ -23,17 +23,24 @@ namespace Ruddat_NK
 
         SqlDataAdapter sdCmp;
         SqlDataAdapter sdContract;
+        SqlDataAdapter sdOldContract;
         SqlDataAdapter sdMieter;
         SqlDataAdapter sdObj;
+        SqlDataAdapter sdObjNew;
         SqlDataAdapter sdObjTeil;
+
         MySqlDataAdapter mysdCmp;
         MySqlDataAdapter mysdContract;
+        MySqlDataAdapter mysdOldContract;
         MySqlDataAdapter mysdMieter;
         MySqlDataAdapter mysdObj;
+        MySqlDataAdapter mysdObjNew;
         MySqlDataAdapter mysdObjTeil;
 
         DataTable tableCmp;
         DataTable tableContract;
+        DataTable tableOldContract;    // Für das automatische Anlegen neuer Verträge
+        DataTable tableObjNew;          // Daten der neuen Objekte besorgen obj_teil_id und Obj_id
         DataTable tableMieter;
         DataTable tableObj;
         DataTable tableObjTeil;
@@ -60,33 +67,33 @@ namespace Ruddat_NK
 
             giDb = aiDb;
             // SqlSelect Firmen erstellen
-            lsSql = getSql(1, 0);
+            lsSql = getSql(1, 0, "");
             // Daten Firmen holen
             liRows = fetchData(lsSql, 1);
 
             // SqlSelect Mieter (gewählte Filiale) Combobox Verträge
-            lsSql = getSql(52, 0);
+            lsSql = getSql(52, 0, "");
             // Daten Mieter holen
             liRows = fetchData(lsSql, 5);
 
             // SqlSelect Verträge
-            lsSql = getSql(2, 0);
+            lsSql = getSql(2, 0, "");
             // Daten Verträge holen
             liRows = fetchData(lsSql, 2);
 
             // SqlSelect Objekte
-            lsSql = getSql(3, 0);
+            lsSql = getSql(3, 0, "");
             // Daten Objekte holen
             liRows = fetchData(lsSql, 3);
 
             // SqlSelect ObjektTeile
-            lsSql = getSql(4, 0);
+            lsSql = getSql(4, 0, "");
             // Daten ObjektTeile holen
             liRows = fetchData(lsSql, 4);
         }
 
         // Sql zusammenstellen
-        private string getSql( int aiArt, int aiId)
+        private string getSql( int aiArt, int aiId, string asValue)
         {
             string lsSql = "";
 
@@ -135,6 +142,31 @@ namespace Ruddat_NK
                     break;
                 case 9:
                     lsSql = @"Select id_mieter from zahlungen where id_mieter = " + aiId.ToString();
+                    break;
+                case 10:        // Verträge auf neue obj_tei_id und neues objekt übertragen. Hier kommt das alte Objekt rein "20"
+                                // und da gehts mit ner Schleife durch
+                    lsSql = @"Select vertrag.Id_vertrag
+                                    ,vertrag.id_objekt
+                                    ,vertrag.id_objekt_teil
+                                    ,vertrag.id_mieter
+                                    ,vertrag.datum_von
+                                    ,vertrag.datum_bis
+								    ,vertrag.vertrag_aktiv
+                                    ,vertrag.anzahl_personen
+                                    ,vertrag.bemerkung 
+								    ,objekt_teil.bez
+	                            from vertrag
+                                Left Join objekt_teil On objekt_teil.Id_objekt_teil = vertrag.Id_objekt_teil
+                                Where vertrag.id_objekt = " + aiId.ToString();
+                    // + " AND bez like '" + asValue.ToString() + "' ";
+                    break;
+                case 11:        // Hier bekommt man die neue teil_objekt_id und die neue objekt Id 21
+                                // Schreiben der neuen Datensätze auf Tabel Verträge Case 2:
+                    lsSql = @"SELECT Id_objekt_teil
+                                    ,id_objekt
+                                    ,bez 
+                                FROM objekt_teil 
+                                Where id_objekt = " + aiId.ToString() + " AND bez like '" + asValue.ToString() + "' ";
                     break;
                 default:
                     break;
@@ -277,6 +309,20 @@ namespace Ruddat_NK
                                 liRows = 0;
                             }
                             break;
+                        case 10:        // Die Infos aus den alten Verträgen anhand der alten Id = 20
+                            tableOldContract = new DataTable();
+                            MySqlCommand command10 = new MySqlCommand(asSql, myConnect);
+                            mysdOldContract = new MySqlDataAdapter(command10);
+                            mysdOldContract.Fill(tableOldContract);
+                            // dgrStOldContract.ItemsSource = tableOldContract.DefaultView;
+                            break;
+                        case 11:        // Die neuen Ids anhand der Raumbezeichnung neue Id = 21
+                            tableObjNew = new DataTable();
+                            MySqlCommand command11 = new MySqlCommand(asSql, myConnect);
+                            mysdObjNew = new MySqlDataAdapter(command11);
+                            mysdObjNew.Fill(tableObjNew);
+                            // dgrStObj.ItemsSource = tableObj.DefaultView;
+                            break;
                         default:
                             break;
                     }
@@ -314,13 +360,13 @@ namespace Ruddat_NK
                     liId = Int32.Parse(rowview.Row[0].ToString());
                     // ComboBoxMieter dazu holen
                     // SqlSelect Mieter (gewählte Filiale) Combobox Verträge
-                    lsSql = getSql(52, liId);
+                    lsSql = getSql(52, liId, "");
                     // Daten Mieter holen
                     liRows = fetchData(lsSql, 5);
 
                     // Objekte dazu holen
                     // SqlSelect Objekte
-                    lsSql = getSql(3, liId);
+                    lsSql = getSql(3, liId, "");
                     // Daten Firmen holen
                     liRows = fetchData(lsSql, 3);
                 }
@@ -347,7 +393,7 @@ namespace Ruddat_NK
                 {
                     liId = Int32.Parse(rowview.Row[0].ToString());
                     // SqlSelect erstellen
-                    lsSql = getSql(4, liId);
+                    lsSql = getSql(4, liId, "");
                     // Daten holen
                     liRows = fetchData(lsSql, 4);
                 }
@@ -372,7 +418,7 @@ namespace Ruddat_NK
                     liId = Int32.Parse(rowview.Row[0].ToString());
 
                     // SqlSelect erstellen
-                    lsSql = getSql( 21, liId);
+                    lsSql = getSql( 21, liId, "");
                     // Daten holen
                     liRows = fetchData(lsSql, 2);
                 }
@@ -409,7 +455,7 @@ namespace Ruddat_NK
                         if (liId >= 0)
                         {
                             // Den Vertrag löschen
-                            lsSql = getSql(8, liId);
+                            lsSql = getSql(8, liId, "");
                             liOk = fetchData(lsSql, 8);
                         }
                     }
@@ -425,7 +471,7 @@ namespace Ruddat_NK
                 {
                     liId = Int32.Parse(rowview.Row[0].ToString());
                     // SqlSelect erstellen
-                    lsSql = getSql(22, liId);
+                    lsSql = getSql(22, liId, "");
                     // Daten holen
                     liRows = fetchData(lsSql, 2);
                 }
@@ -472,7 +518,7 @@ namespace Ruddat_NK
             int liId = 0;
             String lsSql = "";
 
-            lsSql = getSql(9, aiId);
+            lsSql = getSql(9, aiId, "");
             liId = fetchData(lsSql, 9);
 
             return liId;
