@@ -1412,7 +1412,7 @@ namespace Ruddat_NK
                 case 5:
                     // Nebenkostenabrechnung 
                     // SqlStatement für die Zieltabelle x_abr_content erzeugen Abrechnung
-                    // Das Befüllen der Tabelle erfolgt dann in WndRep
+                    // Das Befüllen der Tabelle erfolgt In FillContent in Funktionen
                     lsSqlAbrContent = RdQueries.GetSqlSelect(300, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);      // Abrechnung Content x_abr_content
                     // Abrechnungen (Kosten,Kostenverteilung,Kostenverteilung Summen,Zahlungen Summe,Personen,Zähler,Art)
                     if (liIndex == 3)       // Nebenkosten Mieter

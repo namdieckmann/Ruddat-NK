@@ -31,7 +31,8 @@
             </DataGrid.Columns>
         </DataGrid>
 
-        <DataGrid x:Name="dgrStContract" Margin="215,16,20,41" CanUserAddRows="False" CanUserDeleteRows="False" AutoGenerateColumns="False" ToolTip ="Alle Verträge zeigen mit Doppelklick" HorizontalContentAlignment="Stretch" CellEditEnding="dgrStContract_CellEditEnding" SelectionChanged="dgrStContract_SelectionChanged" >
+        <DataGrid x:Name="dgrStContract" Margin="215,16,20,39" CanUserAddRows="False" CanUserDeleteRows="False" AutoGenerateColumns="False" ToolTip ="Alle Verträge zeigen und kopieren öffnen mit Doppelklick " 
+                  HorizontalContentAlignment="Stretch" CellEditEnding="dgrStContract_CellEditEnding" SelectionChanged="dgrStContract_SelectionChanged" MouseDoubleClick="DgrStContract_MouseDoubleClick" >
             <DataGrid.Columns>
                 <DataGridComboBoxColumn x:Name="mieter" Header="Verträge Mieter"
                         DisplayMemberPath="bez"
@@ -83,6 +84,7 @@
         <Button x:Name="btnSave" Content="Speichern" Margin="0,0,20,10" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="134" RenderTransformOrigin="0.538,0.909" Click="btnSave_Click"/>
         <Button x:Name="btnAdd" Content="Zufügen" HorizontalAlignment="Right" Margin="0,0,159,10" VerticalAlignment="Bottom" Width="75" Click="btnAdd_Click" />
         <Button x:Name="btnDel" Content="Löschen" HorizontalAlignment="Right" Margin="0,0,239,10" VerticalAlignment="Bottom" Width="75" Click="btnDel_Click" />
+        <Button x:Name="btnCopy" Content="Verträge kopieren" IsEnabled="False" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,319,10" Width="143" Click="BtnCopy_Click"/>
     </Grid>
 </Window>
     
