@@ -283,9 +283,9 @@ namespace Ruddat_NK
                     break;
                 case 2:
                     // Lokal MySql 
-                    // MySqlConnectionString = @"server=localhost;userid=rdnk;password=r1d8n9k4!;database=dbo";
+                    MySqlConnectionString = @"server=localhost;userid=rdnk;password=r1d8n9k4!;database=dbo";
                     // Ionos Server 
-                    MySqlConnectionString = @"Data Source=197288c.online-server.cloud;PORT=3306;USERID=namdi;PASSWORD=7V7ADTqWqQPCf9Sge4PT;database=dbo;Connect Timeout = 20";
+                    // MySqlConnectionString = @"Data Source=197288c.online-server.cloud;PORT=3306;USERID=namdi;PASSWORD=7V7ADTqWqQPCf9Sge4PT;database=dbo;Connect Timeout = 20";
                     // MessageBox.Show("Ionos Datenbank MySql wird verwendet", "Achtung! ", MessageBoxButton.OK);
                     break;
                 default:
@@ -966,6 +966,9 @@ namespace Ruddat_NK
             int liRows = 0;
             String lsSql = "";
             string lsConnect = "";
+            DateTime ldtFrom = DateTime.MinValue;
+            DateTime ldtTo = DateTime.MaxValue;
+            DateTime ldtFromZaehler = DateTime.MinValue;
             lsConnect = gsConnect;
 
 
@@ -973,6 +976,14 @@ namespace Ruddat_NK
             {
                 liFiliale = Convert.ToInt16(lbFiliale.SelectedValue.ToString());
                 giFiliale = liFiliale;
+            }
+
+            // Start und EndeDatum angegeben
+            if (clFrom.SelectedDate != null && clTo.SelectedDate != null)
+            {
+                ldtFrom = clFrom.SelectedDate.Value;
+                ldtTo = clTo.SelectedDate.Value;
+                ldtFromZaehler = ldtFrom.AddYears(-1);          //Zähler sollen ein Jahr Vergangenheit zeigen
             }
 
             if (liFiliale > 0)
@@ -983,7 +994,7 @@ namespace Ruddat_NK
                 liRows = FetchData(lsSql, 2, giDb, lsConnect);                          // Aufruf Art 2 ist Treeview befüllen   
 
                 // Tabelle Leerstand befüllen
-                lsSql = RdQueries.GetSqlSelect(211, liFiliale, "", "", "", DateTime.MinValue, DateTime.MaxValue, giFiliale, gsConnect, giDb);
+                lsSql = RdQueries.GetSqlSelect(211, liFiliale, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
                 liRows = FetchData(lsSql, 18, giDb, lsConnect);
             }
         }
@@ -1122,6 +1133,7 @@ namespace Ruddat_NK
             string lsSqlHeader = "";
             string lsSqlAbrContent = "";
             string lsSqlRgNrAnschreiben = "";
+            string lsSqlLeerstand = "";         // Leerstand für Report
             DateTime ldtFrom = DateTime.MinValue;
             DateTime ldtTo = DateTime.MaxValue;
             DateTime ldtFromZaehler = DateTime.MinValue;
@@ -1255,6 +1267,7 @@ namespace Ruddat_NK
                     DgrLeerDetail.ItemsSource = null;
                     lsSql = RdQueries.GetSqlSelect(212, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
                     liRows = FetchData(lsSql, 18, giDb, gsConnect);
+                    lsSqlLeerstand = RdQueries.GetSqlSelect(222, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);     // für Report
 
                     // Db Header für Report befüllen für Objekte x_abr_info
                     lsSqlHeader = RdQueries.GetSqlSelect(201, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
@@ -1328,6 +1341,8 @@ namespace Ruddat_NK
                     DgrLeerDetail.ItemsSource = null;
                     lsSql = RdQueries.GetSqlSelect(213, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
                     liRows = FetchData(lsSql, 18, giDb, gsConnect);
+                    // Detaillierter Leerstand
+                    lsSqlLeerstand = RdQueries.GetSqlSelect(223, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);     // für Report
 
                     // Global TeilObjekt Id
                     giObjekt = 0;
@@ -1381,6 +1396,7 @@ namespace Ruddat_NK
                     // Für Mieter gibt es keinen Leerstand
                     DgrLeer.ItemsSource = null;
                     DgrLeerDetail.ItemsSource = null;
+                    lsSqlLeerstand = "";
 
                     // Zählerstände gibts nicht für Mieter
                     DgrCounters.ItemsSource = null;
@@ -1403,11 +1419,11 @@ namespace Ruddat_NK
             {
                 case 3:
                     // Rechnungen
-                    Timeline.saveLastSql(lsSqlRechnungen, "", "", "", "", "", "", "", "rechnungen", "");
+                    Timeline.saveLastSql(lsSqlRechnungen, "", "", "", "", "", "", "", "", "rechnungen", "");
                     break;
                 case 4:
                     // Zahlungen
-                    Timeline.saveLastSql(lsSqlZahlungen, "", "", "", "", "", "", "", "zahlungen", "");
+                    Timeline.saveLastSql(lsSqlZahlungen, "", "", "", "", "", "", "", "", "zahlungen", "");
                     break;
                 case 5:
                     // Nebenkostenabrechnung 
@@ -1418,12 +1434,12 @@ namespace Ruddat_NK
                     if (liIndex == 3)       // Nebenkosten Mieter
                     {
                         Timeline.saveLastSql(lsSqlTimeline, lsSqlAbrContent, "",
-                                "", lsSqlZahlungen, lsSqlSumme, "", lsSqlTimeline2, "kosten", "");                  // direkte Kosten Mieter 
+                                "", lsSqlZahlungen, lsSqlSumme, "", lsSqlTimeline2, "", "kosten", "");                  // direkte Kosten Mieter 
                     }
                     if (liIndex == 2)       // Nebenkosten Teilobjekt
                     {
                         Timeline.saveLastSql(lsSqlTimeline, lsSqlAbrContent, "", 
-                                "", lsSqlZahlungen, lsSqlSumme, "", lsSqlTimeline2, "kostenteilobjekt", "");       // direkte Kosten Teilobjekt
+                                "", lsSqlZahlungen, lsSqlSumme, "", lsSqlTimeline2, "", "kostenteilobjekt", "");       // direkte Kosten Teilobjekt
                     }
 
                     Timeline.saveLastVal(ldtFrom, ldtTo, "Datum");                          // Übergabe des Datumsbereiches 
@@ -1436,7 +1452,7 @@ namespace Ruddat_NK
                     lsSqlRgNrAnschreiben = RdQueries.GetSqlSelect(140, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb); // Speichern der Rechnungsnummer Anschreiben
                     // Abrechnungen (Kosten,Kostenverteilung,Kostenverteilung Summen,Zahlungen Summe,Personen,Zähler,Art, Rechnungsnummer Anschreiben)
                     Timeline.saveLastSql(lsSqlTimeline, lsSqlAbrContent, "",
-                            "", lsSqlZahlungen, lsSqlSumme, "", lsSqlTimeline2, "anschreiben", lsSqlRgNrAnschreiben);  // direkte Kosten
+                            "", lsSqlZahlungen, lsSqlSumme, "", lsSqlTimeline2, "", "anschreiben", lsSqlRgNrAnschreiben);  // direkte Kosten
                     Timeline.saveLastVal(ldtFrom, ldtTo, "Datum");                          // Übergabe des Datumsbereiches 
                     break;
                 case 7:
@@ -1446,12 +1462,16 @@ namespace Ruddat_NK
                     lsSqlAbrContent = RdQueries.GetSqlSelect(300, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);      // Abrechnung Content x_abr_content
                     // Abrechnungen (Kosten,Kostenverteilung,Kostenverteilung Summen,Zahlungen Summe,Personen,Zähler,Art)
                     Timeline.saveLastSql(lsSqlTimeline, lsSqlAbrContent, "",
-                            "", lsSqlZahlungen, lsSqlSumme, "", lsSqlTimeline2, "kostendetail", "");       // direkte Kosten detailliert
-                    Timeline.saveLastVal(ldtFrom, ldtTo, "Datum");                                        // Übergabe des Datumsbereiches 
+                            "", lsSqlZahlungen, lsSqlSumme, "", lsSqlTimeline2, "", "kostendetail", "");       // direkte Kosten detailliert
+                    Timeline.saveLastVal(ldtFrom, ldtTo, "Datum");                                         // Übergabe des Datumsbereiches 
                     break;
                 case 8:
                     // Zählerstände
-                    Timeline.saveLastSql(lsSqlZahlungen, "", "", "", "", "", "", "", "zaehler", "");
+                    Timeline.saveLastSql(lsSqlZaehlerstd, "", "", "", "", "", "", "", "", "zaehler", "");
+                    break;
+                case 9:
+                    // Leerstände
+                    Timeline.saveLastSql(lsSqlLeerstand, "", "", "", "", "", "", "", "", "leerstand", "");
                     break;
                 default:
                     break;
@@ -2750,6 +2770,15 @@ namespace Ruddat_NK
         {
             // Sql Statement für das Anschreiben in XML Datei speichern
             updateAllDataGrids(8);
+            WndRep frmRep = new WndRep(this);
+            DelPassDataArt delegt = new DelPassDataArt(frmRep.getDb);
+            delegt(giDb);
+            frmRep.ShowDialog();
+        }
+        // Menü Leerstände
+        private void MnOutLeerstaende_Click(object sender, RoutedEventArgs e)
+        {
+            updateAllDataGrids(9);
             WndRep frmRep = new WndRep(this);
             DelPassDataArt delegt = new DelPassDataArt(frmRep.getDb);
             delegt(giDb);

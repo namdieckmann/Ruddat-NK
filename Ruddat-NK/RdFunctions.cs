@@ -548,7 +548,7 @@ namespace Ruddat_NK
                                 join art_kostenart on timeline.id_ksa = art_kostenart.id_ksa
                                 Where timeline.id_rechnung = " + piId.ToString();
                             break;
-                        // Weiterleitung an Mieter
+                            // Weiterleitung an Mieter
                         case 2:
                             lsSql = @"Select art_kostenart.wtl_mieter from timeline 
                                 join art_kostenart on timeline.id_ksa = art_kostenart.id_ksa
@@ -2978,8 +2978,8 @@ namespace Ruddat_NK
 
         // Und den Sql Zusatz für Reports in eine xml-Datei speichern
         public static void saveLastSql(string asSqlKostenDirekt, string asSqlContent, string asSqlContSumObj, string asSqlConSumObjt,
-            string asSqlZahlungen, string asSqlZahlungenSumme, 
-            string asSqlPersonen, string asSqlZaehler, string asReport, string asSqlRgNr)
+            string asSqlZahlungen, string asSqlZahlungenSumme,
+            string asSqlPersonen, string asSqlZaehler, string asSqlLeerstaende, string asReport, string asSqlRgNr)
         {
             String PDataPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\Ruddat\\Nebenkosten";
 

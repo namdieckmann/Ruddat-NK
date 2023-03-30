@@ -42,7 +42,7 @@
                         <MenuItem x:Name="mnOutZahlungen" Header="Report _Zahlungen" Click="mnOutZahlungen_Click"  />
                         <MenuItem x:Name="mnOutZaehler" Header="Report _Zählerstände" Click="MnOutZaehler_Click" />
                         <Separator/>
-                        <MenuItem x:Name="mnOutLeerstaende" Header="Report _Leerstände" />
+                        <MenuItem x:Name="mnOutLeerstaende" Header="Report _Leerstände" Click="MnOutLeerstaende_Click" />
                         <Separator/>
                         <MenuItem x:Name="mnInfoZahlungenTrace" Header="Report _Zahlungen nicht zugeordnet" Click="mnInfoZahlungenTrace_Click" />
 

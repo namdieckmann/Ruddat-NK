@@ -1159,6 +1159,65 @@ namespace Ruddat_NK
                     lsAnd = " Where ";
                 }
             }
+            // Leerstand detaillierter
+            // SQL für die Timeline Darstellung Objekte, TeilObjekte oder Mieter
+            // Bei Leerstand wird das Feld Filiale in der Tabelle mieter geschrieben
+            if (piArt == 221 || piArt == 222 || piArt == 223)
+            {
+                lsSql = @"Select                  
+                art_kostenart.bez as ksa_bez,
+                timeline.betrag_netto as betrag_netto,
+				timeline.betrag_brutto as betrag_brutto,
+                timeline.id_rechnung,
+                timeline.id_vorauszahlung,
+                timeline.wtl_aus_objekt,
+                timeline.wtl_aus_objteil,
+                timeline.id_zaehlerstand,
+                objekt_teil.id_objekt_teil,
+                objekt_teil.bez
+            from timeline
+            Right Join art_kostenart on timeline.id_ksa = art_kostenart.id_ksa
+            Right Join mieter on timeline.id_mieter = mieter.id_mieter
+            Left Join objekt_teil on timeline.leerstand = objekt_teil.id_objekt_teil ";
+                lsGroup = @" Group by timeline.Id_objekt_teil,art_kostenart.bez ";
+                lsOrder = " Order by timeline.Id_objekt_teil ";
+                // Objekt ID
+                if (piId > 0)
+                {
+                    switch (piArt)
+                    {
+                        case 221:                     // Filiale
+                            lsWhereAdd1 = " Where mieter.Id_filiale = " + piId.ToString() + " ";
+                            lsWhereAdd2 = " And timeline.leerstand > 0 ";
+                            lsSql = lsSql + lsWhereAdd1 + lsWhereAdd2;
+                            lsAnd = " And ";
+                            break;
+                        case 222:                     // Objekt
+                            lsWhereAdd1 = " Where objekt_teil.Id_objekt = " + piId.ToString() + " ";
+                            lsSql = lsSql + lsWhereAdd1;
+                            lsAnd = " And ";
+                            break;
+                        case 223:                     // TeilObjekt
+                            lsWhereAdd1 = " Where timeline.leerstand = " + piId.ToString() + " ";
+                            lsSql = lsSql + lsWhereAdd1;
+                            lsAnd = " And ";
+                            break;
+                        default:
+                            break;
+                    }
+
+                    lsFieldFrom = "timeline.dt_monat";
+                    liOne = 2;
+                    lsWhereAdd2 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsFieldFrom, lsFieldFrom, lsAnd, liOne, aiDb);
+
+                    lsSql = lsSql + lsWhereAdd2;
+                    lsSql = lsSql + lsGroup + lsOrder;
+                }
+                else
+                {
+                    lsAnd = " Where ";
+                }
+            }
 
             //----------------------------------------------------------------------------------------------------------------
             // Das Content Abrechnung für Reports befüllen
