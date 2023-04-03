@@ -166,6 +166,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>DataSetHeader.xsd</DependentUpon>
     </Compile>
+    <Compile Include="DataSetLeerstaende.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DataSetLeerstaende.xsd</DependentUpon>
+    </Compile>
     <Compile Include="DataSetRechnungen.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -318,6 +323,7 @@
     <EmbeddedResource Include="ReportAbrechnung.rdlc" />
     <EmbeddedResource Include="ReportAbrechnungdetailliert.rdlc" />
     <EmbeddedResource Include="ReportAnschreiben.rdlc" />
+    <EmbeddedResource Include="ReportLeerstaende.rdlc" />
     <EmbeddedResource Include="ReportRechnungen.rdlc" />
     <EmbeddedResource Include="ReportZahlungen.rdlc" />
     <EmbeddedResource Include="WndAboutBox1.resx">
@@ -366,6 +372,17 @@
     </None>
     <None Include="DataSetHeader.xss">
       <DependentUpon>DataSetHeader.xsd</DependentUpon>
+    </None>
+    <None Include="DataSetLeerstaende.xsc">
+      <DependentUpon>DataSetLeerstaende.xsd</DependentUpon>
+    </None>
+    <None Include="DataSetLeerstaende.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>DataSetLeerstaende.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="DataSetLeerstaende.xss">
+      <DependentUpon>DataSetLeerstaende.xsd</DependentUpon>
     </None>
     <None Include="DataSetRechnungen.xsc">
       <DependentUpon>DataSetRechnungen.xsd</DependentUpon>

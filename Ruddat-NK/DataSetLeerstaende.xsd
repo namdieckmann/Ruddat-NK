@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="DataSetLeerstaende" targetNamespace="http://tempuri.org/DataSetLeerstaende.xsd" xmlns:mstns="http://tempuri.org/DataSetLeerstaende.xsd" xmlns="http://tempuri.org/DataSetLeerstaende.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections />
+        <Tables />
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="DataSetLeerstaende" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:EnableTableAdapterManager="true" msprop:Generator_DataSetName="DataSetLeerstaende" msprop:Generator_UserDSName="DataSetLeerstaende">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="DataTable1" msprop:Generator_TableClassName="DataTable1DataTable" msprop:Generator_TableVarName="tableDataTable1" msprop:Generator_TablePropName="DataTable1" msprop:Generator_RowDeletingName="DataTable1RowDeleting" msprop:Generator_RowChangingName="DataTable1RowChanging" msprop:Generator_RowEvHandlerName="DataTable1RowChangeEventHandler" msprop:Generator_RowDeletedName="DataTable1RowDeleted" msprop:Generator_UserTableName="DataTable1" msprop:Generator_RowChangedName="DataTable1RowChanged" msprop:Generator_RowEvArgName="DataTable1RowChangeEvent" msprop:Generator_RowClassName="DataTable1Row">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="ksa_bez" msprop:Generator_ColumnVarNameInTable="columnksa_bez" msprop:Generator_ColumnPropNameInRow="ksa_bez" msprop:Generator_ColumnPropNameInTable="ksa_bezColumn" msprop:Generator_UserColumnName="ksa_bez" type="xs:string" minOccurs="0" />
+              <xs:element name="betrag_netto" msprop:Generator_ColumnVarNameInTable="columnbetrag_netto" msprop:Generator_ColumnPropNameInRow="betrag_netto" msprop:Generator_ColumnPropNameInTable="betrag_nettoColumn" msprop:Generator_UserColumnName="betrag_netto" type="xs:string" minOccurs="0" />
+              <xs:element name="betrag_brutto" msprop:Generator_ColumnVarNameInTable="columnbetrag_brutto" msprop:Generator_ColumnPropNameInRow="betrag_brutto" msprop:Generator_ColumnPropNameInTable="betrag_bruttoColumn" msprop:Generator_UserColumnName="betrag_brutto" type="xs:string" minOccurs="0" />
+              <xs:element name="bez" msprop:Generator_ColumnVarNameInTable="columnbez" msprop:Generator_ColumnPropNameInRow="bez" msprop:Generator_ColumnPropNameInTable="bezColumn" msprop:Generator_UserColumnName="bez" type="xs:string" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

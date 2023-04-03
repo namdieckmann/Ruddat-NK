@@ -578,11 +578,11 @@ namespace Ruddat_NK
                                     // Report befüllen
                                     RepView.Reset();
                                     ReportDataSource rds = new ReportDataSource("DataSet1", tableRep);
-                                    ReportDataSource rdsHd = new ReportDataSource("DataSetHeader", tableHeader);
-                                    ReportDataSource rdsFa = new ReportDataSource("DataSetFadr", tableFadr);
+                                    // ReportDataSource rdsHd = new ReportDataSource("DataSetHeader", tableHeader);
+                                    // ReportDataSource rdsFa = new ReportDataSource("DataSetFadr", tableFadr);
                                     RepView.LocalReport.DataSources.Add(rds);
-                                    RepView.LocalReport.DataSources.Add(rdsHd);
-                                    RepView.LocalReport.DataSources.Add(rdsFa);
+                                    // RepView.LocalReport.DataSources.Add(rdsHd);
+                                    // RepView.LocalReport.DataSources.Add(rdsFa);
                                     RepView.LocalReport.ReportEmbeddedResource = "Ruddat_NK.ReportLeerstaende.rdlc";
                                     RepView.RefreshReport();
                                 }
