@@ -389,7 +389,7 @@ namespace Ruddat_NK {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
-            public DataTable1Row AddDataTable1Row(string ksa_bez, string betrag_netto, string betrag_brutto, string bez) {
+            public DataTable1Row AddDataTable1Row(string ksa_bez, decimal betrag_netto, decimal betrag_brutto, string bez) {
                 DataTable1Row rowDataTable1Row = ((DataTable1Row)(this.NewRow()));
                 object[] columnValuesArray = new object[] {
                         ksa_bez,
@@ -429,9 +429,9 @@ namespace Ruddat_NK {
             private void InitClass() {
                 this.columnksa_bez = new global::System.Data.DataColumn("ksa_bez", typeof(string), null, global::System.Data.MappingType.Element);
                 base.Columns.Add(this.columnksa_bez);
-                this.columnbetrag_netto = new global::System.Data.DataColumn("betrag_netto", typeof(string), null, global::System.Data.MappingType.Element);
+                this.columnbetrag_netto = new global::System.Data.DataColumn("betrag_netto", typeof(decimal), null, global::System.Data.MappingType.Element);
                 base.Columns.Add(this.columnbetrag_netto);
-                this.columnbetrag_brutto = new global::System.Data.DataColumn("betrag_brutto", typeof(string), null, global::System.Data.MappingType.Element);
+                this.columnbetrag_brutto = new global::System.Data.DataColumn("betrag_brutto", typeof(decimal), null, global::System.Data.MappingType.Element);
                 base.Columns.Add(this.columnbetrag_brutto);
                 this.columnbez = new global::System.Data.DataColumn("bez", typeof(string), null, global::System.Data.MappingType.Element);
                 base.Columns.Add(this.columnbez);
@@ -593,10 +593,10 @@ namespace Ruddat_NK {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
-            public string betrag_netto {
+            public decimal betrag_netto {
                 get {
                     try {
-                        return ((string)(this[this.tableDataTable1.betrag_nettoColumn]));
+                        return ((decimal)(this[this.tableDataTable1.betrag_nettoColumn]));
                     }
                     catch (global::System.InvalidCastException e) {
                         throw new global::System.Data.StrongTypingException("Der Wert für Spalte betrag_netto in Tabelle DataTable1 ist DBNull.", e);
@@ -609,10 +609,10 @@ namespace Ruddat_NK {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
-            public string betrag_brutto {
+            public decimal betrag_brutto {
                 get {
                     try {
-                        return ((string)(this[this.tableDataTable1.betrag_bruttoColumn]));
+                        return ((decimal)(this[this.tableDataTable1.betrag_bruttoColumn]));
                     }
                     catch (global::System.InvalidCastException e) {
                         throw new global::System.Data.StrongTypingException("Der Wert für Spalte betrag_brutto in Tabelle DataTable1 ist DBNull.", e);

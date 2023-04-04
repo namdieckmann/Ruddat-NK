@@ -1261,7 +1261,7 @@ namespace Ruddat_NK
                     lsSql = RdQueries.GetSqlSelect(34, liId, "", "", "", ldtFromZaehler, ldtTo, giFiliale, gsConnect, giDb);
                     liRows = FetchData(lsSql, 21, giDb, gsConnect);
                     // Report  Zählerstände
-                    lsSqlZaehlerstd = RdQueries.GetSqlSelect(134, liId, "", "", "", ldtFrom, ldtTo,giFiliale,gsConnect, giDb);   
+                    lsSqlZaehlerstd = RdQueries.GetSqlSelect(134, liId, "", "", "", ldtFromZaehler, ldtTo,giFiliale,gsConnect, giDb);   // Report
 
                     // Tabelle Leerstand befüllen
                     DgrLeerDetail.ItemsSource = null;
@@ -1331,7 +1331,7 @@ namespace Ruddat_NK
                     lsSql = RdQueries.GetSqlSelect(35, liId, "", "", "", ldtFromZaehler, ldtTo, giFiliale, gsConnect, giDb);
                     liRows = FetchData(lsSql, 21, giDb, gsConnect);
                     // Report Zählerstände
-                    lsSqlZaehlerstd = RdQueries.GetSqlSelect(135, liId, "", "", "", ldtFrom, ldtTo,giFiliale,gsConnect, giDb);   
+                    lsSqlZaehlerstd = RdQueries.GetSqlSelect(135, liId, "", "", "", ldtFromZaehler, ldtTo,giFiliale,gsConnect, giDb);   // Report
 
                     // Db Header für Report befüllen für ObjektTeile x_abr_info
                     lsSqlHeader = RdQueries.GetSqlSelect(202, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);

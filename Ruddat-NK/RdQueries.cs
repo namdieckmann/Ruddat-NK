@@ -640,6 +640,7 @@ namespace Ruddat_NK
 				from zaehlerstaende
 				where zaehlerstaende.id_objekt = " + piId.ToString() + lsWhereAdd2;
                 }
+
                 if (piArt == 35)  // Zählerstände für Teilobjekte
                 {
                     lsSql = @"select id_zs,
@@ -658,6 +659,7 @@ namespace Ruddat_NK
 				from zaehlerstaende
 				where zaehlerstaende.id_objekt_teil = " + piId.ToString() + lsWhereAdd2;
                 }
+
                 lsOrder = " Order by datum_von desc ";
                 lsSql = lsSql + lsOrder;
             }
@@ -987,6 +989,7 @@ namespace Ruddat_NK
                 lsFieldFrom = "zaehlerstaende.datum_von";
                 liOne = 2;
                 lsWhereAdd2 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsFieldFrom, lsFieldFrom, lsAnd, liOne, aiDb);
+                lsOrder = " Order by Id_zaehler, datum_von desc ";
 
                 if (piArt == 134)   // Objekte
                 {
@@ -997,13 +1000,20 @@ namespace Ruddat_NK
 						zaehlerstaende.id_einheit,
                         zaehlerstaende.preis_einheit_netto as prnetto,
                         zaehlerstaende.preis_einheit_brutto as prbrutto,
-						objekt.bez as objbez,
-                        objekt_teil.bez as obtbez,
-                        zaehlerstaende.id_extern_timeline
+                        zaehlerstaende.id_extern_timeline,
+						zaehlerstaende.id_objekt,
+                        zaehlerstaende.id_objekt_teil,
+                        zaehlerstaende.id_zaehler,
+                        zaehlerstaende.id_ksa,
+                        zaehlerstaende.id_verteilung as id_verteilung_zl,
+                        zaehler.zaehlernummer,
+                        zaehler.zaehlerort,
+                        art_zaehler.bez as bezart,
+                        art_einheit.bez as bezeinheit
 				from zaehlerstaende
-				left join zaehler on zaehler.Id_zaehler = zaehlerstaende.id_zaehler
-				left join objekt on zaehler.id_objekt = objekt.id_objekt
-                left join objekt_teil on zaehler.id_objekt_teil = objekt_teil.id_objekt_teil
+                Left join zaehler On zaehler.Id_zaehler = zaehlerstaende.Id_zaehler
+                Left Join art_zaehler On zaehler.Id_zaehler_art = art_zaehler.Id_zaehler_art
+                Left Join art_einheit On art_einheit.Id_einheit = zaehler.Id_einheit
 				where zaehler.id_objekt = " + piId.ToString() + lsWhereAdd2;
                 }
 
@@ -1014,22 +1024,30 @@ namespace Ruddat_NK
 						zaehlerstaende.zs as zs,
 						zaehlerstaende.verbrauch as verb,
 						zaehlerstaende.id_einheit,
-                        zaehlerstaende.preis_einheit_netto,
-                        zaehlerstaende.preis_einheit_brutto,
-						objekt.bez as objbez,
-                        objekt_teil.bez as obtbez,
-                        zaehlerstaende.id_extern_timeline
+                        zaehlerstaende.preis_einheit_netto as prnetto,
+                        zaehlerstaende.preis_einheit_brutto as prbrutto,
+						zaehlerstaende.id_extern_timeline,
+						zaehlerstaende.id_objekt,
+                        zaehlerstaende.id_objekt_teil,
+                        zaehlerstaende.id_zaehler,
+                        zaehlerstaende.id_ksa,
+                        zaehlerstaende.id_verteilung as id_verteilung_zl,
+                        zaehler.zaehlernummer,
+                        zaehler.zaehlerort,
+                        art_zaehler.bez as bezart,
+                        art_einheit.bez as bezeinheit
 				from zaehlerstaende
-				left join zaehler on zaehler.Id_zaehler = zaehlerstaende.id_zaehler
-				left join objekt on zaehler.id_objekt = objekt.id_objekt
-                left join objekt_teil on zaehler.id_objekt_teil = objekt_teil.id_objekt_teil
-				where zaehler.id_objekt_teil = " + piId.ToString() + lsWhereAdd2;
+                Left join zaehler On zaehler.Id_zaehler = zaehlerstaende.Id_zaehler
+                Left Join art_zaehler On zaehler.Id_zaehler_art = art_zaehler.Id_zaehler_art
+                Left Join art_einheit On art_einheit.Id_einheit = zaehler.Id_einheit
+				where zaehlerstaende.id_objekt_teil = " + piId.ToString() + lsWhereAdd2;
                 }
 
                 if (piArt == 133)   // Zähler für Mieter gibt es nicht
                 {
                     lsSql = "";
                 }
+                lsSql = lsSql + lsOrder;
             }
 
             // Bei Druck des Anschreibens muss die Rechnungsnummer in die Timeline eingesetzt werden
