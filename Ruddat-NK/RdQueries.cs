@@ -989,7 +989,7 @@ namespace Ruddat_NK
                 lsFieldFrom = "zaehlerstaende.datum_von";
                 liOne = 2;
                 lsWhereAdd2 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsFieldFrom, lsFieldFrom, lsAnd, liOne, aiDb);
-                lsOrder = " Order by Id_zaehler, datum_von desc ";
+                lsOrder = " Order by zlnum, von Desc";
 
                 if (piArt == 134)   // Objekte
                 {
@@ -1006,8 +1006,8 @@ namespace Ruddat_NK
                         zaehlerstaende.id_zaehler,
                         zaehlerstaende.id_ksa,
                         zaehlerstaende.id_verteilung as id_verteilung_zl,
-                        zaehler.zaehlernummer,
-                        zaehler.zaehlerort,
+                        zaehler.zaehlernummer as zlnum,
+                        zaehler.zaehlerort as zlort,
                         art_zaehler.bez as bezart,
                         art_einheit.bez as bezeinheit
 				from zaehlerstaende
@@ -1032,8 +1032,8 @@ namespace Ruddat_NK
                         zaehlerstaende.id_zaehler,
                         zaehlerstaende.id_ksa,
                         zaehlerstaende.id_verteilung as id_verteilung_zl,
-                        zaehler.zaehlernummer,
-                        zaehler.zaehlerort,
+                        zaehler.zaehlernummer as zlnum,
+                        zaehler.zaehlerort as zlort,
                         art_zaehler.bez as bezart,
                         art_einheit.bez as bezeinheit
 				from zaehlerstaende

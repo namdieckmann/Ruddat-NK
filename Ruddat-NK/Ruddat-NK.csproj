@@ -325,6 +325,7 @@
     <EmbeddedResource Include="ReportAnschreiben.rdlc" />
     <EmbeddedResource Include="ReportLeerstaende.rdlc" />
     <EmbeddedResource Include="ReportRechnungen.rdlc" />
+    <EmbeddedResource Include="ReportZaehler.rdlc" />
     <EmbeddedResource Include="ReportZahlungen.rdlc" />
     <EmbeddedResource Include="WndAboutBox1.resx">
       <DependentUpon>WndAboutBox1.cs</DependentUpon>

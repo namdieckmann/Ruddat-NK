@@ -285,6 +285,18 @@ namespace Ruddat_NK {
             
             private global::System.Data.DataColumn columnvon;
             
+            private global::System.Data.DataColumn columnprnetto;
+            
+            private global::System.Data.DataColumn columnprbrutto;
+            
+            private global::System.Data.DataColumn columnzlnum;
+            
+            private global::System.Data.DataColumn columnzlort;
+            
+            private global::System.Data.DataColumn columnbezart;
+            
+            private global::System.Data.DataColumn columnbezeinheit;
+            
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
             public DataTable1DataTable() {
@@ -344,6 +356,54 @@ namespace Ruddat_NK {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
+            public global::System.Data.DataColumn prnettoColumn {
+                get {
+                    return this.columnprnetto;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
+            public global::System.Data.DataColumn prbruttoColumn {
+                get {
+                    return this.columnprbrutto;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
+            public global::System.Data.DataColumn zlnumColumn {
+                get {
+                    return this.columnzlnum;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
+            public global::System.Data.DataColumn zlortColumn {
+                get {
+                    return this.columnzlort;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
+            public global::System.Data.DataColumn bezartColumn {
+                get {
+                    return this.columnbezart;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
+            public global::System.Data.DataColumn bezeinheitColumn {
+                get {
+                    return this.columnbezeinheit;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
             [global::System.ComponentModel.Browsable(false)]
             public int Count {
                 get {
@@ -379,12 +439,18 @@ namespace Ruddat_NK {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
-            public DataTable1Row AddDataTable1Row(decimal zs, decimal verb, System.DateTime von) {
+            public DataTable1Row AddDataTable1Row(decimal zs, decimal verb, System.DateTime von, decimal prnetto, decimal prbrutto, string zlnum, string zlort, string bezart, string bezeinheit) {
                 DataTable1Row rowDataTable1Row = ((DataTable1Row)(this.NewRow()));
                 object[] columnValuesArray = new object[] {
                         zs,
                         verb,
-                        von};
+                        von,
+                        prnetto,
+                        prbrutto,
+                        zlnum,
+                        zlort,
+                        bezart,
+                        bezeinheit};
                 rowDataTable1Row.ItemArray = columnValuesArray;
                 this.Rows.Add(rowDataTable1Row);
                 return rowDataTable1Row;
@@ -410,6 +476,12 @@ namespace Ruddat_NK {
                 this.columnzs = base.Columns["zs"];
                 this.columnverb = base.Columns["verb"];
                 this.columnvon = base.Columns["von"];
+                this.columnprnetto = base.Columns["prnetto"];
+                this.columnprbrutto = base.Columns["prbrutto"];
+                this.columnzlnum = base.Columns["zlnum"];
+                this.columnzlort = base.Columns["zlort"];
+                this.columnbezart = base.Columns["bezart"];
+                this.columnbezeinheit = base.Columns["bezeinheit"];
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -421,6 +493,18 @@ namespace Ruddat_NK {
                 base.Columns.Add(this.columnverb);
                 this.columnvon = new global::System.Data.DataColumn("von", typeof(global::System.DateTime), null, global::System.Data.MappingType.Element);
                 base.Columns.Add(this.columnvon);
+                this.columnprnetto = new global::System.Data.DataColumn("prnetto", typeof(decimal), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnprnetto);
+                this.columnprbrutto = new global::System.Data.DataColumn("prbrutto", typeof(decimal), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnprbrutto);
+                this.columnzlnum = new global::System.Data.DataColumn("zlnum", typeof(string), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnzlnum);
+                this.columnzlort = new global::System.Data.DataColumn("zlort", typeof(string), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnzlort);
+                this.columnbezart = new global::System.Data.DataColumn("bezart", typeof(string), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnbezart);
+                this.columnbezeinheit = new global::System.Data.DataColumn("bezeinheit", typeof(string), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnbezeinheit);
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -611,6 +695,102 @@ namespace Ruddat_NK {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
+            public decimal prnetto {
+                get {
+                    try {
+                        return ((decimal)(this[this.tableDataTable1.prnettoColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("Der Wert für Spalte prnetto in Tabelle DataTable1 ist DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tableDataTable1.prnettoColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
+            public decimal prbrutto {
+                get {
+                    try {
+                        return ((decimal)(this[this.tableDataTable1.prbruttoColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("Der Wert für Spalte prbrutto in Tabelle DataTable1 ist DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tableDataTable1.prbruttoColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
+            public string zlnum {
+                get {
+                    try {
+                        return ((string)(this[this.tableDataTable1.zlnumColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("Der Wert für Spalte zlnum in Tabelle DataTable1 ist DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tableDataTable1.zlnumColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
+            public string zlort {
+                get {
+                    try {
+                        return ((string)(this[this.tableDataTable1.zlortColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("Der Wert für Spalte zlort in Tabelle DataTable1 ist DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tableDataTable1.zlortColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
+            public string bezart {
+                get {
+                    try {
+                        return ((string)(this[this.tableDataTable1.bezartColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("Der Wert für Spalte bezart in Tabelle DataTable1 ist DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tableDataTable1.bezartColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
+            public string bezeinheit {
+                get {
+                    try {
+                        return ((string)(this[this.tableDataTable1.bezeinheitColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("Der Wert für Spalte bezeinheit in Tabelle DataTable1 ist DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tableDataTable1.bezeinheitColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
             public bool IszsNull() {
                 return this.IsNull(this.tableDataTable1.zsColumn);
             }
@@ -643,6 +823,78 @@ namespace Ruddat_NK {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
             public void SetvonNull() {
                 this[this.tableDataTable1.vonColumn] = global::System.Convert.DBNull;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
+            public bool IsprnettoNull() {
+                return this.IsNull(this.tableDataTable1.prnettoColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
+            public void SetprnettoNull() {
+                this[this.tableDataTable1.prnettoColumn] = global::System.Convert.DBNull;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
+            public bool IsprbruttoNull() {
+                return this.IsNull(this.tableDataTable1.prbruttoColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
+            public void SetprbruttoNull() {
+                this[this.tableDataTable1.prbruttoColumn] = global::System.Convert.DBNull;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
+            public bool IszlnumNull() {
+                return this.IsNull(this.tableDataTable1.zlnumColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
+            public void SetzlnumNull() {
+                this[this.tableDataTable1.zlnumColumn] = global::System.Convert.DBNull;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
+            public bool IszlortNull() {
+                return this.IsNull(this.tableDataTable1.zlortColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
+            public void SetzlortNull() {
+                this[this.tableDataTable1.zlortColumn] = global::System.Convert.DBNull;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
+            public bool IsbezartNull() {
+                return this.IsNull(this.tableDataTable1.bezartColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
+            public void SetbezartNull() {
+                this[this.tableDataTable1.bezartColumn] = global::System.Convert.DBNull;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
+            public bool IsbezeinheitNull() {
+                return this.IsNull(this.tableDataTable1.bezeinheitColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
+            public void SetbezeinheitNull() {
+                this[this.tableDataTable1.bezeinheitColumn] = global::System.Convert.DBNull;
             }
         }
         
