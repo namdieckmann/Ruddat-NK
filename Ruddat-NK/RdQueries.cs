@@ -525,14 +525,14 @@ namespace Ruddat_NK
             }
 
             // Combobox Zählernummern für Objekte und ObjektTeile
-            if (piArt == 22 || piArt == 222)
+            if (piArt == 22 || piArt == 2222)
             {
                 switch (piArt)
                 {
                     case 22:
                         lsWhereAdd = " Where zaehler.Id_objekt = " + piId.ToString() + " and zaehler.Id_objekt_teil = 0 ";
                         break;
-                    case 222:
+                    case 2222:
                         lsWhereAdd = " Where zaehler.Id_objekt_teil = " + piId.ToString();
                         break;
                     default:

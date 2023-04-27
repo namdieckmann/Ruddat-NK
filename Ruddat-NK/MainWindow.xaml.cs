@@ -283,9 +283,9 @@ namespace Ruddat_NK
                     break;
                 case 2:
                     // Lokal MySql 
-                    MySqlConnectionString = @"server=localhost;userid=rdnk;password=r1d8n9k4!;database=dbo";
+                    // MySqlConnectionString = @"server=localhost;userid=rdnk;password=r1d8n9k4!;database=dbo";
                     // Ionos Server 
-                    // MySqlConnectionString = @"Data Source=197288c.online-server.cloud;PORT=3306;USERID=namdi;PASSWORD=7V7ADTqWqQPCf9Sge4PT;database=dbo;Connect Timeout = 20";
+                    MySqlConnectionString = @"Data Source=197288c.online-server.cloud;PORT=3306;USERID=namdi;PASSWORD=7V7ADTqWqQPCf9Sge4PT;database=dbo;Connect Timeout = 20";
                     // MessageBox.Show("Ionos Datenbank MySql wird verwendet", "Achtung! ", MessageBoxButton.OK);
                     break;
                 default:
@@ -1202,6 +1202,7 @@ namespace Ruddat_NK
             liRows = FetchData(lsSql, 12, giDb, gsConnect);
             // Combobox Kostenverteilung in Rechnungen befüllen Art = 16
             lsSql = RdQueries.GetSqlSelect(16, 0, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
+            liRows = FetchData(lsSql, 16, giDb, gsConnect);
             // Combobox Kostenart in Zahlungen befüllen Art = 11/15 Objekt Kennung 4
             lsSql = RdQueries.GetSqlSelect(11, 4, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
             liRows = FetchData(lsSql, 15, giDb, gsConnect);
@@ -1307,7 +1308,7 @@ namespace Ruddat_NK
                     liId = FetchData(lsSql, 4, giDb, gsConnect);
 
                     // Combobox Zählernummern und mwst in Zähler
-                    lsSql = RdQueries.GetSqlSelect(222, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
+                    lsSql = RdQueries.GetSqlSelect(2222, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
                     liRows = FetchData(lsSql, 22, giDb, gsConnect);
 
                     // TimeLine holen für ObjektTeile
