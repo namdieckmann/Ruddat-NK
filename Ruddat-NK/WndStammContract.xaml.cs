@@ -804,27 +804,27 @@ namespace Ruddat_NK
         // Wieder alle Verträge zeigen 
         private void DgrStContract_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            string lsSql = "";
-            int liRows = 0;
-            int liIdObj = 0;
+            //string lsSql = "";
+            //int liRows = 0;
+            //int liIdObj = 0;
 
-            if (tableContract.Rows.Count > 0)
-            {
-                liIdObj = Convert.ToInt16(tableContract.Rows[0].ItemArray.GetValue(1).ToString());
+            //if (tableContract.Rows.Count > 0)
+            //{
+            //    liIdObj = Convert.ToInt16(tableContract.Rows[0].ItemArray.GetValue(1).ToString());
 
-                // SqlSelect gewählte Verträge
-                lsSql = getSql(23, liIdObj, "");
-                // Daten Verträge holen
-                liRows = fetchData(lsSql, 2);
+            //    // SqlSelect gewählte Verträge
+            //    lsSql = getSql(23, liIdObj, "");
+            //    // Daten Verträge holen
+            //    liRows = fetchData(lsSql, 2);
 
-                btnCopy.IsEnabled = true;
-            }
-            else
-            {
-                MessageBoxResult result = MessageBox.Show("Es sind keine Verträge sichtbar?", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
+            //    btnCopy.IsEnabled = true;
+            //}
+            //else
+            //{
+            //    MessageBoxResult result = MessageBox.Show("Es sind keine Verträge sichtbar?", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
 
 
-            }
+            //}
         }
     }
 }

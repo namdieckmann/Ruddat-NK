@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data;
 using System.Data.SqlClient;
+using System.Threading;
 using System.Windows;
 using System.Xml;
 using MySql.Data.MySqlClient;
@@ -28,12 +29,12 @@ namespace Ruddat_NK
         static DataTable tableCnt;
         static DataTable tableCntNew;
         static DataTable tableZlInfo;
-        // static DataTable tableObjTeil;      // Objektteile
-        static DataTable tableParts;        // objekt_mix_parts
-        static DataTable tableTmlCheckRgNr;  // Hier checken, ob schon eine Rechnungsnmmerfür das Anschreiben drin ist
+        // static DataTable tableObjTeil;       // Objektteile
+        static DataTable tableParts;            // objekt_mix_parts
+        static DataTable tableTmlCheckRgNr;     // Hier checken, ob schon eine Rechnungsnmmerfür das Anschreiben drin ist
         static DataTable tableTimeline;
-        static DataTable tableTimeline1;     // Kosten des Objektes darstellen 
-        static DataTable tableContent;       // Content
+        static DataTable tableTimeline1;        // Kosten des Objektes darstellen 
+        static DataTable tableContent;          // Content
         static SqlDataAdapter sda;
         static SqlDataAdapter sdb;
         static SqlDataAdapter sdc;
@@ -1508,6 +1509,18 @@ namespace Ruddat_NK
             //string lsObjektBezS = "";
             int LiReturn = 0;
 
+            // Fenster Progressbar in eigenem Thread
+            var progressWindowThread = new Thread(new ThreadStart(() =>
+            {
+                // Das Progress Fenster öffnen
+                WndGauge frmGauge = new WndGauge();
+                frmGauge.ShowDialog();
+
+                System.Windows.Threading.Dispatcher.Run();
+            }));
+            progressWindowThread.SetApartmentState(ApartmentState.STA);
+            progressWindowThread.Start();
+
             switch (aiArt)
             {
                 case 1:
@@ -1713,6 +1726,12 @@ namespace Ruddat_NK
                     // Aufteilung nach Personen kann hier nicht gemacht werden. 
                     // Geschieht erst beim Verteilen auf die Mieter
 
+                    tableFour.Rows.Clear();     // Timeline leeren
+
+
+                    //var gaugeUpdater = new GaugeUpdater();
+                    //gaugeUpdater.UpdateGaugeValue(frmGauge, 50.0);
+
                     // Timeline
                     for (int i = 0; tableSix.Rows.Count > i; i++)
                     {
@@ -1745,6 +1764,7 @@ namespace Ruddat_NK
                             // Ermitteln der VerteilungsId aus Tabelle rechnungen
                             // Achtung nbüschen gepfuscht liRechnungId ist die externTimeline Id
                             liVerteilungId = getVerteilungsId(asConnect, liRechnungId, aiDb);
+
                             // Ermitteln, wie verteilt werden soll aus der Tabelle art_verteilung
                             lsVerteilung = getVerteilung(asConnect, liVerteilungId, aiDb);
 
@@ -1763,134 +1783,122 @@ namespace Ruddat_NK
                                     dr[6] = liMieter;
                                     dr[7] = liKsa;
 
-                                    // Flächenanteil rechnen
-                                    if (lsVerteilung == "fl")
+                                    switch (lsVerteilung)
                                     {
-                                        if (tableFive.Rows[ii].ItemArray.GetValue(6) != DBNull.Value)
-                                        {
-                                            if ((decimal)tableFive.Rows[ii].ItemArray.GetValue(6) > 0)
+                                        case "fl":
+                                            if (tableFive.Rows[ii].ItemArray.GetValue(6) != DBNull.Value)
                                             {
-                                                // Gesamtfläche aus Tabelle Objekt holen
-                                                if (liObjekt > 0)
+                                                if ((decimal)tableFive.Rows[ii].ItemArray.GetValue(6) > 0)
                                                 {
-                                                    ldGesamtflaeche = getObjektflaeche(liObjekt, 0, 0, asConnect, aiDb);
-                                                    dr[8] = ldBetragNetto / (ldGesamtflaeche / (decimal)tableFive.Rows[ii].ItemArray.GetValue(6));          // Netto    
-                                                    dr[10] = ldBetragBrutto / (ldGesamtflaeche / (decimal)tableFive.Rows[ii].ItemArray.GetValue(6));         // Brutto                                                                                                                                                        
-                                                }
-                                            }
-                                            else
-                                            {
-                                                liSave = 0;
-                                            }
-                                        }
-                                    }
-                                    // Prozentanteil rechnen
-                                    // if (tableFive.Rows[ii].ItemArray.GetValue(7) != DBNull.Value)
-                                    if (lsVerteilung == "pz")
-                                    {
-                                        if (tableFive.Rows[ii].ItemArray.GetValue(7) != DBNull.Value)
-                                        {
-                                            if ((decimal)tableFive.Rows[ii].ItemArray.GetValue(7) > 0)
-                                            {
-                                                dr[8] = (ldBetragNetto / 100) * (decimal)tableFive.Rows[ii].ItemArray.GetValue(7);           // Netto    
-                                                dr[10] = (ldBetragBrutto / 100) * (decimal)tableFive.Rows[ii].ItemArray.GetValue(7);         // Brutto                                                		 
-                                            }
-                                            else
-                                            {
-                                                liSave = 0;
-                                            }
-                                        }
-                                    }
-
-                                    // Personenanzahl für den aktuellen Monat berechnen
-                                    //if (tableFive.Rows[ii].ItemArray.GetValue(8) != DBNull.Value)
-                                    if (lsVerteilung == "ps")
-                                    {
-                                        // Anzahl der Personen in einem Objekt ermitteln
-                                        // Information aus aktiven Verträgen
-                                        // liAnzPersonenObj = getAktPersonen(liObjekt, ldtMonat, 0);
-                                        // liAnzPersonenObt = getAktPersonen(0, ldtMonat, liObjektTeil);
-
-                                        if (tableFive.Rows[ii].ItemArray.GetValue(8) != DBNull.Value)
-                                        {
-                                            if ((int)tableFive.Rows[ii].ItemArray.GetValue(8) > 0)
-                                            {
-                                                // Anzahl der Personen in einem Objekt ermitteln
-                                                // Aktive Verträge
-                                                liAnzPersonenObj = Convert.ToInt32(getAktPersonen(liObjekt, 0, 0, ldtMonat.ToString(), ldtMonat.ToString(), 0, asConnect, aiDb));
-                                                // Anzahl der Personen in einem Objektteil ermitteln
-                                                liAnzPersonenObt = Convert.ToInt32(getAktPersonen(0, liObjektTeil, 0, ldtMonat.ToString(), ldtMonat.ToString(), 0, asConnect, aiDb));
-
-                                                if (liAnzPersonenObj > 0 && liAnzPersonenObt > 0)
-                                                {
-                                                    dr[8] = (ldBetragNetto / liAnzPersonenObj) * liAnzPersonenObt;          // Netto    
-                                                    dr[10] = (ldBetragBrutto / liAnzPersonenObj) * liAnzPersonenObt;        // Brutto                                                		 
+                                                    // Gesamtfläche aus Tabelle Objekt holen
+                                                    if (liObjekt > 0)
+                                                    {
+                                                        ldGesamtflaeche = getObjektflaeche(liObjekt, 0, 0, asConnect, aiDb);
+                                                        dr[8] = ldBetragNetto / (ldGesamtflaeche / (decimal)tableFive.Rows[ii].ItemArray.GetValue(6));          // Netto    
+                                                        dr[10] = ldBetragBrutto / (ldGesamtflaeche / (decimal)tableFive.Rows[ii].ItemArray.GetValue(6));         // Brutto
+                                                    }
                                                 }
                                                 else
                                                 {
                                                     liSave = 0;
                                                 }
                                             }
-                                            else
+                                            break;
+                                        // Prozentanteil rechnen
+                                        case "pz":
+                                            if (tableFive.Rows[ii].ItemArray.GetValue(7) != DBNull.Value)
                                             {
-                                                liSave = 0;
+                                                if ((decimal)tableFive.Rows[ii].ItemArray.GetValue(7) > 0)
+                                                {
+                                                    dr[8] = (ldBetragNetto / 100) * (decimal)tableFive.Rows[ii].ItemArray.GetValue(7);           // Netto    
+                                                    dr[10] = (ldBetragBrutto / 100) * (decimal)tableFive.Rows[ii].ItemArray.GetValue(7);         // Brutto                                                		 
+                                                }
+                                                else
+                                                {
+                                                    liSave = 0;
+                                                }
                                             }
-                                        }
-                                    }
+                                            break;
+                                        // Personenanzahl für den aktuellen Monat berechnen
+                                        case "ps":
+                                            // Anzahl der Personen in einem Objekt ermitteln
+                                            // Information aus aktiven Verträgen
+                                            // liAnzPersonenObj = getAktPersonen(liObjekt, ldtMonat, 0);
+                                            // liAnzPersonenObt = getAktPersonen(0, ldtMonat, liObjektTeil);
 
-                                    // Direkte Verteilung 1:1 weiterleiten   31.5.2018
-                                    if (lsVerteilung == "di")
-                                    {
-                                        dr[8] = ldBetragNetto;          // Netto    
-                                        dr[10] = ldBetragBrutto;        // Brutto                                                		 
-                                    }
+                                            if (tableFive.Rows[ii].ItemArray.GetValue(8) != DBNull.Value)
+                                            {
+                                                if ((int)tableFive.Rows[ii].ItemArray.GetValue(8) > 0)
+                                                {
+                                                    // Anzahl der Personen in einem Objekt ermitteln
+                                                    // Aktive Verträge
+                                                    liAnzPersonenObj = Convert.ToInt32(getAktPersonen(liObjekt, 0, 0, ldtMonat.ToString(), ldtMonat.ToString(), 0, asConnect, aiDb));
+                                                    // Anzahl der Personen in einem Objektteil ermitteln
+                                                    liAnzPersonenObt = Convert.ToInt32(getAktPersonen(0, liObjektTeil, 0, ldtMonat.ToString(), ldtMonat.ToString(), 0, asConnect, aiDb));
 
-                                    // Nix wird verteilt                    31.5.2018
-                                    if (lsVerteilung == "nl")
-                                    {
-                                        // dr[8] = 0;          // Netto    
-                                        // dr[10] = 0;        // Brutto
-                                        liSave = 0;
-                                    }
-
-                                    // Zähleranteil ermitteln 
-                                    if (lsVerteilung == "zl")
-                                    {
-                                        // Zähler werden immer direkt auf die Wohnung bzw den Mieter gebucht  
-                                        liSave = 0;
+                                                    if (liAnzPersonenObj > 0 && liAnzPersonenObt > 0)
+                                                    {
+                                                        dr[8] = (ldBetragNetto / liAnzPersonenObj) * liAnzPersonenObt;          // Netto    
+                                                        dr[10] = (ldBetragBrutto / liAnzPersonenObj) * liAnzPersonenObt;        // Brutto                                                		 
+                                                    }
+                                                    else
+                                                    {
+                                                        liSave = 0;
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    liSave = 0;
+                                                }
+                                            }
+                                            break;
+                                        // Direkte Verteilung 1:1 weiterleiten   31.5.2018
+                                        case "di":
+                                            dr[8] = ldBetragNetto;          // Netto    
+                                            dr[10] = ldBetragBrutto;        // Brutto                                                		 
+                                            break;
+                                        // Nix wird verteilt                    31.5.2018
+                                        case "nl":
+                                            liSave = 0;
+                                            break;
+                                        case "zl":
+                                            // Zähleranteil ermitteln 
+                                            // Zähler werden immer direkt auf die Wohnung bzw den Mieter gebucht  
+                                            liSave = 0;
+                                            break;
+                                        // Verteilung Bedingt mit Anwahl für gewünschte Wohnungen
+                                        // Die Gesamtfläche für die Auswahl wird ermittelt
+                                        case "fa":
+                                            if ((decimal)tableFive.Rows[ii].ItemArray.GetValue(6) > 0)
+                                            {
+                                                // Gesamtfläche der ausgewählten Wohnungen aus Tabelle Objekt_mix_parts holen
+                                                if (liObjekt > 0)
+                                                {
+                                                    int liArt = 0;
+                                                    // Gesamtfläche der Auswahl = 0 oder Gesamtfläche = 1
+                                                    liArt = getObjektflaecheAuswFlag(liObjekt, asConnect, aiDb);
+                                                    ldGesamtflaeche = getObjektflaecheAuswahl(liObjekt, liRechnungId, asConnect, liArt, aiDb);  // RechnungsId ist Timeline ID
+                                                    if (getObjektTeilAuswahl((int)tableFive.Rows[ii].ItemArray.GetValue(0), asConnect, aiDb) > 0)
+                                                    {
+                                                        // decimal ldtest = ldBetragNetto / (ldGesamtflaeche / (decimal)tableFive.Rows[ii].ItemArray.GetValue(6)); 
+                                                        dr[8] = ldBetragNetto / (ldGesamtflaeche / (decimal)tableFive.Rows[ii].ItemArray.GetValue(6));          // Netto    
+                                                        dr[10] = ldBetragBrutto / (ldGesamtflaeche / (decimal)tableFive.Rows[ii].ItemArray.GetValue(6));         // Brutto                                                                                                                                                    
+                                                    }
+                                                    else
+                                                    {
+                                                        dr[8] = 0;
+                                                        dr[10] = 0;
+                                                        liSave = 0;     // nur in diesem Fall Datensatz verwerfen
+                                                    }
+                                                }
+                                            }
+                                            break;
+                                                default:
+                                            break;
                                     }
 
                                     dr[12] = ldZs;                  // Zählerstand
                                     dr[13] = ldtMonat;              // Der Timelinemonat
-
-                                    // Verteilung Bedingt mit Anwahl für gewünschte Wohnungen
-                                    // Die Gesamtfläche für die Auswahl wird ermittelt
-                                    if (lsVerteilung == "fa")
-                                    {
-                                        if ((decimal)tableFive.Rows[ii].ItemArray.GetValue(6) > 0)
-                                        {
-                                            // Gesamtfläche der ausgewählten Wohnungen aus Tabelle Objekt_mix_parts holen
-                                            if (liObjekt > 0)
-                                            {
-                                                int liArt = 0;
-                                                // Gesamtfläche der Auswahl = 0 oder Gesamtfläche = 1
-                                                liArt = getObjektflaecheAuswFlag(liObjekt, asConnect, aiDb);
-                                                ldGesamtflaeche = getObjektflaecheAuswahl(liObjekt, liRechnungId, asConnect, liArt, aiDb);  // RechnungsId ist Timeline ID
-                                                if (getObjektTeilAuswahl((int)tableFive.Rows[ii].ItemArray.GetValue(0), asConnect, aiDb) > 0)
-                                                {
-                                                    // decimal ldtest = ldBetragNetto / (ldGesamtflaeche / (decimal)tableFive.Rows[ii].ItemArray.GetValue(6)); 
-                                                    dr[8] = ldBetragNetto / (ldGesamtflaeche / (decimal)tableFive.Rows[ii].ItemArray.GetValue(6));          // Netto    
-                                                    dr[10] = ldBetragBrutto / (ldGesamtflaeche / (decimal)tableFive.Rows[ii].ItemArray.GetValue(6));         // Brutto                                                                                                                                                    
-                                                }
-                                                else
-                                                {
-                                                    dr[8] = 0;
-                                                    dr[10] = 0;
-                                                    liSave = 0;     // nur in diesem Fall Datensatz verwerfen
-                                                }
-                                            }
-                                        }
-                                    }
 
                                     // Kennzeichnen der Timeline, ob es eine Weiterleitung vom Objekt ist
                                     if (liObjekt > 0)
@@ -1918,9 +1926,10 @@ namespace Ruddat_NK
                                     tableFour.Rows.Add(dr);
                                 }
                                 liSave = 1;
+                                // und alle TimelineEinträge ab in die Datenbank
+                                MakeCommand(aiDb, 2);
+                                tableFour.Rows.Clear();
                             }
-                            // und alle TimelineEinträge ab in die Datenbank
-                            MakeCommand(aiDb, 2);
                         }
                         else
                         {
@@ -1929,10 +1938,13 @@ namespace Ruddat_NK
                             break;
                         }
                     }
-                        break;
+
+                    break;
                 case 5:         // Mieter schreiben
                     // Schleife durch Timeline
                     // Jeder Datensatz muss hier einen Datensatz für den Mieter erzeugen
+                    tableThree.Rows.Clear();    // TimeLine leeren
+
                     for (int i = 0; tableEight.Rows.Count > i; i++)
                     {
                         liSave = 1;
@@ -2086,8 +2098,9 @@ namespace Ruddat_NK
                                 tableThree.Rows.Add(dr);            // Timeline                                     
                             }
                             liSave = 1;
-
-
+                            // und alle TimelineEinträge ab in die Datenbank
+                            MakeCommand(aiDb, 3);
+                            tableThree.Rows.Clear();
                         }
                         else
                         {
@@ -2096,9 +2109,6 @@ namespace Ruddat_NK
                             break;
                         }
                     }
-
-                    // und alle TimelineEinträge ab in die Datenbank
-                    MakeCommand(aiDb, 3);
 
                     break;
                 case 8:
@@ -2394,9 +2404,20 @@ namespace Ruddat_NK
                 default:
                     break;
             }
-
             return LiReturn;
         }
+
+        public class GaugeUpdater
+        {
+            //public void UpdateGaugeValue(Window frmGauge, double value)
+            //{
+            //    if (frmGauge.FindName("PgbVerlauf") is GaugeControl gaugeControl)
+            //    {
+            //        gaugeControl.Value = value;
+            //    }
+            //}
+        }
+
 
         // Berechnen der monatlichen Beträge für die Timeline
         private static decimal[] getBetraege(int liMonths, int liDaysStart, int liDaysEnd, 
@@ -4047,6 +4068,5 @@ namespace Ruddat_NK
             }
             return adtYear;
         }
-
     }
 }
