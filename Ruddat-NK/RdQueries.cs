@@ -953,6 +953,7 @@ namespace Ruddat_NK
                         default:
                             break;
                     }
+                    break;
                 case 134:
                 case 135:
                     // Nur Where für Reports Zählerstände
@@ -1013,9 +1014,6 @@ namespace Ruddat_NK
                                             Left Join art_zaehler On zaehler.Id_zaehler_art = art_zaehler.Id_zaehler_art
                                             Left Join art_einheit On art_einheit.Id_einheit = zaehler.Id_einheit
 				                    where zaehlerstaende.id_objekt_teil = " + piId.ToString() + lsWhereAdd2;
-                            break;
-
-                        default:
                             break;
                     }
                     lsSql = lsSql + lsOrder;
@@ -1081,7 +1079,7 @@ namespace Ruddat_NK
                     }
                     lsSql = RdQueriesTime.GetAbrInfo(aiFiliale, liObjId, liObjTeilId, liMieterId, ldtStartTmp, ldtEndTmp, piArt, aiDb);
                     break;
-                case 221:
+                case 211:
                 case 212:
                 case 213:
                     // Leerstand 
