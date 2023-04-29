@@ -204,9 +204,6 @@
     <Compile Include="WndCompanies.xaml.cs">
       <DependentUpon>WndCompanies.xaml</DependentUpon>
     </Compile>
-    <Compile Include="WndGauge.xaml.cs">
-      <DependentUpon>WndGauge.xaml</DependentUpon>
-    </Compile>
     <Compile Include="WndKsa.xaml.cs">
       <DependentUpon>WndKsa.xaml</DependentUpon>
     </Compile>
@@ -215,6 +212,9 @@
     </Compile>
     <Compile Include="WndPoolRgNr.xaml.cs">
       <DependentUpon>WndPoolRgNr.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="WndProgress.xaml.cs">
+      <DependentUpon>WndProgress.xaml</DependentUpon>
     </Compile>
     <Compile Include="WndRep.xaml.cs">
       <DependentUpon>WndRep.xaml</DependentUpon>
@@ -260,10 +260,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="WndGauge.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="WndKsa.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -273,6 +269,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="WndPoolRgNr.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="WndProgress.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

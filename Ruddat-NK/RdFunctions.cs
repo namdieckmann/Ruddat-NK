@@ -1,8 +1,10 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Data;
 using System.Data.SqlClient;
 using System.Threading;
 using System.Windows;
+using System.Windows.Threading;
 using System.Xml;
 using MySql.Data.MySqlClient;
 
@@ -1509,17 +1511,15 @@ namespace Ruddat_NK
             //string lsObjektBezS = "";
             int LiReturn = 0;
 
-            // Fenster Progressbar in eigenem Thread
-            var progressWindowThread = new Thread(new ThreadStart(() =>
-            {
-                // Das Progress Fenster öffnen
-                WndGauge frmGauge = new WndGauge();
-                frmGauge.ShowDialog();
+            // Thread für Progress definieren
+            Thread thread = new Thread(new ThreadStart(ThreadMethod));
+            thread.SetApartmentState(ApartmentState.STA);
 
-                System.Windows.Threading.Dispatcher.Run();
-            }));
-            progressWindowThread.SetApartmentState(ApartmentState.STA);
-            progressWindowThread.Start();
+            void ThreadMethod()
+            {
+                WndProgress frmProgress = new WndProgress();
+                frmProgress.ShowDialog();
+            }
 
             switch (aiArt)
             {
@@ -1531,7 +1531,7 @@ namespace Ruddat_NK
                         {
                             liExternId = (int)tableOne.Rows[i].ItemArray.GetValue(14);
                             // Timeline löschen
-                            liOk = TimelineDelete(liExternId, "R" ,asConnect, aiDb);
+                            liOk = TimelineDelete(liExternId, "R", asConnect, aiDb);
 
                             // Objekt
                             if (tableOne.Rows[i].ItemArray.GetValue(8) != DBNull.Value)
@@ -1543,7 +1543,7 @@ namespace Ruddat_NK
 
                                     // Weiterleitung an ObjektTeil aus der Kostenart ermitteln
                                     // 1 = Weiterleitung an Teilobjekt
-                                    if (getWtl(1, liExternId, asConnect,aiDb)==1)
+                                    if (getWtl(1, liExternId, asConnect, aiDb) == 1)
                                     {
                                         liObjektTeil = 0;
                                         liArtRelation = 1;
@@ -1551,13 +1551,13 @@ namespace Ruddat_NK
                                         liOk = TimelineCreateRelations(liExternId, liObjekt, liObjektTeil, liMieter, liArtRelation, asConnect, aiDb);
 
                                         // 2 = Weiterleitung an Mieter
-                                        if (getWtl(2, liExternId, asConnect, aiDb) ==1)   
+                                        if (getWtl(2, liExternId, asConnect, aiDb) == 1)
                                         {
                                             liObjekt = 0;
                                             liObjektTeil = 1;   // Auslöser für das Weiterleiten an Mieter
                                             liArtRelation = 1;
-                                                                // Timeline neu erzeugen für Relationen
-                                            liOk = TimelineCreateRelations(liExternId, liObjekt, liObjektTeil, liMieter, liArtRelation ,asConnect, aiDb);
+                                            // Timeline neu erzeugen für Relationen
+                                            liOk = TimelineCreateRelations(liExternId, liObjekt, liObjektTeil, liMieter, liArtRelation, asConnect, aiDb);
                                         }
                                     }
                                 }
@@ -1575,7 +1575,7 @@ namespace Ruddat_NK
                                     {
                                         liArtRelation = 1;
                                         // Timeline neu erzeugen für Relationen
-                                        liOk = TimelineCreateRelations(liExternId, liObjekt, liObjektTeil, liMieter, liArtRelation , asConnect, aiDb);
+                                        liOk = TimelineCreateRelations(liExternId, liObjekt, liObjektTeil, liMieter, liArtRelation, asConnect, aiDb);
                                     }
                                 }
 
@@ -1592,7 +1592,7 @@ namespace Ruddat_NK
                         else
                         {
                             MessageBox.Show("Verarbeitungsfehler ERROR fetchdata fetchdata RdFunctions 0001\n piArt = " + aiArt.ToString(),
-                                     "Achtung");
+                                        "Achtung");
                             break;
                         }
                     }
@@ -1611,7 +1611,7 @@ namespace Ruddat_NK
                                 else
                                 {
                                     MessageBox.Show("Verarbeitungsfehler ERROR fetchdata fetchdata RdFunctions 0002\n piArt = " + aiArt.ToString(),
-                                             "Achtung");
+                                                "Achtung");
                                     break;
                                 }
                             }
@@ -1710,7 +1710,7 @@ namespace Ruddat_NK
                                 else
                                 {
                                     MessageBox.Show("Verarbeitungsfehler ERROR fetchdata fetchdata RdFunctions 0003\n piArt = " + aiArt.ToString(),
-                                             "Achtung");
+                                                "Achtung");
                                     break;
                                 }
                             }
@@ -1726,11 +1726,10 @@ namespace Ruddat_NK
                     // Aufteilung nach Personen kann hier nicht gemacht werden. 
                     // Geschieht erst beim Verteilen auf die Mieter
 
+                    // Progressfenster 
+                    thread.Start();
+
                     tableFour.Rows.Clear();     // Timeline leeren
-
-
-                    //var gaugeUpdater = new GaugeUpdater();
-                    //gaugeUpdater.UpdateGaugeValue(frmGauge, 50.0);
 
                     // Timeline
                     for (int i = 0; tableSix.Rows.Count > i; i++)
@@ -1893,7 +1892,7 @@ namespace Ruddat_NK
                                                 }
                                             }
                                             break;
-                                                default:
+                                        default:
                                             break;
                                     }
 
@@ -1934,10 +1933,16 @@ namespace Ruddat_NK
                         else
                         {
                             MessageBox.Show("Verarbeitungsfehler ERROR fetchdata fetchdata RdFunctions 0004\n piArt = " + aiArt.ToString(),
-                                     "Achtung");
+                                        "Achtung");
                             break;
                         }
                     }
+
+
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        
+                    });
 
                     break;
                 case 5:         // Mieter schreiben
@@ -2002,7 +2007,7 @@ namespace Ruddat_NK
                             // Aktuellen Mieter ermitteln
                             liMieter = getAktMieter(liObjektTeil, ldtMonat, asConnect, aiDb);
 
-                            if (liMieter == 107  && liObjektTeil == 97)
+                            if (liMieter == 107 && liObjektTeil == 97)
                             {
                                 int liTest = liMieter;
                             }
@@ -2040,9 +2045,9 @@ namespace Ruddat_NK
                                 //    ldBetragNetto = (ldBetragNetto / liDaysInMonth) * liDaysStart;
                                 //    ldBetragBrutto = (ldBetragBrutto / liDaysInMonth) * liDaysStart;
                                 //}
-                               
+
                                 dr[6] = liMieter;
-                                
+
                             }
                             else // sonst auf Leerstand buchen
                             {
@@ -2105,7 +2110,7 @@ namespace Ruddat_NK
                         else
                         {
                             MessageBox.Show("Verarbeitungsfehler ERROR fetchdata fetchdata RdFunctions 0005\n piArt = " + aiArt.ToString(),
-                                     "Achtung");
+                                        "Achtung");
                             break;
                         }
                     }
@@ -2175,7 +2180,7 @@ namespace Ruddat_NK
                         else
                         {
                             MessageBox.Show("Verarbeitungsfehler ERROR fetchdata RdFunctions fetchdata\n piArt = " + aiArt.ToString(),
-                                     "Achtung");
+                                        "Achtung");
                             break;
                         }
                     }
@@ -2194,7 +2199,7 @@ namespace Ruddat_NK
                                 else
                                 {
                                     MessageBox.Show("Verarbeitungsfehler ERROR fetchdata RdFunctions 0002\n piArt = " + aiArt.ToString(),
-                                             "Achtung");
+                                                "Achtung");
                                     break;
                                 }
                             }
@@ -2269,7 +2274,7 @@ namespace Ruddat_NK
                                 else
                                 {
                                     MessageBox.Show("Verarbeitungsfehler ERROR fetchdata RdFunctions 0003\n piArt = " + aiArt.ToString(),
-                                             "Achtung");
+                                                "Achtung");
                                     break;
                                 }
                             }
@@ -2344,7 +2349,7 @@ namespace Ruddat_NK
                         else
                         {
                             MessageBox.Show("Verarbeitungsfehler ERROR fetchdata RdFunctions fetchdata\n piArt = " + aiArt.ToString(),
-                                     "Achtung");
+                                        "Achtung");
                             break;
                         }
                     }
@@ -2396,28 +2401,18 @@ namespace Ruddat_NK
                         else
                         {
                             MessageBox.Show("Verarbeitungsfehler ERROR fetchdata RdFunctions 0003\n piArt = " + aiArt.ToString(),
-                                     "Achtung");
+                                        "Achtung");
                             break;
                         }
                     }
                     break;
                 default:
                     break;
+                    
             }
+
             return LiReturn;
         }
-
-        public class GaugeUpdater
-        {
-            //public void UpdateGaugeValue(Window frmGauge, double value)
-            //{
-            //    if (frmGauge.FindName("PgbVerlauf") is GaugeControl gaugeControl)
-            //    {
-            //        gaugeControl.Value = value;
-            //    }
-            //}
-        }
-
 
         // Berechnen der monatlichen Beträge für die Timeline
         private static decimal[] getBetraege(int liMonths, int liDaysStart, int liDaysEnd, 

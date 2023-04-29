@@ -15,11 +15,11 @@ using System.Windows.Shapes;
 namespace Ruddat_NK
 {
     /// <summary>
-    /// Interaktionslogik für WndGauge.xaml
+    /// Interaktionslogik für WndProgress.xaml
     /// </summary>
-    public partial class WndGauge : Window
+    public partial class WndProgress : Window
     {
-        public WndGauge()
+        public WndProgress()
         {
             InitializeComponent();
         }
