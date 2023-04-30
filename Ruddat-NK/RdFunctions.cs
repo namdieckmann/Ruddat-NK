@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Data.SqlClient;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 using System.Xml;
@@ -1511,14 +1512,18 @@ namespace Ruddat_NK
             //string lsObjektBezS = "";
             int LiReturn = 0;
 
-            // Thread für Progress definieren
-            Thread thread = new Thread(new ThreadStart(ThreadMethod));
-            thread.SetApartmentState(ApartmentState.STA);
+            // Get a reference to the MainWindow
+            MainWindow mainWindow = Application.Current.MainWindow as MainWindow;
 
-            void ThreadMethod()
+            // Check if the MainWindow exists
+            if (mainWindow != null)
             {
-                WndProgress frmProgress = new WndProgress();
-                frmProgress.ShowDialog();
+                // Use the Dispatcher to update the progress bar value on the UI thread
+                mainWindow.Dispatcher.Invoke(() =>
+                {
+                    // Start the progress bar
+                    mainWindow.ProgressBar.IsIndeterminate = true;
+                });
             }
 
             switch (aiArt)
@@ -1726,8 +1731,30 @@ namespace Ruddat_NK
                     // Aufteilung nach Personen kann hier nicht gemacht werden. 
                     // Geschieht erst beim Verteilen auf die Mieter
 
-                    // Progressfenster 
-                    thread.Start();
+                    //// Thread für Progress definieren
+                    //Thread thread = new Thread(new ThreadStart(ThreadMethod));
+                    //thread.SetApartmentState(ApartmentState.STA);
+
+                    //// Dispatcher dispatcher = Application.Current.Dispatcher;
+
+                    //void ThreadMethod()
+                    //{
+                    //    WndProgress frmProgress = new WndProgress();
+                    //    var dispatcher = frmProgress.Dispatcher.Invoke(() => frmProgress.PBar);
+                    //    frmProgress.Dispatcher.Invoke(() => dispatcher.Value = 0);
+                    //    frmProgress.ShowDialog();
+                    //}
+
+                    //// Progressfenster 
+                    //thread.Start();
+
+
+                    //Dispatcher.Invoke(() =>
+                    //{
+                    ////    // Führen Sie die Aktion auf dem Hintergrundthread aus
+                    ////    // ...
+                    //});
+
 
                     tableFour.Rows.Clear();     // Timeline leeren
 
@@ -1939,10 +1966,10 @@ namespace Ruddat_NK
                     }
 
 
-                    Application.Current.Dispatcher.Invoke(() =>
-                    {
+                    //Application.Current.Dispatcher.Invoke(() =>
+                    //{
                         
-                    });
+                    //});
 
                     break;
                 case 5:         // Mieter schreiben
@@ -2410,7 +2437,7 @@ namespace Ruddat_NK
                     break;
                     
             }
-
+            mainWindow.ProgressBar.IsIndeterminate = false;
             return LiReturn;
         }
 

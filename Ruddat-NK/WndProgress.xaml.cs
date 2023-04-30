@@ -22,6 +22,27 @@ namespace Ruddat_NK
         public WndProgress()
         {
             InitializeComponent();
+            Process();
+        }
+
+
+        //Create a Delegate that matches the Signature of the ProgressBar's SetValue method
+        public delegate void UpdateProgressBarDelegate(System.Windows.DependencyProperty dp, Object value);
+
+        
+        private void Process()
+        {
+            //Configure the ProgressBar
+            PBar.Minimum = 0;
+            PBar.Maximum = 100;
+            PBar.Value = 0;
+        }
+
+
+        public void SetData(double AdValue, double AdMaximum)
+        {
+            PBar.Maximum = AdMaximum;
+            PBar.Value = AdValue;
         }
     }
 }

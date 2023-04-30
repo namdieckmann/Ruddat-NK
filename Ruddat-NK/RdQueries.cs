@@ -1167,7 +1167,7 @@ namespace Ruddat_NK
                     {
                         switch (piArt)
                         {
-                            case 221:                     // Filiale
+                            case 224:                     // Filiale
                                 lsWhereAdd1 = " Where mieter.Id_filiale = " + piId.ToString() + " ";
                                 lsWhereAdd2 = " And timeline.leerstand > 0 ";
                                 lsSql = lsSql + lsWhereAdd1 + lsWhereAdd2;

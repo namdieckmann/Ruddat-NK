@@ -5,8 +5,13 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Ruddat_NK"
         mc:Ignorable="d"
-        Title="WndProgress" Height="450" Width="800">
+        Title="Es dauert einen Moment" Height="204.28" Width="301.751">
     <Grid>
-        <ProgressBar x:Name="Pbar" HorizontalAlignment="Left" Height="62" Margin="149,113,0,0" VerticalAlignment="Top" Width="476"/>
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <ProgressBar Grid.Row="1" Height="20" Width="200" Margin="0,4,0,0" Name="PBar" HorizontalAlignment="Center"  VerticalAlignment="top"  IsIndeterminate="True"/>
     </Grid>
 </Window>
