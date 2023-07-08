@@ -285,7 +285,7 @@ namespace Ruddat_NK
                     // Lokal MySql 
                     MySqlConnectionString = @"server=localhost;userid=rdnk;password=r1d8n9k4!;database=dbo";
                     // Ionos Server 
-                    // MySqlConnectionString = @"Data Source=197288c.online-server.cloud;PORT=3306;USERID=namdi;PASSWORD=7V7ADTqWqQPCf9Sge4PT;database=dbo;Connect Timeout = 20";
+                    // MySqlConnectionString = @"Data Source=197288c.online-server.cloud;PORT=3306;USERID=namdi;PASSWORD=7V7ADTqWqQPCf9Sge4PT;database=dbo;Connect Timeout = 60";
                     // MessageBox.Show("Ionos Datenbank MySql wird verwendet", "Achtung! ", MessageBoxButton.OK);
                     break;
                 default:
@@ -1860,32 +1860,29 @@ namespace Ruddat_NK
             giFlagTimeline = 12;                // 12 = Zahlung löschen
 
             // Durch alle zum Löschen gewählten Datensätze
-            do
+            if (DgrZahlungen.SelectedItems.Count > 0)
             {
-                DataRow dr = tableZlg.Rows[0];
-
-                if (dr[10] != DBNull.Value)        // Nur, wenn Datensatz in tableZlg vorhanden ist
+                for (int i = 0; i < DgrZahlungen.SelectedItems.Count; i++)
                 {
-                    if (dr[0] != DBNull.Value)
-                    {
-                        giDelZlId = (int)(dr[0]);                // Id des zu löschenden Datensatzes
-                    }
 
-                    liTimelineId = (int)dr[10];          // TimeLine ID holen                    
-                    tableZlg.Rows.Remove(dr);
+                    System.Data.DataRowView selectedFile = (System.Data.DataRowView)DgrZahlungen.SelectedItems[i];
+
+                    giDelZlId = (int)selectedFile.Row.ItemArray[0];
+                    liTimelineId = (int)selectedFile.Row.ItemArray[10];          // TimeLine ID holen                    
 
                     // Timeline bearbeiten Art 12 = Zahlungen löschen
                     Timeline.editTimeline(liTimelineId, giFlagTimeline, gsConnect, giDb);
 
                     // Delete Kommando muss extra erzeugt werden
-                    // Gibt es eine Datensatz ID zum Löschen (button btnRgDel)
+                    // Gibt es eine Datensatz ID zum Löschen
                     if (giDelZlId > 0)
                     {
                         string lsSql = RdQueries.GetSqlSelect(38, giDelZlId, "", "", "", DateTime.MinValue, DateTime.MinValue, giFiliale, gsConnect, giDb);
                         int liOk = FetchData(lsSql, 38, giDb, gsConnect);
                     }
                 }
-            } while (DgrZahlungen.SelectedItems.Count > 0);
+            }
+
             // Update der Daten
             int liOk1 = updateAllDataGrids(0);
         }
