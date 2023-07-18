@@ -3217,292 +3217,127 @@ namespace Ruddat_NK
             } 
         }
 
-        // Erste Tabelle Timeline holen
-        liOk = fetchData(asSql, "", 28, asConnect, aiDb);
-        // Zweite Tabelle Timeline ObjektKostendarstellung 
-        liOk = fetchData(asSql2, "", 29, asConnect, aiDb);
+            // Erste Tabelle Timeline holen
+        if (asSql.Length > 2)
+        {
+            liOk = fetchData(asSql, "", 28, asConnect, aiDb);
+        }
+        // Zweite Tabelle Timeline ObjektKostendarstellung
+        if (asSql2.Length > 2)
+        {
+            liOk = fetchData(asSql2, "", 29, asConnect, aiDb);
+        }
         // Dritte Tabelle x_abr_content
-        liOk = fetchData(asSqlContent, "", 30, asConnect, aiDb);
+        if (asSqlContent.Length > 2)
+        {
+            liOk = fetchData(asSqlContent, "", 30, asConnect, aiDb);
+        }
 
         // Schleife durch Timeline asSql und erstmal stumpf an Tabelle Content übertragen
         // Achtung rows.count -1, weil i bei 0 anfängt
-        for (int i = 0; i < tableTimeline.Rows.Count; i++)
+        if (tableTimeline != null)
         {
-            DataRow dr = tableContent.NewRow();
-
-            if (tableTimeline.Rows[i].ItemArray.GetValue(6) != DBNull.Value)
+            for (int i = 0; i < tableTimeline.Rows.Count; i++)
             {
-                dr[2] = Convert.ToInt16(tableTimeline.Rows[i].ItemArray.GetValue(6).ToString());        //  Id Extern TimeLine
-                liIdExternTimeline = Convert.ToInt16(tableTimeline.Rows[i].ItemArray.GetValue(6).ToString());
-                        
-                dr[27] = getRgInfo(liIdExternTimeline, asConnect, 1, aiDb).Trim();                                   // Rechnungsnummer
-                dr[28] = getRgInfo(liIdExternTimeline, asConnect, 2, aiDb).Trim();                                   // Rechnungstext
-                string lsd;
-                lsd = getRgInfo(liIdExternTimeline, asConnect, 3, aiDb);
-                if (lsd.Length > 0)
+                DataRow dr = tableContent.NewRow();
+
+                if (tableTimeline.Rows[i].ItemArray.GetValue(6) != DBNull.Value)
                 {
-                    dr[29] = lsd;    
-                }
-            }
-            if (tableTimeline.Rows[i].ItemArray.GetValue(7) != DBNull.Value)
-            {
-                if (Convert.ToInt16(tableTimeline.Rows[i].ItemArray.GetValue(7).ToString()) > 0)
-                {
-                    dr[3] = Convert.ToInt16(tableTimeline.Rows[i].ItemArray.GetValue(7).ToString());            //  Id Vorrauszahlung
-                }
-            }
-            if (tableTimeline.Rows[i].ItemArray.GetValue(18) != DBNull.Value)                                   // Id Zählerstand
-            {
-                if (Convert.ToInt16(tableTimeline.Rows[i].ItemArray.GetValue(18).ToString()) > 0)
-                {
-                    dr[4] = Convert.ToInt16(tableTimeline.Rows[i].ItemArray.GetValue(18).ToString());           // Id Zählerstand
-                    liIdZaehlerstand = Convert.ToInt16(tableTimeline.Rows[i].ItemArray.GetValue(18).ToString());
-                    // dr[13] = Convert.ToDecimal(tableTimeline.Rows[i].ItemArray.GetValue(12).ToString());         // Zählerstand wird hier nicht genutzt auf null prüfen
-                }
-            }
-            if (tableTimeline.Rows[i].ItemArray.GetValue(8) != DBNull.Value)
-            {
-                dr[5] = Convert.ToInt16(tableTimeline.Rows[i].ItemArray.GetValue(8).ToString());        //  Id Objekt
-                liIdObj = Convert.ToInt16(tableTimeline.Rows[i].ItemArray.GetValue(8).ToString());
-            }
-            if (tableTimeline.Rows[i].ItemArray.GetValue(9) != DBNull.Value)
-            {
-                dr[6] = Convert.ToInt16(tableTimeline.Rows[i].ItemArray.GetValue(9).ToString());        //  Id Teilobjekt
-                liIdObjt = Convert.ToInt16(tableTimeline.Rows[i].ItemArray.GetValue(9).ToString());
-            }
-            if (tableTimeline.Rows[i].ItemArray.GetValue(10) != DBNull.Value)
-            {
-                dr[7] = Convert.ToInt16(tableTimeline.Rows[i].ItemArray.GetValue(10).ToString());       //  Id Mieter
-                liIdMieter = Convert.ToInt16(tableTimeline.Rows[i].ItemArray.GetValue(10).ToString());
-            }
-            if (tableTimeline.Rows[i].ItemArray.GetValue(16) != DBNull.Value)
-            {
-                dr[8] = Convert.ToInt16(tableTimeline.Rows[i].ItemArray.GetValue(16).ToString());       //  Id Kostenart
-            }
-            if (tableTimeline.Rows[i].ItemArray.GetValue(0) != DBNull.Value)
-            {
-                dr[9] = Convert.ToDecimal(tableTimeline.Rows[i].ItemArray.GetValue(0).ToString());      //  Netto
-            }
-            if (tableTimeline.Rows[i].ItemArray.GetValue(1) != DBNull.Value)
-            {
-                dr[11] = Convert.ToDecimal(tableTimeline.Rows[i].ItemArray.GetValue(1).ToString());     //  Brutto
-            }
+                    dr[2] = Convert.ToInt16(tableTimeline.Rows[i].ItemArray.GetValue(6).ToString());        //  Id Extern TimeLine
+                    liIdExternTimeline = Convert.ToInt16(tableTimeline.Rows[i].ItemArray.GetValue(6).ToString());
 
-            if (tableTimeline.Rows[i].ItemArray.GetValue(4) != DBNull.Value)
-            {
-                dr[15] = Convert.ToInt16(tableTimeline.Rows[i].ItemArray.GetValue(4).ToString());       //  Weiterleitung Objekt
-            }
-            if (tableTimeline.Rows[i].ItemArray.GetValue(5) != DBNull.Value)
-            {
-                dr[16] = Convert.ToInt16(tableTimeline.Rows[i].ItemArray.GetValue(5).ToString());       //  Weiterleitung ObjektTeil
-            }
-            if (tableTimeline.Rows[i].ItemArray.GetValue(17) != DBNull.Value)
-            {
-                if (Convert.ToInt16(tableTimeline.Rows[i].ItemArray.GetValue(17)) > 0)
-                {
-                    dr[23] = Convert.ToInt16(tableTimeline.Rows[i].ItemArray.GetValue(17).ToString());       //  Art der Verteilung REchnungen
-                    liIdArtVerteilung = Convert.ToInt16(tableTimeline.Rows[i].ItemArray.GetValue(17).ToString());                            
-                }
-            }
-            else if (tableTimeline.Rows[i].ItemArray.GetValue(18) != DBNull.Value)                      // Art der Verteilung für Zähler ermitteln "zl"
-            {
-                liIdExternTimelineZaehlerstand = Convert.ToInt16(tableTimeline.Rows[i].ItemArray.GetValue(18));
-                liIdArtVerteilung = Timeline.getIdArtVerteilung("zl",asConnect, aiDb); 
-            }
-            if (tableTimeline.Rows[i].ItemArray.GetValue(2) != DBNull.Value)
-            {
-                dr[24] = Convert.ToDecimal(tableTimeline.Rows[i].ItemArray.GetValue(2).ToString());       //  Rechnung Netto
-            }
-            if (tableTimeline.Rows[i].ItemArray.GetValue(3) != DBNull.Value)
-            {
-                dr[25] = Convert.ToDecimal(tableTimeline.Rows[i].ItemArray.GetValue(3).ToString());       //  Rechnung Brutto
-            }
-
-            if (tableTimeline.Rows[i].ItemArray.GetValue(22) != DBNull.Value)
-            {
-                dr[30] = Convert.ToInt16(tableTimeline.Rows[i].ItemArray.GetValue(22).ToString());       //  id Rechnungsnummer für Anschreiben
-            }
-
-            // Verteilungsinformationen holen
-            if (liIdArtVerteilung > 0)
-            {
-                // Verteilungsinfos ermittlen; letztes Argument ist der Detailgrad 2 = Alles TODO Ulf!!!
-                dr[26] = Timeline.getVerteilungsInfo(asConnect, liIdExternTimeline, liIdArtVerteilung, liIdObj, liIdObjt, liIdMieter, asDatVon, asDatBis, liIdExternTimelineZaehlerstand, 1, aiDb);
-            }
-
-            // Rechnung aus Objekt oder Teilobjekt
-            if (liIdExternTimeline > 0 )
-            {
-                // Objektsummen holen
-                lsSql = getSql(14, liIdExternTimeline, "", "",0);
-                liOk = Timeline.fetchData(lsSql, "", 14, asConnect, aiDb);
-
-                if (tableConSumObj.Rows.Count > 0)
-                {
-                    if (tableConSumObj.Rows[0].ItemArray.GetValue(0) != DBNull.Value)
+                    dr[27] = getRgInfo(liIdExternTimeline, asConnect, 1, aiDb).Trim();                                   // Rechnungsnummer
+                    dr[28] = getRgInfo(liIdExternTimeline, asConnect, 2, aiDb).Trim();                                   // Rechnungstext
+                    string lsd;
+                    lsd = getRgInfo(liIdExternTimeline, asConnect, 3, aiDb);
+                    if (lsd.Length > 0)
                     {
-                        dr[21] = Convert.ToDecimal(tableConSumObj.Rows[0].ItemArray.GetValue(0));
-                    }
-                    if (tableConSumObj.Rows[0].ItemArray.GetValue(1) != DBNull.Value)
-                    {
-                        dr[22] = Convert.ToDecimal(tableConSumObj.Rows[0].ItemArray.GetValue(1));
-                    }  
-                }
-
-                // Teilobjekt ID aus der Mieter ID  ermitteln
-                if (liIdMieter > 0)
-                {
-                    liIdObjt = getVertragInfoFromMieter(liIdMieter, asConnect, 1, aiDb);
-                }
-                lsSql = Timeline.getSql(15, liIdExternTimeline, "", "", liIdObjt);
-                liOk = Timeline.fetchData(lsSql, "", 15, asConnect, aiDb);
-
-                if (tableConSumObjT.Rows.Count > 0 && liIdObjt > 0)
-                {
-                    if (tableConSumObjT.Rows[0].ItemArray.GetValue(0) != DBNull.Value)
-                    {
-                        dr[19] = Convert.ToDecimal(tableConSumObjT.Rows[0].ItemArray.GetValue(0));
-                    }
-                    if (tableConSumObjT.Rows[0].ItemArray.GetValue(1) != DBNull.Value)
-                    {
-                        dr[20] = Convert.ToDecimal(tableConSumObjT.Rows[0].ItemArray.GetValue(1));
+                        dr[29] = lsd;
                     }
                 }
-            }
-
-            // Zählerstand aus Objekt oder ObjektTeil
-            if (liIdZaehlerstand > 0)
-            {
-                // Objektsummen holen
-                lsSql = getSql(16, liIdZaehlerstand, "", "",0);
-                liOk = Timeline.fetchData(lsSql, "", 14, asConnect, aiDb);
-
-                if (tableConSumObj.Rows.Count > 0)
+                if (tableTimeline.Rows[i].ItemArray.GetValue(7) != DBNull.Value)
                 {
-                    if (tableConSumObj.Rows[0].ItemArray.GetValue(0) != DBNull.Value)
+                    if (Convert.ToInt16(tableTimeline.Rows[i].ItemArray.GetValue(7).ToString()) > 0)
                     {
-                        dr[21] = Convert.ToDecimal(tableConSumObj.Rows[0].ItemArray.GetValue(0));
-                    }
-                    if (tableConSumObj.Rows[0].ItemArray.GetValue(1) != DBNull.Value)
-                    {
-                        dr[22] = Convert.ToDecimal(tableConSumObj.Rows[0].ItemArray.GetValue(1));
+                        dr[3] = Convert.ToInt16(tableTimeline.Rows[i].ItemArray.GetValue(7).ToString());            //  Id Vorrauszahlung
                     }
                 }
-
-                // TeilobjektSummen holen
-                // Teilobjekt ID aus der Mieter ID  ermitteln
-                if (liIdMieter > 0)
+                if (tableTimeline.Rows[i].ItemArray.GetValue(18) != DBNull.Value)                                   // Id Zählerstand
                 {
-                    liIdObjt = getVertragInfoFromMieter(liIdMieter, asConnect, 1, aiDb);
-                }
-                lsSql = getSql(17, liIdZaehlerstand, "", "",0);
-                liOk = Timeline.fetchData(lsSql, "", 15, asConnect, aiDb);
-
-                if (tableConSumObjT.Rows.Count > 0)
-                {
-                    if (tableConSumObjT.Rows[0].ItemArray.GetValue(0) != DBNull.Value)
+                    if (Convert.ToInt16(tableTimeline.Rows[i].ItemArray.GetValue(18).ToString()) > 0)
                     {
-                        dr[19] = Convert.ToDecimal(tableConSumObjT.Rows[0].ItemArray.GetValue(0));
-                    }
-                    if (tableConSumObjT.Rows[0].ItemArray.GetValue(1) != DBNull.Value)
-                    {
-                        dr[20] = Convert.ToDecimal(tableConSumObjT.Rows[0].ItemArray.GetValue(1));
+                        dr[4] = Convert.ToInt16(tableTimeline.Rows[i].ItemArray.GetValue(18).ToString());           // Id Zählerstand
+                        liIdZaehlerstand = Convert.ToInt16(tableTimeline.Rows[i].ItemArray.GetValue(18).ToString());
+                        // dr[13] = Convert.ToDecimal(tableTimeline.Rows[i].ItemArray.GetValue(12).ToString());         // Zählerstand wird hier nicht genutzt auf null prüfen
                     }
                 }
-            }
-
-            tableContent.Rows.Add(dr);
-        }
-
-        // Zweiter Teil, nur ObjektKosten darstellen (im Moment nur Zähler)
-        // Schleife durch Timeline1 asSql2 und erstmal stumpf an Tabelle Content übertragen
-        // Achtung rows.count -1, weil i bei 0 anfängt
-        for (int i = 0; i < tableTimeline1.Rows.Count; i++)
-        {
-            DataRow dr = tableContent.NewRow();
-
-            if (tableTimeline1.Rows[i].ItemArray.GetValue(6) != DBNull.Value)
-            {
-                dr[2] = Convert.ToInt16(tableTimeline1.Rows[i].ItemArray.GetValue(6).ToString());        //  Id Rechnung
-                liIdExternTimeline = Convert.ToInt16(tableTimeline1.Rows[i].ItemArray.GetValue(6).ToString());
-                dr[27] = getRgInfo(liIdExternTimeline, asConnect, 1, aiDb).Trim();                                   // Rechnungesnummer
-                dr[28] = getRgInfo(liIdExternTimeline, asConnect, 2, aiDb).Trim();                                   // Rechnungstext
-
-                if (tableTimeline1.Rows[i].ItemArray.GetValue(7) != DBNull.Value)
+                if (tableTimeline.Rows[i].ItemArray.GetValue(8) != DBNull.Value)
                 {
-                    dr[3] = Convert.ToInt16(tableTimeline1.Rows[i].ItemArray.GetValue(7).ToString());        //  Id Vorrauszahlung
+                    dr[5] = Convert.ToInt16(tableTimeline.Rows[i].ItemArray.GetValue(8).ToString());        //  Id Objekt
+                    liIdObj = Convert.ToInt16(tableTimeline.Rows[i].ItemArray.GetValue(8).ToString());
                 }
-                if (tableTimeline1.Rows[i].ItemArray.GetValue(18) != DBNull.Value)                            // Id Zählerstand
+                if (tableTimeline.Rows[i].ItemArray.GetValue(9) != DBNull.Value)
                 {
-                    dr[4] = Convert.ToInt16(tableTimeline1.Rows[i].ItemArray.GetValue(18).ToString());         // Id Zählerstand
-                    liIdZaehlerstand = Convert.ToInt16(tableTimeline1.Rows[i].ItemArray.GetValue(18).ToString());
-                    // dr[13] = Convert.ToDecimal(tableTimeline1.Rows[i].ItemArray.GetValue(12).ToString());   // Zählerstand wird hier nicht genutzt auf null prüfen
+                    dr[6] = Convert.ToInt16(tableTimeline.Rows[i].ItemArray.GetValue(9).ToString());        //  Id Teilobjekt
+                    liIdObjt = Convert.ToInt16(tableTimeline.Rows[i].ItemArray.GetValue(9).ToString());
+                }
+                if (tableTimeline.Rows[i].ItemArray.GetValue(10) != DBNull.Value)
+                {
+                    dr[7] = Convert.ToInt16(tableTimeline.Rows[i].ItemArray.GetValue(10).ToString());       //  Id Mieter
+                    liIdMieter = Convert.ToInt16(tableTimeline.Rows[i].ItemArray.GetValue(10).ToString());
+                }
+                if (tableTimeline.Rows[i].ItemArray.GetValue(16) != DBNull.Value)
+                {
+                    dr[8] = Convert.ToInt16(tableTimeline.Rows[i].ItemArray.GetValue(16).ToString());       //  Id Kostenart
+                }
+                if (tableTimeline.Rows[i].ItemArray.GetValue(0) != DBNull.Value)
+                {
+                    dr[9] = Convert.ToDecimal(tableTimeline.Rows[i].ItemArray.GetValue(0).ToString());      //  Netto
+                }
+                if (tableTimeline.Rows[i].ItemArray.GetValue(1) != DBNull.Value)
+                {
+                    dr[11] = Convert.ToDecimal(tableTimeline.Rows[i].ItemArray.GetValue(1).ToString());     //  Brutto
                 }
 
-                if (tableTimeline1.Rows[i].ItemArray.GetValue(8) != DBNull.Value)
+                if (tableTimeline.Rows[i].ItemArray.GetValue(4) != DBNull.Value)
                 {
-                    dr[5] = Convert.ToInt16(tableTimeline1.Rows[i].ItemArray.GetValue(8).ToString());        //  Id Objekt
-                    liIdObj = Convert.ToInt16(tableTimeline1.Rows[i].ItemArray.GetValue(8).ToString());
+                    dr[15] = Convert.ToInt16(tableTimeline.Rows[i].ItemArray.GetValue(4).ToString());       //  Weiterleitung Objekt
                 }
-                if (tableTimeline1.Rows[i].ItemArray.GetValue(9) != DBNull.Value)
+                if (tableTimeline.Rows[i].ItemArray.GetValue(5) != DBNull.Value)
                 {
-                    dr[6] = Convert.ToInt16(tableTimeline1.Rows[i].ItemArray.GetValue(9).ToString());        //  Id Teilobjekt
-                    liIdObjt = Convert.ToInt16(tableTimeline1.Rows[i].ItemArray.GetValue(9).ToString());
+                    dr[16] = Convert.ToInt16(tableTimeline.Rows[i].ItemArray.GetValue(5).ToString());       //  Weiterleitung ObjektTeil
                 }
-                if (tableTimeline1.Rows[i].ItemArray.GetValue(10) != DBNull.Value)
+                if (tableTimeline.Rows[i].ItemArray.GetValue(17) != DBNull.Value)
                 {
-                    dr[7] = Convert.ToInt16(tableTimeline1.Rows[i].ItemArray.GetValue(10).ToString());       //  Id Mieter
-                    liIdMieter = Convert.ToInt16(tableTimeline1.Rows[i].ItemArray.GetValue(10).ToString());
-                }
-                if (tableTimeline1.Rows[i].ItemArray.GetValue(16) != DBNull.Value)
-                {
-                    dr[8] = Convert.ToInt16(tableTimeline1.Rows[i].ItemArray.GetValue(16).ToString());       //  Id Kostenart
-                }
-                //if (tableTimeline1.Rows[i].ItemArray.GetValue(0) != DBNull.Value)
-                //{
-                //    dr[9] = Convert.ToDecimal(tableTimeline1.Rows[i].ItemArray.GetValue(0).ToString());      //  Netto
-                //}
-                //if (tableTimeline1.Rows[i].ItemArray.GetValue(1) != DBNull.Value)
-                //{
-                //    dr[11] = Convert.ToDecimal(tableTimeline1.Rows[i].ItemArray.GetValue(1).ToString());     //  Brutto
-                //}
-
-                if (tableTimeline1.Rows[i].ItemArray.GetValue(4) != DBNull.Value)
-                {
-                    dr[15] = Convert.ToInt16(tableTimeline1.Rows[i].ItemArray.GetValue(4).ToString());       //  Weiterleitung Objekt
-                }
-                if (tableTimeline1.Rows[i].ItemArray.GetValue(5) != DBNull.Value)
-                {
-                    dr[16] = Convert.ToInt16(tableTimeline1.Rows[i].ItemArray.GetValue(5).ToString());       //  Weiterleitung ObjektTeil
-                }
-                if (tableTimeline1.Rows[i].ItemArray.GetValue(17) != DBNull.Value)
-                {
-                    if (Convert.ToInt16(tableTimeline1.Rows[i].ItemArray.GetValue(17)) > 0)
+                    if (Convert.ToInt16(tableTimeline.Rows[i].ItemArray.GetValue(17)) > 0)
                     {
-                        dr[23] = Convert.ToInt16(tableTimeline1.Rows[i].ItemArray.GetValue(17).ToString());       //  Art der Verteilung REchnungen
-                        liIdArtVerteilung = Convert.ToInt16(tableTimeline1.Rows[i].ItemArray.GetValue(17).ToString());
+                        dr[23] = Convert.ToInt16(tableTimeline.Rows[i].ItemArray.GetValue(17).ToString());       //  Art der Verteilung REchnungen
+                        liIdArtVerteilung = Convert.ToInt16(tableTimeline.Rows[i].ItemArray.GetValue(17).ToString());
                     }
                 }
-                else if (tableTimeline1.Rows[i].ItemArray.GetValue(18) != DBNull.Value)                      // Art der Verteilung für Zähler ermitteln "zl"
+                else if (tableTimeline.Rows[i].ItemArray.GetValue(18) != DBNull.Value)                      // Art der Verteilung für Zähler ermitteln "zl"
                 {
-                    liIdExternTimelineZaehlerstand = Convert.ToInt16(tableTimeline1.Rows[i].ItemArray.GetValue(18));
+                    liIdExternTimelineZaehlerstand = Convert.ToInt16(tableTimeline.Rows[i].ItemArray.GetValue(18));
                     liIdArtVerteilung = Timeline.getIdArtVerteilung("zl", asConnect, aiDb);
                 }
+                if (tableTimeline.Rows[i].ItemArray.GetValue(2) != DBNull.Value)
+                {
+                    dr[24] = Convert.ToDecimal(tableTimeline.Rows[i].ItemArray.GetValue(2).ToString());       //  Rechnung Netto
+                }
+                if (tableTimeline.Rows[i].ItemArray.GetValue(3) != DBNull.Value)
+                {
+                    dr[25] = Convert.ToDecimal(tableTimeline.Rows[i].ItemArray.GetValue(3).ToString());       //  Rechnung Brutto
+                }
 
-                // Hier nicht zeigen
-                //if (tableTimeline1.Rows[i].ItemArray.GetValue(2) != DBNull.Value)
-                //{
-                //    dr[24] = Convert.ToDecimal(tableTimeline1.Rows[i].ItemArray.GetValue(2).ToString());       //  Rechnung Netto
-                //}
-                //if (tableTimeline1.Rows[i].ItemArray.GetValue(3) != DBNull.Value)
-                //{
-                //    dr[25] = Convert.ToDecimal(tableTimeline1.Rows[i].ItemArray.GetValue(3).ToString());       //  Rechnung Brutto
-                //}
+                if (tableTimeline.Rows[i].ItemArray.GetValue(22) != DBNull.Value)
+                {
+                    dr[30] = Convert.ToInt16(tableTimeline.Rows[i].ItemArray.GetValue(22).ToString());       //  id Rechnungsnummer für Anschreiben
+                }
 
                 // Verteilungsinformationen holen
                 if (liIdArtVerteilung > 0)
                 {
-                    // Verteilungsinfos ermitteln letztes Argument ist der Detailgrad 2 ist alles
+                    // Verteilungsinfos ermittlen; letztes Argument ist der Detailgrad 2 = Alles TODO Ulf!!!
                     dr[26] = Timeline.getVerteilungsInfo(asConnect, liIdExternTimeline, liIdArtVerteilung, liIdObj, liIdObjt, liIdMieter, asDatVon, asDatBis, liIdExternTimelineZaehlerstand, 1, aiDb);
                 }
 
@@ -3525,21 +3360,25 @@ namespace Ruddat_NK
                         }
                     }
 
-                    //// TeilobjektSummen holen
-                    //lsSql = getSql(15, liIdRechnung, "", "");
-                    //liOk = Timeline.FetchData(lsSql, "", 15, asConnect);
+                    // Teilobjekt ID aus der Mieter ID  ermitteln
+                    if (liIdMieter > 0)
+                    {
+                        liIdObjt = getVertragInfoFromMieter(liIdMieter, asConnect, 1, aiDb);
+                    }
+                    lsSql = Timeline.getSql(15, liIdExternTimeline, "", "", liIdObjt);
+                    liOk = Timeline.fetchData(lsSql, "", 15, asConnect, aiDb);
 
-                    //if (tableConSumObjT.Rows.Count > 0)
-                    //{
-                    //    if (tableConSumObjT.Rows[0].ItemArray.GetValue(0) != DBNull.Value)
-                    //    {
-                    //        dr[19] = Convert.ToDecimal(tableConSumObjT.Rows[0].ItemArray.GetValue(0));
-                    //    }
-                    //    if (tableConSumObjT.Rows[0].ItemArray.GetValue(1) != DBNull.Value)
-                    //    {
-                    //        dr[20] = Convert.ToDecimal(tableConSumObjT.Rows[0].ItemArray.GetValue(1));
-                    //    }
-                    //}
+                    if (tableConSumObjT.Rows.Count > 0 && liIdObjt > 0)
+                    {
+                        if (tableConSumObjT.Rows[0].ItemArray.GetValue(0) != DBNull.Value)
+                        {
+                            dr[19] = Convert.ToDecimal(tableConSumObjT.Rows[0].ItemArray.GetValue(0));
+                        }
+                        if (tableConSumObjT.Rows[0].ItemArray.GetValue(1) != DBNull.Value)
+                        {
+                            dr[20] = Convert.ToDecimal(tableConSumObjT.Rows[0].ItemArray.GetValue(1));
+                        }
+                    }
                 }
 
                 // Zählerstand aus Objekt oder ObjektTeil
@@ -3560,10 +3399,190 @@ namespace Ruddat_NK
                             dr[22] = Convert.ToDecimal(tableConSumObj.Rows[0].ItemArray.GetValue(1));
                         }
                     }
+
+                    // TeilobjektSummen holen
+                    // Teilobjekt ID aus der Mieter ID  ermitteln
+                    if (liIdMieter > 0)
+                    {
+                        liIdObjt = getVertragInfoFromMieter(liIdMieter, asConnect, 1, aiDb);
+                    }
+                    lsSql = getSql(17, liIdZaehlerstand, "", "", 0);
+                    liOk = Timeline.fetchData(lsSql, "", 15, asConnect, aiDb);
+
+                    if (tableConSumObjT.Rows.Count > 0)
+                    {
+                        if (tableConSumObjT.Rows[0].ItemArray.GetValue(0) != DBNull.Value)
+                        {
+                            dr[19] = Convert.ToDecimal(tableConSumObjT.Rows[0].ItemArray.GetValue(0));
+                        }
+                        if (tableConSumObjT.Rows[0].ItemArray.GetValue(1) != DBNull.Value)
+                        {
+                            dr[20] = Convert.ToDecimal(tableConSumObjT.Rows[0].ItemArray.GetValue(1));
+                        }
+                    }
                 }
+
+                tableContent.Rows.Add(dr);
             }
-            tableContent.Rows.Add(dr);
         }
+
+
+
+        // Zweiter Teil, nur ObjektKosten darstellen (im Moment nur Zähler)
+        // Schleife durch Timeline1 asSql2 und erstmal stumpf an Tabelle Content übertragen
+        // Achtung rows.count -1, weil i bei 0 anfäng
+        if (tableTimeline1 != null)
+        {
+            for (int i = 0; i < tableTimeline1.Rows.Count; i++)
+            {
+                DataRow dr = tableContent.NewRow();
+
+                if (tableTimeline1.Rows[i].ItemArray.GetValue(6) != DBNull.Value)
+                {
+                    dr[2] = Convert.ToInt16(tableTimeline1.Rows[i].ItemArray.GetValue(6).ToString());        //  Id Rechnung
+                    liIdExternTimeline = Convert.ToInt16(tableTimeline1.Rows[i].ItemArray.GetValue(6).ToString());
+                    dr[27] = getRgInfo(liIdExternTimeline, asConnect, 1, aiDb).Trim();                                   // Rechnungesnummer
+                    dr[28] = getRgInfo(liIdExternTimeline, asConnect, 2, aiDb).Trim();                                   // Rechnungstext
+
+                    if (tableTimeline1.Rows[i].ItemArray.GetValue(7) != DBNull.Value)
+                    {
+                        dr[3] = Convert.ToInt16(tableTimeline1.Rows[i].ItemArray.GetValue(7).ToString());        //  Id Vorrauszahlung
+                    }
+                    if (tableTimeline1.Rows[i].ItemArray.GetValue(18) != DBNull.Value)                            // Id Zählerstand
+                    {
+                        dr[4] = Convert.ToInt16(tableTimeline1.Rows[i].ItemArray.GetValue(18).ToString());         // Id Zählerstand
+                        liIdZaehlerstand = Convert.ToInt16(tableTimeline1.Rows[i].ItemArray.GetValue(18).ToString());
+                        // dr[13] = Convert.ToDecimal(tableTimeline1.Rows[i].ItemArray.GetValue(12).ToString());   // Zählerstand wird hier nicht genutzt auf null prüfen
+                    }
+
+                    if (tableTimeline1.Rows[i].ItemArray.GetValue(8) != DBNull.Value)
+                    {
+                        dr[5] = Convert.ToInt16(tableTimeline1.Rows[i].ItemArray.GetValue(8).ToString());        //  Id Objekt
+                        liIdObj = Convert.ToInt16(tableTimeline1.Rows[i].ItemArray.GetValue(8).ToString());
+                    }
+                    if (tableTimeline1.Rows[i].ItemArray.GetValue(9) != DBNull.Value)
+                    {
+                        dr[6] = Convert.ToInt16(tableTimeline1.Rows[i].ItemArray.GetValue(9).ToString());        //  Id Teilobjekt
+                        liIdObjt = Convert.ToInt16(tableTimeline1.Rows[i].ItemArray.GetValue(9).ToString());
+                    }
+                    if (tableTimeline1.Rows[i].ItemArray.GetValue(10) != DBNull.Value)
+                    {
+                        dr[7] = Convert.ToInt16(tableTimeline1.Rows[i].ItemArray.GetValue(10).ToString());       //  Id Mieter
+                        liIdMieter = Convert.ToInt16(tableTimeline1.Rows[i].ItemArray.GetValue(10).ToString());
+                    }
+                    if (tableTimeline1.Rows[i].ItemArray.GetValue(16) != DBNull.Value)
+                    {
+                        dr[8] = Convert.ToInt16(tableTimeline1.Rows[i].ItemArray.GetValue(16).ToString());       //  Id Kostenart
+                    }
+                    //if (tableTimeline1.Rows[i].ItemArray.GetValue(0) != DBNull.Value)
+                    //{
+                    //    dr[9] = Convert.ToDecimal(tableTimeline1.Rows[i].ItemArray.GetValue(0).ToString());      //  Netto
+                    //}
+                    //if (tableTimeline1.Rows[i].ItemArray.GetValue(1) != DBNull.Value)
+                    //{
+                    //    dr[11] = Convert.ToDecimal(tableTimeline1.Rows[i].ItemArray.GetValue(1).ToString());     //  Brutto
+                    //}
+
+                    if (tableTimeline1.Rows[i].ItemArray.GetValue(4) != DBNull.Value)
+                    {
+                        dr[15] = Convert.ToInt16(tableTimeline1.Rows[i].ItemArray.GetValue(4).ToString());       //  Weiterleitung Objekt
+                    }
+                    if (tableTimeline1.Rows[i].ItemArray.GetValue(5) != DBNull.Value)
+                    {
+                        dr[16] = Convert.ToInt16(tableTimeline1.Rows[i].ItemArray.GetValue(5).ToString());       //  Weiterleitung ObjektTeil
+                    }
+                    if (tableTimeline1.Rows[i].ItemArray.GetValue(17) != DBNull.Value)
+                    {
+                        if (Convert.ToInt16(tableTimeline1.Rows[i].ItemArray.GetValue(17)) > 0)
+                        {
+                            dr[23] = Convert.ToInt16(tableTimeline1.Rows[i].ItemArray.GetValue(17).ToString());       //  Art der Verteilung REchnungen
+                            liIdArtVerteilung = Convert.ToInt16(tableTimeline1.Rows[i].ItemArray.GetValue(17).ToString());
+                        }
+                    }
+                    else if (tableTimeline1.Rows[i].ItemArray.GetValue(18) != DBNull.Value)                      // Art der Verteilung für Zähler ermitteln "zl"
+                    {
+                        liIdExternTimelineZaehlerstand = Convert.ToInt16(tableTimeline1.Rows[i].ItemArray.GetValue(18));
+                        liIdArtVerteilung = Timeline.getIdArtVerteilung("zl", asConnect, aiDb);
+                    }
+
+                    // Hier nicht zeigen
+                    //if (tableTimeline1.Rows[i].ItemArray.GetValue(2) != DBNull.Value)
+                    //{
+                    //    dr[24] = Convert.ToDecimal(tableTimeline1.Rows[i].ItemArray.GetValue(2).ToString());       //  Rechnung Netto
+                    //}
+                    //if (tableTimeline1.Rows[i].ItemArray.GetValue(3) != DBNull.Value)
+                    //{
+                    //    dr[25] = Convert.ToDecimal(tableTimeline1.Rows[i].ItemArray.GetValue(3).ToString());       //  Rechnung Brutto
+                    //}
+
+                    // Verteilungsinformationen holen
+                    if (liIdArtVerteilung > 0)
+                    {
+                        // Verteilungsinfos ermitteln letztes Argument ist der Detailgrad 2 ist alles
+                        dr[26] = Timeline.getVerteilungsInfo(asConnect, liIdExternTimeline, liIdArtVerteilung, liIdObj, liIdObjt, liIdMieter, asDatVon, asDatBis, liIdExternTimelineZaehlerstand, 1, aiDb);
+                    }
+
+                    // Rechnung aus Objekt oder Teilobjekt
+                    if (liIdExternTimeline > 0)
+                    {
+                        // Objektsummen holen
+                        lsSql = getSql(14, liIdExternTimeline, "", "", 0);
+                        liOk = Timeline.fetchData(lsSql, "", 14, asConnect, aiDb);
+
+                        if (tableConSumObj.Rows.Count > 0)
+                        {
+                            if (tableConSumObj.Rows[0].ItemArray.GetValue(0) != DBNull.Value)
+                            {
+                                dr[21] = Convert.ToDecimal(tableConSumObj.Rows[0].ItemArray.GetValue(0));
+                            }
+                            if (tableConSumObj.Rows[0].ItemArray.GetValue(1) != DBNull.Value)
+                            {
+                                dr[22] = Convert.ToDecimal(tableConSumObj.Rows[0].ItemArray.GetValue(1));
+                            }
+                        }
+
+                        //// TeilobjektSummen holen
+                        //lsSql = getSql(15, liIdRechnung, "", "");
+                        //liOk = Timeline.FetchData(lsSql, "", 15, asConnect);
+
+                        //if (tableConSumObjT.Rows.Count > 0)
+                        //{
+                        //    if (tableConSumObjT.Rows[0].ItemArray.GetValue(0) != DBNull.Value)
+                        //    {
+                        //        dr[19] = Convert.ToDecimal(tableConSumObjT.Rows[0].ItemArray.GetValue(0));
+                        //    }
+                        //    if (tableConSumObjT.Rows[0].ItemArray.GetValue(1) != DBNull.Value)
+                        //    {
+                        //        dr[20] = Convert.ToDecimal(tableConSumObjT.Rows[0].ItemArray.GetValue(1));
+                        //    }
+                        //}
+                    }
+
+                    // Zählerstand aus Objekt oder ObjektTeil
+                    if (liIdZaehlerstand > 0)
+                    {
+                        // Objektsummen holen
+                        lsSql = getSql(16, liIdZaehlerstand, "", "", 0);
+                        liOk = Timeline.fetchData(lsSql, "", 14, asConnect, aiDb);
+
+                        if (tableConSumObj.Rows.Count > 0)
+                        {
+                            if (tableConSumObj.Rows[0].ItemArray.GetValue(0) != DBNull.Value)
+                            {
+                                dr[21] = Convert.ToDecimal(tableConSumObj.Rows[0].ItemArray.GetValue(0));
+                            }
+                            if (tableConSumObj.Rows[0].ItemArray.GetValue(1) != DBNull.Value)
+                            {
+                                dr[22] = Convert.ToDecimal(tableConSumObj.Rows[0].ItemArray.GetValue(1));
+                            }
+                        }
+                    }
+                }
+                tableContent.Rows.Add(dr);
+            }
+        }
+
+
         // Ab in die Datenbank
         liOk = fetchData("", "", 31, asConnect, aiDb);
         // ist es eine Mieter ID in Timeline, dann die Summen aus Teilobjekt und Objekt einsetzen

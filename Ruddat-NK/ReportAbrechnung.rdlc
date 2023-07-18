@@ -1259,7 +1259,7 @@
           <Paragraph>
             <TextRuns>
               <TextRun>
-                <Value>=First(Fields!mbez.Value, "DataSet2")</Value>
+                <Value>=First(Fields!mbez.Value, "DataSet2") + ", " +First(Fields!mVorname.Value, "DataSet2") + " " +First(Fields!mName.Value, "DataSet2")</Value>
                 <Style>
                   <FontSize>8pt</FontSize>
                 </Style>
@@ -1271,7 +1271,7 @@
         <Top>1.30293cm</Top>
         <Left>11.14438cm</Left>
         <Height>0.5cm</Height>
-        <Width>4.76655cm</Width>
+        <Width>5.72564cm</Width>
         <ZIndex>12</ZIndex>
         <Style>
           <Border>
@@ -1302,7 +1302,7 @@
         <Top>1.80646cm</Top>
         <Left>11.14438cm</Left>
         <Height>0.5cm</Height>
-        <Width>4.76655cm</Width>
+        <Width>5.72564cm</Width>
         <ZIndex>13</ZIndex>
         <Style>
           <Border>
@@ -1333,7 +1333,7 @@
         <Top>2.30646cm</Top>
         <Left>12.34037cm</Left>
         <Height>0.5cm</Height>
-        <Width>3.57056cm</Width>
+        <Width>4.52965cm</Width>
         <ZIndex>14</ZIndex>
         <Style>
           <Border>
@@ -3161,10 +3161,30 @@
           <DataField>otlage</DataField>
           <rd:TypeName>System.String</rd:TypeName>
         </Field>
+        <Field Name="mVorname">
+          <DataField>mVorname</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="mName">
+          <DataField>mName</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="mAnrede">
+          <DataField>mAnrede</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="RpRgNr">
+          <DataField>RpRgNr</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="mfirma">
+          <DataField>mfirma</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
       </Fields>
       <rd:DataSetInfo>
         <rd:DataSetName>DataSetHeader</rd:DataSetName>
-        <rd:SchemaPath>C:\Users\udiec\OneDrive\Dokumente\Visual Studio 2012\Projects\Ruddat-NK\Ruddat-NK\DataSetHeader.xsd</rd:SchemaPath>
+        <rd:SchemaPath>C:\Users\udiec\source\repos\namdieckmann\Ruddat-NK\Ruddat-NK\DataSetHeader.xsd</rd:SchemaPath>
         <rd:TableName>DataTable1</rd:TableName>
         <rd:TableAdapterFillMethod />
         <rd:TableAdapterGetDataMethod />
