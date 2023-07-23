@@ -82,9 +82,9 @@ namespace Ruddat_NK
             liRows = fetchData(lsSql, 5);
 
             // SqlSelect Verträge
-            lsSql = getSql(2, 0, "");
+            // lsSql = getSql(2, 0, "");
             // Daten Verträge holen
-            liRows = fetchData(lsSql, 2);
+            // liRows = fetchData(lsSql, 2);
 
             // SqlSelect Objekte
             lsSql = getSql(3, 0, "");

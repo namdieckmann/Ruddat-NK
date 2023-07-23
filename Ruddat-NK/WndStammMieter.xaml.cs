@@ -79,14 +79,14 @@ namespace Ruddat_NK
             liRows = fetchData(lsSql, 1);
 
             // SqlSelect Mieter
-            lsSql = getSql(2, liFiliale);
+            // lsSql = getSql(2, liFiliale);
             // Daten Firmen holen
-            liRows = fetchData(lsSql, 2);
+            // liRows = fetchData(lsSql, 2);
 
             // SqlSelect Adressen
-            lsSql = getSql(3, 0);
+            // lsSql = getSql(3, 0);
             // Daten Firmen holen
-            liRows = fetchData(lsSql, 3);
+            // liRows = fetchData(lsSql, 3);
 
             // SqlSelect AdressArten
             lsSql = getSql(4, 0);
@@ -366,7 +366,7 @@ namespace Ruddat_NK
             int liSel = dgrStCmp.SelectedIndex;
             int liRows = 0;
             string lsSql = "";
-            string lsSql2 = "";
+            // string lsSql2 = "";
 
             if (liSel >= 0)
             {
@@ -387,9 +387,9 @@ namespace Ruddat_NK
 
                     // SqlSelect Mieter Leerstand
                     // SqlSelect erstellen
-                    lsSql2 = getSql(22, liId);
+                    //lsSql2 = getSql(22, liId);
                     // Daten holen
-                    liRows = fetchData(lsSql2, 2);
+                    // liRows = fetchData(lsSql2, 2);
 
                     if (liRows == 0)
                     {
