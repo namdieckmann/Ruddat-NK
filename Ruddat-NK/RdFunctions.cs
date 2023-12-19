@@ -13,16 +13,18 @@ namespace Ruddat_NK
 {
     public class Timeline
     {
+        private MainWindow mainWindow;
+
         // Datensätze Rechnungen
-        static DataTable tableOne;          // Rechnungen
-        static DataTable tableOneTime;      // Rechnungen für TimelineCreate
+        static DataTable tableRechnungen;          // Rechnungen
+        static DataTable tableRechnungenTimeline;      // Rechnungen für TimelineCreate
         // static DataTable tableTwo;
-        static DataTable tableThree;
-        static DataTable tableFour;
-        static DataTable tableFive;
-        static DataTable tableSix;
-        static DataTable tableSeven;
-        static DataTable tableEight;
+        static DataTable tableNewTimeline;
+        static DataTable tableTimeLineSet;
+        static DataTable tableObjektParts;
+        static DataTable tableTimelineGet;
+        static DataTable tableTaxGet;
+        static DataTable tableTimeLineGet;
         static DataTable tableZlg;
         static DataTable tableZlgNew;
         static DataTable tableTml;
@@ -35,7 +37,7 @@ namespace Ruddat_NK
         // static DataTable tableObjTeil;       // Objektteile
         static DataTable tableParts;            // objekt_mix_parts
         static DataTable tableTmlCheckRgNr;     // Hier checken, ob schon eine Rechnungsnmmerfür das Anschreiben drin ist
-        static DataTable tableTimeline;
+        static DataTable tableTimeline;         // Timeline
         static DataTable tableTimeline1;        // Kosten des Objektes darstellen 
         static DataTable tableContent;          // Content
         static SqlDataAdapter sda;
@@ -752,70 +754,70 @@ namespace Ruddat_NK
                         switch (piArt)
                         {
                             case 1:     // Rechnungen > Timeline erzeugen bearbeiten
-                                tableOne = new DataTable();         // Rechnung 
+                                tableRechnungen = new DataTable();         // Rechnung 
                                 sda = new SqlDataAdapter(command);
-                                sda.Fill(tableOne);
+                                sda.Fill(tableRechnungen);
                                 liOk = MakeAfterFetch(piArt, 1, 0, 0, asConnect, aiDb);
                                 break;
                             case 2:     // Timeline löschen
                                 SqlDataReader queryCommandReader = command.ExecuteReader();
                                 break;
                             case 3:     // Rechnungen + Timeline Create
-                                tableOneTime = new DataTable();         // Rechnungen
+                                tableRechnungenTimeline = new DataTable();         // Rechnungen
                                 SqlCommand command3 = new SqlCommand(psSql2, connect);
                                 sdb = new SqlDataAdapter(command3);
-                                sdb.Fill(tableOneTime);
+                                sdb.Fill(tableRechnungenTimeline);
                                 // Externe ID aus der Rechnung ermitteln 
                                 liExternId = MakeAfterFetch(piArt, 1, 0, 0, asConnect, aiDb);
 
                                 // Timeline neue Datensätze erzeugen
-                                tableThree = new DataTable();
+                                tableNewTimeline = new DataTable();
                                 SqlCommand command31 = new SqlCommand(psSql, connect);
                                 sdc = new SqlDataAdapter(command31);
-                                sdc.Fill(tableThree);
+                                sdc.Fill(tableNewTimeline);
                                 liExternId = MakeAfterFetch(piArt, 2, liExternId, 0, asConnect, aiDb);
 
                                 break;
                             case 4:     // Rechnungen Timeline Create Relations Objektteile schreiben
                                 // tableFive beiinhaltet die Objektteile zu einem gewählten Objekt
                                 SqlCommand command6 = new SqlCommand(psSql2, connect);
-                                tableFive = new DataTable();
+                                tableObjektParts = new DataTable();
                                 sde = new SqlDataAdapter(command6);
-                                sde.Fill(tableFive);
+                                sde.Fill(tableObjektParts);
                                 // tableFive ist jetzt mit allen Objektteilen zum Objekt gefüllt
 
                                 // tableSix: Holen der Timeline
                                 SqlCommand command5 = new SqlCommand(psSql, connect);
-                                tableSix = new DataTable();
+                                tableTimelineGet = new DataTable();
                                 sdf = new SqlDataAdapter(command5);
-                                sdf.Fill(tableSix);
+                                sdf.Fill(tableTimelineGet);
 
                                 // tableFour Timeline schreiben
                                 SqlCommand command7 = new SqlCommand(psSql, connect);
-                                tableFour = new DataTable();
+                                tableTimeLineSet = new DataTable();
                                 sdc = new SqlDataAdapter(command7);
-                                sdc.Fill(tableFour);
+                                sdc.Fill(tableTimeLineSet);
                                 liOk = MakeAfterFetch(piArt, 0, 0, 0, asConnect, aiDb);
                                 break;
                             case 5:     // Rechnungen Timeline Create Relations Mieter schreiben
                                 // Vorhandene Timeline einlesen
                                 SqlCommand command9 = new SqlCommand(psSql, connect);
-                                tableEight = new DataTable();
+                                tableTimeLineGet = new DataTable();
                                 sdh = new SqlDataAdapter(command9);
-                                sdh.Fill(tableEight);
+                                sdh.Fill(tableTimeLineGet);
 
                                 // Timeline neue Datensätze erzeugen
                                 SqlCommand command8 = new SqlCommand(psSql, connect);
-                                tableThree = new DataTable();
+                                tableNewTimeline = new DataTable();
                                 sdc = new SqlDataAdapter(command8);
-                                sdc.Fill(tableThree);
+                                sdc.Fill(tableNewTimeline);
                                 // Schleife durch Timeline
                                 liOk = MakeAfterFetch(piArt, 0, 0, 0, asConnect, aiDb);
                                 break;
                             case 8:     // Mwst Satz holen
                                 sdg = new SqlDataAdapter(command);
-                                tableSeven = new DataTable();
-                                sdg.Fill(tableSeven);
+                                tableTaxGet = new DataTable();
+                                sdg.Fill(tableTaxGet);
                                 liReturn = MakeAfterFetch(piArt, 0, 0, 0, asConnect, aiDb);
                                 break;
                             case 11:    // Zahlungen > Timeline erzeugen bearbeiten
@@ -957,9 +959,9 @@ namespace Ruddat_NK
                         switch (piArt)
                         {
                             case 1:     // Rechnungen > Timeline erzeugen bearbeiten
-                                tableOne = new DataTable();         // Rechnung 
+                                tableRechnungen = new DataTable();         // Rechnung 
                                 mysda = new MySqlDataAdapter(command);
-                                mysda.Fill(tableOne);
+                                mysda.Fill(tableRechnungen);
                                 liOk = MakeAfterFetch(piArt, 1, 0, 0, asConnect, aiDb);
                                 break;
 
@@ -967,61 +969,61 @@ namespace Ruddat_NK
                                 MySqlDataReader queryCommandReader = command.ExecuteReader();
                                 break;
                             case 3:     // Rechnungen Timeline Create
-                                tableOneTime = new DataTable();         // Rechnungen
+                                tableRechnungenTimeline = new DataTable();         // Rechnungen
                                 MySqlCommand command3 = new MySqlCommand(psSql2, connect);
                                 mysdb = new MySqlDataAdapter(command3);
-                                mysdb.Fill(tableOneTime);
+                                mysdb.Fill(tableRechnungenTimeline);
                                 // Externe ID aus der Rechnung ermitteln 
                                 liExternId = MakeAfterFetch(piArt, 1, 0, 0, asConnect, aiDb);
 
                                 // Timeline neue Datensätze erzeugen
-                                tableThree = new DataTable();
+                                tableNewTimeline = new DataTable();
                                 MySqlCommand command31 = new MySqlCommand(psSql, connect);
                                 mysdc = new MySqlDataAdapter(command31);
-                                mysdc.Fill(tableThree);
+                                mysdc.Fill(tableNewTimeline);
                                 liExternId = MakeAfterFetch(piArt, 2, liExternId, 0, asConnect, aiDb);
                                 break;
                             case 4:     // Rechnungen Timeline Create Relations Objektteile schreiben
                                 // tableFive beiinhaltet die Objektteile zu einem gewählten Objekt
                                 MySqlCommand command6 = new MySqlCommand(psSql2, connect);
-                                tableFive = new DataTable();
+                                tableObjektParts = new DataTable();
                                 mysde = new MySqlDataAdapter(command6);
-                                mysde.Fill(tableFive);
+                                mysde.Fill(tableObjektParts);
                                 // tableFive ist jetzt mit allen Objektteilen zum Objekt gefüllt
 
                                 // tableSix: Holen der Timeline
                                 MySqlCommand command5 = new MySqlCommand(psSql, connect);
-                                tableSix = new DataTable();
+                                tableTimelineGet = new DataTable();
                                 mysdf = new MySqlDataAdapter(command5);
-                                mysdf.Fill(tableSix);
+                                mysdf.Fill(tableTimelineGet);
 
                                 // tableFour Timeline schreiben
                                 MySqlCommand command7 = new MySqlCommand(psSql, connect);
-                                tableFour = new DataTable();
+                                tableTimeLineSet = new DataTable();
                                 mysdc = new MySqlDataAdapter(command7);
-                                mysdc.Fill(tableFour);
+                                mysdc.Fill(tableTimeLineSet);
 
                                 liOk = MakeAfterFetch(piArt, 0, 0, 0, asConnect, aiDb);
                                 break;
                             case 5:     // Rechnungen Timeline Create Relations Mieter schreiben
                                 // Vorhandene Timeline einlesen
                                 MySqlCommand command9 = new MySqlCommand(psSql, connect);
-                                tableEight = new DataTable();
+                                tableTimeLineGet = new DataTable();
                                 mysdh = new MySqlDataAdapter(command9);
-                                mysdh.Fill(tableEight);
+                                mysdh.Fill(tableTimeLineGet);
 
                                 // Timeline neue Datensätze erzeugen
                                 MySqlCommand command8 = new MySqlCommand(psSql, connect);
-                                tableThree = new DataTable();
+                                tableNewTimeline = new DataTable();
                                 mysdc = new MySqlDataAdapter(command8);
-                                mysdc.Fill(tableThree);
+                                mysdc.Fill(tableNewTimeline);
                                 // Schleife durch Timeline
                                 liOk = MakeAfterFetch(piArt, 0, 0, 0, asConnect, aiDb);
                                 break;
                             case 8:     // Mwst Satz holen
                                 mysdg = new MySqlDataAdapter(command);
-                                tableSeven = new DataTable();
-                                mysdg.Fill(tableSeven);
+                                tableTaxGet = new DataTable();
+                                mysdg.Fill(tableTaxGet);
                                 liReturn = MakeAfterFetch(piArt, 0, 0, 0, asConnect, aiDb);
                                 break;
                             case 11:    // Zahlungen > Timeline erzeugen bearbeiten
@@ -1418,15 +1420,15 @@ namespace Ruddat_NK
                     {
                         case 1:
                             SqlCommandBuilder commandBuilder11 = new SqlCommandBuilder(sdc);
-                            sdc.Update(tableThree);
+                            sdc.Update(tableNewTimeline);
                             break;
                         case 2:
                             SqlCommandBuilder commandBuilder12 = new SqlCommandBuilder(sdc);
-                            sdc.Update(tableFour);
+                            sdc.Update(tableTimeLineSet);
                             break;
                         case 3:
                             SqlCommandBuilder commandBuilder13 = new SqlCommandBuilder(sdc);
-                            sdc.Update(tableThree);
+                            sdc.Update(tableNewTimeline);
                             break;
                         case 4:
                             SqlCommandBuilder commandBuilder14 = new SqlCommandBuilder(sdTml);
@@ -1441,15 +1443,15 @@ namespace Ruddat_NK
                     {
                         case 1:
                             MySqlCommandBuilder commandBuilder21 = new MySqlCommandBuilder(mysdc);
-                            mysdc.Update(tableThree);
+                            mysdc.Update(tableNewTimeline);
                             break;
                         case 2:
                             MySqlCommandBuilder commandBuilder22 = new MySqlCommandBuilder(mysdc);
-                            mysdc.Update(tableFour);
+                            mysdc.Update(tableTimeLineSet);
                             break;
                         case 3:
                             MySqlCommandBuilder commandBuilder23 = new MySqlCommandBuilder(mysdc);
-                            mysdc.Update(tableThree);
+                            mysdc.Update(tableNewTimeline);
                             break;
                         case 4:
                             MySqlCommandBuilder commandBuilder24 = new MySqlCommandBuilder(mysdTml);
@@ -1465,7 +1467,7 @@ namespace Ruddat_NK
         }
 
         // Datenbankaktionen nach fetchdata
-        private static int MakeAfterFetch(int aiArt, int aiTeil, int ai1, int ai2, string asConnect, int aiDb)
+        public static int MakeAfterFetch(int aiArt, int aiTeil, int ai1, int ai2, string asConnect, int aiDb)
         {
             DateTime ldtStart = DateTime.MinValue;
             DateTime ldtEnd = DateTime.MinValue;
@@ -1482,6 +1484,7 @@ namespace Ruddat_NK
             // int liDaysInMonth = 0; // Tage im Monat aus Vertrag
             int liSave = 1;  // Freigabe
             int liArtRelation = 0;      // 1= Rechnung, 2=Zahlung, 3=Zähler
+            int LiProgValue = 0;        // Progressbar
 
             decimal ldBetragNetto = 0;
             decimal ldBetragSollNetto = 0;
@@ -1512,37 +1515,38 @@ namespace Ruddat_NK
             //string lsObjektBezS = "";
             int LiReturn = 0;
 
+            // TODO Idee für Tasks
             // Get a reference to the MainWindow
-            MainWindow mainWindow = Application.Current.MainWindow as MainWindow;
+            //MainWindow mainWindow = Application.Current.MainWindow as MainWindow;
 
-            // Check if the MainWindow exists
-            if (mainWindow != null)
-            {
-                // Use the Dispatcher to update the progress bar value on the UI thread
-                mainWindow.Dispatcher.Invoke(() =>
-                {
-                    // Start the progress bar
-                    mainWindow.ProgressBar.IsIndeterminate = true;
-                });
-            }
+            //// Check if the MainWindow exists
+            //if (mainWindow != null)
+            //{
+            //    // Use the Dispatcher to update the progress bar value on the UI thread
+            //    mainWindow.Dispatcher.Invoke(() =>
+            //    {
+            //        // Start the progress bar
+            //        mainWindow.ProgressBar.IsIndeterminate = true;
+            //    });
+            //}
 
             switch (aiArt)
             {
                 case 1:
                     // Externe ID aus der Rechnung ermitteln 
-                    for (int i = 0; tableOne.Rows.Count > i; i++)
+                    for (int i = 0; tableRechnungen.Rows.Count > i; i++)
                     {
-                        if (tableOne.Rows[i].ItemArray.GetValue(14) != DBNull.Value)
+                        if (tableRechnungen.Rows[i].ItemArray.GetValue(14) != DBNull.Value)
                         {
-                            liExternId = (int)tableOne.Rows[i].ItemArray.GetValue(14);
+                            liExternId = (int)tableRechnungen.Rows[i].ItemArray.GetValue(14);
                             // Timeline löschen
                             liOk = TimelineDelete(liExternId, "R", asConnect, aiDb);
 
                             // Objekt
-                            if (tableOne.Rows[i].ItemArray.GetValue(8) != DBNull.Value)
-                                if ((int)tableOne.Rows[i].ItemArray.GetValue(8) > 0)
+                            if (tableRechnungen.Rows[i].ItemArray.GetValue(8) != DBNull.Value)
+                                if ((int)tableRechnungen.Rows[i].ItemArray.GetValue(8) > 0)
                                 {
-                                    liObjekt = (int)tableOne.Rows[i].ItemArray.GetValue(8);
+                                    liObjekt = (int)tableRechnungen.Rows[i].ItemArray.GetValue(8);
                                     // Timeline neu erzeugen Objekte aus Rechnungen
                                     liOk = TimelineCreate(liExternId, "id_rechnung", asConnect, aiDb);
 
@@ -1568,10 +1572,10 @@ namespace Ruddat_NK
                                 }
 
                             // ObjektTeil
-                            if (tableOne.Rows[i].ItemArray.GetValue(9) != DBNull.Value)
-                                if ((int)tableOne.Rows[i].ItemArray.GetValue(9) > 0)
+                            if (tableRechnungen.Rows[i].ItemArray.GetValue(9) != DBNull.Value)
+                                if ((int)tableRechnungen.Rows[i].ItemArray.GetValue(9) > 0)
                                 {
-                                    liObjektTeil = (int)tableOne.Rows[i].ItemArray.GetValue(9);
+                                    liObjektTeil = (int)tableRechnungen.Rows[i].ItemArray.GetValue(9);
                                     // Timeline neu erzeugen Objektteile aus Rechnungen
                                     liOk = TimelineCreate(liExternId, "id_rechnung", asConnect, aiDb);
                                     // Weiterleitung an ObjektTeil aus der Kostenart ermitteln
@@ -1585,10 +1589,10 @@ namespace Ruddat_NK
                                 }
 
                             // Mieter
-                            if (tableOne.Rows[i].ItemArray.GetValue(10) != DBNull.Value)
-                                if ((int)tableOne.Rows[i].ItemArray.GetValue(10) > 0)
+                            if (tableRechnungen.Rows[i].ItemArray.GetValue(10) != DBNull.Value)
+                                if ((int)tableRechnungen.Rows[i].ItemArray.GetValue(10) > 0)
                                 {
-                                    liMieter = (int)tableOne.Rows[i].ItemArray.GetValue(10);
+                                    liMieter = (int)tableRechnungen.Rows[i].ItemArray.GetValue(10);
                                     // Timeline neu erzeugen Mieter aus Rechnungen
                                     // TODO hier Kontrolle einbauen, ob Mietvertrag gültig ist
                                     liOk = TimelineCreate(liExternId, "id_rechnung", asConnect, aiDb);
@@ -1606,11 +1610,11 @@ namespace Ruddat_NK
                     switch (aiTeil)
                     {
                         case 1:
-                            for (int i = 0; tableOne.Rows.Count > i; i++)
+                            for (int i = 0; tableRechnungen.Rows.Count > i; i++)
                             {
-                                if (tableOne.Rows[i].ItemArray.GetValue(14) != DBNull.Value)
+                                if (tableRechnungen.Rows[i].ItemArray.GetValue(14) != DBNull.Value)
                                 {
-                                    liExternId = (int)tableOne.Rows[i].ItemArray.GetValue(14);
+                                    liExternId = (int)tableRechnungen.Rows[i].ItemArray.GetValue(14);
                                     LiReturn = liExternId;
                                 }
                                 else
@@ -1622,27 +1626,27 @@ namespace Ruddat_NK
                             }
                             break;
                         case 2:
-                            for (int i = 0; tableOne.Rows.Count > i; i++)
+                            for (int i = 0; tableRechnungen.Rows.Count > i; i++)
                             {
-                                if (tableOne.Rows[i].ItemArray.GetValue(14) != DBNull.Value)
+                                if (tableRechnungen.Rows[i].ItemArray.GetValue(14) != DBNull.Value)
                                 {
-                                    liExternId = (int)tableOne.Rows[i].ItemArray.GetValue(14);
-                                    if (tableOne.Rows[i].ItemArray.GetValue(8) != DBNull.Value)
-                                        liObjekt = (int)tableOne.Rows[i].ItemArray.GetValue(8);
-                                    if (tableOne.Rows[i].ItemArray.GetValue(9) != DBNull.Value)
-                                        liObjektTeil = (int)tableOne.Rows[i].ItemArray.GetValue(9);
-                                    if (tableOne.Rows[i].ItemArray.GetValue(10) != DBNull.Value)
-                                        liMieter = (int)tableOne.Rows[i].ItemArray.GetValue(10);
-                                    if (tableOne.Rows[i].ItemArray.GetValue(5) != DBNull.Value)
-                                        ldBetragNetto = (decimal)tableOne.Rows[i].ItemArray.GetValue(5);
-                                    if (tableOne.Rows[i].ItemArray.GetValue(6) != DBNull.Value)
-                                        ldBetragBrutto = (decimal)tableOne.Rows[i].ItemArray.GetValue(6);
-                                    if (tableOne.Rows[i].ItemArray.GetValue(3) != DBNull.Value)
-                                        ldtStart = (DateTime)tableOne.Rows[i].ItemArray.GetValue(3);
-                                    if (tableOne.Rows[i].ItemArray.GetValue(4) != DBNull.Value)
-                                        ldtEnd = (DateTime)tableOne.Rows[i].ItemArray.GetValue(4);
-                                    if (tableOne.Rows[i].ItemArray.GetValue(1) != DBNull.Value)
-                                        liKsa = (int)tableOne.Rows[i].ItemArray.GetValue(1);
+                                    liExternId = (int)tableRechnungen.Rows[i].ItemArray.GetValue(14);
+                                    if (tableRechnungen.Rows[i].ItemArray.GetValue(8) != DBNull.Value)
+                                        liObjekt = (int)tableRechnungen.Rows[i].ItemArray.GetValue(8);
+                                    if (tableRechnungen.Rows[i].ItemArray.GetValue(9) != DBNull.Value)
+                                        liObjektTeil = (int)tableRechnungen.Rows[i].ItemArray.GetValue(9);
+                                    if (tableRechnungen.Rows[i].ItemArray.GetValue(10) != DBNull.Value)
+                                        liMieter = (int)tableRechnungen.Rows[i].ItemArray.GetValue(10);
+                                    if (tableRechnungen.Rows[i].ItemArray.GetValue(5) != DBNull.Value)
+                                        ldBetragNetto = (decimal)tableRechnungen.Rows[i].ItemArray.GetValue(5);
+                                    if (tableRechnungen.Rows[i].ItemArray.GetValue(6) != DBNull.Value)
+                                        ldBetragBrutto = (decimal)tableRechnungen.Rows[i].ItemArray.GetValue(6);
+                                    if (tableRechnungen.Rows[i].ItemArray.GetValue(3) != DBNull.Value)
+                                        ldtStart = (DateTime)tableRechnungen.Rows[i].ItemArray.GetValue(3);
+                                    if (tableRechnungen.Rows[i].ItemArray.GetValue(4) != DBNull.Value)
+                                        ldtEnd = (DateTime)tableRechnungen.Rows[i].ItemArray.GetValue(4);
+                                    if (tableRechnungen.Rows[i].ItemArray.GetValue(1) != DBNull.Value)
+                                        liKsa = (int)tableRechnungen.Rows[i].ItemArray.GetValue(1);
 
                                     zl = 1;         // Anzahl der Monate = Anzahl der Datensätze in Timeline
 
@@ -1664,7 +1668,7 @@ namespace Ruddat_NK
 
                                     do
                                     {
-                                        DataRow dr = tableThree.NewRow();
+                                        DataRow dr = tableNewTimeline.NewRow();
 
                                         dr[1] = liExternId;
                                         dr[4] = liObjekt;
@@ -1701,7 +1705,7 @@ namespace Ruddat_NK
                                             dr[13] = ldtMonat;      // Der Timelinemonat
                                         dr[14] = 0;
                                         dr[15] = 0;
-                                        tableThree.Rows.Add(dr);
+                                        tableNewTimeline.Rows.Add(dr);
                                         // + Monat 
                                         ldtMonat = ldtMonat.AddMonths(1);
                                         // + Zähler
@@ -1756,36 +1760,36 @@ namespace Ruddat_NK
                     //});
 
 
-                    tableFour.Rows.Clear();     // Timeline leeren
+                    tableTimeLineSet.Rows.Clear();     // Timeline leeren
 
                     // Timeline
-                    for (int i = 0; tableSix.Rows.Count > i; i++)
+                    for (int i = 0; tableTimelineGet.Rows.Count > i; i++)
                     {
-                        if (tableSix.Rows[i].ItemArray.GetValue(1) != DBNull.Value)
+                        if (tableTimelineGet.Rows[i].ItemArray.GetValue(1) != DBNull.Value)
                         {
-                            liRechnungId = (int)tableSix.Rows[i].ItemArray.GetValue(1);
-                            if (tableSix.Rows[i].ItemArray.GetValue(4) != DBNull.Value)
-                                liObjekt = (int)tableSix.Rows[i].ItemArray.GetValue(4);
-                            if (tableSix.Rows[i].ItemArray.GetValue(5) != DBNull.Value)
-                                liObjektTeil = (int)tableSix.Rows[i].ItemArray.GetValue(5);
-                            if (tableSix.Rows[i].ItemArray.GetValue(6) != DBNull.Value)
-                                liMieter = (int)tableSix.Rows[i].ItemArray.GetValue(6);
-                            if (tableSix.Rows[i].ItemArray.GetValue(7) != DBNull.Value)
-                                liKsa = (int)tableSix.Rows[i].ItemArray.GetValue(7);
-                            if (tableSix.Rows[i].ItemArray.GetValue(8) != DBNull.Value)
-                                ldBetragNetto = (decimal)tableSix.Rows[i].ItemArray.GetValue(8);
-                            if (tableSix.Rows[i].ItemArray.GetValue(9) != DBNull.Value)
-                                ldBetragSollNetto = (decimal)tableSix.Rows[i].ItemArray.GetValue(9);
-                            if (tableSix.Rows[i].ItemArray.GetValue(10) != DBNull.Value)
-                                ldBetragBrutto = (decimal)tableSix.Rows[i].ItemArray.GetValue(10);
-                            if (tableSix.Rows[i].ItemArray.GetValue(11) != DBNull.Value)
-                                ldBetragSollBrutto = (decimal)tableSix.Rows[i].ItemArray.GetValue(11);
-                            if (tableSix.Rows[i].ItemArray.GetValue(12) != DBNull.Value)
-                                ldZs = (decimal)tableSix.Rows[i].ItemArray.GetValue(12);
-                            if (tableSix.Rows[i].ItemArray.GetValue(13) != DBNull.Value)
-                                ldtMonat = (DateTime)tableSix.Rows[i].ItemArray.GetValue(13);
-                            if (tableSix.Rows[i].ItemArray.GetValue(17) != DBNull.Value)
-                                liImportId = (int)tableSix.Rows[i].ItemArray.GetValue(17);
+                            liRechnungId = (int)tableTimelineGet.Rows[i].ItemArray.GetValue(1);
+                            if (tableTimelineGet.Rows[i].ItemArray.GetValue(4) != DBNull.Value)
+                                liObjekt = (int)tableTimelineGet.Rows[i].ItemArray.GetValue(4);
+                            if (tableTimelineGet.Rows[i].ItemArray.GetValue(5) != DBNull.Value)
+                                liObjektTeil = (int)tableTimelineGet.Rows[i].ItemArray.GetValue(5);
+                            if (tableTimelineGet.Rows[i].ItemArray.GetValue(6) != DBNull.Value)
+                                liMieter = (int)tableTimelineGet.Rows[i].ItemArray.GetValue(6);
+                            if (tableTimelineGet.Rows[i].ItemArray.GetValue(7) != DBNull.Value)
+                                liKsa = (int)tableTimelineGet.Rows[i].ItemArray.GetValue(7);
+                            if (tableTimelineGet.Rows[i].ItemArray.GetValue(8) != DBNull.Value)
+                                ldBetragNetto = (decimal)tableTimelineGet.Rows[i].ItemArray.GetValue(8);
+                            if (tableTimelineGet.Rows[i].ItemArray.GetValue(9) != DBNull.Value)
+                                ldBetragSollNetto = (decimal)tableTimelineGet.Rows[i].ItemArray.GetValue(9);
+                            if (tableTimelineGet.Rows[i].ItemArray.GetValue(10) != DBNull.Value)
+                                ldBetragBrutto = (decimal)tableTimelineGet.Rows[i].ItemArray.GetValue(10);
+                            if (tableTimelineGet.Rows[i].ItemArray.GetValue(11) != DBNull.Value)
+                                ldBetragSollBrutto = (decimal)tableTimelineGet.Rows[i].ItemArray.GetValue(11);
+                            if (tableTimelineGet.Rows[i].ItemArray.GetValue(12) != DBNull.Value)
+                                ldZs = (decimal)tableTimelineGet.Rows[i].ItemArray.GetValue(12);
+                            if (tableTimelineGet.Rows[i].ItemArray.GetValue(13) != DBNull.Value)
+                                ldtMonat = (DateTime)tableTimelineGet.Rows[i].ItemArray.GetValue(13);
+                            if (tableTimelineGet.Rows[i].ItemArray.GetValue(17) != DBNull.Value)
+                                liImportId = (int)tableTimelineGet.Rows[i].ItemArray.GetValue(17);
 
                             // Ermitteln der VerteilungsId aus Tabelle rechnungen
                             // Achtung nbüschen gepfuscht liRechnungId ist die externTimeline Id
@@ -1795,33 +1799,33 @@ namespace Ruddat_NK
                             lsVerteilung = getVerteilung(asConnect, liVerteilungId, aiDb);
 
                             // Alle Objektteile zu dem Objekt
-                            for (int ii = 0; tableFive.Rows.Count > ii; ii++)
+                            for (int ii = 0; tableObjektParts.Rows.Count > ii; ii++)
                             {
                                 // Timeline schreiben
-                                DataRow dr = tableFour.NewRow();
+                                DataRow dr = tableTimeLineSet.NewRow();
 
                                 dr[1] = liRechnungId;
                                 // dr[4] = liObjekt; nicht eintragen
-                                if (tableFive.Rows[ii].ItemArray.GetValue(0) != DBNull.Value)
+                                if (tableObjektParts.Rows[ii].ItemArray.GetValue(0) != DBNull.Value)
                                 {
-                                    dr[5] = (int)tableFive.Rows[ii].ItemArray.GetValue(0);   // id ObjektTeil
-                                    liObjektTeil = (int)tableFive.Rows[ii].ItemArray.GetValue(0);
+                                    dr[5] = (int)tableObjektParts.Rows[ii].ItemArray.GetValue(0);   // id ObjektTeil
+                                    liObjektTeil = (int)tableObjektParts.Rows[ii].ItemArray.GetValue(0);
                                     dr[6] = liMieter;
                                     dr[7] = liKsa;
 
                                     switch (lsVerteilung)
                                     {
                                         case "fl":
-                                            if (tableFive.Rows[ii].ItemArray.GetValue(6) != DBNull.Value)
+                                            if (tableObjektParts.Rows[ii].ItemArray.GetValue(6) != DBNull.Value)
                                             {
-                                                if ((decimal)tableFive.Rows[ii].ItemArray.GetValue(6) > 0)
+                                                if ((decimal)tableObjektParts.Rows[ii].ItemArray.GetValue(6) > 0)
                                                 {
                                                     // Gesamtfläche aus Tabelle Objekt holen
                                                     if (liObjekt > 0)
                                                     {
                                                         ldGesamtflaeche = getObjektflaeche(liObjekt, 0, 0, asConnect, aiDb);
-                                                        dr[8] = ldBetragNetto / (ldGesamtflaeche / (decimal)tableFive.Rows[ii].ItemArray.GetValue(6));          // Netto    
-                                                        dr[10] = ldBetragBrutto / (ldGesamtflaeche / (decimal)tableFive.Rows[ii].ItemArray.GetValue(6));         // Brutto
+                                                        dr[8] = ldBetragNetto / (ldGesamtflaeche / (decimal)tableObjektParts.Rows[ii].ItemArray.GetValue(6));          // Netto    
+                                                        dr[10] = ldBetragBrutto / (ldGesamtflaeche / (decimal)tableObjektParts.Rows[ii].ItemArray.GetValue(6));         // Brutto
                                                     }
                                                 }
                                                 else
@@ -1832,12 +1836,12 @@ namespace Ruddat_NK
                                             break;
                                         // Prozentanteil rechnen
                                         case "pz":
-                                            if (tableFive.Rows[ii].ItemArray.GetValue(7) != DBNull.Value)
+                                            if (tableObjektParts.Rows[ii].ItemArray.GetValue(7) != DBNull.Value)
                                             {
-                                                if ((decimal)tableFive.Rows[ii].ItemArray.GetValue(7) > 0)
+                                                if ((decimal)tableObjektParts.Rows[ii].ItemArray.GetValue(7) > 0)
                                                 {
-                                                    dr[8] = (ldBetragNetto / 100) * (decimal)tableFive.Rows[ii].ItemArray.GetValue(7);           // Netto    
-                                                    dr[10] = (ldBetragBrutto / 100) * (decimal)tableFive.Rows[ii].ItemArray.GetValue(7);         // Brutto                                                		 
+                                                    dr[8] = (ldBetragNetto / 100) * (decimal)tableObjektParts.Rows[ii].ItemArray.GetValue(7);           // Netto    
+                                                    dr[10] = (ldBetragBrutto / 100) * (decimal)tableObjektParts.Rows[ii].ItemArray.GetValue(7);         // Brutto                                                		 
                                                 }
                                                 else
                                                 {
@@ -1852,9 +1856,9 @@ namespace Ruddat_NK
                                             // liAnzPersonenObj = getAktPersonen(liObjekt, ldtMonat, 0);
                                             // liAnzPersonenObt = getAktPersonen(0, ldtMonat, liObjektTeil);
 
-                                            if (tableFive.Rows[ii].ItemArray.GetValue(8) != DBNull.Value)
+                                            if (tableObjektParts.Rows[ii].ItemArray.GetValue(8) != DBNull.Value)
                                             {
-                                                if ((int)tableFive.Rows[ii].ItemArray.GetValue(8) > 0)
+                                                if ((int)tableObjektParts.Rows[ii].ItemArray.GetValue(8) > 0)
                                                 {
                                                     // Anzahl der Personen in einem Objekt ermitteln
                                                     // Aktive Verträge
@@ -1895,7 +1899,7 @@ namespace Ruddat_NK
                                         // Verteilung Bedingt mit Anwahl für gewünschte Wohnungen
                                         // Die Gesamtfläche für die Auswahl wird ermittelt
                                         case "fa":
-                                            if ((decimal)tableFive.Rows[ii].ItemArray.GetValue(6) > 0)
+                                            if ((decimal)tableObjektParts.Rows[ii].ItemArray.GetValue(6) > 0)
                                             {
                                                 // Gesamtfläche der ausgewählten Wohnungen aus Tabelle Objekt_mix_parts holen
                                                 if (liObjekt > 0)
@@ -1904,11 +1908,11 @@ namespace Ruddat_NK
                                                     // Gesamtfläche der Auswahl = 0 oder Gesamtfläche = 1
                                                     liArt = getObjektflaecheAuswFlag(liObjekt, asConnect, aiDb);
                                                     ldGesamtflaeche = getObjektflaecheAuswahl(liObjekt, liRechnungId, asConnect, liArt, aiDb);  // RechnungsId ist Timeline ID
-                                                    if (getObjektTeilAuswahl((int)tableFive.Rows[ii].ItemArray.GetValue(0), asConnect, aiDb) > 0)
+                                                    if (getObjektTeilAuswahl((int)tableObjektParts.Rows[ii].ItemArray.GetValue(0), asConnect, aiDb) > 0)
                                                     {
                                                         // decimal ldtest = ldBetragNetto / (ldGesamtflaeche / (decimal)tableFive.Rows[ii].ItemArray.GetValue(6)); 
-                                                        dr[8] = ldBetragNetto / (ldGesamtflaeche / (decimal)tableFive.Rows[ii].ItemArray.GetValue(6));          // Netto    
-                                                        dr[10] = ldBetragBrutto / (ldGesamtflaeche / (decimal)tableFive.Rows[ii].ItemArray.GetValue(6));         // Brutto                                                                                                                                                    
+                                                        dr[8] = ldBetragNetto / (ldGesamtflaeche / (decimal)tableObjektParts.Rows[ii].ItemArray.GetValue(6));          // Netto    
+                                                        dr[10] = ldBetragBrutto / (ldGesamtflaeche / (decimal)tableObjektParts.Rows[ii].ItemArray.GetValue(6));         // Brutto                                                                                                                                                    
                                                     }
                                                     else
                                                     {
@@ -1949,12 +1953,12 @@ namespace Ruddat_NK
                                 }
                                 if (liSave == 1)
                                 {
-                                    tableFour.Rows.Add(dr);
+                                    tableTimeLineSet.Rows.Add(dr);
                                 }
                                 liSave = 1;
                                 // und alle TimelineEinträge ab in die Datenbank
                                 MakeCommand(aiDb, 2);
-                                tableFour.Rows.Clear();
+                                tableTimeLineSet.Rows.Clear();
                             }
                         }
                         else
@@ -1975,51 +1979,51 @@ namespace Ruddat_NK
                 case 5:         // Mieter schreiben
                     // Schleife durch Timeline
                     // Jeder Datensatz muss hier einen Datensatz für den Mieter erzeugen
-                    tableThree.Rows.Clear();    // TimeLine leeren
+                    tableNewTimeline.Rows.Clear();    // TimeLine leeren
 
-                    for (int i = 0; tableEight.Rows.Count > i; i++)
+                    for (int i = 0; tableTimeLineGet.Rows.Count > i; i++)
                     {
                         liSave = 1;
-                        if (tableEight.Rows[i].ItemArray.GetValue(1) != DBNull.Value || tableEight.Rows[i].ItemArray.GetValue(2) != DBNull.Value || tableEight.Rows[i].ItemArray.GetValue(3) != DBNull.Value)
+                        if (tableTimeLineGet.Rows[i].ItemArray.GetValue(1) != DBNull.Value || tableTimeLineGet.Rows[i].ItemArray.GetValue(2) != DBNull.Value || tableTimeLineGet.Rows[i].ItemArray.GetValue(3) != DBNull.Value)
                         {
                             // Rechnung
-                            if (tableEight.Rows[i].ItemArray.GetValue(1) != DBNull.Value)
+                            if (tableTimeLineGet.Rows[i].ItemArray.GetValue(1) != DBNull.Value)
                             {
-                                liRechnungId = (int)tableEight.Rows[i].ItemArray.GetValue(1);
+                                liRechnungId = (int)tableTimeLineGet.Rows[i].ItemArray.GetValue(1);
                             }
                             // Zahlung
-                            if (tableEight.Rows[i].ItemArray.GetValue(2) != DBNull.Value)
+                            if (tableTimeLineGet.Rows[i].ItemArray.GetValue(2) != DBNull.Value)
                             {
-                                liZahlungId = (int)tableEight.Rows[i].ItemArray.GetValue(2);
+                                liZahlungId = (int)tableTimeLineGet.Rows[i].ItemArray.GetValue(2);
                             }
                             // Zählerstand
-                            if (tableEight.Rows[i].ItemArray.GetValue(3) != DBNull.Value)
+                            if (tableTimeLineGet.Rows[i].ItemArray.GetValue(3) != DBNull.Value)
                             {
-                                liZaehlerstandId = (int)tableEight.Rows[i].ItemArray.GetValue(3);
+                                liZaehlerstandId = (int)tableTimeLineGet.Rows[i].ItemArray.GetValue(3);
                             }
 
-                            if (tableEight.Rows[i].ItemArray.GetValue(4) != DBNull.Value)
-                                liObjekt = (int)tableEight.Rows[i].ItemArray.GetValue(4);
-                            if (tableEight.Rows[i].ItemArray.GetValue(5) != DBNull.Value)
-                                liObjektTeil = (int)tableEight.Rows[i].ItemArray.GetValue(5);
-                            if (tableEight.Rows[i].ItemArray.GetValue(7) != DBNull.Value)
-                                liKsa = (int)tableEight.Rows[i].ItemArray.GetValue(7);
-                            if (tableEight.Rows[i].ItemArray.GetValue(8) != DBNull.Value)
-                                ldBetragNetto = (decimal)tableEight.Rows[i].ItemArray.GetValue(8);
-                            if (tableEight.Rows[i].ItemArray.GetValue(9) != DBNull.Value)
-                                ldBetragSollNetto = (decimal)tableEight.Rows[i].ItemArray.GetValue(9);
-                            if (tableEight.Rows[i].ItemArray.GetValue(10) != DBNull.Value)
-                                ldBetragBrutto = (decimal)tableEight.Rows[i].ItemArray.GetValue(10);
-                            if (tableEight.Rows[i].ItemArray.GetValue(11) != DBNull.Value)
-                                ldBetragSollBrutto = (decimal)tableEight.Rows[i].ItemArray.GetValue(11);
-                            if (tableEight.Rows[i].ItemArray.GetValue(12) != DBNull.Value)
-                                ldZs = (decimal)tableEight.Rows[i].ItemArray.GetValue(12);
-                            if (tableEight.Rows[i].ItemArray.GetValue(13) != DBNull.Value)
-                                ldtMonat = (DateTime)tableEight.Rows[i].ItemArray.GetValue(13);
-                            if (tableEight.Rows[i].ItemArray.GetValue(17) != DBNull.Value)
-                                liImportId = (int)tableEight.Rows[i].ItemArray.GetValue(17);
+                            if (tableTimeLineGet.Rows[i].ItemArray.GetValue(4) != DBNull.Value)
+                                liObjekt = (int)tableTimeLineGet.Rows[i].ItemArray.GetValue(4);
+                            if (tableTimeLineGet.Rows[i].ItemArray.GetValue(5) != DBNull.Value)
+                                liObjektTeil = (int)tableTimeLineGet.Rows[i].ItemArray.GetValue(5);
+                            if (tableTimeLineGet.Rows[i].ItemArray.GetValue(7) != DBNull.Value)
+                                liKsa = (int)tableTimeLineGet.Rows[i].ItemArray.GetValue(7);
+                            if (tableTimeLineGet.Rows[i].ItemArray.GetValue(8) != DBNull.Value)
+                                ldBetragNetto = (decimal)tableTimeLineGet.Rows[i].ItemArray.GetValue(8);
+                            if (tableTimeLineGet.Rows[i].ItemArray.GetValue(9) != DBNull.Value)
+                                ldBetragSollNetto = (decimal)tableTimeLineGet.Rows[i].ItemArray.GetValue(9);
+                            if (tableTimeLineGet.Rows[i].ItemArray.GetValue(10) != DBNull.Value)
+                                ldBetragBrutto = (decimal)tableTimeLineGet.Rows[i].ItemArray.GetValue(10);
+                            if (tableTimeLineGet.Rows[i].ItemArray.GetValue(11) != DBNull.Value)
+                                ldBetragSollBrutto = (decimal)tableTimeLineGet.Rows[i].ItemArray.GetValue(11);
+                            if (tableTimeLineGet.Rows[i].ItemArray.GetValue(12) != DBNull.Value)
+                                ldZs = (decimal)tableTimeLineGet.Rows[i].ItemArray.GetValue(12);
+                            if (tableTimeLineGet.Rows[i].ItemArray.GetValue(13) != DBNull.Value)
+                                ldtMonat = (DateTime)tableTimeLineGet.Rows[i].ItemArray.GetValue(13);
+                            if (tableTimeLineGet.Rows[i].ItemArray.GetValue(17) != DBNull.Value)
+                                liImportId = (int)tableTimeLineGet.Rows[i].ItemArray.GetValue(17);
 
-                            DataRow dr = tableThree.NewRow();
+                            DataRow dr = tableNewTimeline.NewRow();
                             dr[1] = liRechnungId;
                             dr[2] = liZahlungId;
                             dr[3] = liZaehlerstandId;
@@ -2127,12 +2131,12 @@ namespace Ruddat_NK
 
                             if (liSave == 1)
                             {
-                                tableThree.Rows.Add(dr);            // Timeline                                     
+                                tableNewTimeline.Rows.Add(dr);            // Timeline                                     
                             }
                             liSave = 1;
                             // und alle TimelineEinträge ab in die Datenbank
                             MakeCommand(aiDb, 3);
-                            tableThree.Rows.Clear();
+                            tableNewTimeline.Rows.Clear();
                         }
                         else
                         {
@@ -2145,12 +2149,12 @@ namespace Ruddat_NK
                     break;
                 case 8:
                     // MwstSatz holen
-                    if (tableSeven.Rows.Count > 0)
+                    if (tableTaxGet.Rows.Count > 0)
                     {
-                        if (tableSeven.Rows[0].ItemArray.GetValue(2) != DBNull.Value)
+                        if (tableTaxGet.Rows[0].ItemArray.GetValue(2) != DBNull.Value)
                         {
                             // Hier wird liRows ausnahmsweise mit dem Mwst-Satz belegt
-                            decimal ldMwst = (decimal)tableSeven.Rows[0].ItemArray.GetValue(2);
+                            decimal ldMwst = (decimal)tableTaxGet.Rows[0].ItemArray.GetValue(2);
                             LiReturn = (int)ldMwst;
                         }
                     }
@@ -2437,7 +2441,7 @@ namespace Ruddat_NK
                     break;
                     
             }
-            mainWindow.ProgressBar.IsIndeterminate = false;
+            // mainWindow.ProgressBar.IsIndeterminate = false;
             return LiReturn;
         }
 

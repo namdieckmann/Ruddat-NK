@@ -255,7 +255,7 @@ namespace Ruddat_NK
                     // Die hier eingetragene Db-Verbindung nehmen
                     // SqlConnectionString = "Data Source=server1\rdnk;Initial Catalog=rdnk;Integrated Security=True";
                     // MySql 
-                    MySqlConnectionString = @"Data Source=197288c.online-server.cloud;PORT=3306;USERID=namdi;PASSWORD=7V7ADTqWqQPCf9Sge4PT;database=dbo;Connect Timeout = 20";
+                    // MySqlConnectionString = @"Data Source=197288c.online-server.cloud;PORT=3306;USERID=namdi;PASSWORD=7V7ADTqWqQPCf9Sge4PT;database=dbo;Connect Timeout = 20";
 
                     //MessageBox.Show("Es wurde eine Standardkonfiguration erzeugt.\n" +
                     //                "Die Serververbindung muss noch überprüft werden\n" +
@@ -283,7 +283,7 @@ namespace Ruddat_NK
                     break;
                 case 2:
                     // Lokal MySql 
-                    // MySqlConnectionString = @"server=localhost;userid=rdnk;password=r1d8n9k4!;database=dbo";
+                    MySqlConnectionString = @"server=localhost;userid=rdnk;password=r1d8n9k4!;database=dbo";
                     // Ionos Server 
                     // MySqlConnectionString = @"Data Source=197288c.online-server.cloud;PORT=3306;USERID=namdi;PASSWORD=7V7ADTqWqQPCf9Sge4PT;database=dbo;Connect Timeout = 60";
                     // MessageBox.Show("Ionos Datenbank MySql wird verwendet", "Achtung! ", MessageBoxButton.OK);
@@ -990,6 +990,7 @@ namespace Ruddat_NK
             {
                 // Treeview befüllen 
                 lsSql = RdQueries.GetSqlSelect(2, liFiliale, "", "", "", DateTime.Today, DateTime.Today, giFiliale, gsConnect, giDb);
+
                 // Daten holen 
                 liRows = FetchData(lsSql, 2, giDb, lsConnect);                          // Aufruf Art 2 ist Treeview befüllen   
 
@@ -2060,10 +2061,6 @@ namespace Ruddat_NK
 
                 }
 
-                // Steht etwas im Feld Mehrwertsteuer?
-                // if (((DgrRechnungen.Items[liSel] as DataRowView).Row.ItemArray[7] != DBNull.Value) || liMwstSatz != 99)
-                //{
-
                 if (x == 8)     // NettoPreis !! Achtung: Der Displayindex ist die Darstellung im 
                                 // DGR und nicht die Itemliste
                 {
@@ -2658,6 +2655,9 @@ namespace Ruddat_NK
         // Das Abrechnungsjahr kann gewählt werden
         private void ClYear_SelectedDatesChanged(object sender, SelectionChangedEventArgs e)
         {
+            int liRows = 0;
+            string lsSql = "";
+
             DateTime ldtYear = DateTime.MinValue;
             DateTime ldtFrom = DateTime.MinValue;
             DateTime ldtTo = DateTime.MinValue;
@@ -2685,6 +2685,17 @@ namespace Ruddat_NK
             // Calender Year aus
             clYear.IsEnabled = false;
             cbYear.IsChecked = false;
+
+            // Treeview befüllen 
+            lsSql = RdQueries.GetSqlSelect(2, giFiliale, "", "", "", DateTime.Today, DateTime.Today, giFiliale, gsConnect, giDb);
+
+            // Daten holen 
+            liRows = FetchData(lsSql, 2, giDb, gsConnect);                          // Aufruf Art 2 ist Treeview befüllen   
+
+            // Tabelle Leerstand befüllen
+            lsSql = RdQueries.GetSqlSelect(211, giFiliale, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
+            liRows = FetchData(lsSql, 18, giDb, gsConnect);
+
         }
 
         // Todo Menü Rechnungen importieren
