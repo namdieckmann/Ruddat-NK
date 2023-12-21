@@ -7,40 +7,41 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Xml;
 using MySql.Data.MySqlClient;
+using System.Windows.Threading;
 
 namespace Ruddat_NK
 {
-
-    /// <summary>
-    /// Interaktionslogik für MainWindow.xaml
-    /// </summary>
-    /// 
+    // Todo verhindern, dass Objekte usw. gelöscht weden
 
     public partial class MainWindow : Window
     {
         // Global
-        string gsPath = "";                 // DataPath des xml
+        private string gsPath = "";                 // DataPath des xml
         String gsItemHeader = "";           // Gewähltes Item aus dem Treeview
-        string gsConnect = "";
-        int giMandantId = 0;                  // Mandant        
-        int giFiliale = 0;                  // Angewählte Firma (Aus xml Konfig, den letzten Wert holen)
-        int giObjekt = 0;                   // Objekt global
-        int giObjektTeil = 0;               // Objektteil global
-        int giMieter = 0;                   // Mieter global
-        int giDelId = 0;                    // Rechnungsdatensatz löschen
-        int giDelZlId = 0;                  // Zahlungsdatensatz löschen
-        int giDelZlWertId = 0;              // Zählerwert löschen
-        int giZlId = 0;                     // Zähler Id
-        int giTimelineId = 0;               // TimelineId für löschen
-        int giFlagTimeline = 0;             // Flag TimeLinebearbeitung
-        int giIndex = 0;                    // Index > Objekt, Teil oder Mieter 1,2,3
-        int giMwstSatz = 99;                // Mwst Satz ! Null > 0 gibs ja
-        int giMwstSatzZl = 99;              // Für Zähler
-        int giDb = 2;                       // Datenbank 1 = MsqSql 2= Mysql
-        DateTime gdtZahlung = DateTime.MinValue; // Zahlungsdatum aus Datepicker DataGrid Zahlungen
-        // DateTime gdtFrom = DateTime.MinValue;
-        // DateTime gdtTo = DateTime.MinValue;
-        DateTime gdtYear = DateTime.MinValue;
+        private string gsConnect = "";
+        private int giMandantId = 0;                  // Mandant        
+        private int giFiliale = 0;                  // Angewählte Firma (Aus xml Konfig, den letzten Wert holen)
+        private int giObjekt = 0;                   // Objekt global
+        private int giObjektTeil = 0;               // Objektteil global
+        private int giMieter = 0;                   // Mieter global
+        private int giDelId = 0;                    // Rechnungsdatensatz löschen
+        private int giDelZlId = 0;                  // Zahlungsdatensatz löschen
+        private int giDelZlWertId = 0;              // Zählerwert löschen
+        private int giZlId = 0;                     // Zähler Id
+        private int giTimelineId = 0;               // TimelineId für löschen
+        private int giFlagTimeline = 0;             // Flag TimeLinebearbeitung
+        private int giIndex = 0;                    // Index > Objekt, Teil oder Mieter 1,2,3
+        private int giMwstSatz = 99;                // Mwst Satz ! Null > 0 gibs ja
+        private int giMwstSatzZl = 99;              // Für Zähler
+        private int giDb = 2;                       // Datenbank 1 = MsqSql 2= Mysql
+        private DateTime gdtZahlung = DateTime.MinValue; // Zahlungsdatum aus Datepicker DataGrid Zahlungen
+        // private DateTime gdtFrom = DateTime.MinValue;
+        // private DateTime gdtTo = DateTime.MinValue;
+        private DateTime gdtYear = DateTime.MinValue;
+
+        //Todo PB
+        private readonly DispatcherTimer timer;
+        private int currentValue = 0;
 
         // Daten
         DataTable tableOne;
@@ -95,7 +96,6 @@ namespace Ruddat_NK
         public MainWindow()
         {
             int liRows = 0;
-            int LiOk = 0;
             String lsSql = "";
             String UPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
             string lsConnect = "";
@@ -105,11 +105,10 @@ namespace Ruddat_NK
             DateTime ldtYear = DateTime.MinValue;
             DateTime ldtTo = DateTime.Today;
             gsPath = UPath;                         // Pfad der Konfigurationsdatei global verfügbar machen
-
+            
             InitializeComponent();
 
-            Mouse.OverrideCursor = System.Windows.Input.Cursors.Wait;
-
+            // DatenbankConnect
             lsConnect = DbConnect(UPath);
 
             // Menüpunkte
@@ -1595,6 +1594,9 @@ namespace Ruddat_NK
             string lsSql = "";
             int liOk = 0;
 
+            // Progressbar auf 0
+            MyProgressBar.Value = 0;
+
             // TableOne wird aktualsiert Rechnungen TableOne
             liOk = FetchData("", 35, giDb, gsConnect);
 
@@ -2944,5 +2946,10 @@ namespace Ruddat_NK
             updateAllDataGrids(11);
             // updateAllDataGrids(111);
         }
+    }
+
+    internal class DataProvider
+    {
+        public int ValueUpdated { get; internal set; }
     }
 }
