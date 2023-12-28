@@ -252,7 +252,7 @@ namespace Ruddat_NK
                     xmlwriter.Close();
 
                     // Die hier eingetragene Db-Verbindung nehmen
-                    SqlConnectionString = "Data Source=server1\rdnk;Initial Catalog=rdnk;Integrated Security=True";
+                    // SqlConnectionString = "Data Source=server1\rdnk;Initial Catalog=rdnk;Integrated Security=True";
                     // MySql 
                     // MySqlConnectionString = @"Data Source=197288c.online-server.cloud;PORT=3306;USERID=namdi;PASSWORD=7V7ADTqWqQPCf9Sge4PT;database=dbo;Connect Timeout = 20";
 
@@ -282,7 +282,7 @@ namespace Ruddat_NK
                     break;
                 case 2:
                     // Lokal MySql 
-                    MySqlConnectionString = @"server=localhost;userid=rdnk;password=r1d8n9k4!;database=dbo";
+                    // MySqlConnectionString = @"server=localhost;userid=rdnk;password=r1d8n9k4!;database=dbo";
                     // Ionos Server 
                     // MySqlConnectionString = @"Data Source=197288c.online-server.cloud;PORT=3306;USERID=namdi;PASSWORD=7V7ADTqWqQPCf9Sge4PT;database=dbo;Connect Timeout = 60";
                     // MessageBox.Show("Ionos Datenbank MySql wird verwendet", "Achtung! ", MessageBoxButton.OK);
