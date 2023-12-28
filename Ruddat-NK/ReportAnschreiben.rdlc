@@ -865,9 +865,9 @@
           <Paragraph>
             <TextRuns>
               <TextRun>
-                <Value>=Switch(Trim(First(Fields!mAnrede.Value, "DataSet2")) = "Frau","z.Hd. Frau ",
-	Trim(First(Fields!mAnrede.Value, "DataSet2")) = "Herr","z. Hd. Herrn ",
-	Trim(First(Fields!mAnrede.Value, "DataSet2")) = "","")</Value>
+                <Value>=Switch(Trim(First(Fields!fanrede.Value, "DataSet3")) = "Frau","z.Hd. Frau ",
+	Trim(First(Fields!fanrede.Value, "DataSet3")) = "Herr","z. Hd. Herrn ",
+	Trim(First(Fields!fanrede.Value, "DataSet3")) = "","")</Value>
                 <Style>
                   <FontSize>9pt</FontSize>
                 </Style>
@@ -1498,7 +1498,7 @@
           <Paragraph>
             <TextRuns>
               <TextRun>
-                <Value>=Trim(First(Fields!mVorname.Value, "DataSet2")) + " " + Trim(First(Fields!mName.Value, "DataSet2"))</Value>
+                <Value>=Trim(First(Fields!fvorname.Value, "DataSet3")) + " " + Trim(First(Fields!fname.Value, "DataSet3"))</Value>
                 <Style>
                   <FontSize>9pt</FontSize>
                 </Style>
@@ -1528,7 +1528,7 @@
           <Paragraph>
             <TextRuns>
               <TextRun>
-                <Value>=First(Fields!madr.Value, "DataSet2")</Value>
+                <Value>=First(Fields!fadr.Value, "DataSet3")</Value>
                 <Style>
                   <FontSize>9pt</FontSize>
                 </Style>
@@ -1558,7 +1558,7 @@
           <Paragraph>
             <TextRuns>
               <TextRun>
-                <Value>=Trim(First(Fields!mplz.Value, "DataSet2")) + " " + Trim(First(Fields!mort.Value, "DataSet2"))</Value>
+                <Value>=Trim(First(Fields!fplz.Value, "DataSet3")) + " " + Trim(First(Fields!fort.Value, "DataSet3"))</Value>
                 <Style>
                   <FontSize>9pt</FontSize>
                 </Style>
@@ -1984,7 +1984,7 @@
         </Paragraphs>
         <Top>20.50168cm</Top>
         <Left>0.21662cm</Left>
-        <Height>1.60655cm</Height>
+        <Height>1.83585cm</Height>
         <Width>15.57657cm</Width>
         <ZIndex>22</ZIndex>
         <Style>
@@ -2014,9 +2014,9 @@
           </Paragraph>
         </Paragraphs>
         <rd:DefaultName>Textbox1</rd:DefaultName>
-        <Top>22.1435cm</Top>
+        <Top>22.40808cm</Top>
         <Left>0.21662cm</Left>
-        <Height>0.6cm</Height>
+        <Height>0.67055cm</Height>
         <Width>11.17712cm</Width>
         <ZIndex>23</ZIndex>
         <Style>
@@ -2264,7 +2264,7 @@
           <Paragraph>
             <TextRuns>
               <TextRun>
-                <Value>=First(Fields!mfirma.Value, "DataSet2")</Value>
+                <Value>=First(Fields!ffiname.Value, "DataSet3")</Value>
                 <Style>
                   <FontSize>9pt</FontSize>
                 </Style>

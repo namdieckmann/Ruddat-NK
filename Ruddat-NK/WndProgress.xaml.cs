@@ -19,17 +19,28 @@ namespace Ruddat_NK
     /// </summary>
     public partial class WndProgress : Window
     {
+        // Nchrichten senden
+        private Timeline messageSender;
+
         public WndProgress()
         {
             InitializeComponent();
+
+            Timeline sender = new Timeline();
+            sender.NachrichtGesendet += OnNachrichtEmpfangen;
+
             Process();
         }
 
+        private void OnNachrichtEmpfangen(string nachricht)
+        {
+            // Hier können Sie die empfangene Nachricht verarbeiten
+            MessageBox.Show(nachricht);
+        }
 
-        //Create a Delegate that matches the Signature of the ProgressBar's SetValue method
-        public delegate void UpdateProgressBarDelegate(System.Windows.DependencyProperty dp, Object value);
+        // Create a Delegate that matches the Signature of the ProgressBar's SetValue method
+        // public delegate void UpdateProgressBarDelegate(System.Windows.DependencyProperty dp, Object value);
 
-        
         private void Process()
         {
             //Configure the ProgressBar

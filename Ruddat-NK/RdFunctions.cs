@@ -6,6 +6,8 @@ using System.Xml;
 using MySql.Data.MySqlClient;
 using System.ComponentModel;
 using System.Threading;
+using System.Windows.Threading;
+using System.Threading.Tasks;
 
 namespace Ruddat_NK
 {
@@ -80,6 +82,19 @@ namespace Ruddat_NK
         static MySqlDataAdapter mysdParts;
         static MySqlDataAdapter myadp;
 
+        // Definieren eines Delegates
+        public delegate void NachrichtenEventHandler(string nachricht);
+
+        // Definieren eines Events
+        public event NachrichtenEventHandler NachrichtGesendet;
+
+        // Methode, die das Event auslöst
+        public void SendeNachricht(string nachricht)
+        {
+            NachrichtGesendet?.Invoke(nachricht);
+        }
+
+        // ----------------------------------------------------------------------------------------------
         // Bisher höchste Id für Timeline ermitteln
         public static int getTimelineId(string asConnect, int asArt, int aiDb)
         {
@@ -1730,6 +1745,7 @@ namespace Ruddat_NK
                     // Aufteilung nach Personen kann hier nicht gemacht werden. 
                     // Geschieht erst beim Verteilen auf die Mieter
 
+                    //// Thread Test
                     //// Thread für Progress definieren
                     //Thread thread = new Thread(new ThreadStart(ThreadMethod));
                     //thread.SetApartmentState(ApartmentState.STA);
@@ -1743,26 +1759,28 @@ namespace Ruddat_NK
                     //    frmProgress.Dispatcher.Invoke(() => dispatcher.Value = 0);
                     //    frmProgress.ShowDialog();
                     //}
-
                     //// Progressfenster 
                     //thread.Start();
 
-
                     //Dispatcher.Invoke(() =>
                     //{
-                    ////    // Führen Sie die Aktion auf dem Hintergrundthread aus
-                    ////    // ...
+                    //    //    // Führen Sie die Aktion auf dem Hintergrundthread aus
+                    //    //    // ...
                     //});
 
+                    WndProgress frmPrbar = new WndProgress();
+                    frmPrbar.ShowDialog();
+
+                    Timeline mytimeline = new Timeline();
 
                     tableTimeLineSet.Rows.Clear();     // Timeline leeren
+
 
                     // Timeline
                     for (int i = 0; tableTimelineGet.Rows.Count > i; i++)
                     {
 
-                        // Progressbar
-                        // UpdateGauge(i);
+                        mytimeline.SendeNachricht(i.ToString());
 
                         if (tableTimelineGet.Rows[i].ItemArray.GetValue(1) != DBNull.Value)
                         {
@@ -4113,4 +4131,5 @@ namespace Ruddat_NK
             return adtYear;
         }
     }
+
 }

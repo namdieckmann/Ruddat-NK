@@ -40,8 +40,8 @@ namespace Ruddat_NK
         private DateTime gdtYear = DateTime.MinValue;
 
         //Todo PB
-        private readonly DispatcherTimer timer;
-        private int currentValue = 0;
+        // private readonly DispatcherTimer timer;
+        // private int currentValue = 0;
 
         // Daten
         DataTable tableOne;
@@ -252,7 +252,7 @@ namespace Ruddat_NK
                     xmlwriter.Close();
 
                     // Die hier eingetragene Db-Verbindung nehmen
-                    // SqlConnectionString = "Data Source=server1\rdnk;Initial Catalog=rdnk;Integrated Security=True";
+                    SqlConnectionString = "Data Source=server1\rdnk;Initial Catalog=rdnk;Integrated Security=True";
                     // MySql 
                     // MySqlConnectionString = @"Data Source=197288c.online-server.cloud;PORT=3306;USERID=namdi;PASSWORD=7V7ADTqWqQPCf9Sge4PT;database=dbo;Connect Timeout = 20";
 
@@ -1593,9 +1593,6 @@ namespace Ruddat_NK
         {
             string lsSql = "";
             int liOk = 0;
-
-            // Progressbar auf 0
-            MyProgressBar.Value = 0;
 
             // TableOne wird aktualsiert Rechnungen TableOne
             liOk = FetchData("", 35, giDb, gsConnect);
@@ -2946,10 +2943,5 @@ namespace Ruddat_NK
             updateAllDataGrids(11);
             // updateAllDataGrids(111);
         }
-    }
-
-    internal class DataProvider
-    {
-        public int ValueUpdated { get; internal set; }
     }
 }

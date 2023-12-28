@@ -12,6 +12,6 @@
             <RowDefinition />
             <RowDefinition />
         </Grid.RowDefinitions>
-        <ProgressBar Grid.Row="1" Height="20" Width="200" Margin="0,4,0,0" Name="PBar" HorizontalAlignment="Center"  VerticalAlignment="top"  IsIndeterminate="True"/>
+        <ProgressBar Grid.Row="1" Height="20" Width="200" Margin="0,4,0,0" Name="PBar" HorizontalAlignment="Center"  VerticalAlignment="top" />
     </Grid>
 </Window>
