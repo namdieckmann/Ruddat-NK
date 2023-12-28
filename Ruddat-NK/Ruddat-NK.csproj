@@ -213,9 +213,6 @@
     <Compile Include="WndPoolRgNr.xaml.cs">
       <DependentUpon>WndPoolRgNr.xaml</DependentUpon>
     </Compile>
-    <Compile Include="WndProgress.xaml.cs">
-      <DependentUpon>WndProgress.xaml</DependentUpon>
-    </Compile>
     <Compile Include="WndRep.xaml.cs">
       <DependentUpon>WndRep.xaml</DependentUpon>
     </Compile>
@@ -269,10 +266,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="WndPoolRgNr.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="WndProgress.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

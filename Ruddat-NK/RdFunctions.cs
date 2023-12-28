@@ -1768,20 +1768,13 @@ namespace Ruddat_NK
                     //    //    // ...
                     //});
 
-                    WndProgress frmPrbar = new WndProgress();
-                    frmPrbar.ShowDialog();
-
-                    Timeline mytimeline = new Timeline();
 
                     tableTimeLineSet.Rows.Clear();     // Timeline leeren
-
 
                     // Timeline
                     for (int i = 0; tableTimelineGet.Rows.Count > i; i++)
                     {
-
-                        mytimeline.SendeNachricht(i.ToString());
-
+                        
                         if (tableTimelineGet.Rows[i].ItemArray.GetValue(1) != DBNull.Value)
                         {
                             liRechnungId = (int)tableTimelineGet.Rows[i].ItemArray.GetValue(1);
