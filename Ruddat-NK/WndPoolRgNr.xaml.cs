@@ -66,10 +66,10 @@ namespace Ruddat_NK
             switch (aiArt)
             {
                 case 1:         // Rechnungsnummern
-                    lsSql = "select id_rg_nr,rgnr,id_mieter,flag_besetzt from rgnr Where flag_besetzt != 1 Order by id_rg_nr DESC";
+                    lsSql = "select id_rg_nr,rgnr,id_mieter,flag_besetzt from rgnr Where flag_besetzt != 1 Order by rgnr DESC";
                     break;
                 case 2:         // verwendete Rechnungsnummern
-                    lsSql = "select id_rg_nr,rgnr,id_mieter,flag_besetzt from rgnr Where flag_besetzt = 1 Order by id_rg_nr DESC";
+                    lsSql = "select id_rg_nr,rgnr,id_mieter,flag_besetzt from rgnr Where flag_besetzt = 1 Order by rgnr DESC";
                     break;
                 case 4:
                     lsSql = "Delete from rgnr Where id_rg_nr = " + aiId.ToString();
@@ -239,16 +239,27 @@ namespace Ruddat_NK
         // Button zufügen
         private void btnAdd_Click(object sender, RoutedEventArgs e)
         {
+            string LsRgNr = "";
+            int LiRgNr = 0;
             // Buttons 
             // btnAdd.IsEnabled = false;
             btnSave.IsEnabled = true;
 
+            // Die letzte nicht verwendete Rechnungsnummer ist
+            if (tableRgNr.Rows[0].ItemArray.GetValue(1) != DBNull.Value)
+            {
+                LsRgNr = tableRgNr.Rows[0].ItemArray.GetValue(1).ToString();
+                Int32.TryParse(LsRgNr, out LiRgNr);
+                LiRgNr++;
+                LsRgNr = LiRgNr.ToString();
+            }
+
             DataRow dr = tableRgNr.NewRow();
 
-            dr[1] = 1111;    // Rechnungsnummer einsetzen
+            dr[1] = LsRgNr;    // Rechnungsnummer einsetzen
             dr[3] = 0;       // Flag besetzt
 
-            tableRgNr.Rows.Add(dr);
+            tableRgNr.Rows.InsertAt(dr, 0);
         }
 
         // Zuordnung aufheben (rechtes Datagrid)
