@@ -1682,7 +1682,7 @@
           <Paragraph>
             <TextRuns>
               <TextRun>
-                <Value>="Wohnung: " + Microsoft.VisualBasic.Strings.Trim(First(Fields!otbez.Value, "DataSet2"))</Value>
+                <Value>="Fläche: " + Microsoft.VisualBasic.Strings.Trim(First(Fields!otbez.Value, "DataSet2"))</Value>
                 <Style>
                   <FontSize>9pt</FontSize>
                   <FontWeight>Bold</FontWeight>
