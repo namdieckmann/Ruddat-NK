@@ -775,8 +775,7 @@ namespace Ruddat_NK
                                 break;
                             case 3:     // Rechnungen + Timeline Create
                                 tableRechnungenTimeline = new DataTable();         // Rechnungen
-                                SqlCommand command3 = new SqlCommand(psSql2, connect);
-                                sdb = new SqlDataAdapter(command3);
+                                sdb = new SqlDataAdapter(command);
                                 sdb.Fill(tableRechnungenTimeline);
                                 // Externe ID aus der Rechnung ermitteln 
                                 liExternId = MakeAfterFetch(piArt, 1, 0, 0, asConnect, aiDb);
@@ -4124,5 +4123,4 @@ namespace Ruddat_NK
             return adtYear;
         }
     }
-
 }

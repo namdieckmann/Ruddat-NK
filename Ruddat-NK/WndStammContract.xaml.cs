@@ -486,7 +486,6 @@ namespace Ruddat_NK
                     if ((rowview.Row[0] != DBNull.Value))
                     {
                         liId = Int32.Parse(rowview.Row[0].ToString());
-
                         if (liId >= 0)
                         {
                             // Den Vertrag löschen
