@@ -1590,19 +1590,11 @@ namespace Ruddat_NK
             string lsSql = "";
             int liOk = 0;
 
-            // Popup öffnen
-            WndTimelineCalc frmTml = new WndTimelineCalc();
-            DelPassDb delegateDb = new DelPassDb(frmTml.getDb);
-            delegateDb(giDb);
-            frmTml.Show();
-
             // TableOne wird aktualsiert Rechnungen TableOne
             liOk = FetchData("", 35, giDb, gsConnect);
 
             // Timeline bearbeiten    Art 1 = Rechnungen
-            Timeline.editTimeline(giTimelineId, giFlagTimeline, gsConnect, giDb, frmTml);
-
-            frmTml.Close();
+            Timeline.editTimeline(giTimelineId, giFlagTimeline, gsConnect, giDb);
 
             // Delete Kommando muss extra erzeugt werden
             // Gibt es eine Datensatz ID zum Löschen (button btnRgDel)
@@ -1730,23 +1722,15 @@ namespace Ruddat_NK
             if (liRows > 0)
             {
 
-                // Popup öffnen
-                WndTimelineCalc frmTml = new WndTimelineCalc();
-                DelPassDb delegateDb = new DelPassDb(frmTml.getDb);
-                delegateDb(giDb);
-                frmTml.Show();
-
                 for (int i = 0; i < liRows; i++)           // Ende bei 12 Monate
                 {
                     if (tableZlg.Rows[i][0] == DBNull.Value)        // Id ist noch leer
                     {
                         Int32.TryParse(tableZlg.Rows[i][10].ToString(), out liTimelineId);       // Timeline Id holen
 
-                        Timeline.editTimeline(liTimelineId, liFlagTimeline, gsConnect, giDb, frmTml);   // Timeline aktualisieren
+                        Timeline.editTimeline(liTimelineId, liFlagTimeline, gsConnect, giDb);   // Timeline aktualisieren
                     }
                 }
-
-                frmTml.Close();
             }
 
             // Update der Daten
@@ -1872,12 +1856,6 @@ namespace Ruddat_NK
 
             giFlagTimeline = 12;                // 12 = Zahlung löschen
 
-            // Popup öffnen
-            WndTimelineCalc frmTml = new WndTimelineCalc();
-            DelPassDb delegateDb = new DelPassDb(frmTml.getDb);
-            delegateDb(giDb);
-            frmTml.Show();
-
             // Durch alle zum Löschen gewählten Datensätze
             if (DgrZahlungen.SelectedItems.Count > 0)
             {
@@ -1890,7 +1868,7 @@ namespace Ruddat_NK
                     liTimelineId = (int)selectedFile.Row.ItemArray[10];          // TimeLine ID holen                    
 
                     // Timeline bearbeiten Art 12 = Zahlungen löschen
-                    Timeline.editTimeline(liTimelineId, giFlagTimeline, gsConnect, giDb, frmTml);
+                    Timeline.editTimeline(liTimelineId, giFlagTimeline, gsConnect, giDb);
 
                     // Delete Kommando muss extra erzeugt werden
                     // Gibt es eine Datensatz ID zum Löschen
@@ -1901,8 +1879,6 @@ namespace Ruddat_NK
                     }
                 }
             }
-
-            frmTml.Close();
 
             // Update der Daten
             int liOk1 = updateAllDataGrids(0);
@@ -1989,16 +1965,8 @@ namespace Ruddat_NK
             // Update
             liOk = FetchData("", 39, giDb, gsConnect);
 
-            // Popup öffnen
-            WndTimelineCalc frmTml = new WndTimelineCalc();
-            DelPassDb delegateDb = new DelPassDb(frmTml.getDb);
-            delegateDb(giDb);
-            frmTml.Show();
-
             // Timeline bearbeiten Art 21 = Zähler   
-            Timeline.editTimeline(giTimelineId, giFlagTimeline, gsConnect, giDb, frmTml);
-
-            frmTml.Close();
+            Timeline.editTimeline(giTimelineId, giFlagTimeline, gsConnect, giDb);
 
             // Delete Kommando muss extra erzeugt werden
             // Gibt es eine Datensatz ID zum Löschen (button btnCntDel)

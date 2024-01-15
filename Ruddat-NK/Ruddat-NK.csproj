@@ -26,7 +26,7 @@
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
     <WebPage>publish.htm</WebPage>
-    <ApplicationRevision>152</ApplicationRevision>
+    <ApplicationRevision>153</ApplicationRevision>
     <ApplicationVersion>1.0.1.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
@@ -231,8 +231,11 @@
     <Compile Include="WndStammZaehler.xaml.cs">
       <DependentUpon>WndStammZaehler.xaml</DependentUpon>
     </Compile>
-    <Compile Include="WndTimelineCalc.xaml.cs">
-      <DependentUpon>WndTimelineCalc.xaml</DependentUpon>
+    <Compile Include="public void CheckIfWindowIsOpen%28%29.xaml.cs">
+      <DependentUpon>public void CheckIfWindowIsOpen%28%29.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="WndTimlineCalc.xaml.cs">
+      <DependentUpon>WndTimlineCalc.xaml</DependentUpon>
     </Compile>
     <Compile Include="WndZlgImport.xaml.cs">
       <DependentUpon>WndZlgImport.xaml</DependentUpon>
@@ -296,7 +299,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="WndTimelineCalc.xaml">
+    <Page Include="public void CheckIfWindowIsOpen%28%29.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="WndTimlineCalc.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

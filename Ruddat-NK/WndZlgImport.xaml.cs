@@ -161,11 +161,8 @@ namespace Ruddat_NK
                 liImportId = TableCopy();
                 if (liImportId > 0)
                 {
-                    // Popup öffnen
-                    WndTimelineCalc frmTml = new WndTimelineCalc();
-
                     // Timeline erzeugen
-                    Timeline.editTimeline(liImportId, 13, gsConnect, giDb, frmTml);
+                    Timeline.editTimeline(liImportId, 13, gsConnect, giDb);
                 }
                 else
                 {
@@ -991,9 +988,6 @@ namespace Ruddat_NK
 
                 if (lsKstObj.Length > 0 && lsKstObjTeil.Length > 0 && liHeaderId > 0)
                 {
-                    // Popup öffnen
-                    WndTimelineCalc frmTml = new WndTimelineCalc();
-
                     liObjTeilId = getObjektTeilId(lsKstObjTeil.Trim(),lsKstObj.Trim());
                     // Die Zahlung konnte zugeordnet werden > 0
                     if (liObjTeilId > 0)
@@ -1049,7 +1043,7 @@ namespace Ruddat_NK
                             dr[13] = liHeaderId;            // Import ID
 
                             // Timeline schreiben
-                            Timeline.editTimeline(liTimelineId, 11, gsConnect, giDb, frmTml);
+                            Timeline.editTimeline(liTimelineId, 11, gsConnect, giDb);
 
                             liTimelineId++;
                             table_zlg.Rows.Add(dr);

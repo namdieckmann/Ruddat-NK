@@ -105,7 +105,7 @@ namespace Ruddat_NK
         // Zählerstände
         // Flag = 21 > ändern
         // Flag = 22 > löschen
-        public static void editTimeline(int liTimelineId, int liFlagAdd, string asConnect, int aiDb, WndTimelineCalc frmTml)
+        public static void editTimeline(int liTimelineId, int liFlagAdd, string asConnect, int aiDb)
         {
             string lsSql = "";
             int liRows = 0;
@@ -115,8 +115,8 @@ namespace Ruddat_NK
             {
                 case 1:
                     // Rechnungen Daten holen mit id extern timeline
-                    lsSql = Timeline.getSql(1, liTimelineId, "", "", 0);     // Rechnungen
-                    liRows = Timeline.fetchData(lsSql, "", 1, asConnect, aiDb);  // TableOne
+                    lsSql = Timeline.getSql(1, liTimelineId, "", "", 0);            // Rechnungen
+                    liRows = Timeline.fetchData(lsSql, "", 1, asConnect, aiDb);     // TableOne
                     break;
                 case 2:
                     // Rechnung Timeline löschen
@@ -2779,7 +2779,6 @@ namespace Ruddat_NK
             return ldAnteil;
         }
 
-
         // Die Gesamtfläche der Objektauswahl aus objekt_part_mix ermitteln
         // Art 1 ist die Gesamtgrundfläche der gewählten Wohnungen
         // Art 2 ist die Gesamtfläche des Objektes
@@ -2818,7 +2817,6 @@ namespace Ruddat_NK
 
             return liObjektTeil;
         }
-
 
         // Ist eine Weitergabe der Kosten in art_kostenart eingetragen
         // 1 = Weiterleitung
