@@ -1853,7 +1853,7 @@
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value>=IIf(First(Fields!netto.Value, "DataSet2") = 1,"Kosten Mietfläche brutto","Kosten Mietfläche brutto")</Value>
+                              <Value>=IIf(First(Fields!netto.Value, "DataSet2") = 1,"","Kosten Mietfläche brutto")</Value>
                               <Style>
                                 <FontSize>8pt</FontSize>
                                 <FontWeight>Bold</FontWeight>
@@ -1886,7 +1886,7 @@
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value>=IIf(First(Fields!netto.Value, "DataSet2") = 1,"Kosten Mieter Netto","")</Value>
+                              <Value>=IIf(First(Fields!netto.Value, "DataSet2") = 1,"Kosten Mieter netto","")</Value>
                               <Style>
                                 <FontSize>8pt</FontSize>
                                 <FontWeight>Bold</FontWeight>
@@ -1920,7 +1920,7 @@
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value>=IIf(First(Fields!netto.Value, "DataSet2") = 1,"Kosten Mieter brutto","Kosten Mieter netto")</Value>
+                              <Value>=IIf(First(Fields!netto.Value, "DataSet2") = 1,"","Kosten Mieter brutto")</Value>
                               <Style>
                                 <FontSize>8pt</FontSize>
                                 <FontWeight>Bold</FontWeight>
@@ -1943,7 +1943,6 @@
                         <PaddingBottom>2pt</PaddingBottom>
                       </Style>
                     </Textbox>
-                    <rd:Selected>true</rd:Selected>
                   </CellContents>
                 </TablixCell>
               </TablixCells>
@@ -2179,6 +2178,7 @@
                         <rd:FormatSymbolCulture>de-DE</rd:FormatSymbolCulture>
                       </Style>
                     </Textbox>
+                    <rd:Selected>true</rd:Selected>
                   </CellContents>
                 </TablixCell>
                 <TablixCell>
@@ -2190,7 +2190,7 @@
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value>=IIf(First(Fields!netto.Value, "DataSet2") = 1,Fields!otb.Value,Fields!otb.Value)</Value>
+                              <Value>=IIf(First(Fields!netto.Value, "DataSet2") = 1,"",Fields!otb.Value)</Value>
                               <Style>
                                 <FontSize>8pt</FontSize>
                                 <Format>0.00'€';(0.00'€')</Format>
@@ -2258,7 +2258,7 @@
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value>=IIf(First(Fields!netto.Value, "DataSet2") = 1,Fields!nt.Value,Fields!nt.Value)</Value>
+                              <Value>=IIf(First(Fields!netto.Value, "DataSet2") = 1,"",Fields!bt.Value)</Value>
                               <Style>
                                 <FontSize>8pt</FontSize>
                                 <Format>0.00'€';(0.00'€')</Format>

@@ -1734,6 +1734,10 @@ namespace Ruddat_NK
 
                     tableTimeLineSet.Rows.Clear();     // Timeline leeren
 
+                    // Ein Popup öffnen
+                    WndTimelineCalc frmTml = new WndTimelineCalc();
+                    frmTml.Show();
+
                     // Timeline
                     for (int i = 0; tableTimelineGet.Rows.Count > i; i++)
                     {
@@ -1941,6 +1945,8 @@ namespace Ruddat_NK
                         }
                     }
 
+                    frmTml.Close();
+                        
                     //Application.Current.Dispatcher.Invoke(() =>
                     //{
                     //});
@@ -2411,6 +2417,7 @@ namespace Ruddat_NK
                     break;
 
             }
+
             // mainWindow.ProgressBar.IsIndeterminate = false;
             return LiReturn;
         }
@@ -3475,7 +3482,7 @@ namespace Ruddat_NK
                             liIdArtVerteilung = Timeline.getIdArtVerteilung("zl", asConnect, aiDb);
                         }
 
-                        // Hier nicht zeigen
+                        //// Hier nicht zeigen
                         //if (tableTimeline1.Rows[i].ItemArray.GetValue(2) != DBNull.Value)
                         //{
                         //    dr[24] = Convert.ToDecimal(tableTimeline1.Rows[i].ItemArray.GetValue(2).ToString());       //  Rechnung Netto
