@@ -945,7 +945,7 @@
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value>=Microsoft.VisualBasic.Interaction.IIf(First(Fields!netto.Value, "DataSet2") = 1,Fields!netto.Value,"")</Value>
+                              <Value>=Microsoft.VisualBasic.Interaction.IIf(First(Fields!netto.Value, "DataSet2") = 1,Fields!netto.Value,Fields!brutto.Value)</Value>
                               <Style>
                                 <FontSize>8pt</FontSize>
                                 <Format>0.00'€'</Format>
@@ -968,6 +968,7 @@
                         <rd:FormatSymbolCulture>de-DE</rd:FormatSymbolCulture>
                       </Style>
                     </Textbox>
+                    <rd:Selected>true</rd:Selected>
                   </CellContents>
                 </TablixCell>
                 <TablixCell>
@@ -1920,7 +1921,7 @@
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value>=IIf(First(Fields!netto.Value, "DataSet2") = 1,"Kosten Mieter brutto","Kosten Mieter brutto")</Value>
+                              <Value>=IIf(First(Fields!netto.Value, "DataSet2") = 1,"Kosten Mieter brutto","Kosten Mieter netto")</Value>
                               <Style>
                                 <FontSize>8pt</FontSize>
                                 <FontWeight>Bold</FontWeight>

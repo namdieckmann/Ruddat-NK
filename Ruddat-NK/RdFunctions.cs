@@ -3950,9 +3950,9 @@ namespace Ruddat_NK
             lsInfo = @"Zählernummer: " + lsZlNummer + "\n" +
                       "Ort: " + lsZlOrt + "\n" +
                       "Datum der Ablesung: " + ldtAblesung.ToString("dd.MM.yyyy") + "\n" +
-                      "Verbrauch: " + ldVerbrauch.ToString("0,##") + " " + lsEinheit;
-            // "Preis pro Einheit Netto: " + ldEinheitNetto.ToString("0.##") + "€\n" +
-            // "Preis pro Einheit Brutto: " + ldEinheitBrutto.ToString("0.##") + "€\n" +
+                      "Verbrauch: " + ldVerbrauch.ToString("0,##") + " " + lsEinheit + "\n" +
+                      "Preis pro Einheit Netto: " + ldEinheitNetto.ToString("0.####") + "€\n" +
+                      "Preis pro Einheit Brutto: " + ldEinheitBrutto.ToString("0.####") + "€";
 
             return lsInfo;
         }
