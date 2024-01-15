@@ -52,6 +52,8 @@ namespace Ruddat_NK
         BackgroundWorker worker;
         BackgroundWorker worker2;
 
+        private delegate void DelPassDb(int giDb);
+
         // ConnectString übernehmen
         public string psConnect { get; set; }
 
@@ -159,8 +161,11 @@ namespace Ruddat_NK
                 liImportId = TableCopy();
                 if (liImportId > 0)
                 {
+                    // Popup öffnen
+                    WndTimelineCalc frmTml = new WndTimelineCalc();
+
                     // Timeline erzeugen
-                    Timeline.editTimeline(liImportId, 13, gsConnect, giDb);
+                    Timeline.editTimeline(liImportId, 13, gsConnect, giDb, frmTml);
                 }
                 else
                 {
@@ -771,7 +776,6 @@ namespace Ruddat_NK
 
             // den Thread starten
             worker2.RunWorkerAsync(pbExec.Value);
-
         }
 
         // Auswahl der Location getroffen
@@ -987,6 +991,9 @@ namespace Ruddat_NK
 
                 if (lsKstObj.Length > 0 && lsKstObjTeil.Length > 0 && liHeaderId > 0)
                 {
+                    // Popup öffnen
+                    WndTimelineCalc frmTml = new WndTimelineCalc();
+
                     liObjTeilId = getObjektTeilId(lsKstObjTeil.Trim(),lsKstObj.Trim());
                     // Die Zahlung konnte zugeordnet werden > 0
                     if (liObjTeilId > 0)
@@ -1042,12 +1049,11 @@ namespace Ruddat_NK
                             dr[13] = liHeaderId;            // Import ID
 
                             // Timeline schreiben
-                            Timeline.editTimeline(liTimelineId, 11, gsConnect, giDb);
+                            Timeline.editTimeline(liTimelineId, 11, gsConnect, giDb, frmTml);
 
                             liTimelineId++;
                             table_zlg.Rows.Add(dr);
                         }
-
                     }
                     else    // Die Zahlung aus Excel konnte nicht verbucht werden, kommt in die TraceTabelle Zahlungen
                     {

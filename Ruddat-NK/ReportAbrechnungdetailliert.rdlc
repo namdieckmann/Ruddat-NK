@@ -407,9 +407,10 @@
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value />
+                              <Value>=IIf(First(Fields!netto.Value, "DataSet2") = 1,"",(Fields!betrag_brutto.Value - Fields!betrag_netto.Value))</Value>
                               <Style>
                                 <FontSize>8pt</FontSize>
+                                <Format>0.00'€';(0.00'€')</Format>
                               </Style>
                             </TextRun>
                           </TextRuns>
@@ -426,6 +427,7 @@
                         <PaddingRight>2pt</PaddingRight>
                         <PaddingTop>2pt</PaddingTop>
                         <PaddingBottom>2pt</PaddingBottom>
+                        <rd:FormatSymbolCulture>de-DE</rd:FormatSymbolCulture>
                       </Style>
                     </Textbox>
                   </CellContents>

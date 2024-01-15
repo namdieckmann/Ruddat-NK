@@ -4,10 +4,8 @@ using System.Data.SqlClient;
 using System.Windows;
 using System.Xml;
 using MySql.Data.MySqlClient;
-using System.ComponentModel;
 using System.Threading;
 using System.Windows.Threading;
-using System.Threading.Tasks;
 
 namespace Ruddat_NK
 {
@@ -82,17 +80,8 @@ namespace Ruddat_NK
         static MySqlDataAdapter mysdParts;
         static MySqlDataAdapter myadp;
 
-        // Definieren eines Delegates
-        public delegate void NachrichtenEventHandler(string nachricht);
-
-        // Definieren eines Events
-        public event NachrichtenEventHandler NachrichtGesendet;
-
-        // Methode, die das Event auslöst
-        public void SendeNachricht(string nachricht)
-        {
-            NachrichtGesendet?.Invoke(nachricht);
-        }
+        // Delegates
+        private delegate void DelPassDb(int giDb);
 
         // ----------------------------------------------------------------------------------------------
         // Bisher höchste Id für Timeline ermitteln
@@ -116,7 +105,7 @@ namespace Ruddat_NK
         // Zählerstände
         // Flag = 21 > ändern
         // Flag = 22 > löschen
-        public static void editTimeline(int liTimelineId, int liFlagAdd, string asConnect, int aiDb)
+        public static void editTimeline(int liTimelineId, int liFlagAdd, string asConnect, int aiDb, WndTimelineCalc frmTml)
         {
             string lsSql = "";
             int liRows = 0;
@@ -974,7 +963,6 @@ namespace Ruddat_NK
                                 mysda.Fill(tableRechnungen);
                                 liOk = MakeAfterFetch(piArt, 1, 0, 0, asConnect, aiDb);
                                 break;
-
                             case 2:     // Timeline löschen
                                 MySqlDataReader queryCommandReader = command.ExecuteReader();
                                 break;
@@ -1335,8 +1323,7 @@ namespace Ruddat_NK
             return (lsReturn);
         }
 
-
-        // Daten aus der Db holen hier nur Strings
+        // Daten aus der Db holen hier nur Datum
         public static DateTime fetchDataDate(string psSql, string psSql2, int piArt, string asConnectString, int aiDb)
         {
             DateTime ldtStart = DateTime.MinValue;
@@ -1477,7 +1464,7 @@ namespace Ruddat_NK
         }
 
         // Datenbankaktionen nach fetchdata
-        public static int MakeAfterFetch(int aiArt, int aiTeil, int ai1, int ai2, string asConnect, int aiDb)
+        private static int MakeAfterFetch(int aiArt, int aiTeil, int ai1, int ai2, string asConnect, int aiDb)
         {
             DateTime ldtStart = DateTime.MinValue;
             DateTime ldtEnd = DateTime.MinValue;
@@ -1524,7 +1511,7 @@ namespace Ruddat_NK
             //string lsObjektBezS = "";
             int LiReturn = 0;
 
-            // TODO Idee für Tasks
+            // TODO Idee für Tasks Progressbar
             // Get a reference to the MainWindow
             //MainWindow mainWindow = Application.Current.MainWindow as MainWindow;
 
@@ -1547,6 +1534,7 @@ namespace Ruddat_NK
                     {
                         if (tableRechnungen.Rows[i].ItemArray.GetValue(14) != DBNull.Value)
                         {
+
                             liExternId = (int)tableRechnungen.Rows[i].ItemArray.GetValue(14);
                             // Timeline löschen
                             liOk = TimelineDelete(liExternId, "R", asConnect, aiDb);
@@ -1744,36 +1732,11 @@ namespace Ruddat_NK
                     // Aufteilung nach Personen kann hier nicht gemacht werden. 
                     // Geschieht erst beim Verteilen auf die Mieter
 
-                    //// Thread Test
-                    //// Thread für Progress definieren
-                    //Thread thread = new Thread(new ThreadStart(ThreadMethod));
-                    //thread.SetApartmentState(ApartmentState.STA);
-
-                    //// Dispatcher dispatcher = Application.Current.Dispatcher;
-
-                    //void ThreadMethod()
-                    //{
-                    //    WndProgress frmProgress = new WndProgress();
-                    //    var dispatcher = frmProgress.Dispatcher.Invoke(() => frmProgress.PBar);
-                    //    frmProgress.Dispatcher.Invoke(() => dispatcher.Value = 0);
-                    //    frmProgress.ShowDialog();
-                    //}
-                    //// Progressfenster 
-                    //thread.Start();
-
-                    //Dispatcher.Invoke(() =>
-                    //{
-                    //    //    // Führen Sie die Aktion auf dem Hintergrundthread aus
-                    //    //    // ...
-                    //});
-
-
                     tableTimeLineSet.Rows.Clear();     // Timeline leeren
 
                     // Timeline
                     for (int i = 0; tableTimelineGet.Rows.Count > i; i++)
                     {
-                        
                         if (tableTimelineGet.Rows[i].ItemArray.GetValue(1) != DBNull.Value)
                         {
                             liRechnungId = (int)tableTimelineGet.Rows[i].ItemArray.GetValue(1);
@@ -1800,7 +1763,7 @@ namespace Ruddat_NK
                             if (tableTimelineGet.Rows[i].ItemArray.GetValue(17) != DBNull.Value)
                                 liImportId = (int)tableTimelineGet.Rows[i].ItemArray.GetValue(17);
 
-                            // Ermitteln der VerteilungsId aus Tabelle rechnungen
+                            // Ermitteln der VerteilungsId aus Tabelle Rechnungen
                             // Achtung nbüschen gepfuscht liRechnungId ist die externTimeline Id
                             liVerteilungId = getVerteilungsId(asConnect, liRechnungId, aiDb);
 
@@ -1978,10 +1941,8 @@ namespace Ruddat_NK
                         }
                     }
 
-
                     //Application.Current.Dispatcher.Invoke(() =>
                     //{
-
                     //});
 
                     break;
@@ -3143,7 +3104,6 @@ namespace Ruddat_NK
             }
         }
 
-
         // Aus den Verträgen die Teilobjekt ID anhand der Mieter ID ermitteln
         internal static int getIdObjTeil(int aiId, string asConnect, int aiDb)
         {
@@ -3438,7 +3398,6 @@ namespace Ruddat_NK
                     tableContent.Rows.Add(dr);
                 }
             }
-
 
 
             // Zweiter Teil, nur ObjektKosten darstellen (im Moment nur Zähler)
