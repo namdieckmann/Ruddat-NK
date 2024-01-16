@@ -647,7 +647,7 @@ namespace Ruddat_NK
                     lsSql = @"Select id_objekt_teil from vertrag where vertrag.id_mieter = " + piId.ToString();
                     break;
                 case 44:
-                    lsSql = @"select id_rg_nr from rgnr Where flag_besetzt != 1 Order by id_rg_nr";
+                    lsSql = @"select id_rg_nr from rgnr Where flag_besetzt != 1 Order by rgnr";
                     break;
                 case 45:
                     lsSql = @"Update rgnr Set rgnr.flag_besetzt = 1 where rgnr.id_rg_nr = " + piId.ToString();
@@ -3182,14 +3182,11 @@ namespace Ruddat_NK
                     if (liIdRgNr > 0)
                     {
                         liOk = setRgNrToTml(liIdRgNr, asSqlRgNr, asConnect, aiDb);       // ID Rechnungsnummer in Timeline einsetzen
-                        if (liOk == 1)
-                        {
-                            liOk = setRgNrFromPool(liIdRgNr, asConnect, aiDb);    // Die Rechnungsnummer als besetzt kennzeichnen 
-                        }
+                        liOk = setRgNrFromPool(liIdRgNr, asConnect, aiDb);    // Die Rechnungsnummer als besetzt kennzeichnen 
                     }
                     else
                     {
-                        // Keine Rechnungsnummer Image Pool vorhanden, bitte Eintragen
+                        // Keine Rechnungsnummer Im Pool vorhanden, bitte Eintragen
                         MessageBox.Show("Keine Rechnungsnummer im Pool vorhanden, \nbitte Eintragen");
                     }
                 }
