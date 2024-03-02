@@ -1376,7 +1376,7 @@
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value>=Switch(Sum(Fields!betrag_netto.Value, "DataSet5")&gt;0,"Ihr Zahlbetrag",Sum(Fields!betrag_netto.Value, "DataSet5")=0,"",Sum(Fields!betrag_netto.Value, "DataSet5")&lt;0,"Ihr Erstattungsbetrag")</Value>
+                              <Value>=IIf(Sum(Fields!betrag_brutto.Value, "DataSet5")&gt;0,"Ihr Zahlbetrag","Erstattung")</Value>
                               <Style>
                                 <FontSize>8pt</FontSize>
                                 <FontWeight>Bold</FontWeight>
@@ -1397,6 +1397,7 @@
                         <PaddingBottom>2pt</PaddingBottom>
                       </Style>
                     </Textbox>
+                    <rd:Selected>true</rd:Selected>
                   </CellContents>
                 </TablixCell>
                 <TablixCell>
@@ -2178,7 +2179,6 @@
                         <rd:FormatSymbolCulture>de-DE</rd:FormatSymbolCulture>
                       </Style>
                     </Textbox>
-                    <rd:Selected>true</rd:Selected>
                   </CellContents>
                 </TablixCell>
                 <TablixCell>

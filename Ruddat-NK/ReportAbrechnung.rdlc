@@ -2311,7 +2311,7 @@
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value>=Microsoft.VisualBasic.Interaction.IIF((Sum(Fields!netto.Value, "DataSet4") - Sum(Fields!betrag_netto.Value, "DataSet1"))&lt;0,"Ihr Zahlbetrag","Ihr Erstattungsbetrag")</Value>
+                              <Value>=IIf(Sum(Fields!betrag_brutto.Value, "DataSet5")&gt;0,"Ihr Zahlbetrag","Erstattung")</Value>
                               <Style>
                                 <FontSize>8pt</FontSize>
                                 <FontWeight>Bold</FontWeight>
@@ -2334,6 +2334,7 @@
                         <PaddingBottom>2pt</PaddingBottom>
                       </Style>
                     </Textbox>
+                    <rd:Selected>true</rd:Selected>
                   </CellContents>
                 </TablixCell>
                 <TablixCell>
