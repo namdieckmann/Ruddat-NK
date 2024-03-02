@@ -7,7 +7,7 @@
     <framework targetVersion="4.6" profile="Full" supportedRuntime="4.0.30319" />
   </compatibleFrameworks>
   <dependency>
-    <dependentAssembly dependencyType="install" codebase="Ruddat_NK.exe.manifest" size="10942">
+    <dependentAssembly dependencyType="install" codebase="Application Files\Ruddat_NK_1_0_1_156\Ruddat_NK.exe.manifest" size="10942">
       <assemblyIdentity name="Ruddat_NK.exe" version="1.0.1.156" publicKeyToken="0000000000000000" language="neutral" processorArchitecture="msil" type="win32" />
       <hash>
         <dsig:Transforms>
