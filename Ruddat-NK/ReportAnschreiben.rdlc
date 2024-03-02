@@ -1074,7 +1074,6 @@ IIf(Sum(Fields!betrag_brutto.Value, "DataSet5")&gt;0,"Ihr Zahlbetrag","Erstattun
                         <PaddingBottom>2pt</PaddingBottom>
                       </Style>
                     </Textbox>
-                    <rd:Selected>true</rd:Selected>
                   </CellContents>
                 </TablixCell>
                 <TablixCell>
@@ -2203,7 +2202,7 @@ IIf(Sum(Fields!betrag_brutto.Value, "DataSet5")&gt;0,"Ihr Zahlbetrag","Erstattun
           <Paragraph>
             <TextRuns>
               <TextRun>
-                <Value>=First(Fields!mfirma.Value, "DataSet2")</Value>
+                <Value>=First(Fields!mbez.Value, "DataSet2")</Value>
                 <Style>
                   <FontSize>9pt</FontSize>
                 </Style>
