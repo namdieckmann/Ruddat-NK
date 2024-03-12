@@ -295,7 +295,7 @@
           </TablixColumns>
           <TablixRows>
             <TablixRow>
-              <Height>0.4924cm</Height>
+              <Height>0.54246cm</Height>
               <TablixCells>
                 <TablixCell>
                   <CellContents>
@@ -509,7 +509,7 @@
               </TablixCells>
             </TablixRow>
             <TablixRow>
-              <Height>0.49593cm</Height>
+              <Height>0.54599cm</Height>
               <TablixCells>
                 <TablixCell>
                   <CellContents>
@@ -719,7 +719,7 @@
               </TablixCells>
             </TablixRow>
             <TablixRow>
-              <Height>0.43067cm</Height>
+              <Height>0.48073cm</Height>
               <TablixCells>
                 <TablixCell>
                   <CellContents>
@@ -951,7 +951,7 @@
         <DataSetName>DataSet6</DataSetName>
         <Top>3.94205cm</Top>
         <Left>0.05358cm</Left>
-        <Height>1.419cm</Height>
+        <Height>1.56919cm</Height>
         <Width>23.73563cm</Width>
         <ZIndex>1</ZIndex>
         <Style>
@@ -1259,7 +1259,7 @@
           <Paragraph>
             <TextRuns>
               <TextRun>
-                <Value>=First(Fields!mbez.Value, "DataSet2") + ", " +First(Fields!mVorname.Value, "DataSet2") + " " +First(Fields!mName.Value, "DataSet2")</Value>
+                <Value>=First(Fields!mbez.Value, "DataSet2") + ", " +First(Fields!mName.Value, "DataSet2")</Value>
                 <Style>
                   <FontSize>8pt</FontSize>
                 </Style>
@@ -2336,7 +2336,6 @@ IIf(Sum(Fields!betrag_brutto.Value, "DataSet5")&gt;0,"Ihr Zahlbetrag","Erstattun
                         <PaddingBottom>2pt</PaddingBottom>
                       </Style>
                     </Textbox>
-                    <rd:Selected>true</rd:Selected>
                   </CellContents>
                 </TablixCell>
                 <TablixCell>
