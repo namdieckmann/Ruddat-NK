@@ -951,7 +951,7 @@
         <DataSetName>DataSet6</DataSetName>
         <Top>3.94205cm</Top>
         <Left>0.05358cm</Left>
-        <Height>1.56919cm</Height>
+        <Height>1.56918cm</Height>
         <Width>23.73563cm</Width>
         <ZIndex>1</ZIndex>
         <Style>
@@ -2312,8 +2312,9 @@
                           <TextRuns>
                             <TextRun>
                               <Value>=IIf(First(Fields!netto.Value, "DataSet2") = 1, 
-IIf(Sum(Fields!betrag_netto.Value, "DataSet5")&gt;0,"Ihr Zahlbetrag","Erstattung"),
-IIf(Sum(Fields!betrag_brutto.Value, "DataSet5")&gt;0,"Ihr Zahlbetrag","Erstattung"))</Value>
+IIf((Sum(Fields!nt.Value, "DataSet6") - Sum(Fields!netto.Value, "DataSet4"))&gt;0,"Ihr Zahlbetrag","Erstattung"),
+IIf((Sum(Fields!bt.Value, "DataSet6") - Sum(Fields!brutto.Value, "DataSet4"))&gt;0,"Ihr Zahlbetrag","Erstattung")
+)</Value>
                               <Style>
                                 <FontSize>8pt</FontSize>
                                 <FontWeight>Bold</FontWeight>
@@ -2336,6 +2337,7 @@ IIf(Sum(Fields!betrag_brutto.Value, "DataSet5")&gt;0,"Ihr Zahlbetrag","Erstattun
                         <PaddingBottom>2pt</PaddingBottom>
                       </Style>
                     </Textbox>
+                    <rd:Selected>true</rd:Selected>
                   </CellContents>
                 </TablixCell>
                 <TablixCell>
