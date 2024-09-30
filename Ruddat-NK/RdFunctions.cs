@@ -1511,21 +1511,6 @@ namespace Ruddat_NK
             //string lsObjektBezS = "";
             int LiReturn = 0;
 
-            // TODO Idee für Tasks Progressbar
-            // Get a reference to the MainWindow
-            //MainWindow mainWindow = Application.Current.MainWindow as MainWindow;
-
-            //// Check if the MainWindow exists
-            //if (mainWindow != null)
-            //{
-            //    // Use the Dispatcher to update the progress bar value on the UI thread
-            //    mainWindow.Dispatcher.Invoke(() =>
-            //    {
-            //        // Start the progress bar
-            //        mainWindow.ProgressBar.IsIndeterminate = true;
-            //    });
-            //}
-
             switch (aiArt)
             {
                 case 1:
@@ -1591,7 +1576,6 @@ namespace Ruddat_NK
                                 {
                                     liMieter = (int)tableRechnungen.Rows[i].ItemArray.GetValue(10);
                                     // Timeline neu erzeugen Mieter aus Rechnungen
-                                    // TODO hier Kontrolle einbauen, ob Mietvertrag gültig ist
                                     liOk = TimelineCreate(liExternId, "id_rechnung", asConnect, aiDb);
                                 }
                         }
@@ -1954,7 +1938,7 @@ namespace Ruddat_NK
                     break;
                 case 5:         // Mieter schreiben
                     // Schleife durch Timeline
-                    // Jeder Datensatz muss hier einen Datensatz für den Mieter erzeugen
+                    // Jeder Datensatz aus Timeline Objektteile muss hier einen Datensatz für den Mieter erzeugen
                     tableNewTimeline.Rows.Clear();    // TimeLine leeren
 
                     for (int i = 0; tableTimeLineGet.Rows.Count > i; i++)
@@ -2004,20 +1988,10 @@ namespace Ruddat_NK
                             dr[2] = liZahlungId;
                             dr[3] = liZaehlerstandId;
                             // dr[4] = liObjekt; nicht eintragen
-                            // dr[5] = liObjektTeil; 
-
-                            //if (liObjektTeil == 97)
-                            //{
-                            //    int liTest = liObjektTeil;
-                            //}
+                            // dr[5] = liObjektTeil; nicht eintragen
 
                             // Aktuellen Mieter ermitteln
                             liMieter = getAktMieter(liObjektTeil, ldtMonat, asConnect, aiDb);
-
-                            if (liMieter == 107 && liObjektTeil == 97)
-                            {
-                                int liTest = liMieter;
-                            }
 
                             // Mieter gefunden
                             if (liMieter > 0)

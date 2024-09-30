@@ -228,7 +228,7 @@ namespace Ruddat_NK
                     break;
                 case 2:
                     LsWhereAdd = lsAnd + " (" + AsFieldFrom +     " <= str_to_date(\"" + adtStart.ToString("dd.MM.yyyy") + "\",\"%d.%m.%Y %H:%i:%s %H:%i:%s\") ";
-                    LsWhereAdd = LsWhereAdd + lsAnd + AsFieldTo + " >= str_to_date(\"" + adtStart.ToString("dd.MM.yyyy") + "\",\"%d.%m.%Y %H:%i:%s %H:%i:%s\") " + ") ";                      
+                    LsWhereAdd = LsWhereAdd + lsAnd + AsFieldTo + " >= str_to_date(\"" + adtStart.ToString("dd.MM.yyyy") + "\",\"%d.%m.%Y %H:%i:%s %H:%i:%s\") " + ") ";
                     break;
                 default:
                     break;
