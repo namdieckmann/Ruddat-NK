@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MySql.Data.MySqlClient;
+using System;
 using System.Data;
 using System.Data.SqlClient;
 using System.IO;
@@ -6,8 +7,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Xml;
-using MySql.Data.MySqlClient;
-using System.Windows.Threading;
 
 namespace Ruddat_NK
 {
@@ -44,45 +43,45 @@ namespace Ruddat_NK
         // private int currentValue = 0;
 
         // Daten
-        DataTable tableOne;
-        DataTable tableTwo;
-        DataTable tableThree;
-        DataTable tableFour;
-        DataTable tableFive;
-        DataTable tableSix;
-        DataTable tableSeven;
-        DataTable tableZlg;
-        DataTable tableVert;
-        DataTable tableAbrInfo;
-        DataTable tableLeerstand;
-        DataTable tableZlWert;
-        DataTable tableZlNummer;
-        SqlDataAdapter sda;
-        SqlDataAdapter sdb;
-        SqlDataAdapter sdc;
+        DataTable TblRechnungen;
+        DataTable TblTmlDetail;
+        DataTable TblFilialen;
+        DataTable TblObjTeilObj;
+        DataTable TblZlgKostenart;
+        DataTable TblRgMwst;
+        DataTable TblTmlSum;
+        DataTable TblZahlungen;
+        DataTable TblVerteilung;
+        DataTable TblAbrechnungInfo;
+        DataTable TblLeerstand;
+        DataTable TblZlWerte;
+        DataTable TblZlNummern;
+        SqlDataAdapter SdRechnungen;
+        SqlDataAdapter SdTmlDetail;
+        SqlDataAdapter SdFilialen;
         SqlDataAdapter sdd;
-        SqlDataAdapter sde;
-        SqlDataAdapter sdf;
-        SqlDataAdapter sdg;
-        SqlDataAdapter sdZlg;
-        SqlDataAdapter sdVert;
-        SqlDataAdapter sdAbrInfo;
-        SqlDataAdapter sdLeerstand;
-        SqlDataAdapter sdZlWert;
-        SqlDataAdapter sdZlNummer;
-        MySqlDataAdapter mysda;
-        MySqlDataAdapter mysdb;
-        MySqlDataAdapter mysdc;
-        MySqlDataAdapter mysdd;
-        MySqlDataAdapter mysde;
-        MySqlDataAdapter mysdf;
-        MySqlDataAdapter mysdg;
-        MySqlDataAdapter mysdZlg;
-        MySqlDataAdapter mysdVert;
-        MySqlDataAdapter mysdAbrInfo;
-        MySqlDataAdapter mysdLeerstand;
-        MySqlDataAdapter mysdZlWert;
-        MySqlDataAdapter mysdZlNummer;
+        SqlDataAdapter AdZlgKostenart;
+        SqlDataAdapter SdMwstRechnungen;
+        SqlDataAdapter SdTmlSummen;
+        SqlDataAdapter SdZahlungen;
+        SqlDataAdapter SdVerteilung;
+        SqlDataAdapter SdAbrInfo;
+        SqlDataAdapter SdLeerstand;
+        SqlDataAdapter SdZlWerte;
+        SqlDataAdapter SdZlNummern;
+        MySqlDataAdapter MySdRechnungen;
+        MySqlDataAdapter MySdTmlDetail;
+        MySqlDataAdapter MySdFilialen;
+        MySqlDataAdapter MySdObjTeilObj;
+        MySqlDataAdapter MySdZlgKostArt;
+        MySqlDataAdapter MySdRgMwst;
+        MySqlDataAdapter MySdTmlSum;
+        MySqlDataAdapter MySdZahlungen;
+        MySqlDataAdapter MySdVerteilung;
+        MySqlDataAdapter MySdAbrInfo;
+        MySqlDataAdapter MySdLeerstand;
+        MySqlDataAdapter MySdZlWert;
+        MySqlDataAdapter MySdZlNummer;
 
         // Datenübergabe an WndChooseSet
         private delegate void delPassData(int giTimelineId);
@@ -135,7 +134,7 @@ namespace Ruddat_NK
             rbAktEmps.IsChecked = true;
 
             // Aktiven Mandanten ermitteln
-            giMandantId = Timeline.getMandantId(lsConnect,giDb);
+            giMandantId = Timeline.GetMandantId(lsConnect,giDb);
 
             // Daten für Listbox Filiale holen
             lsSql = RdQueries.GetSqlSelect(1, giMandantId, "", "", "", DateTime.MinValue, DateTime.MinValue, giFiliale, lsConnect, giDb);
@@ -146,7 +145,7 @@ namespace Ruddat_NK
             liRows = FetchData(lsSql, 2, giDb, lsConnect);
 
             // Standard ist Jahr -1
-            ldtYear = DateTime.Now.AddYears(-1);
+            ldtYear = DateTime.Now.AddYears(-2);
             gdtYear = ldtYear;
 
             ldtFrom = Timeline.GetYear(ldtYear, 1);
@@ -179,7 +178,7 @@ namespace Ruddat_NK
             string MySqlConnectionString = "";
             String PDataPath = p + "\\Ruddat\\Nebenkosten\\";
             String PDataPathFile = "";
-            String Server, DbName, Trust, Timeout;
+            String Server, DbName, Timeout;
             string lsConnect = "";
 
             // Daten aus xml-Datei lesen
@@ -277,7 +276,7 @@ namespace Ruddat_NK
                     break;
                 case 2:
                     // Lokal MySql 
-                    // MySqlConnectionString = @"server=localhost;userid=rdnk;password=r1d8n9k4!;database=dbo";
+                    MySqlConnectionString = @"server=localhost;userid=rdnk;password=r1d8n9k4!;database=dbo";
                     // MessageBox.Show("Lokales Login");
                     // Ionos Server 
                     // MySqlConnectionString = @"Data Source=217.160.33.71;PORT=3306;USERID=namdi;PASSWORD=7V7ADTqWqQPCf9Sge4PT;database=dbo;Connect Timeout = 60";
@@ -328,30 +327,30 @@ namespace Ruddat_NK
                         // Daten für Filiale holen
                         if (piArt == 1)
                         {
-                            tableThree = new DataTable();   // Filialen
-                            sdc = new SqlDataAdapter(command);
-                            sdc.Fill(tableThree);
-                            lbFiliale.ItemsSource = tableThree.DefaultView;
+                            TblFilialen = new DataTable();   // Filialen
+                            SdFilialen = new SqlDataAdapter(command);
+                            SdFilialen.Fill(TblFilialen);
+                            lbFiliale.ItemsSource = TblFilialen.DefaultView;
                         }
 
                         // Daten für Objekte und Teilobjekte holen ab ins Treeview
                         // Für aktive Verträge
                         if (piArt == 2)
                         {
-                            tableFour = new DataTable();    // Objekte Teilobjekte
+                            TblObjTeilObj = new DataTable();    // Objekte Teilobjekte
                             sdd = new SqlDataAdapter(command);
-                            sdd.Fill(tableFour);
+                            sdd.Fill(TblObjTeilObj);
 
-                            if (tableFour.Rows.Count > 0)
+                            if (TblObjTeilObj.Rows.Count > 0)
                             {
                                 int i = 0;
                                 tvMain.Items.Clear();
 
                                 //  Eine Schleife durch die Tabelle, um das Treview zu befüllen
-                                for (i = 0; i < tableFour.Rows.Count; i++)
+                                for (i = 0; i < TblObjTeilObj.Rows.Count; i++)
                                 {
-                                    lsObjektBez = tableFour.Rows[i].ItemArray.GetValue(4).ToString().Trim() + ":" + tableFour.Rows[i].ItemArray.GetValue(0).ToString().Trim();
-                                    lsObjektTeilBez = tableFour.Rows[i].ItemArray.GetValue(1).ToString();
+                                    lsObjektBez = TblObjTeilObj.Rows[i].ItemArray.GetValue(4).ToString().Trim() + ":" + TblObjTeilObj.Rows[i].ItemArray.GetValue(0).ToString().Trim();
+                                    lsObjektTeilBez = TblObjTeilObj.Rows[i].ItemArray.GetValue(1).ToString();
 
                                     TreeViewItem root = new TreeViewItem
                                     {
@@ -365,7 +364,7 @@ namespace Ruddat_NK
                                         lsObjektBezS = lsObjektBez;
                                     }
 
-                                    PopulateTree(i, root, tableFour);
+                                    PopulateTree(i, root, TblObjTeilObj);
 
                                     i++;
                                 }
@@ -379,173 +378,173 @@ namespace Ruddat_NK
                         // Die Id aus Objekt holen
                         if (piArt == 3)
                         {
-                            tableFour = new DataTable();    // Objekte Teilobjekte
+                            TblObjTeilObj = new DataTable();    // Objekte Teilobjekte
                             sdd = new SqlDataAdapter(command);
-                            sdd.Fill(tableFour);
-                            if (tableFour.Rows.Count > 0)
+                            sdd.Fill(TblObjTeilObj);
+                            if (TblObjTeilObj.Rows.Count > 0)
                             {
-                                liRows = Convert.ToInt16(tableFour.Rows[0].ItemArray.GetValue(5).ToString());
+                                liRows = Convert.ToInt16(TblObjTeilObj.Rows[0].ItemArray.GetValue(5).ToString());
                             }
                         }
 
                         // Die Id aus Teilobjekt holen
                         if (piArt == 4)
                         {
-                            tableFour = new DataTable();    // Objekte Teilobjekte
+                            TblObjTeilObj = new DataTable();    // Objekte Teilobjekte
                             sdd = new SqlDataAdapter(command);
-                            sdd.Fill(tableFour);
-                            if (tableFour.Rows.Count > 0)
+                            sdd.Fill(TblObjTeilObj);
+                            if (TblObjTeilObj.Rows.Count > 0)
                             {
-                                liRows = Convert.ToInt16(tableFour.Rows[0].ItemArray.GetValue(6).ToString());
+                                liRows = Convert.ToInt16(TblObjTeilObj.Rows[0].ItemArray.GetValue(6).ToString());
                             }
                         }
 
                         // Die Id aus Mieter holen
                         if (piArt == 5)
                         {
-                            tableFour = new DataTable();    // Objekte Teilobjekte
+                            TblObjTeilObj = new DataTable();    // Objekte Teilobjekte
                             sdd = new SqlDataAdapter(command);
-                            sdd.Fill(tableFour);
-                            if (tableFour.Rows.Count > 0)
+                            sdd.Fill(TblObjTeilObj);
+                            if (TblObjTeilObj.Rows.Count > 0)
                             {
-                                liRows = Convert.ToInt16(tableFour.Rows[0].ItemArray.GetValue(7).ToString());
+                                liRows = Convert.ToInt16(TblObjTeilObj.Rows[0].ItemArray.GetValue(7).ToString());
                             }
                         }
 
                         // DataGrid Timline Summen
                         if (piArt == 8)
                         {
-                            tableSeven = new DataTable();   // Timeline Summen 
-                            sdg = new SqlDataAdapter(command);
-                            sdg.Fill(tableSeven);
-                            DgrCost.ItemsSource = tableSeven.DefaultView;
+                            TblTmlSum = new DataTable();   // Timeline Summen 
+                            SdTmlSummen = new SqlDataAdapter(command);
+                            SdTmlSummen.Fill(TblTmlSum);
+                            DgrCost.ItemsSource = TblTmlSum.DefaultView;
                             liRows = DgrCost.Items.Count;
                         }
 
                         // Datagrid für Rechnungen
                         if (piArt == 9)
                         {
-                            tableOne = new DataTable();     // Rechnungen
-                            sda = new SqlDataAdapter(command);
-                            sda.Fill(tableOne);
-                            DgrRechnungen.ItemsSource = tableOne.DefaultView;
+                            TblRechnungen = new DataTable();     // Rechnungen
+                            SdRechnungen = new SqlDataAdapter(command);
+                            SdRechnungen.Fill(TblRechnungen);
+                            DgrRechnungen.ItemsSource = TblRechnungen.DefaultView;
                             liRows = DgrRechnungen.Items.Count;
                         }
 
                         // ListBox Filiale befüllen
                         if (piArt == 10)
                         {
-                            tableThree = new DataTable();
-                            sdc = new SqlDataAdapter(command);
-                            sdc.Fill(tableThree);
-                            lbFiliale.ItemsSource = tableThree.DefaultView;
+                            TblFilialen = new DataTable();
+                            SdFilialen = new SqlDataAdapter(command);
+                            SdFilialen.Fill(TblFilialen);
+                            lbFiliale.ItemsSource = TblFilialen.DefaultView;
                         }
 
                         // Combobox Kostenart in Rechnungen
                         if (piArt == 11)
                         {
-                            tableFive = new DataTable();    // Kostenart
-                            sde = new SqlDataAdapter(command);
-                            sde.Fill(tableFive);
-                            kostenart.ItemsSource = tableFive.DefaultView;
+                            TblZlgKostenart = new DataTable();    // Kostenart
+                            AdZlgKostenart = new SqlDataAdapter(command);
+                            AdZlgKostenart.Fill(TblZlgKostenart);
+                            kostenart.ItemsSource = TblZlgKostenart.DefaultView;
                         }
 
                         // Combobox mwst in Rechnungen
                         if (piArt == 12)
                         {
-                            tableSix = new DataTable();     // mwst
-                            sdf = new SqlDataAdapter(command);
-                            sdf.Fill(tableSix);
-                            mwst.ItemsSource = tableSix.DefaultView;                // Rechnungen
+                            TblRgMwst = new DataTable();     // mwst
+                            SdMwstRechnungen = new SqlDataAdapter(command);
+                            SdMwstRechnungen.Fill(TblRgMwst);
+                            mwst.ItemsSource = TblRgMwst.DefaultView;                // Rechnungen
                         }
 
                         // DataGrid Timline Detail
                         if (piArt == 13)
                         {
-                            tableTwo = new DataTable();     // Timeline
-                            sdb = new SqlDataAdapter(command);
-                            sdb.Fill(tableTwo);
-                            DgrCostDetail.ItemsSource = tableTwo.DefaultView;
+                            TblTmlDetail = new DataTable();     // Timeline
+                            SdTmlDetail = new SqlDataAdapter(command);
+                            SdTmlDetail.Fill(TblTmlDetail);
+                            DgrCostDetail.ItemsSource = TblTmlDetail.DefaultView;
                             liRows = DgrCostDetail.Items.Count;
                         }
 
                         // DataGrid Zahlungen
                         if (piArt == 14)
                         {
-                            tableZlg = new DataTable();     // Zahlungen
-                            sdZlg = new SqlDataAdapter(command);
-                            sdZlg.Fill(tableZlg);
-                            DgrZahlungen.ItemsSource = tableZlg.DefaultView;
+                            TblZahlungen = new DataTable();     // Zahlungen
+                            SdZahlungen = new SqlDataAdapter(command);
+                            SdZahlungen.Fill(TblZahlungen);
+                            DgrZahlungen.ItemsSource = TblZahlungen.DefaultView;
                             liRows = DgrZahlungen.Items.Count;
                         }
 
                         // DataGrid Leerstand Detail
                         if (piArt == 19)
                         {
-                            tableLeerstand = new DataTable();     // Timeline
-                            sdLeerstand = new SqlDataAdapter(command);
-                            sdLeerstand.Fill(tableLeerstand);
-                            DgrLeerDetail.ItemsSource = tableLeerstand.DefaultView;
+                            TblLeerstand = new DataTable();     // Timeline
+                            SdLeerstand = new SqlDataAdapter(command);
+                            SdLeerstand.Fill(TblLeerstand);
+                            DgrLeerDetail.ItemsSource = TblLeerstand.DefaultView;
                             liRows = DgrLeerDetail.Items.Count;
                         }
 
                         // Combobox Kostenart in Zahlungen
                         if (piArt == 15)
                         {
-                            tableFive = new DataTable();    // Kostenart
-                            sde = new SqlDataAdapter(command);
-                            sde.Fill(tableFive);
-                            kostenartZlg.ItemsSource = tableFive.DefaultView;
+                            TblZlgKostenart = new DataTable();    // Kostenart
+                            AdZlgKostenart = new SqlDataAdapter(command);
+                            AdZlgKostenart.Fill(TblZlgKostenart);
+                            kostenartZlg.ItemsSource = TblZlgKostenart.DefaultView;
                         }
                         // Combobox Verteilung in Rechnungen und Zähler
                         if (piArt == 16)
                         {
-                            tableVert = new DataTable();    // Verteilung Rechnungen
-                            sdVert = new SqlDataAdapter(command);
-                            sdVert.Fill(tableVert);
-                            kostenvert.ItemsSource = tableVert.DefaultView;
-                            kostenvertZl.ItemsSource = tableVert.DefaultView;
+                            TblVerteilung = new DataTable();    // Verteilung Rechnungen
+                            SdVerteilung = new SqlDataAdapter(command);
+                            SdVerteilung.Fill(TblVerteilung);
+                            kostenvert.ItemsSource = TblVerteilung.DefaultView;
+                            kostenvertZl.ItemsSource = TblVerteilung.DefaultView;
                         }
                         // Tabelle Infos für Abrechnung
                         if (piArt == 17)
                         {
-                            tableAbrInfo = new DataTable();    // Abrechnung
-                            sdAbrInfo = new SqlDataAdapter(command);
-                            sdAbrInfo.Fill(tableAbrInfo);
+                            TblAbrechnungInfo = new DataTable();    // Abrechnung
+                            SdAbrInfo = new SqlDataAdapter(command);
+                            SdAbrInfo.Fill(TblAbrechnungInfo);
                         }
                         // Tabelle Leerstände
                         if (piArt == 18)
                         {
-                            tableLeerstand = new DataTable();    // Leerstand
-                            sdLeerstand = new SqlDataAdapter(command);
-                            sdLeerstand.Fill(tableLeerstand);
-                            DgrLeer.ItemsSource = tableLeerstand.DefaultView;
+                            TblLeerstand = new DataTable();    // Leerstand
+                            SdLeerstand = new SqlDataAdapter(command);
+                            SdLeerstand.Fill(TblLeerstand);
+                            DgrLeer.ItemsSource = TblLeerstand.DefaultView;
                             liRows = DgrLeer.Items.Count;
                         }
                         // Tabelle Zählerwerte
                         if (piArt == 21)
                         {
-                            tableZlWert = new DataTable();    // Zählerwert
-                            sdZlWert = new SqlDataAdapter(command);
-                            sdZlWert.Fill(tableZlWert);
-                            DgrCounters.ItemsSource = tableZlWert.DefaultView;
+                            TblZlWerte = new DataTable();    // Zählerwert
+                            SdZlWerte = new SqlDataAdapter(command);
+                            SdZlWerte.Fill(TblZlWerte);
+                            DgrCounters.ItemsSource = TblZlWerte.DefaultView;
                             liRows = DgrCounters.Items.Count;
                         }
                         // Combobox Zählernummern
                         if (piArt == 22)
                         {
-                            tableZlNummer = new DataTable();    // Kostenart
-                            sdZlNummer = new SqlDataAdapter(command);
-                            sdZlNummer.Fill(tableZlNummer);
-                            zlNummer.ItemsSource = tableZlNummer.DefaultView;
-                            zleh.ItemsSource = tableZlNummer.DefaultView;
-                            zlmw.ItemsSource = tableZlNummer.DefaultView;
+                            TblZlNummern = new DataTable();    // Kostenart
+                            SdZlNummern = new SqlDataAdapter(command);
+                            SdZlNummern.Fill(TblZlNummern);
+                            zlNummer.ItemsSource = TblZlNummern.DefaultView;
+                            zleh.ItemsSource = TblZlNummern.DefaultView;
+                            zlmw.ItemsSource = TblZlNummern.DefaultView;
                         }
                         if (piArt == 35)
                         {
                             // SqlDataAdapter sda = new SqlDataAdapter(command);
-                            SqlCommandBuilder commandBuilder23 = new SqlCommandBuilder(sda);
-                            sda.Update(tableOne);
+                            SqlCommandBuilder commandBuilder23 = new SqlCommandBuilder(SdRechnungen);
+                            SdRechnungen.Update(TblRechnungen);
                         }
                         // Rechnung löschen
                         if (piArt == 36)
@@ -556,8 +555,8 @@ namespace Ruddat_NK
                         if (piArt == 37)
                         {
                             // SqlDataAdapter sdZlg = new SqlDataAdapter(command);
-                            SqlCommandBuilder commandBuilder37 = new SqlCommandBuilder(sdZlg);
-                            sdZlg.Update(tableZlg);
+                            SqlCommandBuilder commandBuilder37 = new SqlCommandBuilder(SdZahlungen);
+                            SdZahlungen.Update(TblZahlungen);
                         }
                         if (piArt == 38)
                         {
@@ -567,8 +566,8 @@ namespace Ruddat_NK
                         if (piArt == 39)
                         {
                             // Zählerstände
-                            SqlCommandBuilder commandBuilder39 = new SqlCommandBuilder(sdZlWert);
-                            sdZlWert.Update(tableZlWert);
+                            SqlCommandBuilder commandBuilder39 = new SqlCommandBuilder(SdZlWerte);
+                            SdZlWerte.Update(TblZlWerte);
                         }
                         if (piArt == 40)
                         {
@@ -607,30 +606,30 @@ namespace Ruddat_NK
                         // Daten für Filiale holen
                         if (piArt == 1)
                         {
-                            tableThree = new DataTable();   // Filialen
-                            mysdc = new MySqlDataAdapter(com);
-                            mysdc.Fill(tableThree);
-                            lbFiliale.ItemsSource = tableThree.DefaultView;
+                            TblFilialen = new DataTable();   // Filialen
+                            MySdFilialen = new MySqlDataAdapter(com);
+                            MySdFilialen.Fill(TblFilialen);
+                            lbFiliale.ItemsSource = TblFilialen.DefaultView;
                         }
 
                         // Daten für Objekte und Teilobjekte holen ab ins Treeview
                         // Für aktive Verträge
                         if (piArt == 2)
                         {
-                            tableFour = new DataTable();    // Objekte Teilobjekte
-                            mysdd = new MySqlDataAdapter(com);
-                            mysdd.Fill(tableFour);
+                            TblObjTeilObj = new DataTable();    // Objekte Teilobjekte
+                            MySdObjTeilObj = new MySqlDataAdapter(com);
+                            MySdObjTeilObj.Fill(TblObjTeilObj);
 
-                            if (tableFour.Rows.Count > 0)
+                            if (TblObjTeilObj.Rows.Count > 0)
                             {
                                 int i = 0;
                                 tvMain.Items.Clear();
 
                                 //  Eine Schleife durch die Tabelle, um das Treview zu befüllen
-                                for (i = 0; i < tableFour.Rows.Count; i++)
+                                for (i = 0; i < TblObjTeilObj.Rows.Count; i++)
                                 {
-                                    lsObjektBez = tableFour.Rows[i].ItemArray.GetValue(4).ToString().Trim() + ":" + tableFour.Rows[i].ItemArray.GetValue(0).ToString().Trim();
-                                    lsObjektTeilBez = tableFour.Rows[i].ItemArray.GetValue(1).ToString();
+                                    lsObjektBez = TblObjTeilObj.Rows[i].ItemArray.GetValue(4).ToString().Trim() + ":" + TblObjTeilObj.Rows[i].ItemArray.GetValue(0).ToString().Trim();
+                                    lsObjektTeilBez = TblObjTeilObj.Rows[i].ItemArray.GetValue(1).ToString();
 
                                     TreeViewItem root = new TreeViewItem
                                     {
@@ -644,7 +643,7 @@ namespace Ruddat_NK
                                         lsObjektBezS = lsObjektBez;
                                     }
 
-                                    PopulateTree(i, root, tableFour);
+                                    PopulateTree(i, root, TblObjTeilObj);
 
                                     i++;
                                 }
@@ -658,160 +657,160 @@ namespace Ruddat_NK
                         // Die Id aus Objekt holen
                         if (piArt == 3)
                         {
-                            tableFour = new DataTable();    // Objekte Teilobjekte
-                            mysdd = new MySqlDataAdapter(com);
-                            mysdd.Fill(tableFour);
-                            if (tableFour.Rows.Count > 0)
+                            TblObjTeilObj = new DataTable();    // Objekte Teilobjekte
+                            MySdObjTeilObj = new MySqlDataAdapter(com);
+                            MySdObjTeilObj.Fill(TblObjTeilObj);
+                            if (TblObjTeilObj.Rows.Count > 0)
                             {
-                                liRows = Convert.ToInt16(tableFour.Rows[0].ItemArray.GetValue(5).ToString());
+                                liRows = Convert.ToInt16(TblObjTeilObj.Rows[0].ItemArray.GetValue(5).ToString());
                             }
                         }
                         // Die Id aus Teilobjekt holen
                         if (piArt == 4)
                         {
-                            tableFour = new DataTable();    // Objekte Teilobjekte
-                            mysdd = new MySqlDataAdapter(com);
-                            mysdd.Fill(tableFour);
-                            if (tableFour.Rows.Count > 0)
+                            TblObjTeilObj = new DataTable();    // Objekte Teilobjekte
+                            MySdObjTeilObj = new MySqlDataAdapter(com);
+                            MySdObjTeilObj.Fill(TblObjTeilObj);
+                            if (TblObjTeilObj.Rows.Count > 0)
                             {
-                                liRows = Convert.ToInt16(tableFour.Rows[0].ItemArray.GetValue(6).ToString());
+                                liRows = Convert.ToInt16(TblObjTeilObj.Rows[0].ItemArray.GetValue(6).ToString());
                             }
                         }
                         // Die Id aus Mieter holen
                         if (piArt == 5)
                         {
-                            tableFour = new DataTable();    // Objekte Teilobjekte
-                            mysdd = new MySqlDataAdapter(com);
-                            mysdd.Fill(tableFour);
-                            if (tableFour.Rows.Count > 0)
+                            TblObjTeilObj = new DataTable();    // Objekte Teilobjekte
+                            MySdObjTeilObj = new MySqlDataAdapter(com);
+                            MySdObjTeilObj.Fill(TblObjTeilObj);
+                            if (TblObjTeilObj.Rows.Count > 0)
                             {
-                                liRows = Convert.ToInt16(tableFour.Rows[0].ItemArray.GetValue(7).ToString());
+                                liRows = Convert.ToInt16(TblObjTeilObj.Rows[0].ItemArray.GetValue(7).ToString());
                             }
                         }
                         // DataGrid Timline Summen
                         if (piArt == 8)
                         {
-                            tableSeven = new DataTable();   // Timeline Summen 
-                            mysdg = new MySqlDataAdapter(com);
-                            mysdg.Fill(tableSeven);
-                            DgrCost.ItemsSource = tableSeven.DefaultView;
+                            TblTmlSum = new DataTable();   // Timeline Summen 
+                            MySdTmlSum = new MySqlDataAdapter(com);
+                            MySdTmlSum.Fill(TblTmlSum);
+                            DgrCost.ItemsSource = TblTmlSum.DefaultView;
                             liRows = DgrCost.Items.Count;
                         }
                         // Datagrid für Rechnungen
                         if (piArt == 9)
                         {
-                            tableOne = new DataTable();     // Rechnungen
-                            mysda = new MySqlDataAdapter(com);
-                            mysda.Fill(tableOne);
-                            DgrRechnungen.ItemsSource = tableOne.DefaultView;
+                            TblRechnungen = new DataTable();     // Rechnungen
+                            MySdRechnungen = new MySqlDataAdapter(com);
+                            MySdRechnungen.Fill(TblRechnungen);
+                            DgrRechnungen.ItemsSource = TblRechnungen.DefaultView;
                             liRows = DgrRechnungen.Items.Count;
                         }
                         // ListBox Filiale befüllen
                         if (piArt == 10)
                         {
-                            tableThree = new DataTable();
-                            mysdc = new MySqlDataAdapter(com);
-                            mysdc.Fill(tableThree);
-                            lbFiliale.ItemsSource = tableThree.DefaultView;
+                            TblFilialen = new DataTable();
+                            MySdFilialen = new MySqlDataAdapter(com);
+                            MySdFilialen.Fill(TblFilialen);
+                            lbFiliale.ItemsSource = TblFilialen.DefaultView;
                         }
                         // Combobox Kostenart in Rechnungen
                         if (piArt == 11)
                         {
-                            tableFive = new DataTable();    // Kostenart
-                            mysde = new MySqlDataAdapter(com);
-                            mysde.Fill(tableFive);
-                            kostenart.ItemsSource = tableFive.DefaultView;
+                            TblZlgKostenart = new DataTable();    // Kostenart
+                            MySdZlgKostArt = new MySqlDataAdapter(com);
+                            MySdZlgKostArt.Fill(TblZlgKostenart);
+                            kostenart.ItemsSource = TblZlgKostenart.DefaultView;
                         }
                         // Combobox mwst in Rechnungen
                         if (piArt == 12)
                         {
-                            tableSix = new DataTable();     // mwst
-                            mysdf = new MySqlDataAdapter(com);
-                            mysdf.Fill(tableSix);
-                            mwst.ItemsSource = tableSix.DefaultView;                // Rechnungen
+                            TblRgMwst = new DataTable();     // mwst
+                            MySdRgMwst = new MySqlDataAdapter(com);
+                            MySdRgMwst.Fill(TblRgMwst);
+                            mwst.ItemsSource = TblRgMwst.DefaultView;                // Rechnungen
                         }
                         // DataGrid Timline Detail
                         if (piArt == 13)
                         {
-                            tableTwo = new DataTable();     // Timeline
-                            mysdb = new MySqlDataAdapter(com);
-                            mysdb.Fill(tableTwo);
-                            DgrCostDetail.ItemsSource = tableTwo.DefaultView;
+                            TblTmlDetail = new DataTable();     // Timeline
+                            MySdTmlDetail = new MySqlDataAdapter(com);
+                            MySdTmlDetail.Fill(TblTmlDetail);
+                            DgrCostDetail.ItemsSource = TblTmlDetail.DefaultView;
                             liRows = DgrCostDetail.Items.Count;
                         }
                         // DataGrid Zahlungen
                         if (piArt == 14)
                         {
-                            tableZlg = new DataTable();     // Zahlungen
-                            mysdZlg = new MySqlDataAdapter(com);
-                            mysdZlg.Fill(tableZlg);
-                            DgrZahlungen.ItemsSource = tableZlg.DefaultView;
+                            TblZahlungen = new DataTable();     // Zahlungen
+                            MySdZahlungen = new MySqlDataAdapter(com);
+                            MySdZahlungen.Fill(TblZahlungen);
+                            DgrZahlungen.ItemsSource = TblZahlungen.DefaultView;
                             liRows = DgrZahlungen.Items.Count;
                         }
                         // DataGrid Leerstand Detail
                         if (piArt == 19)
                         {
-                            tableLeerstand = new DataTable();     // Timeline
-                            mysdLeerstand = new MySqlDataAdapter(com);
-                            mysdLeerstand.Fill(tableLeerstand);
-                            DgrLeerDetail.ItemsSource = tableLeerstand.DefaultView;
+                            TblLeerstand = new DataTable();     // Timeline
+                            MySdLeerstand = new MySqlDataAdapter(com);
+                            MySdLeerstand.Fill(TblLeerstand);
+                            DgrLeerDetail.ItemsSource = TblLeerstand.DefaultView;
                             liRows = DgrLeerDetail.Items.Count;
                         }
                         // Combobox Kostenart in Zahlungen
                         if (piArt == 15)
                         {
-                            tableFive = new DataTable();    // Kostenart
-                            mysde = new MySqlDataAdapter(com);
-                            mysde.Fill(tableFive);
-                            kostenartZlg.ItemsSource = tableFive.DefaultView;
+                            TblZlgKostenart = new DataTable();    // Kostenart
+                            MySdZlgKostArt = new MySqlDataAdapter(com);
+                            MySdZlgKostArt.Fill(TblZlgKostenart);
+                            kostenartZlg.ItemsSource = TblZlgKostenart.DefaultView;
                         }
                         // Combobox Verteilung in Rechnungen und Zähler
                         if (piArt == 16)
                         {
-                            tableVert = new DataTable();    // Verteilung Rechnungen
-                            mysdVert = new MySqlDataAdapter(com);
-                            mysdVert.Fill(tableVert);
-                            kostenvert.ItemsSource = tableVert.DefaultView;
-                            kostenvertZl.ItemsSource = tableVert.DefaultView;
+                            TblVerteilung = new DataTable();    // Verteilung Rechnungen
+                            MySdVerteilung = new MySqlDataAdapter(com);
+                            MySdVerteilung.Fill(TblVerteilung);
+                            kostenvert.ItemsSource = TblVerteilung.DefaultView;
+                            kostenvertZl.ItemsSource = TblVerteilung.DefaultView;
                         }
                         // Tabelle Infos für Abrechnung
                         if (piArt == 17)
                         {
-                            tableAbrInfo = new DataTable();    // Abrechnung
-                            mysdAbrInfo = new MySqlDataAdapter(com);
-                            mysdAbrInfo.Fill(tableAbrInfo);
+                            TblAbrechnungInfo = new DataTable();    // Abrechnung
+                            MySdAbrInfo = new MySqlDataAdapter(com);
+                            MySdAbrInfo.Fill(TblAbrechnungInfo);
                         }
                         // Tabelle Leerstände
                         if (piArt == 18)
                         {
-                            tableLeerstand = new DataTable();    // Leerstand
-                            mysdLeerstand = new MySqlDataAdapter(com);
-                            mysdLeerstand.Fill(tableLeerstand);
-                            DgrLeer.ItemsSource = tableLeerstand.DefaultView;
+                            TblLeerstand = new DataTable();    // Leerstand
+                            MySdLeerstand = new MySqlDataAdapter(com);
+                            MySdLeerstand.Fill(TblLeerstand);
+                            DgrLeer.ItemsSource = TblLeerstand.DefaultView;
                         }
                         // Tabelle Zählerwerte
                         if (piArt == 21)
                         {
-                            tableZlWert = new DataTable();    // Zählerwert
-                            mysdZlWert = new MySqlDataAdapter(com);
-                            mysdZlWert.Fill(tableZlWert);
-                            DgrCounters.ItemsSource = tableZlWert.DefaultView;
+                            TblZlWerte = new DataTable();    // Zählerwert
+                            MySdZlWert = new MySqlDataAdapter(com);
+                            MySdZlWert.Fill(TblZlWerte);
+                            DgrCounters.ItemsSource = TblZlWerte.DefaultView;
                         }
                         // Combobox Zählernummern
                         if (piArt == 22)
                         {
-                            tableZlNummer = new DataTable();    // Kostenart
-                            mysdZlNummer = new MySqlDataAdapter(com);
-                            mysdZlNummer.Fill(tableZlNummer);
-                            zlNummer.ItemsSource = tableZlNummer.DefaultView;
-                            zleh.ItemsSource = tableZlNummer.DefaultView;
-                            zlmw.ItemsSource = tableZlNummer.DefaultView;
+                            TblZlNummern = new DataTable();    // Kostenart
+                            MySdZlNummer = new MySqlDataAdapter(com);
+                            MySdZlNummer.Fill(TblZlNummern);
+                            zlNummer.ItemsSource = TblZlNummern.DefaultView;
+                            zleh.ItemsSource = TblZlNummern.DefaultView;
+                            zlmw.ItemsSource = TblZlNummern.DefaultView;
                         }
                         if (piArt == 35)
                         {
                             // MySqlDataAdapter mysda = new MySqlDataAdapter(com);
-                            MySqlCommandBuilder commandBuilder23 = new MySqlCommandBuilder(mysda);
-                            mysda.Update(tableOne);
+                            MySqlCommandBuilder commandBuilder23 = new MySqlCommandBuilder(MySdRechnungen);
+                            MySdRechnungen.Update(TblRechnungen);
                         }
                         // Rechnung löschen
                         if (piArt == 36)
@@ -822,8 +821,8 @@ namespace Ruddat_NK
                         if (piArt == 37)    // Zahlung 
                         {
                             // MySqlDataAdapter mysdZlg = new MySqlDataAdapter(com);
-                            MySqlCommandBuilder commandBuilder37 = new MySqlCommandBuilder(mysdZlg);
-                            mysdZlg.Update(tableZlg);
+                            MySqlCommandBuilder commandBuilder37 = new MySqlCommandBuilder(MySdZahlungen);
+                            MySdZahlungen.Update(TblZahlungen);
                         }
                         if (piArt == 38)
                         {
@@ -833,8 +832,8 @@ namespace Ruddat_NK
                         if (piArt == 39)
                         {
                             // Zählerstände
-                            MySqlCommandBuilder commandBuilder39 = new MySqlCommandBuilder(mysdZlWert);
-                            mysdZlWert.Update(tableZlWert);
+                            MySqlCommandBuilder commandBuilder39 = new MySqlCommandBuilder(MySdZlWert);
+                            MySdZlWert.Update(TblZlWerte);
                         }
                         if (piArt == 40)
                         {
@@ -1153,7 +1152,7 @@ namespace Ruddat_NK
                 // Daten für die Anwahl der Firma nur nach Filialänderungen durchführen
                 // Datum ist egal
                 // Daten für listbox Filiale holen
-                giMandantId = Timeline.getMandantId(gsConnect,giDb);
+                giMandantId = Timeline.GetMandantId(gsConnect,giDb);
                 lsSql = RdQueries.GetSqlSelect(1, giMandantId, "", "", "", DateTime.MinValue, DateTime.MinValue, giFiliale, gsConnect, giDb);
                 // Daten holen für Listbox Filiale
                 liRows = FetchData(lsSql, 1, giDb, gsConnect);
@@ -1369,7 +1368,7 @@ namespace Ruddat_NK
                     liId = FetchData(lsSql, 5, giDb, gsConnect);
 
                     // Die Objekt Id für die Darstellung der ObjektKosten besorgen
-                    liObjektIdTmp = Timeline.getIdObj(liId, gsConnect, 1, giDb);
+                    liObjektIdTmp = Timeline.GetIdObj(liId, gsConnect, 1, giDb);
 
                     // TimeLine holen für Mieter
                     lsSql = RdQueries.GetSqlSelect(7, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
@@ -1416,11 +1415,11 @@ namespace Ruddat_NK
             {
                 case 3:
                     // Rechnungen
-                    Timeline.saveLastSql(lsSqlRechnungen, "", "", "", "", "", "", "", "", "rechnungen", "");
+                    Timeline.SaveLastSql(lsSqlRechnungen, "", "", "", "", "", "", "", "", "rechnungen", "");
                     break;
                 case 4:
                     // Zahlungen
-                    Timeline.saveLastSql(lsSqlZahlungen, "", "", "", "", "", "", "", "", "zahlungen", "");
+                    Timeline.SaveLastSql(lsSqlZahlungen, "", "", "", "", "", "", "", "", "zahlungen", "");
                     break;
                 case 5:
                     // Nebenkostenabrechnung 
@@ -1430,12 +1429,12 @@ namespace Ruddat_NK
                     // Abrechnungen (Kosten,Kostenverteilung,Kostenverteilung Summen,Zahlungen Summe,Personen,Zähler,Art)
                     if (liIndex == 3)       // Nebenkosten Mieter
                     {
-                        Timeline.saveLastSql(lsSqlTimeline, lsSqlAbrContent, "",
+                        Timeline.SaveLastSql(lsSqlTimeline, lsSqlAbrContent, "",
                                 "", lsSqlZahlungen, lsSqlSumme, "", lsSqlTimeline2, "", "kosten", "");                  // direkte Kosten Mieter 
                     }
                     if (liIndex == 2)       // Nebenkosten Teilobjekt
                     {
-                        Timeline.saveLastSql(lsSqlTimeline, lsSqlAbrContent, "", 
+                        Timeline.SaveLastSql(lsSqlTimeline, lsSqlAbrContent, "", 
                                 "", lsSqlZahlungen, lsSqlSumme, "", lsSqlTimeline2, "", "kostenteilobjekt", "");       // direkte Kosten Teilobjekt
                     }
 
@@ -1448,7 +1447,7 @@ namespace Ruddat_NK
                     lsSqlAbrContent = RdQueries.GetSqlSelect(300, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);      // Abrechnung Content x_abr_content
                     lsSqlRgNrAnschreiben = RdQueries.GetSqlSelect(140, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb); // Speichern der Rechnungsnummer Anschreiben
                     // Abrechnungen (Kosten,Kostenverteilung,Kostenverteilung Summen,Zahlungen Summe,Personen,Zähler,Art, Rechnungsnummer Anschreiben)
-                    Timeline.saveLastSql(lsSqlTimeline, lsSqlAbrContent, "",
+                    Timeline.SaveLastSql(lsSqlTimeline, lsSqlAbrContent, "",
                             "", lsSqlZahlungen, lsSqlSumme, "", lsSqlTimeline2, "", "anschreiben", lsSqlRgNrAnschreiben);  // direkte Kosten
                     Timeline.saveLastVal(ldtFrom, ldtTo, "Datum");                          // Übergabe des Datumsbereiches 
                     break;
@@ -1458,17 +1457,17 @@ namespace Ruddat_NK
                     // Das Befüllen der Tabelle erfolgt dann in WndRep
                     lsSqlAbrContent = RdQueries.GetSqlSelect(300, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);      // Abrechnung Content x_abr_content
                     // Abrechnungen (Kosten,Kostenverteilung,Kostenverteilung Summen,Zahlungen Summe,Personen,Zähler,Art)
-                    Timeline.saveLastSql(lsSqlTimeline, lsSqlAbrContent, "",
+                    Timeline.SaveLastSql(lsSqlTimeline, lsSqlAbrContent, "",
                             "", lsSqlZahlungen, lsSqlSumme, "", lsSqlTimeline2, "", "kostendetail", "");       // direkte Kosten detailliert
                     Timeline.saveLastVal(ldtFrom, ldtTo, "Datum");                                         // Übergabe des Datumsbereiches 
                     break;
                 case 8:
                     // Zählerstände
-                    Timeline.saveLastSql(lsSqlZaehlerstd, "", "", "", "", "", "", "", "", "zaehler", "");
+                    Timeline.SaveLastSql(lsSqlZaehlerstd, "", "", "", "", "", "", "", "", "zaehler", "");
                     break;
                 case 9:
                     // Leerstände
-                    Timeline.saveLastSql(lsSqlLeerstand, "", "", "", "", "", "", "", "", "leerstand", "");
+                    Timeline.SaveLastSql(lsSqlLeerstand, "", "", "", "", "", "", "", "", "leerstand", "");
                     break;
                 default:
                     break;
@@ -1590,10 +1589,10 @@ namespace Ruddat_NK
             string lsSql = "";
             int liOk = 0;
 
-            // TableOne wird aktualsiert Rechnungen TableOne
+            // aktualsiert Rechnungen TblRechnungen
             liOk = FetchData("", 35, giDb, gsConnect);
 
-            // Timeline bearbeiten    Art 1 = Rechnungen
+            // Timeline bearbeiten    giFlagTimeline 1 = Rechnungen
             Timeline.editTimeline(giTimelineId, giFlagTimeline, gsConnect, giDb);
 
             // Delete Kommando muss extra erzeugt werden
@@ -1627,7 +1626,7 @@ namespace Ruddat_NK
             int liSel = DgrRechnungen.SelectedIndex;
             if (liSel >= 0)
             {
-                DataRow dr = tableOne.Rows[liSel];
+                DataRow dr = TblRechnungen.Rows[liSel];
                 if (dr[14] != DBNull.Value)
                 {
                     liTimelineId = Int32.Parse(dr[14].ToString());           // TimeLine ID holen
@@ -1646,12 +1645,12 @@ namespace Ruddat_NK
         {
 
             int liTimelineId = 0;
-            int liRows = tableOne.Rows.Count;
+            int liRows = TblRechnungen.Rows.Count;
 
             // ID für Timeline ermitteln Art 1 = Rechnungs ID
             liTimelineId = Timeline.getTimelineId(gsConnect, 1, giDb) + 1;
 
-            DataRow dr = tableOne.NewRow();
+            DataRow dr = TblRechnungen.NewRow();
             dr[8] = giObjekt;
             dr[9] = giObjektTeil;
             dr[10] = giMieter;
@@ -1661,12 +1660,12 @@ namespace Ruddat_NK
             // Datum vorbelegen erst ab dem 2 ten Datensatz
             if (liRows > 0)
             {
-                dr[2] = tableOne.Rows[liRows - 1][2];       // Rechnungsdatum
-                dr[3] = tableOne.Rows[liRows - 1][3];       // Start Datum
-                dr[4] = tableOne.Rows[liRows - 1][4];       // Ende Datum
+                dr[2] = TblRechnungen.Rows[liRows - 1][2];       // Rechnungsdatum
+                dr[3] = TblRechnungen.Rows[liRows - 1][3];       // Start Datum
+                dr[4] = TblRechnungen.Rows[liRows - 1][4];       // Ende Datum
             }
 
-            tableOne.Rows.Add(dr);
+            TblRechnungen.Rows.Add(dr);
 
             btnRgAdd.IsEnabled = false;
 
@@ -1681,7 +1680,7 @@ namespace Ruddat_NK
             if (liSel >= 0)
             {
 
-                DataRow dr = tableOne.Rows[liSel];
+                DataRow dr = TblRechnungen.Rows[liSel];
                 giDelId = (int)(dr[0]);                // Id des zu löschenden Datensatzes
 
 
@@ -1689,7 +1688,7 @@ namespace Ruddat_NK
                 {
                     liTimelineId = (int)dr[14];          // TimeLine ID holen                    
                     giTimelineId = liTimelineId;
-                    tableOne.Rows.Remove(dr);
+                    TblRechnungen.Rows.Remove(dr);
 
                     btnRgSave.Content = "wirklich löschen?";
                     btnRgSave.IsEnabled = true;
@@ -1717,16 +1716,16 @@ namespace Ruddat_NK
             // Timeline bearbeiten Art 11 = Zahlungen ändern
             int liFlagTimeline = 11;
             // Timeline.editTimeline(giTimelineId, giFlagTimeline, gsConnect, giDb);
-            liRows = tableZlg.Rows.Count;
+            liRows = TblZahlungen.Rows.Count;
 
             if (liRows > 0)
             {
 
                 for (int i = 0; i < liRows; i++)           // Ende bei 12 Monate
                 {
-                    if (tableZlg.Rows[i][0] == DBNull.Value)        // Id ist noch leer
+                    if (TblZahlungen.Rows[i][0] == DBNull.Value)        // Id ist noch leer
                     {
-                        Int32.TryParse(tableZlg.Rows[i][10].ToString(), out liTimelineId);       // Timeline Id holen
+                        Int32.TryParse(TblZahlungen.Rows[i][10].ToString(), out liTimelineId);       // Timeline Id holen
 
                         Timeline.editTimeline(liTimelineId, liFlagTimeline, gsConnect, giDb);   // Timeline aktualisieren
                     }
@@ -1751,16 +1750,16 @@ namespace Ruddat_NK
         {
             int liTimelineId = 0;
             int liNkId = 0;
-            int liRows = tableZlg.Rows.Count;
+            int liRows = TblZahlungen.Rows.Count;
             DateTime ldtZlg = DateTime.MinValue;
 
             // ID für Timeline ermitteln Art 2 = Zahlungs ID
             liTimelineId = Timeline.getTimelineId(gsConnect, 2, giDb) + 1;
 
             // Kostenart ID ermitteln Art 1 = Nebenkostenzahlungen
-            liNkId = Timeline.getKsaId(1, gsConnect, giDb);
+            liNkId = Timeline.GetKsaId(1, gsConnect, giDb);
 
-            DataRow dr = tableZlg.NewRow();
+            DataRow dr = TblZahlungen.NewRow();
             dr[2] = giObjekt;
             dr[3] = giObjektTeil;
             dr[1] = giMieter;
@@ -1770,19 +1769,19 @@ namespace Ruddat_NK
 
             // Datum vorbelegen erst ab dem 2 ten Datensatz
             // Der neueste ist immer der oberste 0
-            if (liRows > 0 && tableZlg.Rows[0][4] != DBNull.Value)
+            if (liRows > 0 && TblZahlungen.Rows[0][4] != DBNull.Value)
             {
-                ldtZlg = Convert.ToDateTime(tableZlg.Rows[0][4]);
+                ldtZlg = Convert.ToDateTime(TblZahlungen.Rows[0][4]);
                 dr[4] = ldtZlg.AddMonths(1);       // Ende Datum
 
-                if (tableZlg.Rows[0][6] != DBNull.Value)   // Netto
+                if (TblZahlungen.Rows[0][6] != DBNull.Value)   // Netto
                 {
-                    dr[6] = tableZlg.Rows[0][6];
+                    dr[6] = TblZahlungen.Rows[0][6];
                 }
 
-                if (tableZlg.Rows[0][7] != DBNull.Value)   // Brutto
+                if (TblZahlungen.Rows[0][7] != DBNull.Value)   // Brutto
                 {
-                    dr[7] = tableZlg.Rows[0][7];
+                    dr[7] = TblZahlungen.Rows[0][7];
                 }
 
                 giTimelineId = liTimelineId;
@@ -1791,7 +1790,7 @@ namespace Ruddat_NK
                 btnZlSave.IsEnabled = true;
             }
 
-            tableZlg.Rows.Add(dr);
+            TblZahlungen.Rows.Add(dr);
             btnZlAdd.IsEnabled = false;
         }
 
@@ -1800,25 +1799,25 @@ namespace Ruddat_NK
         {
             int liTimelineId = 0;
             int liNkId = 0;
-            int liRows = tableZlg.Rows.Count;
+            int liRows = TblZahlungen.Rows.Count;
             DateTime ldtZlg = DateTime.MinValue;
 
             // Datum vorbelegen erst ab dem 2 ten Datensatz
             // Der neueste ist immer der oberste 0
-            if (liRows > 0 && tableZlg.Rows[0][4] != DBNull.Value && DgrZahlungen.SelectedIndex != 0)
+            if (liRows > 0 && TblZahlungen.Rows[0][4] != DBNull.Value && DgrZahlungen.SelectedIndex != 0)
             {
                 // Kostenart ID ermitteln Art 1 = Nebenkostenzahlungen
-                liNkId = Timeline.getKsaId(1, gsConnect, giDb);
+                liNkId = Timeline.GetKsaId(1, gsConnect, giDb);
 
                 // ID für Timeline ermitteln Art 2 = Zahlungs ID
                 liTimelineId = Timeline.getTimelineId(gsConnect, 2, giDb) + 1;
 
                 // Monat der vorhandenen Zahlung
-                ldtZlg = Convert.ToDateTime(tableZlg.Rows[0][4]);
+                ldtZlg = Convert.ToDateTime(TblZahlungen.Rows[0][4]);
 
                 for (int i = liRows; i < 12; i++)           // Ende bei 12 Monate
                 {
-                    DataRow dr = tableZlg.NewRow();
+                    DataRow dr = TblZahlungen.NewRow();
                     dr[2] = giObjekt;
                     dr[3] = giObjektTeil;
                     dr[1] = giMieter;
@@ -1827,17 +1826,17 @@ namespace Ruddat_NK
                     dr[12] = liNkId;            // Kostenart Nebenkosten
                     dr[4] = ldtZlg.AddMonths(i);       // Datum
 
-                    if (tableZlg.Rows[0][6] != DBNull.Value)   // Netto
+                    if (TblZahlungen.Rows[0][6] != DBNull.Value)   // Netto
                     {
-                        dr[6] = tableZlg.Rows[0][6];
+                        dr[6] = TblZahlungen.Rows[0][6];
                     }
 
-                    if (tableZlg.Rows[0][7] != DBNull.Value)   // Brutto
+                    if (TblZahlungen.Rows[0][7] != DBNull.Value)   // Brutto
                     {
-                        dr[7] = tableZlg.Rows[0][7];
+                        dr[7] = TblZahlungen.Rows[0][7];
                     }
 
-                    tableZlg.Rows.Add(dr);
+                    TblZahlungen.Rows.Add(dr);
 
                     liTimelineId++;
                 }
@@ -1904,7 +1903,7 @@ namespace Ruddat_NK
             if (liSel >= 0)
             {
 
-                DataRow dr = tableZlWert.Rows[liSel];
+                DataRow dr = TblZlWerte.Rows[liSel];
                 giDelZlWertId = (int)(dr[0]);                // Id des zu löschenden Datensatzes
 
 
@@ -1912,7 +1911,7 @@ namespace Ruddat_NK
                 {
                     liTimelineId = (int)dr[7];          // TimeLine ID holen                    
                     giTimelineId = liTimelineId;
-                    tableZlWert.Rows.Remove(dr);
+                    TblZlWerte.Rows.Remove(dr);
 
                     btnCntSave.Content = "wirklich löschen?";
                     btnCntSave.IsEnabled = true;
@@ -1934,15 +1933,15 @@ namespace Ruddat_NK
             // ID für Timeline ermitteln Art
             liTimelineId = Timeline.getTimelineId(gsConnect, 3, giDb) + 1;
             // KostenstellenartId Zähler ermitteln
-            liKsaId = Timeline.getKsaId(2, gsConnect, giDb);
+            liKsaId = Timeline.GetKsaId(2, gsConnect, giDb);
 
             // Nur wenn das Grid DgrCounters erzeugt wurde
             // Zählerstand ermöglichen
             if (DgrCounters.ItemsSource != null)
             {
-                DataRow dr = tableZlWert.NewRow();
+                DataRow dr = TblZlWerte.NewRow();
 
-                tableZlWert.Rows.Add(dr);
+                TblZlWerte.Rows.Add(dr);
                 dr[7] = liTimelineId;       // ID für Timeline
                 dr[8] = giObjekt;           // Objekt
                 dr[9] = giObjektTeil;       // Teilobjekt
@@ -2019,12 +2018,12 @@ namespace Ruddat_NK
                 {
                     lsArtVerteilung = getCurrentCellValue((ComboBox)e.EditingElement);
                     // Verteilung Kurzzeichen ermitteln
-                    lsArtVertKurz = Timeline.getVerteilungFromString(gsConnect, lsArtVerteilung, giDb);
+                    lsArtVertKurz = Timeline.GetVerteilungFromString(gsConnect, lsArtVerteilung, giDb);
                     // Wurde eine Bedingte Verteilung gewählt? Auswahlformular öffnen?
                     if (lsArtVertKurz == "fa")
                     {
                         // Objekt Mix neu anlegen mit Objekt ID und 
-                        liOk = Timeline.makeChoose(giObjekt, giTimelineId, gsConnect, giDb);
+                        liOk = Timeline.MakeChoose(giObjekt, giTimelineId, gsConnect, giDb);
                         // Objekt Mix Parts auswählen
                         WndChooseSet frmChooseSet = new WndChooseSet(this);
                         // Welche Datenbank
@@ -2064,7 +2063,7 @@ namespace Ruddat_NK
                     if (liMwstSatz == 99 && ((DgrRechnungen.Items[liSel] as DataRowView).Row.ItemArray[7] != DBNull.Value))
                     {
                         liMwstArt = Int32.Parse((DgrRechnungen.Items[liSel] as DataRowView).Row.ItemArray[7].ToString()); // Art Mehrwertsteuer
-                        liMwstSatz = Timeline.getMwstSatz(liMwstArt, gsConnect, giDb);
+                        liMwstSatz = Timeline.GetMwstSatz(liMwstArt, gsConnect, giDb);
                     }
                     else
                     {
@@ -2104,7 +2103,7 @@ namespace Ruddat_NK
                     if (liMwstSatz == 99 && ((DgrRechnungen.Items[liSel] as DataRowView).Row.ItemArray[7] != DBNull.Value))
                     {
                         liMwstArt = Int32.Parse((DgrRechnungen.Items[liSel] as DataRowView).Row.ItemArray[7].ToString()); // Art Mehrwertsteuer                            
-                        liMwstSatz = Timeline.getMwstSatz(liMwstArt, gsConnect, giDb);
+                        liMwstSatz = Timeline.GetMwstSatz(liMwstArt, gsConnect, giDb);
                     }
                     else
                     {
@@ -2277,11 +2276,11 @@ namespace Ruddat_NK
                 // hier nochmal schnell die Mieter ID eintragen, wenn ein Teilobjekt 
                 // gewählt wurde. Das Teilobjekt gibt den Wert an den derzeit
                 // gültigen Mieter weiter
-                if (x == 1 && tableZlg.Rows[liSel][3] != DBNull.Value)        // Teilobjekt ID ist vorhanden
+                if (x == 1 && TblZahlungen.Rows[liSel][3] != DBNull.Value)        // Teilobjekt ID ist vorhanden
                 {
-                    if ((int)tableZlg.Rows[liSel].ItemArray.GetValue(3) >= 0)
+                    if ((int)TblZahlungen.Rows[liSel].ItemArray.GetValue(3) >= 0)
                     {
-                        liObjTeilId = (int)tableZlg.Rows[liSel].ItemArray.GetValue(3);
+                        liObjTeilId = (int)TblZahlungen.Rows[liSel].ItemArray.GetValue(3);
                     }
                 }
 
@@ -2290,7 +2289,7 @@ namespace Ruddat_NK
                 // DGR und nicht die Itemliste
                 {
                     // MwstSatz holen
-                    liMwstSatz = Timeline.getMwstFromBez("normal", gsConnect, giDb);
+                    liMwstSatz = Timeline.GetMwstFromBez("normal", gsConnect, giDb);
                     // Element holen
                     TextBox t1 = e.EditingElement as TextBox;
                     lsNetto = t1.Text.ToString();
@@ -2310,7 +2309,7 @@ namespace Ruddat_NK
                 {
                     // Hier wird die Zelle des DataGrid ausgelesen, oder bei NewRow der Wert aus der globalen Variablen geholt
                     // MwstSatz holen
-                    liMwstSatz = Timeline.getMwstFromBez("normal", gsConnect, giDb);
+                    liMwstSatz = Timeline.GetMwstFromBez("normal", gsConnect, giDb);
                     // Element holen
                     TextBox t2 = e.EditingElement as TextBox;
                     lsBrutto = t2.Text.ToString();
@@ -2331,7 +2330,7 @@ namespace Ruddat_NK
                 // DGR und nicht die Itemliste
                 {
                     // MwstSatz holen
-                    liMwstSatz = Timeline.getMwstFromBez("normal", gsConnect, giDb);
+                    liMwstSatz = Timeline.GetMwstFromBez("normal", gsConnect, giDb);
                     // Element holen
                     TextBox t1 = e.EditingElement as TextBox;
                     lsNetto = t1.Text.ToString();
@@ -2352,7 +2351,7 @@ namespace Ruddat_NK
                 {
                     // Hier wird die Zelle des DataGrid ausgelesen, oder bei NewRow der Wert aus der globalen Variablen geholt
                     // MwstSatz holen
-                    liMwstSatz = Timeline.getMwstFromBez("normal", gsConnect, giDb);
+                    liMwstSatz = Timeline.GetMwstFromBez("normal", gsConnect, giDb);
                     // Element holen
                     TextBox t2 = e.EditingElement as TextBox;
                     lsBrutto = t2.Text.ToString();
@@ -2380,7 +2379,7 @@ namespace Ruddat_NK
             int liSel = DgrZahlungen.SelectedIndex;
             if (liSel >= 0)
             {
-                DataRow dr = tableZlg.Rows[liSel];
+                DataRow dr = TblZahlungen.Rows[liSel];
                 if (dr[10] != DBNull.Value)
                 {
                     liTimelineId = Int32.Parse(dr[10].ToString());           // TimeLine ID holen
@@ -2415,7 +2414,7 @@ namespace Ruddat_NK
 
             if (liSel >= 0)
             {
-                DataRow dr = tableZlWert.Rows[liSel];
+                DataRow dr = TblZlWerte.Rows[liSel];
                 if (dr[8] != DBNull.Value)
                 {
                     liTimelineId = Int32.Parse(dr[7].ToString());                  // TimeLine ID holen
@@ -2454,9 +2453,9 @@ namespace Ruddat_NK
                 if (x == 0)       // Gewählter Zähler Id ermitteln
                 {
                     lsZlName = getCurrentCellValue((ComboBox)e.EditingElement);
-                    liZlId = Timeline.getZlId(lsZlName, gsConnect, giDb);
+                    liZlId = Timeline.GetZlId(lsZlName, gsConnect, giDb);
                     // Das Feld Zähler Id befüllen
-                    tableZlWert.Rows[liSel][10] = liZlId;
+                    TblZlWerte.Rows[liSel][10] = liZlId;
 
                     giZlId = liZlId;
                 }
@@ -2468,9 +2467,9 @@ namespace Ruddat_NK
                     if (lsZlStand.Length > 0)
                     {
                         ldZlStand = Convert.ToDecimal(lsZlStand);
-                        if (tableZlWert.Rows[liSel][10] != DBNull.Value)                // Zähler Id aus DataGrid
+                        if (TblZlWerte.Rows[liSel][10] != DBNull.Value)                // Zähler Id aus DataGrid
                         {
-                            liZlId = Convert.ToInt32(tableZlWert.Rows[liSel][10]);      // Zähler Id  
+                            liZlId = Convert.ToInt32(TblZlWerte.Rows[liSel][10]);      // Zähler Id  
                             liFlagNew = 0;  // Datensatz wird editiert
                         }
                         if (giZlId > 0)     // Zähler Id aus globaler Variable
@@ -2481,7 +2480,7 @@ namespace Ruddat_NK
 
                         if (liZlId > 0)
                         {
-                            ldVerbrauch = Timeline.getZlVerbrauch(ldZlStand, liZlId, gsConnect, liFlagNew, giDb);
+                            ldVerbrauch = Timeline.GetZlVerbrauch(ldZlStand, liZlId, gsConnect, liFlagNew, giDb);
                             DataRowView oDataRowView = DgrCounters.SelectedItem as DataRowView;
                             oDataRowView.Row[3] = ldVerbrauch;
                         }
@@ -2494,13 +2493,13 @@ namespace Ruddat_NK
                 // DGR und nicht die Itemliste
                 {
                     // MwstSatz holen
-                    if (tableZlWert.Rows[liSel][10] == DBNull.Value && giZlId >= 0)
+                    if (TblZlWerte.Rows[liSel][10] == DBNull.Value && giZlId >= 0)
                     {
-                        liMwstSatz = Timeline.getMwstSatzZaehler(giZlId, gsConnect, giDb);
+                        liMwstSatz = Timeline.GetMwstSatzZaehler(giZlId, gsConnect, giDb);
                     }
                     else
                     {
-                        liMwstSatz = Timeline.getMwstSatzZaehler(Convert.ToInt32(tableZlWert.Rows[liSel][10]), gsConnect, giDb);
+                        liMwstSatz = Timeline.GetMwstSatzZaehler(Convert.ToInt32(TblZlWerte.Rows[liSel][10]), gsConnect, giDb);
                     }
                     // Element holen
                     TextBox t1 = e.EditingElement as TextBox;
@@ -2520,13 +2519,13 @@ namespace Ruddat_NK
                 if (x == 7)     // Brutto
                 {
                     // MwstSatz holen
-                    if (tableZlWert.Rows[liSel][10] == DBNull.Value && giZlId >= 0)
+                    if (TblZlWerte.Rows[liSel][10] == DBNull.Value && giZlId >= 0)
                     {
-                        liMwstSatz = Timeline.getMwstSatzZaehler(giZlId, gsConnect, giDb);
+                        liMwstSatz = Timeline.GetMwstSatzZaehler(giZlId, gsConnect, giDb);
                     }
                     else
                     {
-                        liMwstSatz = Timeline.getMwstSatzZaehler(Convert.ToInt32(tableZlWert.Rows[liSel][10]), gsConnect, giDb);
+                        liMwstSatz = Timeline.GetMwstSatzZaehler(Convert.ToInt32(TblZlWerte.Rows[liSel][10]), gsConnect, giDb);
                     }
                     // Element holen
                     TextBox t2 = e.EditingElement as TextBox;
@@ -2600,7 +2599,7 @@ namespace Ruddat_NK
                         liObjekt = Int16.Parse(giObjekt.ToString());
                         lsIdObj = liObjekt.ToString();
                         // Mieter Leerstand ermitteln
-                        liMieter = Timeline.getMieterLeerstandObjekt(liObjekt,gsConnect,giDb);
+                        liMieter = Timeline.GetMieterLeerstandObjekt(liObjekt,gsConnect,giDb);
 
                         DataRowView rowview = DgrLeer.SelectedItem as DataRowView;
                         // Es ist eine Leerstand gewählt

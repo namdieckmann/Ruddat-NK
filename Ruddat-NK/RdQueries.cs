@@ -747,7 +747,7 @@ namespace Ruddat_NK
                                 break;
                             case 116:                   // Jetzt wird es kompliziert > Objekt
                                                         // id der Verteilung ermitteln, dann wird kein Join benötigt
-                                int liId = Timeline.getVertId("nl", asConnectString, aiDb);
+                                int liId = Timeline.GetVertId("nl", asConnectString, aiDb);
                                 lsWhereAdd1 = " Where timeline.Id_objekt = " + piId.ToString() + " ";                     // Nur Zählerstände für das Objekt darstellen  
                                 lsSql = lsSql + lsWhereAdd1;                                                              // Es sollen nur ObjektKosten in der Nebenkostenabrechnung dargestellt werden
                                 lsAnd = " And ";
@@ -1065,14 +1065,14 @@ namespace Ruddat_NK
                             ldtStartTmp = adtWtStart;
                             ldtEndTmp = adtWtEnd;
                             liObjTeilId = piId;
-                            liObjId = Timeline.getIdObj(piId, asConnectString, 2, aiDb);
+                            liObjId = Timeline.GetIdObj(piId, asConnectString, 2, aiDb);
                             break;
                         case 203:       // Mieter Id übergeben
                             ldtStartTmp = adtWtStart;
                             ldtEndTmp = adtWtEnd;
                             liMieterId = piId;
-                            liObjTeilId = Timeline.getIdObjTeil(piId, asConnectString, aiDb);
-                            liObjId = Timeline.getIdObj(piId, asConnectString, 1, aiDb);
+                            liObjTeilId = Timeline.GetIdObjTeil(piId, asConnectString, aiDb);
+                            liObjId = Timeline.GetIdObj(piId, asConnectString, 1, aiDb);
                             break;
                         default:
                             break;

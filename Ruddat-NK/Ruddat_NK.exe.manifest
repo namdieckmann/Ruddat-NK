@@ -16,15 +16,15 @@
       <requestedPrivileges xmlns="urn:schemas-microsoft-com:asm.v3">
         <!--
           UAC-Manifestoptionen
-          Wenn Sie die Ebene der Windows-Benutzerkontensteuerung ändern möchten, ersetzen Sie den 
-          Knoten "requestedExecutionLevel" durch eine der folgenden Angaben.
+          Wenn Sie die Zugangsebene für das Windows-Benutzerkonto ändern möchten, ersetzen Sie den 
+          requestedExecutionLevel-Knoten durch eines der folgenden Elemente.
 
-        <requestedExecutionLevel level="asInvoker" uiAccess="false" />
-        <requestedExecutionLevel level="requireAdministrator" uiAccess="false" />
-        <requestedExecutionLevel level="highestAvailable" uiAccess="false" />
+        <requestedExecutionLevel  level="asInvoker" uiAccess="false" />
+        <requestedExecutionLevel  level="requireAdministrator" uiAccess="false" />
+        <requestedExecutionLevel  level="highestAvailable" uiAccess="false" />
 
-         Wenn Sie Datei- und Registrierungsvirtualisierung für Abwärtskompatibilität 
-         verwenden möchten, löschen Sie den Knoten "requestedExecutionLevel".
+         Löschen Sie den requestedExecutionLevel-Knoten, wenn Sie 
+         zum Gewährleisten der Abwärtskompatibilität die Datei- und Registrierungsvirtualisierung verwenden möchten.
     -->
         <requestedExecutionLevel level="asInvoker" uiAccess="false" />
       </requestedPrivileges>
@@ -115,14 +115,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Ruddat_NK.exe" size="2304512">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Ruddat_NK.exe" size="2305536">
       <assemblyIdentity name="Ruddat_NK" version="21.9.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>akvDX06vBt6upTyM+Q1Fbh9auShKEcv+CgNKFCMm8S0=</dsig:DigestValue>
+        <dsig:DigestValue>SBao7fGQUoZqvoKBfJIyta4+8GUyhTDdblQaQVy6Ofg=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>

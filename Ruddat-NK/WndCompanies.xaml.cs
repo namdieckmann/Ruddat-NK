@@ -56,7 +56,7 @@ namespace Ruddat_NK
             giDb = aiDb;
 
             // aktiven Mandanten ermitteln
-            liMandantId = Timeline.getMandantId(gsConnect, giDb);
+            liMandantId = Timeline.GetMandantId(gsConnect, giDb);
 
             // SqlSelect Firmen erstellen
             lsSql = getSql("cmp", 1, liMandantId);
@@ -255,7 +255,7 @@ namespace Ruddat_NK
             btnAdd.IsEnabled = false;
             btnSave.IsEnabled = true;
 
-            int liMandantId = Timeline.getMandantId(gsConnect, giDb);
+            int liMandantId = Timeline.GetMandantId(gsConnect, giDb);
 
             if (liMandantId > 0)
             {

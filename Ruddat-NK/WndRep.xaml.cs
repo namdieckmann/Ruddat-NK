@@ -347,7 +347,7 @@ namespace Ruddat_NK
                                 if (asReportName == "kosten" || asReportName == "kostenteilobjekt")  // Nebenkostenabrecnung
                                 {
                                     // Die Tabelle x_abr_content muss befüllt werden
-                                    liOk = Timeline.fill_content(asSql, asSqlContent, asSqlContent2, asDatVon, asDatBis, gsConnect, "", 0, aiDb);
+                                    liOk = Timeline.FillContent(asSql, asSqlContent, asSqlContent2, asDatVon, asDatBis, gsConnect, "", 0, aiDb);
                                     // Dann die Tabelle laden 
                                     // Hauptcontent für Abrechnung holen
                                     lsSqlContentShow = getSql("", 3, 0);
@@ -383,7 +383,7 @@ namespace Ruddat_NK
                                 if (asReportName == "kostendetail")  // Nebenkostenabrecnung detailliert
                                 {
                                     // Die Tabelle x_abr_content muss befüllt werden
-                                    liOk = Timeline.fill_content(asSql, asSqlContent, asSqlContent2, asDatVon, asDatBis, gsConnect, "", 0, aiDb);
+                                    liOk = Timeline.FillContent(asSql, asSqlContent, asSqlContent2, asDatVon, asDatBis, gsConnect, "", 0, aiDb);
                                     // Dann die Tabelle laden 
                                     // Hauptcontent für Abrechnung holen
                                     lsSqlContentShow = getSql("", 3, 0);
@@ -420,7 +420,7 @@ namespace Ruddat_NK
                                 {
 
                                     // Die Tabelle x_abr_content muss befüllt werden
-                                    liOk = Timeline.fill_content(asSql, asSqlContent, asSqlContent2, asDatVon, asDatBis, gsConnect, asSqlRgNr, 1, aiDb);
+                                    liOk = Timeline.FillContent(asSql, asSqlContent, asSqlContent2, asDatVon, asDatBis, gsConnect, asSqlRgNr, 1, aiDb);
                                     // Dann die Tabelle laden 
                                     // Hauptcontent für Abrechnung holen
                                     lsSqlContentShow = getSql("", 3, 0);
@@ -590,7 +590,7 @@ namespace Ruddat_NK
                                 if (asReportName == "kosten" || asReportName == "kostenteilobjekt")  // Nebenkostenabrecnung
                                 {
                                     // Die Tabelle x_abr_content muss befüllt werden
-                                    liOk = Timeline.fill_content(asSql, asSqlContent, asSqlContent2, asDatVon, asDatBis, gsConnect, "", 0, aiDb);
+                                    liOk = Timeline.FillContent(asSql, asSqlContent, asSqlContent2, asDatVon, asDatBis, gsConnect, "", 0, aiDb);
                                     // Dann die Tabelle laden 
                                     // Hauptcontent für Abrechnung holen
                                     lsSqlContentShow = getSql("", 3, 0);
@@ -626,7 +626,7 @@ namespace Ruddat_NK
                                 if (asReportName == "kostendetail")  // Nebenkostenabrecnung detailliert
                                 {
                                     // Die Tabelle x_abr_content muss befüllt werden
-                                    liOk = Timeline.fill_content(asSql, asSqlContent, asSqlContent2, asDatVon, asDatBis, gsConnect, "", 0, aiDb);
+                                    liOk = Timeline.FillContent(asSql, asSqlContent, asSqlContent2, asDatVon, asDatBis, gsConnect, "", 0, aiDb);
                                     // Dann die Tabelle laden 
                                     // Hauptcontent für Abrechnung holen
                                     lsSqlContentShow = getSql("", 3, 0);
@@ -663,7 +663,7 @@ namespace Ruddat_NK
                                 {
 
                                     // Die Tabelle x_abr_content muss befüllt werden
-                                    liOk = Timeline.fill_content(asSql, asSqlContent, asSqlContent2, asDatVon, asDatBis, gsConnect, asSqlRgNr, 1, aiDb);
+                                    liOk = Timeline.FillContent(asSql, asSqlContent, asSqlContent2, asDatVon, asDatBis, gsConnect, asSqlRgNr, 1, aiDb);
                                     // Dann die Tabelle laden 
                                     // Hauptcontent für Abrechnung holen
                                     lsSqlContentShow = getSql("", 3, 0);
