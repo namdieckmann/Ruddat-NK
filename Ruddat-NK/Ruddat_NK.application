@@ -4,17 +4,17 @@
   <description asmv2:publisher="Ruddat_NK" asmv2:product="Ruddat_NK" xmlns="urn:schemas-microsoft-com:asm.v1" />
   <deployment install="true" mapFileExtensions="true" co.v1:createDesktopShortcut="true" />
   <compatibleFrameworks xmlns="urn:schemas-microsoft-com:clickonce.v2">
-    <framework targetVersion="4.6" profile="Full" supportedRuntime="4.0.30319" />
+    <framework targetVersion="4.8" profile="Full" supportedRuntime="4.0.30319" />
   </compatibleFrameworks>
   <dependency>
-    <dependentAssembly dependencyType="install" codebase="Ruddat_NK.exe.manifest" size="10967">
+    <dependentAssembly dependencyType="install" codebase="Ruddat_NK.exe.manifest" size="11633">
       <assemblyIdentity name="Ruddat_NK.exe" version="1.0.1.163" publicKeyToken="0000000000000000" language="neutral" processorArchitecture="msil" type="win32" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>d3e7flt/JrvxIrsUkXH1aDHwDZSACRW/RiNhRUQImxI=</dsig:DigestValue>
+        <dsig:DigestValue>SGNZcv2sHyj1PhG3EH4R2tH4pJjpYBuR8E5q5j5+3CA=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>

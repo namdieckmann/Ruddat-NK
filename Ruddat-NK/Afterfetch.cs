@@ -6,7 +6,7 @@ using System.Windows;
 
 namespace Ruddat_NK
 {
-    internal class RdAfterFetch
+    internal class Afterfetch
     {
         static string lsSql = "";
 
@@ -79,7 +79,7 @@ namespace Ruddat_NK
         private delegate void DelPassDb(int giDb);
 
         // Datenbankaktionen nach Fetchdata
-        public static int MakeAfterFetch(int aiArt, int aiTeil, int ai1, int ai2, string asConnect, int aiDb)
+        public static int MakeAfterFetch(int aiArt, int aiTeil, int ai1, int ai2, string asConnect, MySqlDataAdapter aSda, DataTable aTbl)
         {
             DateTime ldtStart = DateTime.MinValue;
             DateTime ldtEnd = DateTime.MinValue;
@@ -108,7 +108,7 @@ namespace Ruddat_NK
 
             int zl = 0;
             int liZlgOrRg = 0;
-            int liExternId = 0;
+            int LiSourceId = 0;
             int liRechnungId = 0;
             int liZahlungId = 0;
             int liZaehlerstandId = 0;
@@ -121,61 +121,50 @@ namespace Ruddat_NK
             int liRgId = 0;             // Rechnungs ID
             int liZsId = 0;             // Zähler Id
 
+            int aiDb = 2;
+
             string lsVerteilung = "";
             //string lsObjektBez = "", lsObjektTeilBez = "";
             //string lsObjektBezS = "";
             int LiReturn = 0;
 
+            // Daten zuordnen
+            aSda.Fill(aTbl);
+
             switch (aiArt)
             {
                 case 1:
                     // Externe ID aus der Rechnung ermitteln 
-                    for (int i = 0; TblRechnungen.Rows.Count > i; i++)
+                    for (int i = 0; aTbl.Rows.Count > i; i++)
                     {
-                        if (TblRechnungen.Rows[i].ItemArray.GetValue(14) != DBNull.Value)
+                        if (aTbl.Rows[i].ItemArray.GetValue(14) != DBNull.Value)
                         {
+                            // Die Original Id der Rechnung
+                            LiSourceId = int.Parse(aTbl.Rows[i].ItemArray.GetValue(0).ToString());
 
-                            liExternId = (int)TblRechnungen.Rows[i].ItemArray.GetValue(14);
+                            // Erzeugte Unterrechnunen erstmal löschen Datenbank übergeben
+                            // Alle mit der Id der Hauptrechnung
+                            liOk = Timeline.DeleteRechnungen(LiSourceId, "R", asConnect);
 
-                            // Todo TimeLine nicht löschen
-                            // Timeline löschen
-                            // liOk = TimelineDelete(liExternId, "R", asConnect, aiDb);
-
-                            // Objekt
-                            if (TblRechnungen.Rows[i].ItemArray.GetValue(8) != DBNull.Value)
-                                if ((int)TblRechnungen.Rows[i].ItemArray.GetValue(8) > 0)
+                            // Objekt > Rechnungen für Objektteile
+                            if (aTbl.Rows[i].ItemArray.GetValue(8) != DBNull.Value)
+                                if ((int)aTbl.Rows[i].ItemArray.GetValue(8) > 0)
                                 {
-                                    liObjekt = (int)TblRechnungen.Rows[i].ItemArray.GetValue(8);
-
-
-                                    // Todo Keine TimeLine erzeugen
-                                    // Timeline neu erzeugen Objekte aus Rechnungen
-                                    // liOk = TimelineCreate(liExternId, "id_rechnung", asConnect, aiDb);
+                                    liObjekt = (int)aTbl.Rows[i].ItemArray.GetValue(8);
 
                                     // Weiterleitung an ObjektTeil aus der Kostenart ermitteln
                                     // 1 = Weiterleitung an Teilobjekt
-                                    if (Timeline.GetWeiterleitung(1, liExternId, asConnect, aiDb) == 1)
+                                    if (Timeline.GetWeiterleitung(1, LiSourceId, asConnect, aiDb) == 1)
                                     {
                                         liObjektTeil = 0;
                                         liArtRelation = 1;
 
-                                        // Todo erstmal keine Timeline
-                                        // Timeline neu erzeugen für Relationen
-                                        // liOk = TimelineCreateRelations(liExternId, liObjekt, liObjektTeil, liMieter, liArtRelation, asConnect, aiDb);
-
-                                        // 2 = Weiterleitung an Mieter
-                                        if (Timeline.GetWeiterleitung(2, liExternId, asConnect, aiDb) == 1)
-                                        {
-                                            liObjekt = 0;
-                                            liObjektTeil = 1;   // Auslöser für das Weiterleiten an Mieter
-                                            liArtRelation = 1;
-
-                                            // Todo erstmal keine Timeline
-                                            // Timeline neu erzeugen für Relationen
-                                            // liOk = TimelineCreateRelations(liExternId, liObjekt, liObjektTeil, liMieter, liArtRelation, asConnect, aiDb);
-                                        }
+                                        // Rechnungen für alle zugehörigen Objektteile erzeugen
+                                        liOk = Timeline.CreateRechnungen(LiSourceId, liObjekt, liObjektTeil, liMieter, liArtRelation, aSda, aTbl);
                                     }
                                 }
+
+                            // Todo : Das hier nichr mehr machen
 
                             // ObjektTeil
                             if (TblRechnungen.Rows[i].ItemArray.GetValue(9) != DBNull.Value)
@@ -187,7 +176,7 @@ namespace Ruddat_NK
                                     // liOk = TimelineCreate(liExternId, "id_rechnung", asConnect, aiDb);
                                     // Weiterleitung an ObjektTeil aus der Kostenart ermitteln
                                     // 2 = Weiterleitung an Mieter
-                                    if (Timeline.GetWeiterleitung(2, liExternId, asConnect, aiDb) == 1)
+                                    if (Timeline.GetWeiterleitung(2, LiSourceId, asConnect, aiDb) == 1)
                                     {
                                         liArtRelation = 1;
                                         // Todo erstmal keine Timeline
@@ -222,8 +211,8 @@ namespace Ruddat_NK
                             {
                                 if (TblRechnungen.Rows[i].ItemArray.GetValue(14) != DBNull.Value)
                                 {
-                                    liExternId = (int)TblRechnungen.Rows[i].ItemArray.GetValue(14);
-                                    LiReturn = liExternId;
+                                    LiSourceId = (int)TblRechnungen.Rows[i].ItemArray.GetValue(14);
+                                    LiReturn = LiSourceId;
                                 }
                                 else
                                 {
@@ -238,7 +227,7 @@ namespace Ruddat_NK
                             {
                                 if (TblRechnungen.Rows[i].ItemArray.GetValue(14) != DBNull.Value)
                                 {
-                                    liExternId = (int)TblRechnungen.Rows[i].ItemArray.GetValue(14);
+                                    LiSourceId = (int)TblRechnungen.Rows[i].ItemArray.GetValue(14);
                                     if (TblRechnungen.Rows[i].ItemArray.GetValue(8) != DBNull.Value)
                                         liObjekt = (int)TblRechnungen.Rows[i].ItemArray.GetValue(8);
                                     if (TblRechnungen.Rows[i].ItemArray.GetValue(9) != DBNull.Value)
@@ -278,7 +267,7 @@ namespace Ruddat_NK
                                     {
                                         DataRow dr = TblTimelineNew.NewRow();
 
-                                        dr[1] = liExternId;
+                                        dr[1] = LiSourceId;
                                         dr[4] = liObjekt;
                                         dr[5] = liObjektTeil;
                                         dr[6] = liMieter;
@@ -742,9 +731,9 @@ namespace Ruddat_NK
                     {
                         if (TblZlg.Rows[i].ItemArray.GetValue(10) != DBNull.Value)
                         {
-                            liExternId = (int)TblZlg.Rows[i].ItemArray.GetValue(10);
+                            LiSourceId = (int)TblZlg.Rows[i].ItemArray.GetValue(10);
                             // Timeline löschen
-                            liOk = Timeline.TimelineDelete(liExternId, "A", asConnect, aiDb);
+                            liOk = Timeline.TimelineDelete(LiSourceId, "A", asConnect, aiDb);
 
                             // Objekt
                             if (TblZlg.Rows[i].ItemArray.GetValue(2) != DBNull.Value)
@@ -752,7 +741,7 @@ namespace Ruddat_NK
                                 {
                                     liObjekt = (int)TblZlg.Rows[i].ItemArray.GetValue(2);
                                     // Timeline neu erzeugen Objekte aus Rechnungen
-                                    liOk = Timeline.TimelineCreate(liExternId, "id_vorauszahlung", asConnect, aiDb);
+                                    liOk = Timeline.TimelineCreate(LiSourceId, "id_vorauszahlung", asConnect, aiDb);
                                 }
                             // ObjektTeil
                             if (TblZlg.Rows[i].ItemArray.GetValue(3) != DBNull.Value)
@@ -761,7 +750,7 @@ namespace Ruddat_NK
                                     liObjektTeil = (int)TblZlg.Rows[i].ItemArray.GetValue(3);
                                     ldtMonat = Convert.ToDateTime(TblZlg.Rows[i].ItemArray.GetValue(4));
                                     // Timeline neu erzeugen Objektteile aus Rechnungen
-                                    liOk = Timeline.TimelineCreate(liExternId, "id_vorauszahlung", asConnect, aiDb);
+                                    liOk = Timeline.TimelineCreate(LiSourceId, "id_vorauszahlung", asConnect, aiDb);
 
                                     // Weiterleitung an aktiven Mieter
                                     liMieter = 0;
@@ -771,7 +760,7 @@ namespace Ruddat_NK
                                     {
                                         liArtRelation = 2;
                                         // Timeline neu erzeugen für Relationen
-                                        liOk = Timeline.TimelineCreateRelations(liExternId, liObjekt, liObjektTeil, liMieter, liArtRelation, asConnect, aiDb);
+                                        liOk = Timeline.TimelineCreateRelations(LiSourceId, liObjekt, liObjektTeil, liMieter, liArtRelation, asConnect, aiDb);
                                     }
                                 }
 
@@ -782,7 +771,7 @@ namespace Ruddat_NK
                                     liMieter = (int)TblZlg.Rows[i].ItemArray.GetValue(1);
                                     // Timeline neu erzeugen Mieter aus Zahlungen
                                     // TODO ACHTUNG hier Kontrolle einbauen, ob Mietvertrag gültig ist
-                                    liOk = Timeline.TimelineCreate(liExternId, "id_vorauszahlung", asConnect, aiDb);
+                                    liOk = Timeline.TimelineCreate(LiSourceId, "id_vorauszahlung", asConnect, aiDb);
                                 }
                         }
                         else
@@ -802,7 +791,7 @@ namespace Ruddat_NK
                             {
                                 if (TblZlgNew.Rows[i].ItemArray.GetValue(10) != DBNull.Value)
                                 {
-                                    liExternId = (int)TblZlgNew.Rows[i].ItemArray.GetValue(10);
+                                    LiSourceId = (int)TblZlgNew.Rows[i].ItemArray.GetValue(10);
                                 }
                                 else
                                 {
@@ -818,7 +807,7 @@ namespace Ruddat_NK
                             {
                                 if (TblZlgNew.Rows[i].ItemArray.GetValue(10) != DBNull.Value)
                                 {
-                                    liExternId = (int)TblZlgNew.Rows[i].ItemArray.GetValue(10);
+                                    LiSourceId = (int)TblZlgNew.Rows[i].ItemArray.GetValue(10);
                                     if (TblZlgNew.Rows[i].ItemArray.GetValue(1) != DBNull.Value)
                                         liMieter = (int)TblZlgNew.Rows[i].ItemArray.GetValue(1);
                                     if (TblZlgNew.Rows[i].ItemArray.GetValue(2) != DBNull.Value)
@@ -853,7 +842,7 @@ namespace Ruddat_NK
                                     {
                                         DataRow dr = TblTml.NewRow();
 
-                                        dr[2] = liExternId;
+                                        dr[2] = LiSourceId;
                                         dr[4] = liObjekt;
                                         dr[5] = liObjektTeil;
                                         dr[6] = liMieter;
@@ -911,9 +900,9 @@ namespace Ruddat_NK
                     {
                         if (TblCnt.Rows[i].ItemArray.GetValue(8) != DBNull.Value)
                         {
-                            liExternId = (int)TblCnt.Rows[i].ItemArray.GetValue(8);
+                            LiSourceId = (int)TblCnt.Rows[i].ItemArray.GetValue(8);
                             // Timeline löschen
-                            liOk = Timeline.TimelineDelete(liExternId, "Z", asConnect, aiDb);
+                            liOk = Timeline.TimelineDelete(LiSourceId, "Z", asConnect, aiDb);
 
                             // Objekt
                             if (TblCnt.Rows[i].ItemArray.GetValue(9) != DBNull.Value)
@@ -921,7 +910,7 @@ namespace Ruddat_NK
                                 {
                                     liObjekt = (int)TblCnt.Rows[i].ItemArray.GetValue(9);
                                     // Timeline neu erzeugen Objekte aus Zählerständen
-                                    liOk = Timeline.TimelineCreate(liExternId, "id_zaehlerstand", asConnect, aiDb);
+                                    liOk = Timeline.TimelineCreate(LiSourceId, "id_zaehlerstand", asConnect, aiDb);
                                 }
 
                             // ObjektTeil
@@ -931,7 +920,7 @@ namespace Ruddat_NK
                                     liObjektTeil = (int)TblCnt.Rows[i].ItemArray.GetValue(10);
                                     ldtMonat = Convert.ToDateTime(TblCnt.Rows[i].ItemArray.GetValue(4));
                                     // Timeline neu erzeugen Objektteile aus Zählerständen
-                                    liOk = Timeline.TimelineCreate(liExternId, "id_zaehlerstand", asConnect, aiDb);
+                                    liOk = Timeline.TimelineCreate(LiSourceId, "id_zaehlerstand", asConnect, aiDb);
 
                                     // Weiterleitung an aktiven Mieter
                                     liMieter = Timeline.GetAktMieter(liObjektTeil, ldtMonat, asConnect, aiDb);
@@ -940,7 +929,7 @@ namespace Ruddat_NK
                                     {
                                         liArtRelation = 3;
                                         // Timeline neu erzeugen für Relationen
-                                        liOk = Timeline.TimelineCreateRelations(liExternId, liObjekt, liObjektTeil, liMieter, liArtRelation, asConnect, aiDb);
+                                        liOk = Timeline.TimelineCreateRelations(LiSourceId, liObjekt, liObjektTeil, liMieter, liArtRelation, asConnect, aiDb);
                                     }
                                 }
 
@@ -968,7 +957,7 @@ namespace Ruddat_NK
                     {
                         if (TblCntNew.Rows[i].ItemArray.GetValue(8) != DBNull.Value)
                         {
-                            liExternId = (int)TblCntNew.Rows[i].ItemArray.GetValue(8);
+                            LiSourceId = (int)TblCntNew.Rows[i].ItemArray.GetValue(8);
 
                             if (TblCntNew.Rows[i].ItemArray.GetValue(0) != DBNull.Value)
                                 liZsId = (int)TblCntNew.Rows[i].ItemArray.GetValue(0);            // Id Zählerstand
@@ -989,7 +978,7 @@ namespace Ruddat_NK
 
                             DataRow dr = TblTml.NewRow();
 
-                            dr[3] = liExternId;     // id Zählerstand
+                            dr[3] = LiSourceId;     // id Zählerstand
                             dr[4] = liObjekt;
                             dr[5] = liObjektTeil;
                             dr[6] = liMieter;

@@ -162,7 +162,7 @@ namespace Ruddat_NK
                 if (liImportId > 0)
                 {
                     // Timeline erzeugen
-                    Timeline.editTimeline(liImportId, 13, gsConnect, giDb);
+                    Timeline.EditRechung(liImportId, 13, gsConnect, giDb);
                 }
                 else
                 {
@@ -1043,7 +1043,7 @@ namespace Ruddat_NK
                             dr[13] = liHeaderId;            // Import ID
 
                             // Timeline schreiben
-                            Timeline.editTimeline(liTimelineId, 11, gsConnect, giDb);
+                            Timeline.EditRechung(liTimelineId, 11, gsConnect, giDb);
 
                             liTimelineId++;
                             table_zlg.Rows.Add(dr);

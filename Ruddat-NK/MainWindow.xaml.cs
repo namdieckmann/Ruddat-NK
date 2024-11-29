@@ -20,15 +20,15 @@ namespace Ruddat_NK
         private string gsConnect = "";
         private int giMandantId = 0;                  // Mandant        
         private int giFiliale = 0;                  // Angewählte Firma (Aus xml Konfig, den letzten Wert holen)
-        private int giObjekt = 0;                   // Objekt global
-        private int giObjektTeil = 0;               // Objektteil global
-        private int giMieter = 0;                   // Mieter global
+        private int GiObjekt = 0;                   // Objekt global
+        private int GiObjektTeil = 0;               // Objektteil global
+        private int GiMieter = 0;                   // Mieter global
         private int giDelId = 0;                    // Rechnungsdatensatz löschen
         private int giDelZlId = 0;                  // Zahlungsdatensatz löschen
         private int giDelZlWertId = 0;              // Zählerwert löschen
         private int giZlId = 0;                     // Zähler Id
-        private int giTimelineId = 0;               // TimelineId für löschen
-        private int giFlagTimeline = 0;             // Flag TimeLinebearbeitung
+        private int GiRgId = 0;               // TimelineId für löschen
+        private int GiFlagTimeline = 0;             // Flag TimeLinebearbeitung
         private int giIndex = 0;                    // Index > Objekt, Teil oder Mieter 1,2,3
         private int giMwstSatz = 99;                // Mwst Satz ! Null > 0 gibs ja
         private int giMwstSatzZl = 99;              // Für Zähler
@@ -843,7 +843,7 @@ namespace Ruddat_NK
                         // db close
                         con.Close();
                     }
-                    catch (MySqlException myex)
+                    catch (MySqlException)
                     {
                         // Die Anwendung anhalten 
                         MessageBox.Show("Verarbeitungsfehler ERROR fetchdata main MySQL \n piArt = " + piArt.ToString(),
@@ -1270,9 +1270,9 @@ namespace Ruddat_NK
                     liRows = FetchData(lsSqlHeader, 17, giDb, gsConnect);
 
                     // Global Objekt Id
-                    giObjekt = liId;
-                    giObjektTeil = 0;
-                    giMieter = 0;
+                    GiObjekt = liId;
+                    GiObjektTeil = 0;
+                    GiMieter = 0;
 
                     break;
                 case 2:     // ObjektTeil
@@ -1341,9 +1341,9 @@ namespace Ruddat_NK
                     lsSqlLeerstand = RdQueries.GetSqlSelect(223, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);     // für Report
 
                     // Global TeilObjekt Id
-                    giObjekt = 0;
-                    giObjektTeil = liId;
-                    giMieter = 0;
+                    GiObjekt = 0;
+                    GiObjektTeil = liId;
+                    GiMieter = 0;
 
                     break;
                 case 3:         // Mieter
@@ -1402,9 +1402,9 @@ namespace Ruddat_NK
                     liRows = FetchData(lsSqlHeader, 17, giDb, gsConnect);
 
                     // Global Mieter Id
-                    giObjekt = 0;
-                    giObjektTeil = 0;
-                    giMieter = liId;
+                    GiObjekt = 0;
+                    GiObjektTeil = 0;
+                    GiMieter = liId;
                     break;
                 default:
                     break;
@@ -1593,7 +1593,7 @@ namespace Ruddat_NK
             liOk = FetchData("", 35, giDb, gsConnect);
 
             // Timeline bearbeiten    giFlagTimeline 1 = Rechnungen
-            Timeline.editTimeline(giTimelineId, giFlagTimeline, gsConnect, giDb);
+            Timeline.EditRechung(GiRgId, GiFlagTimeline, gsConnect, giDb);
 
             // Delete Kommando muss extra erzeugt werden
             // Gibt es eine Datensatz ID zum Löschen (button btnRgDel)
@@ -1606,7 +1606,7 @@ namespace Ruddat_NK
 
             // Die IDs und Flags zurücksetzen
             giDelId = 0;
-            giTimelineId = 0;
+            GiRgId = 0;
             giMwstSatz = 99;
 
             // save Button Rechnungen wieder aus
@@ -1621,18 +1621,18 @@ namespace Ruddat_NK
         {
 
             // gewählten Datensatz ermitteln
-            int liTimelineId = 0;
+            int LiRgId = 0;
+            int LiSel = DgrRechnungen.SelectedIndex;
 
-            int liSel = DgrRechnungen.SelectedIndex;
-            if (liSel >= 0)
+            if (LiSel >= 0)
             {
-                DataRow dr = TblRechnungen.Rows[liSel];
+                DataRow dr = TblRechnungen.Rows[LiSel];
                 if (dr[14] != DBNull.Value)
                 {
-                    liTimelineId = Int32.Parse(dr[14].ToString());           // TimeLine ID holen
+                    LiRgId = Int32.Parse(dr[0].ToString());           // RechnungsId holen
                 }
-                giTimelineId = liTimelineId;
-                giFlagTimeline = 1;                                         // 1 = Rechnung bearbeiten
+                GiRgId = LiRgId;
+                GiFlagTimeline = 1;                                         // 1 = Rechnung bearbeiten
 
             }
 
@@ -1644,57 +1644,38 @@ namespace Ruddat_NK
         private void btnRgAdd_Click(object sender, RoutedEventArgs e)
         {
 
-            int liTimelineId = 0;
-            int liRows = TblRechnungen.Rows.Count;
-
-            // ID für Timeline ermitteln Art 1 = Rechnungs ID
-            liTimelineId = Timeline.getTimelineId(gsConnect, 1, giDb) + 1;
-
             DataRow dr = TblRechnungen.NewRow();
-            dr[8] = giObjekt;
-            dr[9] = giObjektTeil;
-            dr[10] = giMieter;
-            dr[14] = liTimelineId;      // ID für Timeline
+            dr[8] = GiObjekt;
+            dr[9] = GiObjektTeil;
+            dr[10] = GiMieter;
             dr[15] = 1;                 // Flag für Timelinebearbeitung erzeugen
-
-            // Datum vorbelegen erst ab dem 2 ten Datensatz
-            if (liRows > 0)
-            {
-                dr[2] = TblRechnungen.Rows[liRows - 1][2];       // Rechnungsdatum
-                dr[3] = TblRechnungen.Rows[liRows - 1][3];       // Start Datum
-                dr[4] = TblRechnungen.Rows[liRows - 1][4];       // Ende Datum
-            }
 
             TblRechnungen.Rows.Add(dr);
 
             btnRgAdd.IsEnabled = false;
-
         }
 
         // Rechnungen Button löschen
         private void btnRgDel_Click(object sender, RoutedEventArgs e)
         {
-            int liTimelineId = 0;
+            int LiSel = DgrRechnungen.SelectedIndex;
 
-            int liSel = DgrRechnungen.SelectedIndex;
-            if (liSel >= 0)
+            if (LiSel >= 0)
             {
 
-                DataRow dr = TblRechnungen.Rows[liSel];
+                DataRow dr = TblRechnungen.Rows[LiSel];
                 giDelId = (int)(dr[0]);                // Id des zu löschenden Datensatzes
 
 
                 if (dr[14] != DBNull.Value)
                 {
-                    liTimelineId = (int)dr[14];          // TimeLine ID holen                    
-                    giTimelineId = liTimelineId;
                     TblRechnungen.Rows.Remove(dr);
 
                     btnRgSave.Content = "wirklich löschen?";
                     btnRgSave.IsEnabled = true;
                     btnRgAdd.IsEnabled = false;
 
-                    giFlagTimeline = 2;                 // Rechnung löschen
+                    GiFlagTimeline = 2;                 // Rechnung löschen
                     // delete Button zu
                     btnRgDel.IsEnabled = false;
                 }
@@ -1706,7 +1687,7 @@ namespace Ruddat_NK
         {
             int liOk = 0;
             int liRows = 0;
-            int liNkId = 0;
+            // int liNkId = 0;
             int liTimelineId = 0;
             string lsSql = "";
 
@@ -1727,7 +1708,7 @@ namespace Ruddat_NK
                     {
                         Int32.TryParse(TblZahlungen.Rows[i][10].ToString(), out liTimelineId);       // Timeline Id holen
 
-                        Timeline.editTimeline(liTimelineId, liFlagTimeline, gsConnect, giDb);   // Timeline aktualisieren
+                        Timeline.EditRechung(liTimelineId, liFlagTimeline, gsConnect, giDb);   // Timeline aktualisieren
                     }
                 }
             }
@@ -1737,7 +1718,7 @@ namespace Ruddat_NK
 
             // Die IDs und Flags zurücksetzen
             giDelZlId = 0;
-            giTimelineId = 0;
+            GiRgId = 0;
 
             // save Button Zahlungen wieder aus
             btnZlSave.IsEnabled = false;
@@ -1760,9 +1741,9 @@ namespace Ruddat_NK
             liNkId = Timeline.GetKsaId(1, gsConnect, giDb);
 
             DataRow dr = TblZahlungen.NewRow();
-            dr[2] = giObjekt;
-            dr[3] = giObjektTeil;
-            dr[1] = giMieter;
+            dr[2] = GiObjekt;
+            dr[3] = GiObjektTeil;
+            dr[1] = GiMieter;
             dr[10] = liTimelineId;      // ID für Timeline
             dr[11] = 1;                 // Flag für Timelinebearbeitung erzeugen
             dr[12] = liNkId;            // Kostenart Nebenkosten
@@ -1784,8 +1765,8 @@ namespace Ruddat_NK
                     dr[7] = TblZahlungen.Rows[0][7];
                 }
 
-                giTimelineId = liTimelineId;
-                giFlagTimeline = 11;                                         // 11 = Zahlung bearbeiten
+                GiRgId = liTimelineId;
+                GiFlagTimeline = 11;                                         // 11 = Zahlung bearbeiten
 
                 btnZlSave.IsEnabled = true;
             }
@@ -1818,9 +1799,9 @@ namespace Ruddat_NK
                 for (int i = liRows; i < 12; i++)           // Ende bei 12 Monate
                 {
                     DataRow dr = TblZahlungen.NewRow();
-                    dr[2] = giObjekt;
-                    dr[3] = giObjektTeil;
-                    dr[1] = giMieter;
+                    dr[2] = GiObjekt;
+                    dr[3] = GiObjektTeil;
+                    dr[1] = GiMieter;
                     dr[10] = liTimelineId;      // ID für Timeline
                     dr[11] = 1;                 // Flag für Timelinebearbeitung erzeugen
                     dr[12] = liNkId;            // Kostenart Nebenkosten
@@ -1841,8 +1822,8 @@ namespace Ruddat_NK
                     liTimelineId++;
                 }
 
-                giTimelineId = liTimelineId;
-                giFlagTimeline = 11;                                         // 11 = Zahlung bearbeiten
+                GiRgId = liTimelineId;
+                GiFlagTimeline = 11;                                         // 11 = Zahlung bearbeiten
                 btnZlSave.IsEnabled = true;
             }
 
@@ -1853,7 +1834,7 @@ namespace Ruddat_NK
         {
             int liTimelineId = 0;
 
-            giFlagTimeline = 12;                // 12 = Zahlung löschen
+            GiFlagTimeline = 12;                // 12 = Zahlung löschen
 
             // Durch alle zum Löschen gewählten Datensätze
             if (DgrZahlungen.SelectedItems.Count > 0)
@@ -1867,7 +1848,7 @@ namespace Ruddat_NK
                     liTimelineId = (int)selectedFile.Row.ItemArray[10];          // TimeLine ID holen                    
 
                     // Timeline bearbeiten Art 12 = Zahlungen löschen
-                    Timeline.editTimeline(liTimelineId, giFlagTimeline, gsConnect, giDb);
+                    Timeline.EditRechung(liTimelineId, GiFlagTimeline, gsConnect, giDb);
 
                     // Delete Kommando muss extra erzeugt werden
                     // Gibt es eine Datensatz ID zum Löschen
@@ -1910,14 +1891,14 @@ namespace Ruddat_NK
                 if (dr[7] != DBNull.Value || liTest == 1)
                 {
                     liTimelineId = (int)dr[7];          // TimeLine ID holen                    
-                    giTimelineId = liTimelineId;
+                    GiRgId = liTimelineId;
                     TblZlWerte.Rows.Remove(dr);
 
                     btnCntSave.Content = "wirklich löschen?";
                     btnCntSave.IsEnabled = true;
                     btnCntAdd.IsEnabled = false;
 
-                    giFlagTimeline = 22;                 // Zählerwert löschen
+                    GiFlagTimeline = 22;                 // Zählerwert löschen
                     // delete Button zu
                     btnCntDel.IsEnabled = false;
                 }
@@ -1943,8 +1924,8 @@ namespace Ruddat_NK
 
                 TblZlWerte.Rows.Add(dr);
                 dr[7] = liTimelineId;       // ID für Timeline
-                dr[8] = giObjekt;           // Objekt
-                dr[9] = giObjektTeil;       // Teilobjekt
+                dr[8] = GiObjekt;           // Objekt
+                dr[9] = GiObjektTeil;       // Teilobjekt
                 dr[11] = liKsaId;           // Kostenstellenart einsetzen
 
                 btnCntAdd.IsEnabled = false;
@@ -1965,7 +1946,7 @@ namespace Ruddat_NK
             liOk = FetchData("", 39, giDb, gsConnect);
 
             // Timeline bearbeiten Art 21 = Zähler   
-            Timeline.editTimeline(giTimelineId, giFlagTimeline, gsConnect, giDb);
+            Timeline.EditRechung(GiRgId, GiFlagTimeline, gsConnect, giDb);
 
             // Delete Kommando muss extra erzeugt werden
             // Gibt es eine Datensatz ID zum Löschen (button btnCntDel)
@@ -1982,7 +1963,7 @@ namespace Ruddat_NK
             // Die IDs und Flags zurücksetzen
             giDelZlWertId = 0;
             giZlId = 0;                 // globale Zähler Id
-            giTimelineId = 0;
+            GiRgId = 0;
             giMwstSatzZl = 99;
 
             // Save Button Zähler wieder aus
@@ -2023,7 +2004,7 @@ namespace Ruddat_NK
                     if (lsArtVertKurz == "fa")
                     {
                         // Objekt Mix neu anlegen mit Objekt ID und 
-                        liOk = Timeline.MakeChoose(giObjekt, giTimelineId, gsConnect, giDb);
+                        liOk = Timeline.MakeChoose(GiObjekt, GiRgId, gsConnect, giDb);
                         // Objekt Mix Parts auswählen
                         WndChooseSet frmChooseSet = new WndChooseSet(this);
                         // Welche Datenbank
@@ -2031,10 +2012,10 @@ namespace Ruddat_NK
                         delegt4(giDb);
                         // Übergabe der TimeLine ID an das Auswahlfenster
                         delPassData delegt = new delPassData(frmChooseSet.getTimelineId);
-                        delegt(giTimelineId);
+                        delegt(GiRgId);
                         // Übergabe der Objekt ID
                         delPassData delegt2 = new delPassData(frmChooseSet.getObjektId);
-                        delegt2(giObjekt);
+                        delegt2(GiObjekt);
                         // Übergabe, ob Datensatz existiert oder wurde neu angelegt 1,2
                         delPassData delegt3 = new delPassData(frmChooseSet.getArt);
                         delegt3(liOk);
@@ -2187,13 +2168,13 @@ namespace Ruddat_NK
                 switch (giIndex)
                 {
                     case 1:
-                        lsIdObj = giObjekt.ToString();
+                        lsIdObj = GiObjekt.ToString();
                         break;
                     case 2:
-                        lsIdObj = giObjektTeil.ToString();
+                        lsIdObj = GiObjektTeil.ToString();
                         break;
                     case 3:
-                        lsIdObj = giMieter.ToString();
+                        lsIdObj = GiMieter.ToString();
                         break;
                     default:
                         break;
@@ -2384,8 +2365,8 @@ namespace Ruddat_NK
                 {
                     liTimelineId = Int32.Parse(dr[10].ToString());           // TimeLine ID holen
                 }
-                giTimelineId = liTimelineId;
-                giFlagTimeline = 11;                                         // 11 = Zahlung bearbeiten
+                GiRgId = liTimelineId;
+                GiFlagTimeline = 11;                                         // 11 = Zahlung bearbeiten
 
             }
             // Button Save auf
@@ -2418,8 +2399,8 @@ namespace Ruddat_NK
                 if (dr[8] != DBNull.Value)
                 {
                     liTimelineId = Int32.Parse(dr[7].ToString());                  // TimeLine ID holen
-                    giTimelineId = liTimelineId;
-                    giFlagTimeline = 21;                                           // 21 = Zähler bearbeiten
+                    GiRgId = liTimelineId;
+                    GiFlagTimeline = 21;                                           // 21 = Zähler bearbeiten
                 }
             }
             // Button Save auf
@@ -2596,7 +2577,7 @@ namespace Ruddat_NK
                 {
                     case 1:
                         // Daten für Leerstand Details zeigen
-                        liObjekt = Int16.Parse(giObjekt.ToString());
+                        liObjekt = Int16.Parse(GiObjekt.ToString());
                         lsIdObj = liObjekt.ToString();
                         // Mieter Leerstand ermitteln
                         liMieter = Timeline.GetMieterLeerstandObjekt(liObjekt,gsConnect,giDb);
@@ -2614,7 +2595,7 @@ namespace Ruddat_NK
                         }
                         break;
                     case 2:
-                        lsIdObj = giObjektTeil.ToString();
+                        lsIdObj = GiObjektTeil.ToString();
                         DataRowView rowview1 = DgrLeer.SelectedItem as DataRowView;
                         // Es ist eine Leerstand gewählt
                         if (rowview1.Row[5] != DBNull.Value)
@@ -2629,7 +2610,7 @@ namespace Ruddat_NK
                         }
                         break;
                     case 3:
-                        lsIdObj = giMieter.ToString();
+                        lsIdObj = GiMieter.ToString();
                         break;
                     default:
                         break;
