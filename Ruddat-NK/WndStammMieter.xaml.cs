@@ -69,9 +69,9 @@ namespace Ruddat_NK
             giDb = aiDb;
 
             // Mandanten ID ermitteln
-            liMandantId = Timeline.GetMandantId(gsConnect,giDb);
+            liMandantId = Timeline.GetMandantId(gsConnect);
             // Filiale Id ermitteln
-            liFiliale = Timeline.GetFilialeId(liMandantId, gsConnect, giDb);
+            liFiliale = Timeline.GetFilialeId(liMandantId, gsConnect);
 
             // SqlSelect Firmen erstellen
             lsSql = getSql(1, liMandantId);

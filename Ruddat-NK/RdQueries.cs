@@ -9,7 +9,8 @@ namespace Ruddat_NK
     public class RdQueries
     {
         // Sql-Statement erstellen
-        public static string GetSqlSelect(int piArt, int piId, string ps2, string ps3, string ps4, DateTime adtWtStart, DateTime adtWtEnd, int aiFiliale, string asConnectString, int aiDb)
+        public static string GetSqlSelect(int piArt, int piId, string ps2, string ps3, string ps4, 
+            DateTime adtWtStart, DateTime adtWtEnd, int aiFiliale, string asConnectString, int aiDb)
         {
             String lsSql = "";
             String lsWhereAdd = "";
@@ -204,7 +205,8 @@ namespace Ruddat_NK
                                 text,
                                 id_extern_timeline,
                                 flag_timeline,
-                                id_verteilung
+                                id_verteilung,
+                                id_rechnung_source
 					        from rechnungen
 					        where id_objekt = " + piId.ToString() + lsWhereAdd2 +
                                 " Order by rechnungen.datum_rechnung desc";
@@ -233,7 +235,8 @@ namespace Ruddat_NK
                                 text,
                                 id_extern_timeline,
                                 flag_timeline,
-                                id_verteilung
+                                id_verteilung,
+                                id_rechnung_source
 					        from rechnungen
 					        where id_objekt_teil = " + piId.ToString() + lsWhereAdd2 +
                                 " Order by rechnungen.datum_rechnung desc";
@@ -262,7 +265,8 @@ namespace Ruddat_NK
                                     text,
                                     id_extern_timeline,
                                     flag_timeline,
-                                    id_verteilung
+                                    id_verteilung,
+                                    id_rechnung_source
                             from rechnungen
 					        where id_mieter = " + piId.ToString() + lsWhereAdd2 +
                                 " Order by rechnungen.datum_rechnung desc";
@@ -276,10 +280,10 @@ namespace Ruddat_NK
                             lsWhereAdd = " Where ksa_objekt = 1 ";
                             break;
                         case 2: // Objektteil
-                            lsWhereAdd = " Where ksa_obj_teil = 1 ";
+                            lsWhereAdd = " Where ksa_obj_teil = 1 or ksa_objekt = 1 ";
                             break;
                         case 3: // Mieter
-                            lsWhereAdd = " Where ksa_mieter = 1 ";
+                            lsWhereAdd = " Where ksa_mieter = 1 or ksa_obj_teil = 1 or ksa_objekt = 1 ";
                             break;
                         case 4: // Zahlung
                             lsWhereAdd = " Where ksa_zahlung = 1 ";
@@ -747,7 +751,7 @@ namespace Ruddat_NK
                                 break;
                             case 116:                   // Jetzt wird es kompliziert > Objekt
                                                         // id der Verteilung ermitteln, dann wird kein Join benötigt
-                                int liId = Timeline.GetVertId("nl", asConnectString, aiDb);
+                                int liId = Timeline.GetVertId("nl", asConnectString);
                                 lsWhereAdd1 = " Where timeline.Id_objekt = " + piId.ToString() + " ";                     // Nur Zählerstände für das Objekt darstellen  
                                 lsSql = lsSql + lsWhereAdd1;                                                              // Es sollen nur ObjektKosten in der Nebenkostenabrechnung dargestellt werden
                                 lsAnd = " And ";
@@ -1065,14 +1069,14 @@ namespace Ruddat_NK
                             ldtStartTmp = adtWtStart;
                             ldtEndTmp = adtWtEnd;
                             liObjTeilId = piId;
-                            liObjId = Timeline.GetIdObj(piId, asConnectString, 2, aiDb);
+                            liObjId = Timeline.GetIdObj(piId, asConnectString, 2);
                             break;
                         case 203:       // Mieter Id übergeben
                             ldtStartTmp = adtWtStart;
                             ldtEndTmp = adtWtEnd;
                             liMieterId = piId;
-                            liObjTeilId = Timeline.GetIdObjTeil(piId, asConnectString, aiDb);
-                            liObjId = Timeline.GetIdObj(piId, asConnectString, 1, aiDb);
+                            liObjTeilId = Timeline.GetIdObjTeil(piId, asConnectString);
+                            liObjId = Timeline.GetIdObj(piId, asConnectString, 1);
                             break;
                         default:
                             break;
