@@ -280,10 +280,10 @@ namespace Ruddat_NK
                             lsWhereAdd = " Where ksa_objekt = 1 ";
                             break;
                         case 2: // Objektteil
-                            lsWhereAdd = " Where ksa_obj_teil = 1 or ksa_objekt = 1 ";
+                            lsWhereAdd = " Where ksa_obj_teil = 1 OR ksa_objekt = 1";
                             break;
                         case 3: // Mieter
-                            lsWhereAdd = " Where ksa_mieter = 1 or ksa_obj_teil = 1 or ksa_objekt = 1 ";
+                            lsWhereAdd = " Where ksa_mieter = 1 ";
                             break;
                         case 4: // Zahlung
                             lsWhereAdd = " Where ksa_zahlung = 1 ";

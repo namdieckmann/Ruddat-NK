@@ -189,6 +189,7 @@
     <Compile Include="Afterfetch.cs" />
     <Compile Include="RdFunctions.cs" />
     <Compile Include="RdQueries.cs" />
+    <Compile Include="RdQueriesFunctions.cs" />
     <Compile Include="RdQueriesTime.cs" />
     <Compile Include="WndAboutBox1.cs">
       <SubType>Form</SubType>
@@ -228,9 +229,6 @@
     </Compile>
     <Compile Include="WndStammZaehler.xaml.cs">
       <DependentUpon>WndStammZaehler.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="public void CheckIfWindowIsOpen%28%29.xaml.cs">
-      <DependentUpon>public void CheckIfWindowIsOpen%28%29.xaml</DependentUpon>
     </Compile>
     <Compile Include="WndTimlineCalc.xaml.cs">
       <DependentUpon>WndTimlineCalc.xaml</DependentUpon>
@@ -294,10 +292,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="WndStammZaehler.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="public void CheckIfWindowIsOpen%28%29.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
