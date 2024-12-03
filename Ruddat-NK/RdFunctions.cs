@@ -62,8 +62,8 @@ namespace Ruddat_NK
         private delegate void DelPassDb(int giDb);
 
         // ----------------------------------------------------------------------------------------------
-        // Bisher höchste Id für Timeline ermitteln
-        public static int getTimelineId(string asConnect, int asArt, int aiDb)
+        // Bisher höchste Id ermitteln
+        public static int getTmpId(string asConnect, int asArt)
         {
             Int32 liGetLastTempId = 0;
 
@@ -83,7 +83,7 @@ namespace Ruddat_NK
         // Zählerstände
         // Flag = 21 > ändern
         // Flag = 22 > löschen
-        public static void EditRechung(int LiIdRechnung, int LiObjektId, int liFlagAdd, string asConnect)
+        public static void EditRechung(int LiIdRechnungTmp, int LiObjektId, int liFlagAdd, string asConnect)
         {
             string LsSql = "";
             string LsSql2 = "";
@@ -95,40 +95,40 @@ namespace Ruddat_NK
             {
                 case 1:
                     // Rechnungen Daten holen mit id extern timeline
-                    LsSql = RdQueriesFunctions.GetSql(1, LiIdRechnung, "", "", 0);                // Rechnungen
+                    LsSql = RdQueriesFunctions.GetSql(1, LiIdRechnungTmp, "", "", 0);                // temporäre Id Rechnungen
                     LsSql2 = RdQueriesFunctions.GetSql(6, LiObjektId, "", "", 0);                 // Liste der Teilobjekte dazuholen
-                    LsSql3 = RdQueriesFunctions.GetSql(31,LiIdRechnung, "id_extern_timeline", "",0 );                // Timeline New
+                    LsSql3 = RdQueriesFunctions.GetSql(31,LiIdRechnungTmp, "id_extern_timeline", "",0 );                // Timeline New
                     liRows = Timeline.FetchData(LsSql, LsSql2, LsSql3, 1, asConnect);           // TblRechnungen
                     break;
                 case 2:
                     // Rechnung Timeline löschen
-                    liOk = Timeline.DeleteTimeline(LiIdRechnung, "R", asConnect);
+                    liOk = Timeline.DeleteTimeline(LiIdRechnungTmp, "R", asConnect);
                     break;
                 case 11:
                     // Zahlungen Daten holen mit id extern timeline
-                    LsSql = RdQueriesFunctions.GetSql(12, LiIdRechnung, "", "", 0);
+                    LsSql = RdQueriesFunctions.GetSql(12, LiIdRechnungTmp, "", "", 0);
                     // Sql, Art = 11 
                     liRows = Timeline.FetchData(LsSql, "", "", 11, asConnect);
                     break;
                 case 12:
                     // Zahlungen Timeline löschen 
-                    liOk = Timeline.DeleteTimeline(LiIdRechnung, "A", asConnect);
+                    liOk = Timeline.DeleteTimeline(LiIdRechnungTmp, "A", asConnect);
                     break;
                 case 13:
                     // Zahlungen importieren. Nur anderes SQL Statement, sonst wie Case 11
-                    LsSql = RdQueriesFunctions.GetSql(13, LiIdRechnung, "", "", 0);
+                    LsSql = RdQueriesFunctions.GetSql(13, LiIdRechnungTmp, "", "", 0);
                     // Sql, Art = 11 
                     liRows = Timeline.FetchData(LsSql, "", "", 11, asConnect);
                     break;
                 case 21:
                     // Zählerstände Daten holen mit id extern timeline
-                    LsSql = RdQueriesFunctions.GetSql(21, LiIdRechnung, "", "", 0);
+                    LsSql = RdQueriesFunctions.GetSql(21, LiIdRechnungTmp, "", "", 0);
                     // Sql, Art = 21 
                     liRows = Timeline.FetchData(LsSql, "", "", 21, asConnect);
                     break;
                 case 22:
                     // Zählerstände Timeline löschen
-                    liOk = Timeline.DeleteTimeline(LiIdRechnung, "Z", asConnect);
+                    liOk = Timeline.DeleteTimeline(LiIdRechnungTmp, "Z", asConnect);
                     break;
                 default:
                     break;
@@ -885,24 +885,22 @@ namespace Ruddat_NK
         }
 
         // Gesamtfläche eines Objektes holen
-        public static decimal GetObjektflaeche(int aiObjekt, int aiTObjekt, int aiMieterId, string asConnect)
+        public static decimal GetObjektflaeche(int aiObjekt, int aiTeilObjekt, int aiMieterId, string asConnect)
         {
-            int liObjTeilId = 0;
-            int liObjId = 0;
             decimal ldGesamtflaeche = 0;
             String lsSql = "";
 
             // Mieter ID vorhanden
             if (aiMieterId > 0)
             {
-                liObjTeilId = GetIdObjTeil(aiMieterId, asConnect);
-                liObjId = GetIdObj(liObjTeilId, asConnect, 2);
+                int liObjTeilId = GetIdObjTeil(aiMieterId, asConnect);
+                int liObjId = GetIdObj(aiTeilObjekt, asConnect, 2);
                 lsSql = "SELECT flaeche_gesamt FROM objekt  WHERE id_objekt = " + liObjId.ToString();
             }
             // TeilObjekt ID vorhanden
-            if (aiTObjekt > 0)
+            if (aiTeilObjekt > 0)
             {
-                liObjId = GetIdObj(liObjTeilId, asConnect, 2);
+                int liObjId = GetIdObj(aiTeilObjekt, asConnect, 2);
                 lsSql = "SELECT flaeche_gesamt FROM objekt  WHERE id_objekt = " + liObjId.ToString();
             }
             // Objekt ID vorhanden
@@ -1006,12 +1004,12 @@ namespace Ruddat_NK
 
         // Ist eine Weitergabe der Kosten in art_kostenart eingetragen
         // 1 = Weiterleitung
-        public static int GetWeiterleitung(int p, int liExternId, string asConnect)
+        public static int GetWeiterleitung(int AiWahl, int liExternId, string asConnect)
         {
             int liWtl = 0;
             string lsSql = "";
 
-            lsSql = RdQueriesFunctions.GetSql(28, liExternId, "", "", p);
+            lsSql = RdQueriesFunctions.GetSql(28, liExternId, "", "", AiWahl);
             liWtl = FetchData(lsSql, "", "", 26, asConnect);
 
             return liWtl;
@@ -1117,7 +1115,7 @@ namespace Ruddat_NK
         // Die Nebenkosten ID in der Tabelle art_KostenArt ermitteln
         // Art 1 = Zahlung Nebenkosten
         // Art 2 = Zählerstände
-        public static int GetKsaId(int aiArt, String asConnect, int aiDb)
+        public static int GetKsaId(int aiArt, String asConnect)
         {
             int liKsaId = 0;
             String lsSql = "";

@@ -191,6 +191,7 @@
     <Compile Include="RdQueries.cs" />
     <Compile Include="RdQueriesFunctions.cs" />
     <Compile Include="RdQueriesTime.cs" />
+    <Compile Include="RdTrash.cs" />
     <Compile Include="WndAboutBox1.cs">
       <SubType>Form</SubType>
     </Compile>

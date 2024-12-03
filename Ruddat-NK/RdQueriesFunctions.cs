@@ -43,9 +43,10 @@ namespace Ruddat_NK
                                     id_extern_timeline,
                                     flag_timeline,
                                     id_verteilung,
-                                    id_rechnung_source
+                                    id_rechnung_source,
+                                    flag_editable
                             FROM rechnungen
-					         WHERE id_rechnungen = " + lsWhereAdd +
+					         WHERE id_extern_timeline = " + lsWhereAdd +
                           " ORDER BY rechnungen.datum_rechnung desc";
                     break;
                 case 200:
@@ -400,18 +401,16 @@ namespace Ruddat_NK
                 case 27:
                     lsSql = "SELECT id_objekt_teil FROM objekt_mix_parts  WHERE sel = 1 and id_objekt_teil = " + piId.ToString();
                     break;
-                case 28:
+                case 28:        // Weiterleitung Info holen
                     switch (piId2)
                     {
                         case 1:
                             // Weiterleitung an Objektteil
                             lsSql = "SELECT wtl_obj_teil FROM dbo.art_kostenart WHERE Id_ksa =" + piId.ToString();
                             break;
-                        // Weiterleitung an Mieter
+                            // Weiterleitung an Mieter
                         case 2:
-                            lsSql = @"SELECT art_kostenart.wtl_mieter FROM timeline 
-                                join art_kostenart on timeline.id_ksa = art_kostenart.id_ksa
-                                 WHERE timeline.id_rechnung = " + piId.ToString();
+                            lsSql = "SELECT wtl_mieter FROM dbo.art_kostenart WHERE Id_ksa =" + piId.ToString();
                             break;
                         default:
                             break;
@@ -446,8 +445,8 @@ namespace Ruddat_NK
                             break;
                     }
                     break;
-                case 32:        // Die VerteilungsId aus Rechnungen ermitteln
-                    lsSql = @"SELECT id_verteilung FROM rechnungen  WHERE id_extern_timeline = " + piId.ToString();
+                case 32:        // Die VerteilungsId aus der übergeordneten Rechnungen ermitteln
+                    lsSql = @"SELECT id_verteilung FROM rechnungen  WHERE id_rechnungen = " + piId.ToString();
                     break;
                 case 33:        // Verteilungs ID aus art_verteilung ermitteln
                     lsSql = @"SELECT id_verteilung FROM art_verteilung  WHERE kb = '" + ps2.ToString() + "'";

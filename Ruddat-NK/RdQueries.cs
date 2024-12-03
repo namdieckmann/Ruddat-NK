@@ -206,7 +206,8 @@ namespace Ruddat_NK
                                 id_extern_timeline,
                                 flag_timeline,
                                 id_verteilung,
-                                id_rechnung_source
+                                id_rechnung_source,
+                                flag_editable
 					        from rechnungen
 					        where id_objekt = " + piId.ToString() + lsWhereAdd2 +
                                 " Order by rechnungen.datum_rechnung desc";
@@ -236,7 +237,8 @@ namespace Ruddat_NK
                                 id_extern_timeline,
                                 flag_timeline,
                                 id_verteilung,
-                                id_rechnung_source
+                                id_rechnung_source,
+                                flag_editable
 					        from rechnungen
 					        where id_objekt_teil = " + piId.ToString() + lsWhereAdd2 +
                                 " Order by rechnungen.datum_rechnung desc";
@@ -266,7 +268,8 @@ namespace Ruddat_NK
                                     id_extern_timeline,
                                     flag_timeline,
                                     id_verteilung,
-                                    id_rechnung_source
+                                    id_rechnung_source,
+                                    flag_editable
                             from rechnungen
 					        where id_mieter = " + piId.ToString() + lsWhereAdd2 +
                                 " Order by rechnungen.datum_rechnung desc";
@@ -805,7 +808,9 @@ namespace Ruddat_NK
                                     firma,
                                     text,
                                     id_extern_timeline,
-                                    flag_timeline
+                                    flag_timeline,
+                                    id_rechnung_souce,
+                                    flag_editable
 				            from rechnungen
                                     left join art_kostenart on rechnungen.id_ksa = art_kostenart.id_ksa
                                     left join art_mwst on rechnungen.id_mwst_art = art_mwst.id_mwst_art
@@ -836,7 +841,9 @@ namespace Ruddat_NK
                                     firma,
                                     text,
                                     id_extern_timeline,
-                                    flag_timeline
+                                    flag_timeline,
+                                    id_rechnung_source,
+                                    flag_editable
 				            from rechnungen
                                     left join art_kostenart on rechnungen.id_ksa = art_kostenart.id_ksa
                                     left join art_mwst on rechnungen.id_mwst_art = art_mwst.id_mwst_art
@@ -867,7 +874,9 @@ namespace Ruddat_NK
                                     firma,
                                     text,
                                     id_extern_timeline,
-                                    flag_timeline
+                                    flag_timeline,
+                                    id_rechnung_source,
+                                    flag_editable
 				            from rechnungen
                                     left join art_kostenart on rechnungen.id_ksa = art_kostenart.id_ksa
                                     left join art_mwst on rechnungen.id_mwst_art = art_mwst.id_mwst_art
