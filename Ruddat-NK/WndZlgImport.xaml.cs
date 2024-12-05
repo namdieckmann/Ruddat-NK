@@ -162,7 +162,7 @@ namespace Ruddat_NK
                 if (liImportId > 0)
                 {
                     // Timeline erzeugen
-                    Timeline.EditRechung(liImportId, 0,13, gsConnect);
+                    Timeline.EditRechung(liImportId, 0,13, 0, gsConnect);
                 }
                 else
                 {
@@ -920,6 +920,7 @@ namespace Ruddat_NK
             return liObjTeilId;
         }
 
+        // Todo 2412 Überprüfen
         // Hier werden die Daten von import_dirty nach zahlungen umkopiert
         private int TableCopy()
         {
@@ -1043,7 +1044,7 @@ namespace Ruddat_NK
                             dr[13] = liHeaderId;            // Import ID
 
                             // Timeline schreiben
-                            Timeline.EditRechung(liTimelineId, 0, 11, gsConnect);
+                            Timeline.EditRechung(liTimelineId, 0, 11, 0, gsConnect);
 
                             liTimelineId++;
                             table_zlg.Rows.Add(dr);

@@ -243,6 +243,30 @@ namespace Ruddat_NK
 					        where id_objekt_teil = " + piId.ToString() + lsWhereAdd2 +
                                 " Order by rechnungen.datum_rechnung desc";
                     break;
+                case 91:
+                    // Zum Ertellen von Untergeordneten Rechnungen aus TeilObjekte für Mieter
+                    lsSql = @"select id_rechnungen,
+                                id_ksa,
+                                datum_rechnung as datum,
+                                datum_von as von,
+                                datum_bis as bis,
+                                betrag_netto netto,
+                                betrag_brutto brutto,
+                                id_mwst_art,
+                                id_objekt,
+                                id_objekt_teil,
+                                id_mieter,
+                                rg_nr,
+                                firma,
+                                text,
+                                id_extern_timeline,
+                                flag_timeline,
+                                id_verteilung,
+                                id_rechnung_source,
+                                flag_editable
+					        from rechnungen
+					        where id_rechnungen = 1";
+                    break;
                 case 10:
                     // Rechnungsdarstellung für Mieter
                     lsAnd = " And ";

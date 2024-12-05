@@ -23,9 +23,9 @@ namespace Ruddat_NK
         private string gsConnect = "";
         private int giMandantId = 0;                  // Mandant        
         private int giFiliale = 0;                  // Angewählte Firma (Aus xml Konfig, den letzten Wert holen)
-        private int GiObjekt = 0;                   // Objekt global
-        private int GiObjektTeil = 0;               // Objektteil global
-        private int GiMieter = 0;                   // Mieter global
+        private int GiObjektId = 0;                   // Objekt global
+        private int GiObjektTeilId = 0;               // Objektteil global
+        private int GiMieterId = 0;                   // Mieter global
         private int giDelId = 0;                    // Rechnungsdatensatz löschen
         private int giDelZlId = 0;                  // Zahlungsdatensatz löschen
         private int giDelZlWertId = 0;              // Zählerwert löschen
@@ -979,9 +979,9 @@ namespace Ruddat_NK
                     liRows = FetchData(lsSqlHeader, 17, giDb, gsConnect);
 
                     // Global Objekt Id
-                    GiObjekt = liId;
-                    GiObjektTeil = 0;
-                    GiMieter = 0;
+                    GiObjektId = liId;
+                    GiObjektTeilId = 0;
+                    GiMieterId = 0;
 
                     break;
                 case 2:     // ObjektTeil
@@ -1007,13 +1007,16 @@ namespace Ruddat_NK
                     lsSql = RdQueries.GetSqlSelect(11, liIndex, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
                     liRows = FetchData(lsSql, 11, giDb, gsConnect);
 
+                    // Combobox Zählernummern und mwst in Zähler
+                    lsSql = RdQueries.GetSqlSelect(2222, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
+                    liRows = FetchData(lsSql, 22, giDb, gsConnect);
+
                     // Die TeilObjekt ID ermitteln
                     lsSql = RdQueries.GetSqlSelect(3, giFiliale, gsItemHeader, "2", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
                     liId = FetchData(lsSql, 4, giDb, gsConnect);
 
-                    // Combobox Zählernummern und mwst in Zähler
-                    lsSql = RdQueries.GetSqlSelect(2222, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
-                    liRows = FetchData(lsSql, 22, giDb, gsConnect);
+                    // Untergordnete Rechungen und Timline für Mieter erzeugen (alte erstmal löschen)
+                    Timeline.EditRechung(0, 0, liId, 3, gsConnect);
 
                     // TimeLine holen für ObjektTeile
                     lsSql = RdQueries.GetSqlSelect(6, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
@@ -1050,9 +1053,9 @@ namespace Ruddat_NK
                     lsSqlLeerstand = RdQueries.GetSqlSelect(223, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);     // für Report
 
                     // Global TeilObjekt Id
-                    GiObjekt = 0;
-                    GiObjektTeil = liId;
-                    GiMieter = 0;
+                    GiObjektId = 0;
+                    GiObjektTeilId = liId;
+                    GiMieterId = 0;
 
                     break;
                 case 3:         // Mieter
@@ -1111,9 +1114,9 @@ namespace Ruddat_NK
                     liRows = FetchData(lsSqlHeader, 17, giDb, gsConnect);
 
                     // Global Mieter Id
-                    GiObjekt = 0;
-                    GiObjektTeil = 0;
-                    GiMieter = liId;
+                    GiObjektId = 0;
+                    GiObjektTeilId = 0;
+                    GiMieterId = liId;
                     break;
                 default:
                     break;
@@ -1305,7 +1308,7 @@ namespace Ruddat_NK
             LiObkjektId = int.Parse(TblRechnungen.Rows[DgrRechnungen.SelectedIndex][8].ToString());
 
             // Timeline bearbeiten    giFlagTimeline 1 = Rechnungen
-            Timeline.EditRechung(GiRechnungId, LiObkjektId, GiFlagTimeline, gsConnect);
+            Timeline.EditRechung(GiRechnungId, LiObkjektId, 0, GiFlagTimeline, gsConnect);
 
             // Die IDs und Flags zurücksetzen
             GiRechnungId = 0;
@@ -1349,9 +1352,9 @@ namespace Ruddat_NK
             GiRechnungId = liTmpId;
 
             DataRow dr = TblRechnungen.NewRow();
-            dr[8] = GiObjekt;
-            dr[9] = GiObjektTeil;
-            dr[10] = GiMieter;
+            dr[8] = GiObjektId;
+            dr[9] = GiObjektTeilId;
+            dr[10] = GiMieterId;
             dr[14] = liTmpId;
             dr[15] = 1;                 // Flag für Bearbeitung erzeugen
 
@@ -1426,7 +1429,7 @@ namespace Ruddat_NK
                     {
                         Int32.TryParse(TblZahlungen.Rows[i][10].ToString(), out liTimelineId);       // Timeline Id holen
 
-                        Timeline.EditRechung(liTimelineId, 0,liFlagTimeline, gsConnect);   // Timeline aktualisieren
+                        Timeline.EditRechung(liTimelineId, 0,liFlagTimeline, 0, gsConnect);   // Timeline aktualisieren
                     }
                 }
             }
@@ -1459,9 +1462,9 @@ namespace Ruddat_NK
             liNkId = Timeline.GetKsaId(1, gsConnect);
 
             DataRow dr = TblZahlungen.NewRow();
-            dr[2] = GiObjekt;
-            dr[3] = GiObjektTeil;
-            dr[1] = GiMieter;
+            dr[2] = GiObjektId;
+            dr[3] = GiObjektTeilId;
+            dr[1] = GiMieterId;
             dr[10] = liTimelineId;      // ID für Timeline
             dr[11] = 1;                 // Flag für Timelinebearbeitung erzeugen
             dr[12] = liNkId;            // Kostenart Nebenkosten
@@ -1517,9 +1520,9 @@ namespace Ruddat_NK
                 for (int i = liRows; i < 12; i++)           // Ende bei 12 Monate
                 {
                     DataRow dr = TblZahlungen.NewRow();
-                    dr[2] = GiObjekt;
-                    dr[3] = GiObjektTeil;
-                    dr[1] = GiMieter;
+                    dr[2] = GiObjektId;
+                    dr[3] = GiObjektTeilId;
+                    dr[1] = GiMieterId;
                     dr[10] = liTimelineId;      // ID für Timeline
                     dr[11] = 1;                 // Flag für Timelinebearbeitung erzeugen
                     dr[12] = liNkId;            // Kostenart Nebenkosten
@@ -1566,7 +1569,7 @@ namespace Ruddat_NK
                     liTimelineId = (int)selectedFile.Row.ItemArray[10];          // TimeLine ID holen                    
 
                     // Timeline bearbeiten Art 12 = Zahlungen löschen
-                    Timeline.EditRechung(liTimelineId, 0, GiFlagTimeline, gsConnect);
+                    Timeline.EditRechung(liTimelineId, 0, GiFlagTimeline, 0, gsConnect);
 
                     // Delete Kommando muss extra erzeugt werden
                     // Gibt es eine Datensatz ID zum Löschen
@@ -1642,8 +1645,8 @@ namespace Ruddat_NK
 
                 TblZlWerte.Rows.Add(dr);
                 dr[7] = liTmpId;       // ID für Timeline
-                dr[8] = GiObjekt;           // Objekt
-                dr[9] = GiObjektTeil;       // Teilobjekt
+                dr[8] = GiObjektId;           // Objekt
+                dr[9] = GiObjektTeilId;       // Teilobjekt
                 dr[11] = liKsaId;           // Kostenstellenart einsetzen
 
                 btnCntAdd.IsEnabled = false;
@@ -1664,7 +1667,7 @@ namespace Ruddat_NK
             liOk = FetchData("", 39, giDb, gsConnect);
 
             // Timeline bearbeiten Art 21 = Zähler   
-            Timeline.EditRechung(GiRechnungId, 0, GiFlagTimeline, gsConnect);
+            Timeline.EditRechung(GiRechnungId, 0, GiFlagTimeline, 0, gsConnect);
 
             // Delete Kommando muss extra erzeugt werden
             // Gibt es eine Datensatz ID zum Löschen (button btnCntDel)
@@ -1722,7 +1725,7 @@ namespace Ruddat_NK
                     if (lsArtVertKurz == "fa")
                     {
                         // Objekt Mix neu anlegen mit Objekt ID und 
-                        liOk = Timeline.MakeChoose(GiObjekt, GiRechnungId, gsConnect, giDb);
+                        liOk = Timeline.MakeChoose(GiObjektId, GiRechnungId, gsConnect, giDb);
                         // Objekt Mix Parts auswählen
                         WndChooseSet frmChooseSet = new WndChooseSet(this);
                         // Welche Datenbank
@@ -1733,7 +1736,7 @@ namespace Ruddat_NK
                         delegt(GiRechnungId);
                         // Übergabe der Objekt ID
                         delPassData delegt2 = new delPassData(frmChooseSet.getObjektId);
-                        delegt2(GiObjekt);
+                        delegt2(GiObjektId);
                         // Übergabe, ob Datensatz existiert oder wurde neu angelegt 1,2
                         delPassData delegt3 = new delPassData(frmChooseSet.getArt);
                         delegt3(liOk);
@@ -1886,13 +1889,13 @@ namespace Ruddat_NK
                 switch (giIndex)
                 {
                     case 1:
-                        lsIdObj = GiObjekt.ToString();
+                        lsIdObj = GiObjektId.ToString();
                         break;
                     case 2:
-                        lsIdObj = GiObjektTeil.ToString();
+                        lsIdObj = GiObjektTeilId.ToString();
                         break;
                     case 3:
-                        lsIdObj = GiMieter.ToString();
+                        lsIdObj = GiMieterId.ToString();
                         break;
                     default:
                         break;
@@ -2295,7 +2298,7 @@ namespace Ruddat_NK
                 {
                     case 1:
                         // Daten für Leerstand Details zeigen
-                        liObjekt = Int16.Parse(GiObjekt.ToString());
+                        liObjekt = Int16.Parse(GiObjektId.ToString());
                         lsIdObj = liObjekt.ToString();
                         // Mieter Leerstand ermitteln
                         liMieter = Timeline.GetMieterLeerstandObjekt(liObjekt,gsConnect,giDb);
@@ -2313,7 +2316,7 @@ namespace Ruddat_NK
                         }
                         break;
                     case 2:
-                        lsIdObj = GiObjektTeil.ToString();
+                        lsIdObj = GiObjektTeilId.ToString();
                         DataRowView rowview1 = DgrLeer.SelectedItem as DataRowView;
                         // Es ist eine Leerstand gewählt
                         if (rowview1.Row[5] != DBNull.Value)
@@ -2328,7 +2331,7 @@ namespace Ruddat_NK
                         }
                         break;
                     case 3:
-                        lsIdObj = GiMieter.ToString();
+                        lsIdObj = GiMieterId.ToString();
                         break;
                     default:
                         break;
