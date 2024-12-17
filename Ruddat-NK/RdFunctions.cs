@@ -92,57 +92,57 @@ namespace Ruddat_NK
             int liRows = 0;
             int liOk = 0;
 
-            switch (liFlagAdd)
-            {
-                case 1:
-                    // Rechnungen Daten holen mit id extern timeline für Objekte
-                    // Rechnung Schreiben an Teilobjekte
-                    LsSql = RdQueriesFunctions.GetSql(1, LiIdRechnungTmp, "", "", 0);                       // temporäre Id Rechnungen
-                    LsSql2 = RdQueriesFunctions.GetSql(6, LiObjektId, "", "", 0);                           // Liste der Objekte dazuholen
-                    LsSql3 = RdQueriesFunctions.GetSql(31,LiIdRechnungTmp, "id_extern_timeline", "",0 );    // Timeline New
-                    liRows = Timeline.FetchData(LsSql, LsSql2, LsSql3, 1, asConnect);                       // TblRechnungen
-                    break;
-                case 2:
-                    // Rechnung Timeline löschen
-                    liOk = Timeline.DeleteTimeline(LiIdRechnungTmp, "R", asConnect);
-                    break;
-                case 3:
-                    // Rechnungen Daten holen mit id extern timeline für Teilobjekt
-                    // Rechnung erzeugen an Mieter
-                    LsSql = RdQueriesFunctions.GetSql(1, LiIdRechnungTmp, "", "", 0);                       // Rechnungen für die Teilobjekt ID holen
-                    LsSql2 = RdQueriesFunctions.GetSql(6, LiTeilObjektId, "", "", 0);                       // Liste der Teilobjekte dazuholen?
-                    LsSql3 = RdQueriesFunctions.GetSql(31, LiIdRechnungTmp, "id_extern_timeline", "", 0);   // Timeline New
-                    liRows = Timeline.FetchData(LsSql, LsSql2, LsSql3, 3, asConnect);                       // TblRechnungen
-                    break;
-                case 11:
-                    // Zahlungen Daten holen mit id extern timeline
-                    LsSql = RdQueriesFunctions.GetSql(12, LiIdRechnungTmp, "", "", 0);
-                    // Sql, Art = 11 
-                    liRows = Timeline.FetchData(LsSql, "", "", 11, asConnect);
-                    break;
-                case 12:
-                    // Zahlungen Timeline löschen 
-                    liOk = Timeline.DeleteTimeline(LiIdRechnungTmp, "A", asConnect);
-                    break;
-                case 13:
-                    // Zahlungen importieren. Nur anderes SQL Statement, sonst wie Case 11
-                    LsSql = RdQueriesFunctions.GetSql(13, LiIdRechnungTmp, "", "", 0);
-                    // Sql, Art = 11 
-                    liRows = Timeline.FetchData(LsSql, "", "", 11, asConnect);
-                    break;
-                case 21:
-                    // Zählerstände Daten holen mit id extern timeline
-                    LsSql = RdQueriesFunctions.GetSql(21, LiIdRechnungTmp, "", "", 0);
-                    // Sql, Art = 21 
-                    liRows = Timeline.FetchData(LsSql, "", "", 21, asConnect);
-                    break;
-                case 22:
-                    // Zählerstände Timeline löschen
-                    liOk = Timeline.DeleteTimeline(LiIdRechnungTmp, "Z", asConnect);
-                    break;
-                default:
-                    break;
-            }
+            //switch (liFlagAdd)
+            //{
+            //    case 1:
+            //        // Rechnungen Daten holen mit id extern timeline für Objekte
+            //        // Rechnung Schreiben an Teilobjekte
+            //        LsSql = RdQueriesFunctions.GetSql(1, LiIdRechnungTmp, "", "", 0);                       // temporäre Id Rechnungen
+            //        LsSql2 = RdQueriesFunctions.GetSql(6, LiObjektId, "", "", 0);                           // Liste der Objekte dazuholen
+            //        LsSql3 = RdQueriesFunctions.GetSql(31,LiIdRechnungTmp, "id_extern_timeline", "",0 );    // Timeline New
+            //        liRows = Timeline.FetchData(LsSql, LsSql2, LsSql3, 1, asConnect);                       // TblRechnungen
+            //        break;
+            //    case 2:
+            //        // Rechnung Timeline löschen
+            //        liOk = Timeline.DeleteTimeline(LiIdRechnungTmp, "R", asConnect);
+            //        break;
+            //    case 3:
+            //        // Rechnungen Daten holen mit id extern timeline für Teilobjekt
+            //        // Rechnung erzeugen an Mieter
+            //        LsSql = RdQueriesFunctions.GetSql(1, LiIdRechnungTmp, "", "", 0);                       // Rechnungen für die Teilobjekt ID holen
+            //        LsSql2 = RdQueriesFunctions.GetSql(6, LiTeilObjektId, "", "", 0);                       // Liste der Teilobjekte dazuholen?
+            //        LsSql3 = RdQueriesFunctions.GetSql(31, LiIdRechnungTmp, "id_extern_timeline", "", 0);   // Timeline New
+            //        liRows = Timeline.FetchData(LsSql, LsSql2, LsSql3, 3, asConnect);                       // TblRechnungen
+            //        break;
+            //    case 11:
+            //        // Zahlungen Daten holen mit id extern timeline
+            //        LsSql = RdQueriesFunctions.GetSql(12, LiIdRechnungTmp, "", "", 0);
+            //        // Sql, Art = 11 
+            //        liRows = Timeline.FetchData(LsSql, "", "", 11, asConnect);
+            //        break;
+            //    case 12:
+            //        // Zahlungen Timeline löschen 
+            //        liOk = Timeline.DeleteTimeline(LiIdRechnungTmp, "A", asConnect);
+            //        break;
+            //    case 13:
+            //        // Zahlungen importieren. Nur anderes SQL Statement, sonst wie Case 11
+            //        LsSql = RdQueriesFunctions.GetSql(13, LiIdRechnungTmp, "", "", 0);
+            //        // Sql, Art = 11 
+            //        liRows = Timeline.FetchData(LsSql, "", "", 11, asConnect);
+            //        break;
+            //    case 21:
+            //        // Zählerstände Daten holen mit id extern timeline
+            //        LsSql = RdQueriesFunctions.GetSql(21, LiIdRechnungTmp, "", "", 0);
+            //        // Sql, Art = 21 
+            //        liRows = Timeline.FetchData(LsSql, "", "", 21, asConnect);
+            //        break;
+            //    case 22:
+            //        // Zählerstände Timeline löschen
+            //        liOk = Timeline.DeleteTimeline(LiIdRechnungTmp, "Z", asConnect);
+            //        break;
+            //    default:
+            //        break;
+            //}
         }
 
         // Sql Statements zusammenbauen
@@ -378,22 +378,22 @@ namespace Ruddat_NK
                         MySqlCommandBuilder commandBuilder31 = new MySqlCommandBuilder(myadp);
                         myadp.Update(TblContent);
                         break;
-                    case 32:
-                        // Timeline update
-                        MySqlCommandBuilder commandBuilder32 = new MySqlCommandBuilder(MySdTimeline);
-                        MySdTimeline.Update(TblTimeline);
-                        break;
-                    case 33:
-                        // Rechnungen update
-                        MySqlCommandBuilder commandBuilder33 = new MySqlCommandBuilder(MySdRechnungen);
-                        MySdRechnungen.Update(TblRechnungen);
-                        break;
+                        // Todo Kann evtl. weg
+                    //case 32:
+                    //    // Timeline update
+                    //    MySqlCommandBuilder commandBuilder32 = new MySqlCommandBuilder(MySdTimeline);
+                    //    MySdTimeline.Update(TblTimeline);
+                    //    break;
+                    //case 33:
+                    //    // Rechnungen update
+                    //    MySqlCommandBuilder commandBuilder33 = new MySqlCommandBuilder(MySdRechnungen);
+                    //    MySdRechnungen.Update(TblRechnungen);
+                    //    break;
                     case 34:
                         var lvId = command01.ExecuteScalar();
                         break;
                     default:
                         break;
-
                 }
                 // db close
                 connect.Close();

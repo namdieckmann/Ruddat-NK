@@ -731,6 +731,48 @@ namespace Ruddat_NK
                             FROM timeline
                             WHERE id_rechnung = " + piId.ToString() + " ";
                     break;
+                case 44:
+                    // für die TimelineRelation Objektteile holen
+                    lsWhereAdd = "id_objekt = " + piId.ToString() + " ";
+                    lsSql = @"SELECT id_objekt_teil,
+                                id_objekt,
+                                bez,
+                                geschoss,
+                                lage,
+                                id_adresse,
+                                flaeche_anteil,
+                                prozent_anteil,
+                                personen_anteil_flag
+                            FROM objekt_teil
+                             WHERE " + lsWhereAdd;
+                    break;
+                case 45:
+                    // Rechnungen mit definierter id_extern_timeline
+                    lsWhereAdd = piId.ToString() + " ";
+
+                    lsSql = @"SELECT id_rechnungen,
+                                    id_ksa,
+                                    datum_rechnung as datum,
+                                    datum_von as von,
+                                    datum_bis as bis,
+                                    betrag_netto netto,
+                                    betrag_brutto brutto,
+                                    id_mwst_art,
+                                    id_objekt,
+                                    id_objekt_teil,
+                                    id_mieter,
+                                    rg_nr,
+                                    firma,
+                                    text,
+                                    id_extern_timeline,
+                                    flag_timeline,
+                                    id_verteilung,
+                                    id_rechnung_source,
+                                    flag_editable
+                            FROM rechnungen
+					         WHERE id_extern_timeline = " + lsWhereAdd +
+                          " ORDER BY rechnungen.datum_rechnung desc";
+                    break;
                 // -----------------------------------------------------------------------------------------------------------------------------
                 // ----------------------------------------------------Reports ab hier----------------------------------------------------------
                 // -----------------------------------------------------------------------------------------------------------------------------

@@ -47,8 +47,10 @@ namespace Ruddat_NK
 
         // Daten
         DataTable TblRechnungen;
+        DataTable TblRechnungenTmp;
         DataTable TblTmlDetail;
         DataTable TblFilialen;
+        DataTable TblTeilObj;
         DataTable TblTeilObjekte;
         DataTable TblZlgKostenart;
         DataTable TblRgMwst;
@@ -74,8 +76,10 @@ namespace Ruddat_NK
         //SqlDataAdapter SdZlWerte;
         //SqlDataAdapter SdZlNummern;
         MySqlDataAdapter MySdRechnungen;
+        MySqlDataAdapter MySdRechnungenTmp;
         MySqlDataAdapter MySdTmlDetail;
         MySqlDataAdapter MySdFilialen;
+        MySqlDataAdapter MySdTeilObj;
         MySqlDataAdapter MySdTeilObjekte;
         MySqlDataAdapter MySdZlgKostArt;
         MySqlDataAdapter MySdRgMwst;
@@ -337,20 +341,20 @@ namespace Ruddat_NK
                 // Für aktive Verträge
                 if (piArt == 2)
                 {
-                    TblTeilObjekte = new DataTable();    // Objekte Teilobjekte
-                    MySdTeilObjekte = new MySqlDataAdapter(com);
-                    MySdTeilObjekte.Fill(TblTeilObjekte);
+                    TblTeilObj = new DataTable();    // Objekte Teilobjekte
+                    MySdTeilObj = new MySqlDataAdapter(com);
+                    MySdTeilObj.Fill(TblTeilObj);
 
-                    if (TblTeilObjekte.Rows.Count > 0)
+                    if (TblTeilObj.Rows.Count > 0)
                     {
                         int i = 0;
                         tvMain.Items.Clear();
 
                         //  Eine Schleife durch die Tabelle, um das Treview zu befüllen
-                        for (i = 0; i < TblTeilObjekte.Rows.Count; i++)
+                        for (i = 0; i < TblTeilObj.Rows.Count; i++)
                         {
-                            lsObjektBez = TblTeilObjekte.Rows[i].ItemArray.GetValue(4).ToString().Trim() + ":" + TblTeilObjekte.Rows[i].ItemArray.GetValue(0).ToString().Trim();
-                            lsObjektTeilBez = TblTeilObjekte.Rows[i].ItemArray.GetValue(1).ToString();
+                            lsObjektBez = TblTeilObj.Rows[i].ItemArray.GetValue(4).ToString().Trim() + ":" + TblTeilObj.Rows[i].ItemArray.GetValue(0).ToString().Trim();
+                            lsObjektTeilBez = TblTeilObj.Rows[i].ItemArray.GetValue(1).ToString();
 
                             TreeViewItem root = new TreeViewItem
                             {
@@ -363,7 +367,7 @@ namespace Ruddat_NK
                                 tvMain.Items.Add(root);
                                 lsObjektBezS = lsObjektBez;
                             }
-                            PopulateTree(i, root, TblTeilObjekte);
+                            PopulateTree(i, root, TblTeilObj);
                             i++;
                         }
                     }
@@ -376,34 +380,34 @@ namespace Ruddat_NK
                 // Die Id aus Objekt holen
                 if (piArt == 3)
                 {
-                    TblTeilObjekte = new DataTable();    // Objekte Teilobjekte
-                    MySdTeilObjekte = new MySqlDataAdapter(com);
-                    MySdTeilObjekte.Fill(TblTeilObjekte);
-                    if (TblTeilObjekte.Rows.Count > 0)
+                    TblTeilObj = new DataTable();    // Objekte Teilobjekte
+                    MySdTeilObj = new MySqlDataAdapter(com);
+                    MySdTeilObj.Fill(TblTeilObj);
+                    if (TblTeilObj.Rows.Count > 0)
                     {
-                        liRows = Convert.ToInt16(TblTeilObjekte.Rows[0].ItemArray.GetValue(5).ToString());
+                        liRows = Convert.ToInt16(TblTeilObj.Rows[0].ItemArray.GetValue(5).ToString());
                     }
                 }
                 // Die Id aus Teilobjekt holen
                 if (piArt == 4)
                 {
-                    TblTeilObjekte = new DataTable();    // Objekte Teilobjekte
-                    MySdTeilObjekte = new MySqlDataAdapter(com);
-                    MySdTeilObjekte.Fill(TblTeilObjekte);
-                    if (TblTeilObjekte.Rows.Count > 0)
+                    TblTeilObj = new DataTable();    // Objekte Teilobjekte
+                    MySdTeilObj = new MySqlDataAdapter(com);
+                    MySdTeilObj.Fill(TblTeilObj);
+                    if (TblTeilObj.Rows.Count > 0)
                     {
-                        liRows = Convert.ToInt16(TblTeilObjekte.Rows[0].ItemArray.GetValue(6).ToString());
+                        liRows = Convert.ToInt16(TblTeilObj.Rows[0].ItemArray.GetValue(6).ToString());
                     }
                 }
                 // Die Id aus Mieter holen
                 if (piArt == 5)
                 {
-                    TblTeilObjekte = new DataTable();    // Objekte Teilobjekte
-                    MySdTeilObjekte = new MySqlDataAdapter(com);
-                    MySdTeilObjekte.Fill(TblTeilObjekte);
-                    if (TblTeilObjekte.Rows.Count > 0)
+                    TblTeilObj = new DataTable();    // Objekte Teilobjekte
+                    MySdTeilObj = new MySqlDataAdapter(com);
+                    MySdTeilObj.Fill(TblTeilObj);
+                    if (TblTeilObj.Rows.Count > 0)
                     {
-                        liRows = Convert.ToInt16(TblTeilObjekte.Rows[0].ItemArray.GetValue(7).ToString());
+                        liRows = Convert.ToInt16(TblTeilObj.Rows[0].ItemArray.GetValue(7).ToString());
                     }
                 }
                 // DataGrid Timline Summen
@@ -534,7 +538,7 @@ namespace Ruddat_NK
                     // Mieter gibt es hier leider nicht
                     // Todo den Mieter im Treeview über die ID ermitteln
                     Afterfetch.MakeAfterFetch(piArt, 1, 0, 0, asConnect,
-                            MySdRechnungen, TblRechnungen,
+                            MySdRechnungenTmp, TblRechnungenTmp,        // Temporäre Rechnungen nach Anwahl in Rechnungensfenster
                             MySdTeilObjekte, TblTeilObjekte,
                             null, null,
                             MySdTimeLine, TblTimeLine);
@@ -572,6 +576,18 @@ namespace Ruddat_NK
                     TblTimeLine = new DataTable();     // Timeline
                     MySdTimeLine = new MySqlDataAdapter(com);
                     MySdTimeLine.Fill(TblTimeLine);
+                }
+                if (piArt == 44)
+                {
+                    TblTeilObjekte = new DataTable();     // Teilobjekte nach Objekt Id
+                    MySdTeilObjekte = new MySqlDataAdapter(com);
+                    MySdTeilObjekte.Fill(TblTeilObjekte);
+                }
+                if (piArt == 45)
+                {
+                    TblRechnungenTmp = new DataTable();     // Teilobjekte nach Objekt Id
+                    MySdRechnungenTmp = new MySqlDataAdapter(com);
+                    MySdRechnungenTmp.Fill(TblRechnungenTmp);
                 }
                 // db close
                 con.Close();
@@ -948,6 +964,10 @@ namespace Ruddat_NK
                     lsSql = RdQueries.GetSqlSelect(3, giFiliale, words[1], "1", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
                     liId = FetchData(lsSql, 3, giDb, gsConnect);
 
+                    // Die zugehörigen Teilobjekte holen
+                    lsSql = RdQueries.GetSqlSelect(44, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
+                    liRows = FetchData(lsSql, 44, giDb, gsConnect);
+
                     // Combobox Kostenart in rechnungen befüllen Art = 11 Objekt Kennung 1
                     lsSql = RdQueries.GetSqlSelect(11, liIndex, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
                     liRows = FetchData(lsSql, 11, giDb, gsConnect);
@@ -1267,21 +1287,21 @@ namespace Ruddat_NK
                                 ldtTo = clTo.SelectedDate.Value;
                             }
                         }
-
-                    }
-                    else
-
-                    // Der Index wird nochmal bei TimeLine Details benötigt
-                    giIndex = index;
-                    gsItemHeader = item.Header.ToString().Trim();
-
-                    if (gsItemHeader != "Kein Mieter")
-                    {
-                        updateAllDataGrids(0);      // alle grids aktualisieren
                     }
                     else
                     {
-                        updateAllDataGrids(11);     // Treview zurücksetzen ohne Auswahl
+                        // Der Index wird nochmal bei TimeLine Details benötigt
+                        giIndex = index;
+                        gsItemHeader = item.Header.ToString().Trim();
+
+                        if (gsItemHeader != "Kein Mieter")
+                        {
+                            updateAllDataGrids(0);      // alle grids aktualisieren
+                        }
+                        else
+                        {
+                            updateAllDataGrids(11);     // Treview zurücksetzen ohne Auswahl
+                        }
                     }
                 }
              }
@@ -1290,6 +1310,25 @@ namespace Ruddat_NK
         // Rechnungen DataGrid 
         private void DgrRechnungen_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            string LsSql = "";
+            int LiExternId = 0;
+
+            if (DgrRechnungen.SelectedIndex >= 0)
+            {
+                DataRowView rowview = DgrRechnungen.SelectedItem as DataRowView;
+                // Es ist eine Rechnung gewählt
+                if (rowview.Row[14] != DBNull.Value)
+                {
+                    LiExternId = Int32.Parse(rowview.Row[14].ToString());
+                    if (LiExternId > 0)
+                    {
+                        // Tabelle RechnungenTmp mit Extern id füllen  (vorläufige id)
+                        LsSql = RdQueries.GetSqlSelect(45, LiExternId, "", "", "", DateTime.MinValue, DateTime.MinValue, giFiliale, gsConnect, giDb);
+                        FetchData(LsSql, 45, giDb, gsConnect);
+                    }
+                }
+            }
+
             // delete Button auf
             btnRgDel.IsEnabled = true;
         }

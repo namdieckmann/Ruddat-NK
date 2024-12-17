@@ -9,14 +9,12 @@ namespace Ruddat_NK
 {
     internal class Afterfetch
     {
-        static string lsSql = "";
-
         // ----------------------------------------------------------------------------------------
         // Datenbankaktionen nach Fetchdata
         // Rechnungen direkt für Objekte, Teilobjekte und Mieter
         // ----------------------------------------------------------------------------------------
         public static int MakeAfterFetch(int aiArt, int aiTeil, int ai1, int ai2, string asConnect, 
-            MySqlDataAdapter ASdaRechnungen, DataTable ATblRechnungen,
+            MySqlDataAdapter ASdaRechnungenTmp, DataTable ATblRechnungenTmp,
             MySqlDataAdapter AsdaObjektTeile, DataTable ATblObjektTeile,
             MySqlDataAdapter AsdaMieter, DataTable ATblMieter,
             MySqlDataAdapter AsdaTimeline, DataTable ATblTimeline
@@ -71,51 +69,52 @@ namespace Ruddat_NK
             //string lsObjektBezS = "";
             int LiReturn = 0;
 
-            // Daten zuordnen
-            ASdaRechnungen.Fill(ATblRechnungen);
-            AsdaObjektTeile.Fill(ATblObjektTeile);
-            AsdaTimeline.Fill(ATblTimeline);
-            if (AsdaMieter != null)
-            {
-                AsdaMieter.Fill(ATblMieter);
-            }
+            // Sind schon gefüllt
+            // Daten zuordnen 
+            //ASdaRechnungenTmp.Fill(ATblRechnungenTmp);
+            //AsdaObjektTeile.Fill(ATblObjektTeile);
+            //AsdaTimeline.Fill(ATblTimeline);
+            //if (AsdaMieter != null)
+            //{
+            //    AsdaMieter.Fill(ATblMieter);
+            //}
 
-            for (int i = 0; i < ATblRechnungen.Rows.Count; i++)
+            for (int i = 0; i < ATblRechnungenTmp.Rows.Count; i++)
             {
                 // ID aus der Rechnung ermitteln 
-                if (ATblRechnungen.Rows[i].ItemArray.GetValue(14) != DBNull.Value)
+                if (ATblRechnungenTmp.Rows[i].ItemArray.GetValue(14) != DBNull.Value)
                 {
                     // Die Original Id der Rechnung
-                    LiSourceId = int.Parse(ATblRechnungen.Rows[i].ItemArray.GetValue(0).ToString());
+                    LiSourceId = int.Parse(ATblRechnungenTmp.Rows[i].ItemArray.GetValue(0).ToString());
 
                     // Erzeugte Untergeordnete Rechnungen löschen
-                    // Alle mit der Id der Hauptrechnung in id_rechnung_source
+                    // Alle mit der Id der Hauptrechnung in id_rechnung_source löschen
                     liOk = Timeline.DeleteRechnung(LiSourceId, "R", asConnect);
                     // Delete Timeline mit dieser Rechnungs id
                     liOk = Timeline.DeleteTimeline(LiSourceId, "R", asConnect);
 
                     // Objekt Rechnung > Timeline erzeugen
-                    if (ATblRechnungen.Rows[i].ItemArray.GetValue(8) != DBNull.Value)
-                        if ((int)ATblRechnungen.Rows[i].ItemArray.GetValue(8) > 0)
+                    if (ATblRechnungenTmp.Rows[i].ItemArray.GetValue(8) != DBNull.Value)
+                        if ((int)ATblRechnungenTmp.Rows[i].ItemArray.GetValue(8) > 0)
                         {
-                            LiKsa = (int)ATblRechnungen.Rows[i].ItemArray.GetValue(1);                  // Kostenart
-                            liObjekt = (int)ATblRechnungen.Rows[i].ItemArray.GetValue(8);               // Objekt
+                            LiKsa = (int)ATblRechnungenTmp.Rows[i].ItemArray.GetValue(1);                  // Kostenart
+                            liObjekt = (int)ATblRechnungenTmp.Rows[i].ItemArray.GetValue(8);               // Objekt
                             LiSwitch = 1;
                         }
                     // Teilobjekt Rechnung und Timeline erzeugen
-                    if (ATblRechnungen.Rows[i].ItemArray.GetValue(9) != DBNull.Value)
-                        if ((int)ATblRechnungen.Rows[i].ItemArray.GetValue(9) > 0)
+                    if (ATblRechnungenTmp.Rows[i].ItemArray.GetValue(9) != DBNull.Value)
+                        if ((int)ATblRechnungenTmp.Rows[i].ItemArray.GetValue(9) > 0)
                         {
-                            LiKsa = (int)ATblRechnungen.Rows[i].ItemArray.GetValue(1);                  // Kostenart
-                            liObjektTeil = (int)ATblRechnungen.Rows[i].ItemArray.GetValue(9);           // ObjektTeil
+                            LiKsa = (int)ATblRechnungenTmp.Rows[i].ItemArray.GetValue(1);                  // Kostenart
+                            liObjektTeil = (int)ATblRechnungenTmp.Rows[i].ItemArray.GetValue(9);           // ObjektTeil
                             LiSwitch = 2;
                         }
                     // Mieter Rechnung und Timeline erzeugen
-                    if (ATblRechnungen.Rows[i].ItemArray.GetValue(10) != DBNull.Value)
-                        if ((int)ATblRechnungen.Rows[i].ItemArray.GetValue(10) > 0)
+                    if (ATblRechnungenTmp.Rows[i].ItemArray.GetValue(10) != DBNull.Value)
+                        if ((int)ATblRechnungenTmp.Rows[i].ItemArray.GetValue(10) > 0)
                         {
-                            LiKsa = (int)ATblRechnungen.Rows[i].ItemArray.GetValue(1);                  // Kostenart
-                            liObjektTeil = (int)ATblRechnungen.Rows[i].ItemArray.GetValue(10);          // Mieter
+                            LiKsa = (int)ATblRechnungenTmp.Rows[i].ItemArray.GetValue(1);                  // Kostenart
+                            liObjektTeil = (int)ATblRechnungenTmp.Rows[i].ItemArray.GetValue(10);          // Mieter
                             LiSwitch = 3;
                         }
                     {
@@ -124,7 +123,7 @@ namespace Ruddat_NK
                             case 1:         // Objekte nach Anlegen einer Rechnung in Objekten
                                 // Timeline für Objekte
                                 if (CreateObjekteTimeline(LiSourceId, liObjekt, liObjektTeil, liMieter, liArtRelation,
-                                    ASdaRechnungen, ATblRechnungen,
+                                    ASdaRechnungenTmp, ATblRechnungenTmp,
                                     AsdaObjektTeile, ATblObjektTeile,
                                     AsdaTimeline, ATblTimeline,
                                     asConnect
@@ -137,26 +136,25 @@ namespace Ruddat_NK
                                         liArtRelation = 1;          // Rechnung
                                                                     // Rechnungen und Timeline für alle zugehörigen Objektteile erzeugen
                                         CreateRechnungenObjTeile(LiSourceId, liObjekt, liObjektTeil, liMieter, liArtRelation,
-                                            ASdaRechnungen, ATblRechnungen,
+                                            ASdaRechnungenTmp, ATblRechnungenTmp,
                                             AsdaObjektTeile, ATblObjektTeile,
                                             AsdaTimeline, ATblTimeline,
                                             asConnect
                                             );
-
                                     }
                                 }
                                 break;
-                            case 2:         // Teilobjekte nach Anlegen einer Rechnung in Teilobjekten
+                            case 2:         // Teilobjekte nach Anlegen oder ändern einer Rechnung in Teilobjekten
                                             // Timeline erstellen
                                 CreateObjekteTimeline(LiSourceId, liObjekt, liObjektTeil, liMieter, liArtRelation,
-                                    ASdaRechnungen, ATblRechnungen,
+                                    ASdaRechnungenTmp, ATblRechnungenTmp,
                                     AsdaObjektTeile, ATblObjektTeile,
                                     AsdaTimeline, ATblTimeline,
                                     asConnect);
                                 break;
                             case 3:         // Mieter
                                 CreateRechnungenMieter(LiSourceId, liArtRelation,
-                                    ASdaRechnungen, ATblRechnungen,
+                                    ASdaRechnungenTmp, ATblRechnungenTmp,
                                     AsdaObjektTeile, ATblObjektTeile,
                                     AsdaMieter, ATblMieter,
                                     AsdaTimeline, ATblTimeline,
@@ -169,7 +167,6 @@ namespace Ruddat_NK
                     }
                 }
             }
-
             return LiReturn;
         }
 
