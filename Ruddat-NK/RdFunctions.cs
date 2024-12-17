@@ -98,7 +98,7 @@ namespace Ruddat_NK
                     // Rechnungen Daten holen mit id extern timeline für Objekte
                     // Rechnung Schreiben an Teilobjekte
                     LsSql = RdQueriesFunctions.GetSql(1, LiIdRechnungTmp, "", "", 0);                       // temporäre Id Rechnungen
-                    LsSql2 = RdQueriesFunctions.GetSql(6, LiObjektId, "", "", 0);                           // Liste der Teilobjekte dazuholen
+                    LsSql2 = RdQueriesFunctions.GetSql(6, LiObjektId, "", "", 0);                           // Liste der Objekte dazuholen
                     LsSql3 = RdQueriesFunctions.GetSql(31,LiIdRechnungTmp, "id_extern_timeline", "",0 );    // Timeline New
                     liRows = Timeline.FetchData(LsSql, LsSql2, LsSql3, 1, asConnect);                       // TblRechnungen
                     break;
@@ -107,11 +107,10 @@ namespace Ruddat_NK
                     liOk = Timeline.DeleteTimeline(LiIdRechnungTmp, "R", asConnect);
                     break;
                 case 3:
-                    // Rechnungen Daten holen mit id extern timeline für teilobjekte
-                    // Rechnung Schreiben an Mieter
-                    // Todo 241205 Queries und Fetchdata bearbeiten
-                    LsSql = RdQueriesFunctions.GetSql(1, LiIdRechnungTmp, "", "", 0);                       // temporäre Id Rechnungen
-                    LsSql2 = RdQueriesFunctions.GetSql(6, LiTeilObjektId, "", "", 0);                       // Liste der Mieter dazuholen?
+                    // Rechnungen Daten holen mit id extern timeline für Teilobjekt
+                    // Rechnung erzeugen an Mieter
+                    LsSql = RdQueriesFunctions.GetSql(1, LiIdRechnungTmp, "", "", 0);                       // Rechnungen für die Teilobjekt ID holen
+                    LsSql2 = RdQueriesFunctions.GetSql(6, LiTeilObjektId, "", "", 0);                       // Liste der Teilobjekte dazuholen?
                     LsSql3 = RdQueriesFunctions.GetSql(31, LiIdRechnungTmp, "id_extern_timeline", "", 0);   // Timeline New
                     liRows = Timeline.FetchData(LsSql, LsSql2, LsSql3, 3, asConnect);                       // TblRechnungen
                     break;
@@ -192,13 +191,15 @@ namespace Ruddat_NK
                     case 2:     // Datensatz löschen
                         MySqlDataReader queryCommandReader = command01.ExecuteReader();
                         break;
-                    case 3:     // Rechnungen und Timeline für Mieter erzeugen
+                    case 3:     // Rechnungen und Timeline erzeugen
                         TblRechnungen = new DataTable();         // Rechnung 
                         MySdRechnungen = new MySqlDataAdapter(command01);
-                        TblMieter = new DataTable();
-                        MySdMieter = new MySqlDataAdapter(command02);
-                        TblTimeline = new DataTable();
-                        MySdTimeline = new MySqlDataAdapter(command03);
+                        TblObjektTeile = new DataTable();
+                        MySdObjektTeile = new MySqlDataAdapter(command02);
+                        //TblMieter = new DataTable();
+                        //MySdMieter = new MySqlDataAdapter(command02);
+                        //TblTimeline = new DataTable();
+                        //MySdTimeline = new MySqlDataAdapter(command03);
 
                         liOk = Afterfetch.MakeAfterFetch(piArt, 1, 0, 0, asConnect,
                             MySdRechnungen, TblRechnungen,
@@ -220,6 +221,8 @@ namespace Ruddat_NK
                         //mysdc = new MySqlDataAdapter(command31);
                         //mysdc.Fill(TblTimelineNew);
                         //// liExternId = Afterfetch.MakeAfterFetch(piArt, 2, liExternId, 0, asConnect, aiDb);
+
+
                         break;
                     case 4:     // Rechnungen Timeline Create Relations Objektteile schreiben
                         // tableFive beiinhaltet die Objektteile zu einem gewählten Objekt

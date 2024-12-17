@@ -120,8 +120,6 @@ namespace Ruddat_NK
                     break;
                 case 5:
                 case 6:
-                case 7:
-                case 71:
                     // SQL für die Timeline Summendarstellung Objekte, TeilObjekte oder Mieter
                     lsSql = @"Select                  
                                 art_kostenart.bez as ksa_bez,
@@ -708,6 +706,30 @@ namespace Ruddat_NK
                         default:
                             break;
                     }
+                    break;
+                case 43:
+                    // Eine Dummy Timeline zum Beschreiben
+                    lsSql = @"SELECT 
+                                Id_timeline,     
+                                id_rechnung,     
+                                id_vorauszahlung,
+                                id_zaehlerstand, 
+                                id_objekt,       
+                                id_objekt_teil,  
+                                id_mieter,       
+                                id_ksa,          
+                                betrag_netto,          
+                                betrag_soll_netto,     
+                                betrag_brutto,          
+                                betrag_soll_brutto,     
+                                zs,              
+                                dt_monat,
+                                wtl_aus_objekt,
+                                wtl_aus_objteil,
+                                leerstand,
+                                id_import
+                            FROM timeline
+                            WHERE id_rechnung = " + piId.ToString() + " ";
                     break;
                 // -----------------------------------------------------------------------------------------------------------------------------
                 // ----------------------------------------------------Reports ab hier----------------------------------------------------------
