@@ -52,7 +52,8 @@ namespace Ruddat_NK
 
                     // lsWhereAdd = " and  vertrag.vertrag_aktiv = 1";
 
-                    lsSql = @"Select    objekt.bez as obj,
+                    lsSql = @"Select    
+                            objekt.bez as obj,
 				            objekt_teil.bez as objteil,
 				            mieter.bez as mieter, 
 				            adressen.adresse as adresse, 
@@ -101,7 +102,8 @@ namespace Ruddat_NK
                     lsWhereAdd2 = " ";
                     lsWhereAdd = " " + lsWhereAdd.Trim();
 
-                    lsSql = @"Select    objekt.bez as obj, 
+                    lsSql = @"Select    
+                            objekt.bez as obj, 
 				            objekt_teil.bez as objteil,
 				            mieter.bez as mieter, 
 				            adressen.adresse as adresse, 
@@ -187,7 +189,8 @@ namespace Ruddat_NK
                     liOne = 3;
                     lsWhereAdd2 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsFieldFrom, lsFieldTo, lsAnd, liOne, aiDb);
 
-                    lsSql = @"select id_rechnungen,
+                    lsSql = @"select 
+                                id_rechnungen,
                                 id_ksa,
                                 datum_rechnung as datum,
                                 datum_von as von,
@@ -218,7 +221,8 @@ namespace Ruddat_NK
                     liOne = 3;      // rechnungen von bis
                     lsWhereAdd2 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsFieldFrom, lsFieldFrom, lsAnd, liOne, aiDb);
 
-                    lsSql = @"select id_rechnungen,
+                    lsSql = @"select 
+                                id_rechnungen,
                                 id_ksa,
                                 datum_rechnung as datum,
                                 datum_von as von,
@@ -243,7 +247,8 @@ namespace Ruddat_NK
                     break;
                 case 91:
                     // Zum Ertellen von Untergeordneten Rechnungen aus TeilObjekte für Mieter
-                    lsSql = @"select id_rechnungen,
+                    lsSql = @"select 
+                                id_rechnungen,
                                 id_ksa,
                                 datum_rechnung as datum,
                                 datum_von as von,

@@ -12,6 +12,8 @@ namespace Ruddat_NK
         // ----------------------------------------------------------------------------------------
         // Datenbankaktionen nach Fetchdata
         // Rechnungen direkt für Objekte, Teilobjekte und Mieter
+        // aiArt wird für Art 1 = Rechnung
+        // AiTeil wird Art der Aufteilung?
         // ----------------------------------------------------------------------------------------
         public static int MakeAfterFetch(int aiArt, int aiTeil, int ai1, int ai2, string asConnect, 
             MySqlDataAdapter ASdaRechnungenTmp, DataTable ATblRechnungenTmp,
@@ -69,59 +71,51 @@ namespace Ruddat_NK
             //string lsObjektBezS = "";
             int LiReturn = 0;
 
-            // Sind schon gefüllt
-            // Daten zuordnen 
-            //ASdaRechnungenTmp.Fill(ATblRechnungenTmp);
-            //AsdaObjektTeile.Fill(ATblObjektTeile);
-            //AsdaTimeline.Fill(ATblTimeline);
-            //if (AsdaMieter != null)
-            //{
-            //    AsdaMieter.Fill(ATblMieter);
-            //}
-
             for (int i = 0; i < ATblRechnungenTmp.Rows.Count; i++)
             {
                 // ID aus der Rechnung ermitteln 
                 if (ATblRechnungenTmp.Rows[i].ItemArray.GetValue(14) != DBNull.Value)
                 {
-                    // Die Original Id der Rechnung
-                    LiSourceId = int.Parse(ATblRechnungenTmp.Rows[i].ItemArray.GetValue(0).ToString());
-
-                    // Erzeugte Untergeordnete Rechnungen löschen
-                    // Alle mit der Id der Hauptrechnung in id_rechnung_source löschen
-                    liOk = Timeline.DeleteRechnung(LiSourceId, "R", asConnect);
-                    // Delete Timeline mit dieser Rechnungs id
-                    liOk = Timeline.DeleteTimeline(LiSourceId, "R", asConnect);
-
-                    // Objekt Rechnung > Timeline erzeugen
-                    if (ATblRechnungenTmp.Rows[i].ItemArray.GetValue(8) != DBNull.Value)
-                        if ((int)ATblRechnungenTmp.Rows[i].ItemArray.GetValue(8) > 0)
-                        {
-                            LiKsa = (int)ATblRechnungenTmp.Rows[i].ItemArray.GetValue(1);                  // Kostenart
-                            liObjekt = (int)ATblRechnungenTmp.Rows[i].ItemArray.GetValue(8);               // Objekt
-                            LiSwitch = 1;
-                        }
-                    // Teilobjekt Rechnung und Timeline erzeugen
-                    if (ATblRechnungenTmp.Rows[i].ItemArray.GetValue(9) != DBNull.Value)
-                        if ((int)ATblRechnungenTmp.Rows[i].ItemArray.GetValue(9) > 0)
-                        {
-                            LiKsa = (int)ATblRechnungenTmp.Rows[i].ItemArray.GetValue(1);                  // Kostenart
-                            liObjektTeil = (int)ATblRechnungenTmp.Rows[i].ItemArray.GetValue(9);           // ObjektTeil
-                            LiSwitch = 2;
-                        }
-                    // Mieter Rechnung und Timeline erzeugen
-                    if (ATblRechnungenTmp.Rows[i].ItemArray.GetValue(10) != DBNull.Value)
-                        if ((int)ATblRechnungenTmp.Rows[i].ItemArray.GetValue(10) > 0)
-                        {
-                            LiKsa = (int)ATblRechnungenTmp.Rows[i].ItemArray.GetValue(1);                  // Kostenart
-                            liObjektTeil = (int)ATblRechnungenTmp.Rows[i].ItemArray.GetValue(10);          // Mieter
-                            LiSwitch = 3;
-                        }
+                    if (int.Parse(ATblRechnungenTmp.Rows[i].ItemArray.GetValue(14).ToString()) == ai1)     // Nur der zugefügte oder editierte Datensatz
                     {
+                        // Die Original Id der Rechnung
+                        LiSourceId = int.Parse(ATblRechnungenTmp.Rows[i].ItemArray.GetValue(0).ToString());
+
+                        // Erzeugte Untergeordnete Rechnungen löschen
+                        // Alle mit der Id der Hauptrechnung in id_rechnung_source löschen
+                        liOk = Timeline.DeleteRechnung(LiSourceId, "R", asConnect);
+                        // Delete Timeline mit dieser Rechnungs id
+                        liOk = Timeline.DeleteTimeline(LiSourceId, "R", asConnect);
+
+                        // Objekt Rechnung > Timeline erzeugen
+                        if (ATblRechnungenTmp.Rows[i].ItemArray.GetValue(8) != DBNull.Value)
+                            if ((int)ATblRechnungenTmp.Rows[i].ItemArray.GetValue(8) > 0)
+                            {
+                                LiKsa = (int)ATblRechnungenTmp.Rows[i].ItemArray.GetValue(1);                  // Kostenart
+                                liObjekt = (int)ATblRechnungenTmp.Rows[i].ItemArray.GetValue(8);               // Objekt
+                                LiSwitch = 1;
+                            }
+                        // Teilobjekt Rechnung und Timeline erzeugen
+                        if (ATblRechnungenTmp.Rows[i].ItemArray.GetValue(9) != DBNull.Value)
+                            if ((int)ATblRechnungenTmp.Rows[i].ItemArray.GetValue(9) > 0)
+                            {
+                                LiKsa = (int)ATblRechnungenTmp.Rows[i].ItemArray.GetValue(1);                  // Kostenart
+                                liObjektTeil = (int)ATblRechnungenTmp.Rows[i].ItemArray.GetValue(9);           // ObjektTeil
+                                LiSwitch = 2;
+                            }
+                        // Mieter Rechnung und Timeline erzeugen
+                        if (ATblRechnungenTmp.Rows[i].ItemArray.GetValue(10) != DBNull.Value)
+                            if ((int)ATblRechnungenTmp.Rows[i].ItemArray.GetValue(10) > 0)
+                            {
+                                LiKsa = (int)ATblRechnungenTmp.Rows[i].ItemArray.GetValue(1);                  // Kostenart
+                                liObjektTeil = (int)ATblRechnungenTmp.Rows[i].ItemArray.GetValue(10);          // Mieter
+                                LiSwitch = 3;
+                            }
+
                         switch (LiSwitch)
                         {
                             case 1:         // Objekte nach Anlegen einer Rechnung in Objekten
-                                // Timeline für Objekte
+                                            // Timeline für Objekte
                                 if (CreateObjekteTimeline(LiSourceId, liObjekt, liObjektTeil, liMieter, liArtRelation,
                                     ASdaRechnungenTmp, ATblRechnungenTmp,
                                     AsdaObjektTeile, ATblObjektTeile,
@@ -173,7 +167,7 @@ namespace Ruddat_NK
         // Einfache Timeline für eine Rechnung erzeugen
         internal static int CreateObjekteTimeline(int AiSourceId, int AiObjektId, int AiObjektTeilId,
                 int AiMieterid, int AiArtRelation, 
-                MySqlDataAdapter ASdaRechnungen, System.Data.DataTable ATblRechnungen,
+                MySqlDataAdapter ASdaRechnungenTmp, System.Data.DataTable ATblRechnungenTmp,
                 MySqlDataAdapter ASdaTeilobjekte, System.Data.DataTable ATblTeilobjekte,
                 MySqlDataAdapter ASdaTimeline, System.Data.DataTable ATblTimeline,
                 string AsConnect)
@@ -226,35 +220,35 @@ namespace Ruddat_NK
             string LsRgNr = "";
             string LsFirma = "";
 
-            if (ATblRechnungen.Rows[0].ItemArray.GetValue(0) != DBNull.Value)
+            if (ATblRechnungenTmp.Rows[0].ItemArray.GetValue(0) != DBNull.Value)
             {
-                LiSourceId = (int)ATblRechnungen.Rows[0].ItemArray.GetValue(0);        // Rechnungs Id Quelle
-                if (ATblRechnungen.Rows[0].ItemArray.GetValue(7) != DBNull.Value)
-                    LiMwstId = int.Parse(ATblRechnungen.Rows[0].ItemArray.GetValue(7).ToString());
-                if (ATblRechnungen.Rows[0].ItemArray.GetValue(8) != DBNull.Value)
-                    liObjekt = (int)ATblRechnungen.Rows[0].ItemArray.GetValue(8);
-                if (ATblRechnungen.Rows[0].ItemArray.GetValue(9) != DBNull.Value)
-                    liObjektTeil = (int)ATblRechnungen.Rows[0].ItemArray.GetValue(9);
-                if (ATblRechnungen.Rows[0].ItemArray.GetValue(10) != DBNull.Value)
-                    liMieter = (int)ATblRechnungen.Rows[0].ItemArray.GetValue(10);
-                if (ATblRechnungen.Rows[0].ItemArray.GetValue(11) != DBNull.Value)
-                    LsRgNr = ATblRechnungen.Rows[0].ItemArray.GetValue(11).ToString();
-                if (ATblRechnungen.Rows[0].ItemArray.GetValue(12) != DBNull.Value)
-                    LsFirma = ATblRechnungen.Rows[0].ItemArray.GetValue(12).ToString();
-                if (ATblRechnungen.Rows[0].ItemArray.GetValue(5) != DBNull.Value)
-                    ldBetragNetto = (decimal)ATblRechnungen.Rows[0].ItemArray.GetValue(5);
-                if (ATblRechnungen.Rows[0].ItemArray.GetValue(6) != DBNull.Value)
-                    ldBetragBrutto = (decimal)ATblRechnungen.Rows[0].ItemArray.GetValue(6);
-                if (ATblRechnungen.Rows[0].ItemArray.GetValue(3) != DBNull.Value)
-                    Ldtrechnung = (DateTime)ATblRechnungen.Rows[0].ItemArray.GetValue(2);
-                if (ATblRechnungen.Rows[0].ItemArray.GetValue(3) != DBNull.Value)
-                    LdtStart = (DateTime)ATblRechnungen.Rows[0].ItemArray.GetValue(3);
-                if (ATblRechnungen.Rows[0].ItemArray.GetValue(4) != DBNull.Value)
-                    LdtEnd = (DateTime)ATblRechnungen.Rows[0].ItemArray.GetValue(4);
-                if (ATblRechnungen.Rows[0].ItemArray.GetValue(1) != DBNull.Value)
-                    LiKsa = (int)ATblRechnungen.Rows[0].ItemArray.GetValue(1);
-                if (ATblRechnungen.Rows[0].ItemArray.GetValue(16) != DBNull.Value)
-                    liVerteilungId = (int)ATblRechnungen.Rows[0].ItemArray.GetValue(16);
+                LiSourceId = (int)ATblRechnungenTmp.Rows[0].ItemArray.GetValue(0);        // Rechnungs Id Quelle
+                if (ATblRechnungenTmp.Rows[0].ItemArray.GetValue(7) != DBNull.Value)
+                    LiMwstId = int.Parse(ATblRechnungenTmp.Rows[0].ItemArray.GetValue(7).ToString());
+                if (ATblRechnungenTmp.Rows[0].ItemArray.GetValue(8) != DBNull.Value)
+                    liObjekt = (int)ATblRechnungenTmp.Rows[0].ItemArray.GetValue(8);
+                if (ATblRechnungenTmp.Rows[0].ItemArray.GetValue(9) != DBNull.Value)
+                    liObjektTeil = (int)ATblRechnungenTmp.Rows[0].ItemArray.GetValue(9);
+                if (ATblRechnungenTmp.Rows[0].ItemArray.GetValue(10) != DBNull.Value)
+                    liMieter = (int)ATblRechnungenTmp.Rows[0].ItemArray.GetValue(10);
+                if (ATblRechnungenTmp.Rows[0].ItemArray.GetValue(11) != DBNull.Value)
+                    LsRgNr = ATblRechnungenTmp.Rows[0].ItemArray.GetValue(11).ToString();
+                if (ATblRechnungenTmp.Rows[0].ItemArray.GetValue(12) != DBNull.Value)
+                    LsFirma = ATblRechnungenTmp.Rows[0].ItemArray.GetValue(12).ToString();
+                if (ATblRechnungenTmp.Rows[0].ItemArray.GetValue(5) != DBNull.Value)
+                    ldBetragNetto = (decimal)ATblRechnungenTmp.Rows[0].ItemArray.GetValue(5);
+                if (ATblRechnungenTmp.Rows[0].ItemArray.GetValue(6) != DBNull.Value)
+                    ldBetragBrutto = (decimal)ATblRechnungenTmp.Rows[0].ItemArray.GetValue(6);
+                if (ATblRechnungenTmp.Rows[0].ItemArray.GetValue(3) != DBNull.Value)
+                    Ldtrechnung = (DateTime)ATblRechnungenTmp.Rows[0].ItemArray.GetValue(2);
+                if (ATblRechnungenTmp.Rows[0].ItemArray.GetValue(3) != DBNull.Value)
+                    LdtStart = (DateTime)ATblRechnungenTmp.Rows[0].ItemArray.GetValue(3);
+                if (ATblRechnungenTmp.Rows[0].ItemArray.GetValue(4) != DBNull.Value)
+                    LdtEnd = (DateTime)ATblRechnungenTmp.Rows[0].ItemArray.GetValue(4);
+                if (ATblRechnungenTmp.Rows[0].ItemArray.GetValue(1) != DBNull.Value)
+                    LiKsa = (int)ATblRechnungenTmp.Rows[0].ItemArray.GetValue(1);
+                if (ATblRechnungenTmp.Rows[0].ItemArray.GetValue(16) != DBNull.Value)
+                    liVerteilungId = (int)ATblRechnungenTmp.Rows[0].ItemArray.GetValue(16);
 
                 // Anzahl der Tage des ersten Monats        99 ist der volle Monat
                 liDaysStart = Timeline.GetDaysStart(LdtStart);

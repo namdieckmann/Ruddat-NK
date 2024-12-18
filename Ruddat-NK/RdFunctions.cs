@@ -84,6 +84,7 @@ namespace Ruddat_NK
         // Zählerstände
         // Flag = 21 > ändern
         // Flag = 22 > löschen
+        // Todo 2412 Ohne Editrechnung auskommen Besser MakeAfterFetch mit Datenbankübergabe
         public static void EditRechung(int LiIdRechnungTmp, int LiObjektId, int LiTeilObjektId, int liFlagAdd, string asConnect)
         {
             string LsSql = "";
