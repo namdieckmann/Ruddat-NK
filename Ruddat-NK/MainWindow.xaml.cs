@@ -592,8 +592,6 @@ namespace Ruddat_NK
                 throw;
             }
 
-
-
             return (liRows);     // oder Ausnahmsweise die gefundene ID bei art 3-5
         }
 

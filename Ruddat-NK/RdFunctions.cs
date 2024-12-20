@@ -6,6 +6,9 @@ using System.Xml;
 using MySql.Data.MySqlClient;
 using System.Threading;
 using System.Windows.Threading;
+using System.Drawing;
+using System.Diagnostics;
+using System.Linq.Expressions;
 // using Microsoft.Office.Interop.Excel;
 
 namespace Ruddat_NK
@@ -701,8 +704,8 @@ namespace Ruddat_NK
                 // volle Monate werden gerechnet
                 if (liDaysStart == 99 && liDaysEnd == 99)
                 {
-                    LadBetraege[1] = ldBetragNetto / liMonths;
-                    LadBetraege[2] = ldBetragBrutto / liMonths;
+                    LadBetraege[0] = ldBetragNetto / liMonths;
+                    LadBetraege[1] = ldBetragBrutto / liMonths;
                 }
                 // Tageweise rechnen, Start oder Ende in der Monatsmitte
                 if (liDaysStart != 99 || liDaysEnd != 99)
@@ -755,8 +758,8 @@ namespace Ruddat_NK
                     }
 
                     // Die verbleibende Summe wird auf die verbleibenden Monate verteilt
-                    LadBetraege[1] = ldBetragNetto / liMonths;
-                    LadBetraege[2] = ldBetragBrutto / liMonths;
+                    LadBetraege[0] = ldBetragNetto / liMonths;
+                    LadBetraege[1] = ldBetragBrutto / liMonths;
                 }
             }
 
@@ -771,7 +774,6 @@ namespace Ruddat_NK
             {
                 //TODO Zählerstand
             }
-
             return LadBetraege;
         }
 
@@ -2277,7 +2279,5 @@ namespace Ruddat_NK
             }
             return adtYear;
         }
-
-
     }
 }

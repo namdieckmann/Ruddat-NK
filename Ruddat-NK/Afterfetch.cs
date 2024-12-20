@@ -299,8 +299,8 @@ namespace Ruddat_NK
                     }
                     else
                     {
-                        DrTimeline[8] = ladBetraege[1];
-                        DrTimeline[10] = ladBetraege[2];
+                        DrTimeline[8] = ladBetraege[0];
+                        DrTimeline[10] = ladBetraege[1];
                     }
                     //---------------------------------------------
                     DrTimeline[9] = ladBetraege[3];
@@ -363,15 +363,16 @@ namespace Ruddat_NK
             // int liDaysInMonth = 0; // Tage im Monat aus Vertrag
             int liSave = 1;  // Freigabe
             int LiArtRelation = 0;      // 1= Rechnung, 2=Zahlung, 3=Zähler
+            int LiPersonenFlag = 0;     // Für Message Personen
 
             decimal ldBetragNetto = 0;
             decimal ldBetragSollNetto = 0;
             decimal ldBetragBrutto = 0;
             decimal ldBetragSollBrutto = 0;
-            decimal ldGesamtflaeche = 0;
+            decimal LdGesamtflaeche = 0;
             decimal ldZs = 0;            // Zählerstand
             decimal ldVerbrauch = 0;     // Zähler Verbrauch
-            decimal[] ladBetraege = new decimal[12];
+            decimal[] LadBetragMonat = new decimal[12];
 
             int zl = 0;
             int LiMwstId = 0;
@@ -433,7 +434,7 @@ namespace Ruddat_NK
                 liZlgOrRg = 2;
 
                 // Monatsbeträge ermitteln (Brutto und Netto) und evtl. erster und letzter Monat nicht voll
-                ladBetraege = Timeline.GetBetraege(liMonths, liDaysStart, liDaysEnd,
+                LadBetragMonat = Timeline.GetBetraege(liMonths, liDaysStart, liDaysEnd,
                 ldBetragNetto, ldBetragBrutto,
                         ldBetragSollNetto, ldBetragSollBrutto, liZlgOrRg, LdtStart, LdtEnd);
 
@@ -446,7 +447,7 @@ namespace Ruddat_NK
                 // Ermitteln, wie verteilt werden soll aus der Tabelle art_verteilung
                 LsVerteilung = Timeline.GetVerteilung(AsConnect, liVerteilungId);
                 // Gesamtfläche aus Tabelle Objekt holen
-                ldGesamtflaeche = Timeline.GetObjektflaeche(liObjekt, 0, 0, AsConnect);
+                LdGesamtflaeche = Timeline.GetObjektflaeche(liObjekt, 0, 0, AsConnect);
 
                 // Schleife durch alle Teilobjekte
                 for (int i = 0; i < ATblTeilobjekte.Rows.Count; i++)
@@ -467,19 +468,68 @@ namespace Ruddat_NK
                     DrRechnung[16] = liVerteilungId;
                     DrRechnung[17] = AiSourceId;
 
-                    if (ATblTeilobjekte.Rows[i].ItemArray.GetValue(6) != DBNull.Value)
+                    switch (LsVerteilung)
                     {
-                        if ((decimal)ATblTeilobjekte.Rows[i].ItemArray.GetValue(6) > 0) // Fläche Teilobjekt
-                        {
-                            if (liObjekt > 0)
+                        case "fl":          // Berechnung Kosten MietFläche
+                            if (ATblTeilobjekte.Rows[i].ItemArray.GetValue(6) != DBNull.Value)
                             {
-                                DrRechnung[5] = ldBetragNetto / (ldGesamtflaeche / (decimal)ATblTeilobjekte.Rows[i].ItemArray.GetValue(6));           // Netto    
-                                DrRechnung[6] = ldBetragBrutto / (ldGesamtflaeche / (decimal)ATblTeilobjekte.Rows[i].ItemArray.GetValue(6));          // Brutto
+                                if ((decimal)ATblTeilobjekte.Rows[i].ItemArray.GetValue(6) > 0) // Fläche Teilobjekt
+                                {
+                                    decimal LdteilFlaeche = (decimal)ATblTeilobjekte.Rows[i].ItemArray.GetValue(6);
+                                    decimal[] LdaBetrag = new decimal[2];
+
+                                    LdaBetrag[0] = LadBetragMonat[0] / (LdGesamtflaeche / LdteilFlaeche);           // Netto    
+                                    LdaBetrag[1] = LadBetragMonat[1] / (LdGesamtflaeche / LdteilFlaeche);           // Brutto
+
+                                    DrRechnung[5] = LdaBetrag[0];           // Netto    
+                                    DrRechnung[6] = LdaBetrag[1];           // Brutto
+
+                                    ATblRechnungen.Rows.Add(DrRechnung);
+                                }
+
                             }
-                        }
-                        ATblRechnungen.Rows.Add(DrRechnung);
+                            break;
+                        case "pz":          // Berechung nach Prozent
+                            if (ATblTeilobjekte.Rows[i].ItemArray.GetValue(7) != DBNull.Value)
+                            {
+                                if ((decimal)ATblTeilobjekte.Rows[i].ItemArray.GetValue(7) > 0)     //  Prozent
+                                {
+                                    decimal LdteilProzent = (decimal)ATblTeilobjekte.Rows[i].ItemArray.GetValue(7);
+                                    decimal[] LdaBetrag = new decimal[2];
+
+                                    LdaBetrag[0] = LadBetragMonat[0] / (100 / LdteilProzent);           // Netto    
+                                    LdaBetrag[1] = LadBetragMonat[1] / (100 / LdteilProzent);           // Brutto
+
+                                    DrRechnung[5] = LdaBetrag[0];           // Netto    
+                                    DrRechnung[6] = LdaBetrag[1];           // Brutto
+
+                                    ATblRechnungen.Rows.Add(DrRechnung);
+                                }
+                            }
+                            break;
+                        case "ps":
+                            LiPersonenFlag = 1;
+                            break;
+                        case "zl":      // Verteilung nach Zählerwert
+                            break;
+                        case "nl":      // Keine Verteilung
+                            break;
+                        case "di":      // Direkt und alles
+                            break;
+                        case "fa":      // Verteilung nach Flächenauswahl
+                            break;
+                        default:
+                            break;
                     }
                 }
+
+                // Meldung Personenverteilung
+                if (LiPersonenFlag == 1)
+                {
+                    MessageBox.Show("Keine Beredchnung nach Personenanzahl möglich", "Verteilung auf Personen");
+                    LiPersonenFlag = 0;
+                }
+
                 // Daten in die Datenbank schreiben
                 MySqlCommandBuilder commandBuilder = new MySqlCommandBuilder(ASdaRechnungen);
                 ASdaRechnungen.Update(ATblRechnungen);
