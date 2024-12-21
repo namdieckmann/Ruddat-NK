@@ -186,7 +186,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>DataSetZahlungen.xsd</DependentUpon>
     </Compile>
-    <Compile Include="Afterfetch.cs" />
+    <Compile Include="RdAfterfetch.cs" />
     <Compile Include="RdFunctions.cs" />
     <Compile Include="RdQueries.cs" />
     <Compile Include="RdQueriesFunctions.cs" />

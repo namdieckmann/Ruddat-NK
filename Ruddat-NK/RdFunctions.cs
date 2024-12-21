@@ -186,7 +186,7 @@ namespace Ruddat_NK
                         TblTimeline = new DataTable();
                         MySdTimeline = new MySqlDataAdapter(command03);
 
-                        liOk = Afterfetch.MakeAfterFetch(piArt, 1, 0, 0, asConnect, 
+                        liOk = RdAfterfetch.MakeAfterFetch(piArt, 1, 0, 0, asConnect, 
                             MySdRechnungen, TblRechnungen,
                             MySdObjektTeile, TblObjektTeile,
                             MySdMieter, TblMieter,
@@ -205,7 +205,7 @@ namespace Ruddat_NK
                         //TblTimeline = new DataTable();
                         //MySdTimeline = new MySqlDataAdapter(command03);
 
-                        liOk = Afterfetch.MakeAfterFetch(piArt, 1, 0, 0, asConnect,
+                        liOk = RdAfterfetch.MakeAfterFetch(piArt, 1, 0, 0, asConnect,
                             MySdRechnungen, TblRechnungen,
                             MySdObjektTeile, TblObjektTeile,
                             MySdMieter, TblMieter,

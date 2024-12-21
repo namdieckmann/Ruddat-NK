@@ -9,6 +9,8 @@ using System.Xml;
 using System.Windows.Controls;
 using System.Windows.Input;
 using static System.Windows.Forms.LinkLabel;
+using System.Runtime.Remoting.Messaging;
+using System.Windows.Media;
 
 
 namespace Ruddat_NK
@@ -33,7 +35,6 @@ namespace Ruddat_NK
         private int GiRechnungTmpId = 0;               // TimelineId für löschen
         private int GiFlagTimeline = 0;             // Flag TimeLinebearbeitung
         private int giIndex = 0;                    // Index > Objekt, Teil oder Mieter 1,2,3
-        private int giMwstSatz = 99;                // Mwst Satz ! Null > 0 gibs ja
         private int giMwstSatzZl = 99;              // Für Zähler
         private int giDb = 2;                       // Datenbank 1 = MsqSql 2= Mysql
         private DateTime gdtZahlung = DateTime.MinValue; // Zahlungsdatum aus Datepicker DataGrid Zahlungen
@@ -1346,12 +1347,11 @@ namespace Ruddat_NK
             // Mieter gibt es hier leider nicht, deshalb null
             // Todo den Mieter im Treeview über die ID ermitteln
             // Art 1 = Rechnung
-            Afterfetch.MakeAfterFetch(1, 1, GiRechnungTmpId, 0, gsConnect,
+            RdAfterfetch.MakeAfterFetch(1, 1, GiRechnungTmpId, 0, gsConnect,
                     MySdRechnungenTmp, TblRechnungenTmp,        // Temporäre Rechnungen nach Anwahl in Rechnungensfenster
                     MySdTeilObjekte, TblTeilObjekte,
                     null, null,
                     MySdTimeLine, TblTimeLine);
-
 
             // LiObkjektId = int.Parse(TblRechnungen.Rows[DgrRechnungen.SelectedIndex][8].ToString());
             // Timeline bearbeiten    giFlagTimeline 1 = Rechnungen
@@ -1359,7 +1359,6 @@ namespace Ruddat_NK
 
             // Die IDs und Flags zurücksetzen
             GiRechnungTmpId = 0;
-            giMwstSatz = 99;
 
             // save Button Rechnungen wieder aus
             btnRgSave.IsEnabled = false;
@@ -1800,8 +1799,6 @@ namespace Ruddat_NK
                         lsMwstSatz = "0";
                     }
                     liMwstSatz = Convert.ToInt16(lsMwstSatz);
-                    giMwstSatz = liMwstSatz;
-
                 }
 
                 if (x == 8)     // NettoPreis !! Achtung: Der Displayindex ist die Darstellung im 
@@ -1810,13 +1807,23 @@ namespace Ruddat_NK
                     // Hier wird die Zelle des DataGrid ausgelesen, oder bei NewRow der Wert aus der globalen Variablen geholt
                     if (liMwstSatz == 99 && ((DgrRechnungen.Items[liSel] as DataRowView).Row.ItemArray[7] != DBNull.Value))
                     {
-                        liMwstArt = Int32.Parse((DgrRechnungen.Items[liSel] as DataRowView).Row.ItemArray[7].ToString()); // Art Mehrwertsteuer
-                        liMwstSatz = Timeline.GetMwstSatz(liMwstArt, gsConnect, giDb);
+
+                        var cellInfo = DgrRechnungen.SelectedCells[7];
+                        var cellContent = cellInfo.Column.GetCellContent(cellInfo.Item) as ComboBox;
+
+                        if (cellContent != null)
+                        {
+                            lsMwstSatz = cellContent.Text.ToString(); // Sichtbarer Text in der ComboBox
+                        }
+
+                        if (lsMwstSatz == "")
+                        {
+                            lsMwstSatz = "0";
+                        }
+                        liMwstSatz = Convert.ToInt16(lsMwstSatz);
                     }
                     else
                     {
-                        liMwstSatz = giMwstSatz;
-                        liMwstSatz = giMwstSatz;
                         if (liMwstSatz == 99)
                         {
                             liMwstSatz = 0;
@@ -1850,12 +1857,17 @@ namespace Ruddat_NK
                     // Hier wird die Zelle des DataGrid ausgelesen, oder bei NewRow der Wert aus der globalen Variablen geholt
                     if (liMwstSatz == 99 && ((DgrRechnungen.Items[liSel] as DataRowView).Row.ItemArray[7] != DBNull.Value))
                     {
-                        liMwstArt = Int32.Parse((DgrRechnungen.Items[liSel] as DataRowView).Row.ItemArray[7].ToString()); // Art Mehrwertsteuer                            
-                        liMwstSatz = Timeline.GetMwstSatz(liMwstArt, gsConnect, giDb);
+                        var cellInfo = DgrRechnungen.SelectedCells[7];
+                        var cellContent = cellInfo.Column.GetCellContent(cellInfo.Item) as ComboBox;
+
+                        if (cellContent != null)
+                        {
+                            lsMwstSatz = cellContent.Text.ToString(); // Sichtbarer Text in der ComboBox
+                            liMwstSatz = Convert.ToInt16(lsMwstSatz);
+                        }
                     }
                     else
                     {
-                        liMwstSatz = giMwstSatz;
                         if (liMwstSatz == 99)
                         {
                             liMwstSatz = 0;
@@ -1881,7 +1893,6 @@ namespace Ruddat_NK
                         }
                     }
                 }
-                //}
             }
         }
 

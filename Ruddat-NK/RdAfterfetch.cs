@@ -7,7 +7,7 @@ using System.Windows;
 
 namespace Ruddat_NK
 {
-    internal class Afterfetch
+    internal class RdAfterfetch
     {
         // ----------------------------------------------------------------------------------------
         // Datenbankaktionen nach Fetchdata
