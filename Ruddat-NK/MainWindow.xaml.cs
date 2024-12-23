@@ -1060,6 +1060,7 @@ namespace Ruddat_NK
                     lsSqlZaehlerstd = RdQueries.GetSqlSelect(135, liId, "", "", "", ldtFromZaehler, ldtTo,giFiliale,gsConnect, giDb);   // Report
 
                     // Timeline Rechnungen erzeugen für ObjektTeile
+                    // LiArtRelation = 1 für Rechnung (4. Argument
                     RdAfterfetch.CreateTimeline(0, 0, liId, 0, 1,
                          MySdRechnungen, TblRechnungen,
                          MySdTeilObj, TblTeilObjekte,
@@ -1106,6 +1107,10 @@ namespace Ruddat_NK
                     // Combobox Kostenart in rechnungen befüllen Art = 11
                     lsSql = RdQueries.GetSqlSelect(11, liIndex, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
                     liRows = FetchData(lsSql, 11, giDb, gsConnect);
+
+                    // Eine DummyTimeline zu schreiben aus einer Funktion
+                    lsSql = RdQueries.GetSqlSelect(43, 0, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
+                    liRows = FetchData(lsSql, 43, giDb, gsConnect);
 
                     // Die Mieter ID ermitteln
                     lsSql = RdQueries.GetSqlSelect(3, giFiliale, gsItemHeader, "3", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
@@ -1359,18 +1364,12 @@ namespace Ruddat_NK
             LsSql = RdQueries.GetSqlSelect(45, GiRechnungTmpId, "", "", "", DateTime.MinValue, DateTime.MinValue, giFiliale, gsConnect, giDb);
             FetchData(LsSql, 45, giDb, gsConnect);
 
-            // Mieter gibt es hier leider nicht, deshalb null
-            // Todo den Mieter im Treeview über die ID ermitteln
             // Art 1 = Rechnung
             RdAfterfetch.MakeAfterFetch(1, 1, GiRechnungTmpId, 0, gsConnect,
                     MySdRechnungenTmp, TblRechnungenTmp,        // Temporäre Rechnungen nach Anwahl in Rechnungensfenster
                     MySdTeilObjekte, TblTeilObjekte,
                     null, null,
                     MySdTimeLine, TblTimeLine);
-
-            // LiObkjektId = int.Parse(TblRechnungen.Rows[DgrRechnungen.SelectedIndex][8].ToString());
-            // Timeline bearbeiten    giFlagTimeline 1 = Rechnungen
-            // Timeline.EditRechung(GiRechnungId, LiObkjektId, 0, GiFlagTimeline, gsConnect);
 
             // Die IDs und Flags zurücksetzen
             GiRechnungTmpId = 0;
@@ -1819,31 +1818,20 @@ namespace Ruddat_NK
                 if (x == 8)     // NettoPreis !! Achtung: Der Displayindex ist die Darstellung im 
                                 // DGR und nicht die Itemliste
                 {
-                    // Hier wird die Zelle des DataGrid ausgelesen, oder bei NewRow der Wert aus der globalen Variablen geholt
-                    if (liMwstSatz == 99 && ((DgrRechnungen.Items[liSel] as DataRowView).Row.ItemArray[7] != DBNull.Value))
+                    // MwstSatz auslesen
+                    var cellInfo = DgrRechnungen.SelectedCells[7];
+                    var cellContent = cellInfo.Column.GetCellContent(cellInfo.Item) as ComboBox;
+
+                    if (cellContent != null)
                     {
-
-                        var cellInfo = DgrRechnungen.SelectedCells[7];
-                        var cellContent = cellInfo.Column.GetCellContent(cellInfo.Item) as ComboBox;
-
-                        if (cellContent != null)
-                        {
-                            lsMwstSatz = cellContent.Text.ToString(); // Sichtbarer Text in der ComboBox
-                        }
-
-                        if (lsMwstSatz == "")
-                        {
-                            lsMwstSatz = "0";
-                        }
-                        liMwstSatz = Convert.ToInt16(lsMwstSatz);
+                        lsMwstSatz = cellContent.Text.ToString(); // Sichtbarer Text in der ComboBox
                     }
-                    else
+                    if (lsMwstSatz == "")
                     {
-                        if (liMwstSatz == 99)
-                        {
-                            liMwstSatz = 0;
-                        }
+                        lsMwstSatz = "0";
                     }
+                    liMwstSatz = Convert.ToInt16(lsMwstSatz);
+
 
                     // Element holen
                     TextBox t1 = e.EditingElement as TextBox;
@@ -1869,25 +1857,19 @@ namespace Ruddat_NK
                 }
                 if (x == 9)     // Brutto
                 {
-                    // Hier wird die Zelle des DataGrid ausgelesen, oder bei NewRow der Wert aus der globalen Variablen geholt
-                    if (liMwstSatz == 99 && ((DgrRechnungen.Items[liSel] as DataRowView).Row.ItemArray[7] != DBNull.Value))
-                    {
-                        var cellInfo = DgrRechnungen.SelectedCells[7];
-                        var cellContent = cellInfo.Column.GetCellContent(cellInfo.Item) as ComboBox;
+                    // Mwst Satz auslesen
+                    var cellInfo = DgrRechnungen.SelectedCells[7];
+                    var cellContent = cellInfo.Column.GetCellContent(cellInfo.Item) as ComboBox;
 
-                        if (cellContent != null)
-                        {
-                            lsMwstSatz = cellContent.Text.ToString(); // Sichtbarer Text in der ComboBox
-                            liMwstSatz = Convert.ToInt16(lsMwstSatz);
-                        }
-                    }
-                    else
+                    if (cellContent != null)
                     {
-                        if (liMwstSatz == 99)
-                        {
-                            liMwstSatz = 0;
-                        }
+                        lsMwstSatz = cellContent.Text.ToString(); // Sichtbarer Text in der ComboBox
                     }
+                    if (lsMwstSatz == "")
+                    {
+                        lsMwstSatz = "0";
+                    }
+                    liMwstSatz = Convert.ToInt16(lsMwstSatz);
 
                     // Element holen
                     TextBox t2 = e.EditingElement as TextBox;
