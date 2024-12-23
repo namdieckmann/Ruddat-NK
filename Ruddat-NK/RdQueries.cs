@@ -122,6 +122,7 @@ namespace Ruddat_NK
                     break;
                 case 5:
                 case 6:
+                case 7:
                     // SQL für die Timeline Summendarstellung Objekte, TeilObjekte oder Mieter
                     lsSql = @"Select                  
                                 art_kostenart.bez as ksa_bez,

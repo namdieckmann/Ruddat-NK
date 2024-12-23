@@ -4,6 +4,7 @@ using System;
 using System.Data;
 using System.Data.SqlClient;
 using System.Windows;
+using static System.Windows.Forms.LinkLabel;
 
 namespace Ruddat_NK
 {
@@ -84,8 +85,6 @@ namespace Ruddat_NK
                         // Erzeugte Untergeordnete Rechnungen löschen
                         // Alle mit der Id der Hauptrechnung in id_rechnung_source löschen
                         liOk = Timeline.DeleteRechnung(LiSourceId, "R", asConnect);
-                        // Delete Timeline mit dieser Rechnungs id
-                        liOk = Timeline.DeleteTimeline(LiSourceId, "R", asConnect);
 
                         // Objekt Rechnung > Timeline erzeugen
                         if (ATblRechnungenTmp.Rows[i].ItemArray.GetValue(8) != DBNull.Value)
@@ -116,7 +115,7 @@ namespace Ruddat_NK
                         {
                             case 1:         // Objekte nach Anlegen einer Rechnung in Objekten
                                             // Timeline für Objekte
-                                if (CreateObjekteTimeline(LiSourceId, liObjekt, liObjektTeil, liMieter, liArtRelation,
+                                if (CreateTimeline(LiSourceId, liObjekt, liObjektTeil, liMieter, liArtRelation,
                                     ASdaRechnungenTmp, ATblRechnungenTmp,
                                     AsdaObjektTeile, ATblObjektTeile,
                                     AsdaTimeline, ATblTimeline,
@@ -140,20 +139,20 @@ namespace Ruddat_NK
                                 break;
                             case 2:         // Teilobjekte nach Anlegen oder ändern einer Rechnung in Teilobjekten
                                             // Timeline erstellen
-                                CreateObjekteTimeline(LiSourceId, liObjekt, liObjektTeil, liMieter, liArtRelation,
+                                CreateTimeline(LiSourceId, liObjekt, liObjektTeil, liMieter, liArtRelation,
                                     ASdaRechnungenTmp, ATblRechnungenTmp,
                                     AsdaObjektTeile, ATblObjektTeile,
                                     AsdaTimeline, ATblTimeline,
                                     asConnect);
                                 break;
                             case 3:         // Mieter
-                                CreateRechnungenMieter(LiSourceId, liArtRelation,
-                                    ASdaRechnungenTmp, ATblRechnungenTmp,
-                                    AsdaObjektTeile, ATblObjektTeile,
-                                    AsdaMieter, ATblMieter,
-                                    AsdaTimeline, ATblTimeline,
-                                    asConnect
-                                    );
+                                //createrechnungenmieter(lisourceid, liartrelation,
+                                //    asdarechnungentmp, atblrechnungentmp,
+                                //    asdaobjektteile, atblobjektteile,
+                                //    asdamieter, atblmieter,
+                                //    asdatimeline, atbltimeline,
+                                //    asconnect
+                                //     );
                                 break;
                             default:
                                 break;
@@ -165,7 +164,7 @@ namespace Ruddat_NK
         }
 
         // Einfache Timeline für eine Rechnung erzeugen
-        internal static int CreateObjekteTimeline(int AiSourceId, int AiObjektId, int AiObjektTeilId,
+        internal static int CreateTimeline(int AiSourceId, int AiObjektId, int AiObjektTeilId,
                 int AiMieterid, int AiArtRelation, 
                 MySqlDataAdapter ASdaRechnungenTmp, System.Data.DataTable ATblRechnungenTmp,
                 MySqlDataAdapter ASdaTeilobjekte, System.Data.DataTable ATblTeilobjekte,
@@ -189,7 +188,7 @@ namespace Ruddat_NK
             int liDaysEnd = 0; // Anzahl der Tages EndMonats
             // int liDaysInMonth = 0; // Tage im Monat aus Vertrag
             int liSave = 1;  // Freigabe
-            int LiArtRelation = 0;      // 1= Rechnung, 2=Zahlung, 3=Zähler
+            int LiArtRelation = AiArtRelation;      // 1= Rechnung, 2=Zahlung, 3=Zähler
 
             decimal ldBetragNetto = 0;
             decimal ldBetragSollNetto = 0;
@@ -197,143 +196,152 @@ namespace Ruddat_NK
             decimal ldBetragSollBrutto = 0;
             decimal ldGesamtflaeche = 0;
             decimal ldZs = 0;            // Zählerstand
-            decimal ldVerbrauch = 0;    // Zähler Verbrauch
+            // decimal ldVerbrauch = 0;    // Zähler Verbrauch
             decimal[] ladBetraege = new decimal[12];
 
             int zl = 0;
             int LiMwstId = 0;
             int liZlgOrRg = 0;
             int LiSourceId = 0;
-            int liRechnungId = 0;
-            int liZahlungId = 0;
-            int liZaehlerstandId = 0;
-            int liOk = 0;
-            int liAnzPersonenObj = 0;
-            int liAnzPersonenObt = 0;
-            int liFlTml = 0;            // Flag TimeLine in Zahlungen
-            int liImportId = 0;         // Import Id
             int liVerteilungId = 0;     // Id Kostenverteilung
-            int liRgId = 0;             // Rechnungs ID
-            int liZsId = 0;             // Zähler Id
+            //int liRechnungId = 0;
+            //int liZahlungId = 0;
+            //int liZaehlerstandId = 0;
+            //int liOk = 0;
+            //int liAnzPersonenObj = 0;
+            //int liAnzPersonenObt = 0;
+            //int liFlTml = 0;            // Flag TimeLine in Zahlungen
+            //int liImportId = 0;         // Import Id
+
+            //int liRgId = 0;             // Rechnungs ID
+            //int liZsId = 0;             // Zähler Id
 
             string LsVerteilung = "";
             string LsRgNr = "";
             string LsFirma = "";
 
-            if (ATblRechnungenTmp.Rows[0].ItemArray.GetValue(0) != DBNull.Value)
+            for (int i = 0; i < ATblRechnungenTmp.Rows.Count; i++)
             {
-                LiSourceId = (int)ATblRechnungenTmp.Rows[0].ItemArray.GetValue(0);        // Rechnungs Id Quelle
-                if (ATblRechnungenTmp.Rows[0].ItemArray.GetValue(7) != DBNull.Value)
-                    LiMwstId = int.Parse(ATblRechnungenTmp.Rows[0].ItemArray.GetValue(7).ToString());
-                if (ATblRechnungenTmp.Rows[0].ItemArray.GetValue(8) != DBNull.Value)
-                    liObjekt = (int)ATblRechnungenTmp.Rows[0].ItemArray.GetValue(8);
-                if (ATblRechnungenTmp.Rows[0].ItemArray.GetValue(9) != DBNull.Value)
-                    liObjektTeil = (int)ATblRechnungenTmp.Rows[0].ItemArray.GetValue(9);
-                if (ATblRechnungenTmp.Rows[0].ItemArray.GetValue(10) != DBNull.Value)
-                    liMieter = (int)ATblRechnungenTmp.Rows[0].ItemArray.GetValue(10);
-                if (ATblRechnungenTmp.Rows[0].ItemArray.GetValue(11) != DBNull.Value)
-                    LsRgNr = ATblRechnungenTmp.Rows[0].ItemArray.GetValue(11).ToString();
-                if (ATblRechnungenTmp.Rows[0].ItemArray.GetValue(12) != DBNull.Value)
-                    LsFirma = ATblRechnungenTmp.Rows[0].ItemArray.GetValue(12).ToString();
-                if (ATblRechnungenTmp.Rows[0].ItemArray.GetValue(5) != DBNull.Value)
-                    ldBetragNetto = (decimal)ATblRechnungenTmp.Rows[0].ItemArray.GetValue(5);
-                if (ATblRechnungenTmp.Rows[0].ItemArray.GetValue(6) != DBNull.Value)
-                    ldBetragBrutto = (decimal)ATblRechnungenTmp.Rows[0].ItemArray.GetValue(6);
-                if (ATblRechnungenTmp.Rows[0].ItemArray.GetValue(3) != DBNull.Value)
-                    Ldtrechnung = (DateTime)ATblRechnungenTmp.Rows[0].ItemArray.GetValue(2);
-                if (ATblRechnungenTmp.Rows[0].ItemArray.GetValue(3) != DBNull.Value)
-                    LdtStart = (DateTime)ATblRechnungenTmp.Rows[0].ItemArray.GetValue(3);
-                if (ATblRechnungenTmp.Rows[0].ItemArray.GetValue(4) != DBNull.Value)
-                    LdtEnd = (DateTime)ATblRechnungenTmp.Rows[0].ItemArray.GetValue(4);
-                if (ATblRechnungenTmp.Rows[0].ItemArray.GetValue(1) != DBNull.Value)
-                    LiKsa = (int)ATblRechnungenTmp.Rows[0].ItemArray.GetValue(1);
-                if (ATblRechnungenTmp.Rows[0].ItemArray.GetValue(16) != DBNull.Value)
-                    liVerteilungId = (int)ATblRechnungenTmp.Rows[0].ItemArray.GetValue(16);
-
-                // Anzahl der Tage des ersten Monats        99 ist der volle Monat
-                liDaysStart = Timeline.GetDaysStart(LdtStart);
-                // Anzahl der Tage des letzten Monats       99 ist der volle Monat
-                liDaysEnd = Timeline.GetDaysEnd(LdtEnd);
-                // Anzahl der einzutragenden Monate ermitteln
-                liMonths = Timeline.GetMonths(LdtStart, LdtEnd);
-                // Zahlung oder Rechnung 1= Zahlung 2= Rechnung
-                liZlgOrRg = 2;
-
-                // Monatsbeträge ermitteln (Brutto und Netto) und evtl. erster und letzter Monat nicht voll
-                ladBetraege = Timeline.GetBetraege(liMonths, liDaysStart, liDaysEnd,
-                ldBetragNetto, ldBetragBrutto,
-                        ldBetragSollNetto, ldBetragSollBrutto, liZlgOrRg, LdtStart, LdtEnd);
-
-                // Den ersten Monat ermitteln
-                string dt = (LdtStart.Year.ToString()) + "-" + LdtStart.Month.ToString() + "-01";
-                ldtMonat = DateTime.Parse(dt);                 // Datetime mit erstem Tag des Monats
-
-                // Ermitteln der VerteilungsId aus Tabelle Rechnungen
-                liVerteilungId = Timeline.GetVerteilungsId(AsConnect, LiSourceId);
-                // Ermitteln, wie verteilt werden soll aus der Tabelle art_verteilung
-                LsVerteilung = Timeline.GetVerteilung(AsConnect, liVerteilungId);
-                // Gesamtfläche aus Tabelle Objekt holen
-                ldGesamtflaeche = Timeline.GetObjektflaeche(liObjekt, liObjektTeil, liMieter, AsConnect);
-
-                // Timeline für das Objekt oder Objektteil erzeugen
-                for (int ii = 1; ii <= liMonths; ii++)
+                if (ATblRechnungenTmp.Rows[i].ItemArray.GetValue(0) != DBNull.Value)
                 {
-                    DataRow DrTimeline = ATblTimeline.NewRow();
+                    LiSourceId = (int)ATblRechnungenTmp.Rows[i].ItemArray.GetValue(0);        // Rechnungs Id Quelle
 
-                    DrTimeline[1] = LiSourceId;
-                    DrTimeline[4] = liObjekt;
-                    DrTimeline[5] = liObjektTeil;              // (int)ATblTeilobjekte.Rows[i].ItemArray.GetValue(0); // Objekt Id
-                    DrTimeline[6] = liMieter;
-                    DrTimeline[7] = LiKsa;
-                    //---------------------------------------------
-                    if (liDaysStart != 99 && zl == 1)
+                    // Delete Timeline mit dieser Rechnungs id
+                    Timeline.DeleteTimeline(LiSourceId, "R", AsConnect);
+
+                    if (ATblRechnungenTmp.Rows[i].ItemArray.GetValue(7) != DBNull.Value)
+                        LiMwstId = int.Parse(ATblRechnungenTmp.Rows[i].ItemArray.GetValue(7).ToString());
+                    if (ATblRechnungenTmp.Rows[i].ItemArray.GetValue(8) != DBNull.Value)
+                        liObjekt = (int)ATblRechnungenTmp.Rows[i].ItemArray.GetValue(8);
+                    if (ATblRechnungenTmp.Rows[i].ItemArray.GetValue(9) != DBNull.Value)
+                        liObjektTeil = (int)ATblRechnungenTmp.Rows[i].ItemArray.GetValue(9);
+                    if (ATblRechnungenTmp.Rows[i].ItemArray.GetValue(10) != DBNull.Value)
+                        liMieter = (int)ATblRechnungenTmp.Rows[i].ItemArray.GetValue(10);
+                    if (ATblRechnungenTmp.Rows[i].ItemArray.GetValue(11) != DBNull.Value)
+                        LsRgNr = ATblRechnungenTmp.Rows[i].ItemArray.GetValue(11).ToString();
+                    if (ATblRechnungenTmp.Rows[i].ItemArray.GetValue(12) != DBNull.Value)
+                        LsFirma = ATblRechnungenTmp.Rows[i].ItemArray.GetValue(12).ToString();
+                    if (ATblRechnungenTmp.Rows[i].ItemArray.GetValue(5) != DBNull.Value)
+                        ldBetragNetto = (decimal)ATblRechnungenTmp.Rows[i].ItemArray.GetValue(5);
+                    if (ATblRechnungenTmp.Rows[i].ItemArray.GetValue(6) != DBNull.Value)
+                        ldBetragBrutto = (decimal)ATblRechnungenTmp.Rows[i].ItemArray.GetValue(6);
+                    if (ATblRechnungenTmp.Rows[i].ItemArray.GetValue(3) != DBNull.Value)
+                        Ldtrechnung = (DateTime)ATblRechnungenTmp.Rows[i].ItemArray.GetValue(2);
+                    if (ATblRechnungenTmp.Rows[i].ItemArray.GetValue(3) != DBNull.Value)
+                        LdtStart = (DateTime)ATblRechnungenTmp.Rows[i].ItemArray.GetValue(3);
+                    if (ATblRechnungenTmp.Rows[i].ItemArray.GetValue(4) != DBNull.Value)
+                        LdtEnd = (DateTime)ATblRechnungenTmp.Rows[i].ItemArray.GetValue(4);
+                    if (ATblRechnungenTmp.Rows[i].ItemArray.GetValue(1) != DBNull.Value)
+                        LiKsa = (int)ATblRechnungenTmp.Rows[i].ItemArray.GetValue(1);
+                    if (ATblRechnungenTmp.Rows[i].ItemArray.GetValue(16) != DBNull.Value)
+                        liVerteilungId = (int)ATblRechnungenTmp.Rows[i].ItemArray.GetValue(16);
+
+                    // Anzahl der Tage des ersten Monats        99 ist der volle Monat
+                    liDaysStart = Timeline.GetDaysStart(LdtStart);
+                    // Anzahl der Tage des letzten Monats       99 ist der volle Monat
+                    liDaysEnd = Timeline.GetDaysEnd(LdtEnd);
+                    // Anzahl der einzutragenden Monate ermitteln
+                    liMonths = Timeline.GetMonths(LdtStart, LdtEnd);
+                    // Zahlung oder Rechnung 1= Zahlung 2= Rechnung
+                    liZlgOrRg = 2;
+
+                    // Monatsbeträge ermitteln (Brutto und Netto) und evtl. erster und letzter Monat nicht voll
+                    ladBetraege = Timeline.GetBetraege(liMonths, liDaysStart, liDaysEnd,
+                    ldBetragNetto, ldBetragBrutto,
+                            ldBetragSollNetto, ldBetragSollBrutto, liZlgOrRg, LdtStart, LdtEnd);
+
+                    // Den ersten Monat ermitteln
+                    string dt = (LdtStart.Year.ToString()) + "-" + LdtStart.Month.ToString() + "-01";
+                    ldtMonat = DateTime.Parse(dt);                 // Datetime mit erstem Tag des Monats
+
+                    // Ermitteln der VerteilungsId aus Tabelle Rechnungen
+                    liVerteilungId = Timeline.GetVerteilungsId(AsConnect, LiSourceId);
+                    // Ermitteln, wie verteilt werden soll aus der Tabelle art_verteilung
+                    LsVerteilung = Timeline.GetVerteilung(AsConnect, liVerteilungId);
+                    // Gesamtfläche aus Tabelle Objekt holen
+                    ldGesamtflaeche = Timeline.GetObjektflaeche(liObjekt, liObjektTeil, liMieter, AsConnect);
+
+                    // Timeline für das Objekt oder Objektteil erzeugen
+                    for (int ii = 1; ii <= liMonths; ii++)
                     {
-                        DrTimeline[8] = ladBetraege[5];         // Netto erster Monat bei späterem Beginn
-                        DrTimeline[10] = ladBetraege[6];         // Brutto
-                    }
-                    //---------------------------------------------
-                    else if (liDaysEnd != 99 && zl == liMonths)
-                    {
-                        DrTimeline[8] = ladBetraege[9];         // Netto letzter Monat bei früherem Ende
-                        DrTimeline[10] = ladBetraege[10];         // Brutto
-                    }
-                    else
-                    {
-                        DrTimeline[8] = ladBetraege[0];
-                        DrTimeline[10] = ladBetraege[1];
-                    }
-                    //---------------------------------------------
-                    DrTimeline[9] = ladBetraege[3];
-                    DrTimeline[11] = ladBetraege[4];
-                    DrTimeline[12] = ldZs;                  // Zählerstand
+                        DataRow DrTimeline = ATblTimeline.NewRow();
 
-                    if (ii == 1)                            // erster Monat
-                        DrTimeline[13] = LdtStart;
-                    else if (ii == liMonths)                // letzter Monat Letzten Tag eintragen
-                        DrTimeline[13] = LdtEnd;
-                    else
-                        DrTimeline[13] = ldtMonat;          // Der Timelinemonat
+                        DrTimeline[1] = LiSourceId;
+                        DrTimeline[4] = liObjekt;
+                        DrTimeline[5] = liObjektTeil;              // (int)ATblTeilobjekte.Rows[i].ItemArray.GetValue(0); // Objekt Id
+                        DrTimeline[6] = liMieter;
+                        DrTimeline[7] = LiKsa;
+                        //---------------------------------------------
+                        if (liDaysStart != 99 && zl == 1)
+                        {
+                            DrTimeline[8] = ladBetraege[5];         // Netto erster Monat bei späterem Beginn
+                            DrTimeline[10] = ladBetraege[6];         // Brutto
+                        }
+                        //---------------------------------------------
+                        else if (liDaysEnd != 99 && zl == liMonths)
+                        {
+                            DrTimeline[8] = ladBetraege[9];         // Netto letzter Monat bei früherem Ende
+                            DrTimeline[10] = ladBetraege[10];         // Brutto
+                        }
+                        else
+                        {
+                            DrTimeline[8] = ladBetraege[0];
+                            DrTimeline[10] = ladBetraege[1];
+                        }
+                        //---------------------------------------------
+                        DrTimeline[9] = ladBetraege[3];
+                        DrTimeline[11] = ladBetraege[4];
+                        DrTimeline[12] = ldZs;                  // Zählerstand
 
-                    DrTimeline[14] = 0;
-                    DrTimeline[15] = 0;
-                    ATblTimeline.Rows.Add(DrTimeline);
-                    // + Monat 
-                    ldtMonat = ldtMonat.AddMonths(1);
+                        if (ii == 1)                            // erster Monat
+                            DrTimeline[13] = LdtStart;
+                        else if (ii == liMonths)                // letzter Monat Letzten Tag eintragen
+                            DrTimeline[13] = LdtEnd;
+                        else
+                            DrTimeline[13] = ldtMonat;          // Der Timelinemonat
 
+                        DrTimeline[14] = 0;
+                        DrTimeline[15] = 0;
+                        ATblTimeline.Rows.Add(DrTimeline);
+                        // + Monat 
+                        ldtMonat = ldtMonat.AddMonths(1);
+
+                    }
+                    // Ab in die Datenbank
+                    MySqlCommandBuilder commandBuilder = new MySqlCommandBuilder(ASdaTimeline);
+                    ASdaTimeline.Update(ATblTimeline);
+
+                    LiOk = 1;
+                    // Todo Die Rechnungsverschiebung testen
                 }
-                // Ab in die Datenbank
-                MySqlCommandBuilder commandBuilder = new MySqlCommandBuilder(ASdaTimeline);
-                ASdaTimeline.Update(ATblTimeline);
+                else
+                {
+                    MessageBox.Show("Verarbeitungsfehler ERROR fetchdata fetchdata RdFunctions\n CreateRechnungen = ",
+                                "Achtung");
+                    LiOk = 0;
+                }
+            }
 
-                LiOk = 1;
-                // Todo Die Rechnungsverschiebung testen
-            }
-            else
-            {
-                MessageBox.Show("Verarbeitungsfehler ERROR fetchdata fetchdata RdFunctions\n CreateRechnungen = ",
-                            "Achtung");
-                LiOk = 0;
-            }
             return LiOk;
         }
 
@@ -471,11 +479,11 @@ namespace Ruddat_NK
                     switch (LsVerteilung)
                     {
                         case "fl":          // Berechnung Kosten MietFläche
-                            if (ATblTeilobjekte.Rows[i].ItemArray.GetValue(6) != DBNull.Value)
+                            if (ATblTeilobjekte.Rows[0].ItemArray.GetValue(6) != DBNull.Value)
                             {
-                                if ((decimal)ATblTeilobjekte.Rows[i].ItemArray.GetValue(6) > 0) // Fläche Teilobjekt
+                                if ((decimal)ATblTeilobjekte.Rows[0].ItemArray.GetValue(6) > 0) // Fläche Teilobjekt
                                 {
-                                    decimal LdteilFlaeche = (decimal)ATblTeilobjekte.Rows[i].ItemArray.GetValue(6);
+                                    decimal LdteilFlaeche = (decimal)ATblTeilobjekte.Rows[0].ItemArray.GetValue(6);
                                     decimal[] LdaBetrag = new decimal[2];
 
                                     LdaBetrag[0] = LadBetragMonat[0] / (LdGesamtflaeche / LdteilFlaeche);           // Netto    
@@ -486,15 +494,14 @@ namespace Ruddat_NK
 
                                     ATblRechnungen.Rows.Add(DrRechnung);
                                 }
-
                             }
                             break;
                         case "pz":          // Berechung nach Prozent
-                            if (ATblTeilobjekte.Rows[i].ItemArray.GetValue(7) != DBNull.Value)
+                            if (ATblTeilobjekte.Rows[0].ItemArray.GetValue(7) != DBNull.Value)
                             {
-                                if ((decimal)ATblTeilobjekte.Rows[i].ItemArray.GetValue(7) > 0)     //  Prozent
+                                if ((decimal)ATblTeilobjekte.Rows[0].ItemArray.GetValue(7) > 0)     //  Prozent
                                 {
-                                    decimal LdteilProzent = (decimal)ATblTeilobjekte.Rows[i].ItemArray.GetValue(7);
+                                    decimal LdteilProzent = (decimal)ATblTeilobjekte.Rows[0].ItemArray.GetValue(7);
                                     decimal[] LdaBetrag = new decimal[2];
 
                                     LdaBetrag[0] = LadBetragMonat[0] / (100 / LdteilProzent);           // Netto    
@@ -529,7 +536,6 @@ namespace Ruddat_NK
                     MessageBox.Show("Keine Beredchnung nach Personenanzahl möglich", "Verteilung auf Personen");
                     LiPersonenFlag = 0;
                 }
-
                 // Daten in die Datenbank schreiben
                 MySqlCommandBuilder commandBuilder = new MySqlCommandBuilder(ASdaRechnungen);
                 ASdaRechnungen.Update(ATblRechnungen);
@@ -537,10 +543,11 @@ namespace Ruddat_NK
             return LiOk;
         }
         // Nach Anwahl der Teilobjekte im Treeview die Mieterrechnungen erzeugen
-        internal static void CreateRechnungenMieter(int liId, int liArtRelation,
+        // Todo > nein Mieterrechnugen müssen aus der Timeline erzeugt werden
+        // Jeder Monat muss einzeln betrachtet werden (Mietervertrag)
+        internal static void CreateRechnungenMieter(int AiMieterId, int AiArtRelation,
             MySqlDataAdapter aSdRechnungen, DataTable aTblRechnungen,
             MySqlDataAdapter aSdObjektTeile, DataTable aTblObjektTeile,
-            MySqlDataAdapter aSdMieter, DataTable aTblMieter,
             MySqlDataAdapter aSdTimeline, DataTable aTblTimeline,
             string asConnect)
         {
@@ -559,33 +566,33 @@ namespace Ruddat_NK
             int liMonths = 0; //Anzahl der einzutragenden Monate
             int liDaysStart = 0; // Anzahl der Tages Startmonats
             int liDaysEnd = 0; // Anzahl der Tages EndMonats
-            // int liDaysInMonth = 0; // Tage im Monat aus Vertrag
+            int liDaysInMonth = 0; // Tage im Monat aus Vertrag
             int liSave = 1;  // Freigabe
-            int LiArtRelation = 0;      // 1= Rechnung, 2=Zahlung, 3=Zähler
+            int LiArtRelation = AiArtRelation;      // 1= Rechnung, 2=Zahlung, 3=Zähler
 
             decimal ldBetragNetto = 0;
-            decimal ldBetragSollNetto = 0;
+            //decimal ldBetragSollNetto = 0;
             decimal ldBetragBrutto = 0;
-            decimal ldBetragSollBrutto = 0;
-            decimal ldGesamtflaeche = 0;
-            decimal ldZs = 0;            // Zählerstand
-            decimal ldVerbrauch = 0;    // Zähler Verbrauch
+            //decimal ldBetragSollBrutto = 0;
+            //decimal ldGesamtflaeche = 0;
+            //decimal ldZs = 0;            // Zählerstand
+            //decimal ldVerbrauch = 0;    // Zähler Verbrauch
             decimal[] ladBetraege = new decimal[12];
 
             int LiMwstId = 0;
-            int liZlgOrRg = 0;
+            //int liZlgOrRg = 0;
             int LiSourceId = 0;
-            int liRechnungId = 0;
-            int liZahlungId = 0;
-            int liZaehlerstandId = 0;
-            int liOk = 0;
-            int liAnzPersonenObj = 0;
-            int liAnzPersonenObt = 0;
-            int liFlTml = 0;            // Flag TimeLine in Zahlungen
-            int liImportId = 0;         // Import Id
+            //int liRechnungId = 0;
+            //int liZahlungId = 0;
+            //int liZaehlerstandId = 0;
+            //int liOk = 0;
+            //int liAnzPersonenObj = 0;
+            //int liAnzPersonenObt = 0;
+            //int liFlTml = 0;            // Flag TimeLine in Zahlungen
+            //int liImportId = 0;         // Import Id
             int liVerteilungId = 0;     // Id Kostenverteilung
-            int liRgId = 0;             // Rechnungs ID
-            int liZsId = 0;             // Zähler Id
+            //int liRgId = 0;             // Rechnungs ID
+            //int liZsId = 0;             // Zähler Id
 
             string LsVerteilung = "";
             string LsRgNr = "";
@@ -595,14 +602,15 @@ namespace Ruddat_NK
             for (int i = 0; i < aTblRechnungen.Rows.Count; i++)
             {
                 LiSourceId = (int)aTblRechnungen.Rows[i].ItemArray.GetValue(0);        // Rechnungs Id Quelle
+
                 if (aTblRechnungen.Rows[i].ItemArray.GetValue(7) != DBNull.Value)
                     LiMwstId = int.Parse(aTblRechnungen.Rows[i].ItemArray.GetValue(7).ToString());
                 if (aTblRechnungen.Rows[i].ItemArray.GetValue(8) != DBNull.Value)
                     liObjekt = (int)aTblRechnungen.Rows[i].ItemArray.GetValue(8);
                 if (aTblRechnungen.Rows[i].ItemArray.GetValue(9) != DBNull.Value)
                     liObjektTeil = (int)aTblRechnungen.Rows[i].ItemArray.GetValue(9);
-                if (aTblRechnungen.Rows[i].ItemArray.GetValue(10) != DBNull.Value)
-                    liMieter = (int)aTblRechnungen.Rows[i].ItemArray.GetValue(10);
+                //if (aTblRechnungen.Rows[i].ItemArray.GetValue(10) != DBNull.Value)
+                //    liMieter = (int)aTblRechnungen.Rows[i].ItemArray.GetValue(10);
                 if (aTblRechnungen.Rows[i].ItemArray.GetValue(11) != DBNull.Value)
                     LsRgNr = aTblRechnungen.Rows[i].ItemArray.GetValue(11).ToString();
                 if (aTblRechnungen.Rows[i].ItemArray.GetValue(12) != DBNull.Value)

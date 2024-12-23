@@ -1043,13 +1043,6 @@ namespace Ruddat_NK
                     lsSql = RdQueries.GetSqlSelect(43, 0, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
                     liRows = FetchData(lsSql, 43, giDb, gsConnect);
 
-                    // TimeLine holen für ObjektTeile
-                    lsSql = RdQueries.GetSqlSelect(6, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
-                    liRows = FetchData(lsSql, 8, giDb, gsConnect);
-                    lsSqlTimeline = RdQueries.GetSqlSelect(106, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);      // Report
-                    lsSqlTimeline2 = RdQueries.GetSqlSelect(116, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);     // Darstellung der ObjektKosten in der NKA
-                    lsSqlTimeline3 = RdQueries.GetSqlSelect(140, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);     // Für das Einsetzen der Rechnungsnummer in die Timeline
-
                     // Rechnungen zeigen  Art 9 = Rechungen zeigen für Teilobjekte Datum aktiv
                     lsSql = RdQueries.GetSqlSelect(9, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
                     liRows = FetchData(lsSql, 9, giDb, gsConnect);
@@ -1065,6 +1058,20 @@ namespace Ruddat_NK
                     liRows = FetchData(lsSql, 21, giDb, gsConnect);
                     // Report Zählerstände
                     lsSqlZaehlerstd = RdQueries.GetSqlSelect(135, liId, "", "", "", ldtFromZaehler, ldtTo,giFiliale,gsConnect, giDb);   // Report
+
+                    // Timeline Rechnungen erzeugen für ObjektTeile
+                    RdAfterfetch.CreateTimeline(0, 0, liId, 0, 1,
+                         MySdRechnungen, TblRechnungen,
+                         MySdTeilObj, TblTeilObjekte,
+                         MySdTimeLine, TblTimeLine,
+                         gsConnect);
+
+                    // TimeLine holen für ObjektTeile
+                    lsSql = RdQueries.GetSqlSelect(6, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
+                    liRows = FetchData(lsSql, 8, giDb, gsConnect);
+                    lsSqlTimeline = RdQueries.GetSqlSelect(106, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);      // Report
+                    lsSqlTimeline2 = RdQueries.GetSqlSelect(116, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);     // Darstellung der ObjektKosten in der NKA
+                    lsSqlTimeline3 = RdQueries.GetSqlSelect(140, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);     // Für das Einsetzen der Rechnungsnummer in die Timeline
 
                     // Db Header für Report befüllen für ObjektTeile x_abr_info
                     lsSqlHeader = RdQueries.GetSqlSelect(202, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
@@ -1107,13 +1114,6 @@ namespace Ruddat_NK
                     // Die Objekt Id für die Darstellung der ObjektKosten besorgen
                     liObjektIdTmp = Timeline.GetIdObj(liId, gsConnect, 1);
 
-                    // TimeLine holen für Mieter
-                    lsSql = RdQueries.GetSqlSelect(7, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
-                    liRows = FetchData(lsSql, 8, giDb, gsConnect);
-                    lsSqlTimeline = RdQueries.GetSqlSelect(107, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);               // Report Nebenkosten Hauptteil
-                    lsSqlTimeline2 = RdQueries.GetSqlSelect(116, liObjektIdTmp, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);     // Darstellung der ObjektKosten in der NKA
-                    lsSqlTimeline3 = RdQueries.GetSqlSelect(140, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);              // Für das Einsetzen der Rechnungsnummer in die Timeline
-
                     // Rechnungen zeigen  Art 10 = Rechungen zeigen für Mieter Datum aktiv
                     lsSql = RdQueries.GetSqlSelect(10, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
                     liRows = FetchData(lsSql, 9, giDb, gsConnect);
@@ -1124,6 +1124,21 @@ namespace Ruddat_NK
                     liRows = FetchData(lsSql, 14, giDb, gsConnect);
                     lsSqlZahlungen = RdQueries.GetSqlSelect(123, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);     // Report
                     lsSqlSumme = RdQueries.GetSqlSelect(115, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);         // Report Summendarstellung Zahlbetrag
+
+                    // Timeline Rechnungen erzeugen für Mieter
+                    // Quelle ist die Timline der ObjektTeile
+                    //RdAfterfetch.CreateTimeline(0, 0, 0, liId, 1,
+                    //     MySdRechnungen, TblRechnungen,
+                    //     MySdTeilObj, TblTeilObjekte,
+                    //     MySdTimeLine, TblTimeLine,
+                    //     gsConnect);
+
+                    // TimeLine holen für Mieter
+                    lsSql = RdQueries.GetSqlSelect(7, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
+                    liRows = FetchData(lsSql, 8, giDb, gsConnect);
+                    lsSqlTimeline = RdQueries.GetSqlSelect(107, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);               // Report Nebenkosten Hauptteil
+                    lsSqlTimeline2 = RdQueries.GetSqlSelect(116, liObjektIdTmp, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);     // Darstellung der ObjektKosten in der NKA
+                    lsSqlTimeline3 = RdQueries.GetSqlSelect(140, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);              // Für das Einsetzen der Rechnungsnummer in die Timeline
 
                     // Tabelle Leerstand nicht befüllen, sondern leeren.
                     // Für Mieter gibt es keinen Leerstand

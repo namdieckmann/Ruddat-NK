@@ -104,9 +104,9 @@
                                 <DataGridTextColumn Header="Monat" 
                                     Binding="{Binding monat, StringFormat ={}{0:dd.MM.yyyy}}"/>
                                 <DataGridTextColumn Header="Betrag (Netto)" 
-                                    Binding="{Binding betrag_netto, StringFormat ={}{0:c},ConverterCulture=de-DE}"/>
+                                    Binding="{Binding betrag_netto, StringFormat ={}{0:c4},ConverterCulture=de-DE}"/>
                                 <DataGridTextColumn Header="Betrag (Brutto)" 
-                                    Binding="{Binding betrag_brutto, StringFormat ={}{0:c},ConverterCulture=de-DE}"/>
+                                    Binding="{Binding betrag_brutto, StringFormat ={}{0:c4},ConverterCulture=de-DE}"/>
                             </DataGrid.Columns>
                         </DataGrid>
                     </Grid>
@@ -241,8 +241,6 @@
                         <Button x:Name="btnRgSave" Content="Speichern" Margin="0,0,10.2,10.4" Click="btnRgSave_Click" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="134" RenderTransformOrigin="0.538,0.909" Grid.Column="1"/>
                         <Button x:Name="btnRgAdd" Content="Zufügen" HorizontalAlignment="Right" Margin="0,0,149.2,10.4" VerticalAlignment="Bottom" Width="75" Click="btnRgAdd_Click" Grid.Column="1"/>
                         <Button x:Name="btnRgDel" Content="Löschen" HorizontalAlignment="Right" Margin="0,0,229.2,10.4" VerticalAlignment="Bottom" Width="75" Click="btnRgDel_Click" Grid.Column="1"/>
-                        <ProgressBar x:Name="PBar" HorizontalAlignment="Left" Height="20" VerticalAlignment="Bottom" Width="817" 
-                                        Grid.Column="0" Grid.ColumnSpan="2" Margin="10,0,0,10" />
 
                     </Grid>
                 </TabItem.Content>
