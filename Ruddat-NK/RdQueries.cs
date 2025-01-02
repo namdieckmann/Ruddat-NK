@@ -352,6 +352,7 @@ namespace Ruddat_NK
                                     timeline.wtl_aus_objteil
                                 from timeline
                                 Right Join art_kostenart on timeline.id_ksa = art_kostenart.id_ksa ";
+                            lsWhereAdd = " Where  timeline.Id_rechnung = " + piId.ToString() + " ";
                             lsWhereAdd2 = " And timeline.id_objekt = " + ps3 + " ";
                             lsOrder = " Order by art_kostenart.bez, timeline.dt_monat desc ";
                             break;
@@ -370,6 +371,7 @@ namespace Ruddat_NK
                                 from timeline
                                 Right Join art_kostenart on timeline.id_ksa = art_kostenart.id_ksa 
                                 Right Join objekt_teil on timeline.id_objekt_teil = objekt_teil.id_objekt_teil ";
+                            lsWhereAdd = " Where  timeline.Id_rechnung = " + piId.ToString() + " ";
                             lsWhereAdd2 = " And timeline.id_objekt_teil = " + ps3 + " AND timeline.id_mieter = 0 ";
                             lsOrder = " Order by objekt_teil.bez, timeline.dt_monat desc";
                             break;
@@ -385,6 +387,7 @@ namespace Ruddat_NK
                                     timeline.wtl_aus_objekt
                                 from timeline
                                 Right Join art_kostenart on timeline.id_ksa = art_kostenart.id_ksa ";
+                            lsWhereAdd = " Where  timeline.Id_rechnung = " + piId.ToString() + " ";
                             lsWhereAdd2 = " And timeline.id_mieter = " + ps3 + " ";
                             //lsOrder = " Order by objekt_teil.bez, timeline.dt_monat desc";
                             lsOrder = " Order by timeline.dt_monat desc";
@@ -404,6 +407,7 @@ namespace Ruddat_NK
                                 from timeline
                                 Right Join art_kostenart on timeline.id_ksa = art_kostenart.id_ksa 
                                 Right Join objekt_teil on timeline.id_objekt_teil = objekt_teil.id_objekt_teil ";
+                            lsWhereAdd = " Where  timeline.Id_rechnung = " + piId.ToString() + " ";
                             lsWhereAdd2 = " And timeline.leerstand = " + ps3 + " ";
                             lsOrder = " Order by objekt_teil.bez, timeline.dt_monat desc";
                             break;
@@ -422,6 +426,7 @@ namespace Ruddat_NK
                                 from timeline
                                 Right Join art_kostenart on timeline.id_ksa = art_kostenart.id_ksa 
                                 Right Join objekt_teil on timeline.id_objekt_teil = objekt_teil.id_objekt_teil ";
+                            lsWhereAdd = " Where  timeline.Id_rechnung = " + piId.ToString() + " ";
                             lsWhereAdd2 = " And timeline.leerstand > 0 ";
                             lsOrder = " Order by objekt_teil.bez, timeline.dt_monat desc";
                             break;
@@ -430,7 +435,6 @@ namespace Ruddat_NK
                             break;
                     }
 
-                    lsWhereAdd = " Where  timeline.Id_rechnung = " + piId.ToString() + " ";
                     lsAnd = " And ";
                     lsFieldFrom = "timeline.dt_monat";
                     liOne = 2;
@@ -714,7 +718,9 @@ namespace Ruddat_NK
                     }
                     break;
                 case 43:
-                    // Eine Dummy Timeline zum Beschreiben
+                case 431:
+                case 432:
+                    // Timeline Lesen oder schreiben
                     lsSql = @"SELECT 
                                 Id_timeline,     
                                 id_rechnung,     
@@ -734,8 +740,21 @@ namespace Ruddat_NK
                                 wtl_aus_objteil,
                                 leerstand,
                                 id_import
-                            FROM timeline
-                            WHERE id_rechnung = " + piId.ToString() + " ";
+                            FROM timeline ";
+                    switch (piArt)
+                    {
+                        case 43:     // nur Timeline Schreiben
+                            break;
+                        case 431:     // Id Rechnung
+                            lsWhereAdd = " WHERE id_rechnung = " + piId.ToString() + " ";
+                            break;
+                        case 432:
+                            lsWhereAdd = " WHERE id_objekt_teil = " + piId.ToString() + " ";
+                            break;
+                        default:
+                            break;
+                    }
+                    lsSql = lsSql + lsWhereAdd;
                     break;
                 case 44:
                     // für die TimelineRelation Objektteile holen

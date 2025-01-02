@@ -224,7 +224,7 @@ namespace Ruddat_NK
                         //MySqlCommand command31 = new MySqlCommand(psSql, connect);
                         //mysdc = new MySqlDataAdapter(command31);
                         //mysdc.Fill(TblTimelineNew);
-                        //// liExternId = Afterfetch.MakeAfterFetch(piArt, 2, liExternId, 0, asConnect, aiDb);
+                     //    liExternId = RdAfterfetch.MakeAfterFetch(piArt, 2, liExternId, 0, asConnect, aiDb);
 
 
                         break;
@@ -650,7 +650,7 @@ namespace Ruddat_NK
             return LiOk;
         }
 
-        // Alle Datensätze der Timeline ID zunächst löschen
+        // Alle Datensätze der Timeline mit der Source ID zunächst löschen
         public static int DeleteTimeline(int AiSourceId, string asArt, string asConnect)
         {
             int liOk = 0;
@@ -667,6 +667,9 @@ namespace Ruddat_NK
                     break;
                 case "Z":   // Zählerstand
                     lsSql = RdQueriesFunctions.GetSql(202, AiSourceId, "", "", 0);
+                    break;
+                case "M":   // Timeline Mieter
+                    lsSql = RdQueriesFunctions.GetSql(203, AiSourceId, "", "", 0);
                     break;
                 default:
                     break;

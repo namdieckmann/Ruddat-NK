@@ -56,6 +56,7 @@ namespace Ruddat_NK
         DataTable TblZlgKostenart;
         DataTable TblRgMwst;
         DataTable TblTimeLine;
+        DataTable TblTimeLineObjTeile;
         DataTable TblTimelineSum;
         DataTable TblZahlungen;
         DataTable TblVerteilung;
@@ -85,6 +86,7 @@ namespace Ruddat_NK
         MySqlDataAdapter MySdZlgKostArt;
         MySqlDataAdapter MySdRgMwst;
         MySqlDataAdapter MySdTimeLine;
+        MySqlDataAdapter MySdTimeLineObjTeile;
         MySqlDataAdapter MySdTimelineSum;
         MySqlDataAdapter MySdZahlungen;
         MySqlDataAdapter MySdVerteilung;
@@ -155,7 +157,7 @@ namespace Ruddat_NK
             liRows = FetchData(lsSql, 2, giDb, lsConnect);
 
             // Standard ist Jahr -1
-            ldtYear = DateTime.Now.AddYears(-2);
+            ldtYear = DateTime.Now.AddYears(-3);
             gdtYear = ldtYear;
 
             ldtFrom = Timeline.GetYear(ldtYear, 1);
@@ -570,6 +572,12 @@ namespace Ruddat_NK
                     MySdTimeLine = new MySqlDataAdapter(com);
                     MySdTimeLine.Fill(TblTimeLine);
                 }
+                if (piArt == 432)                       // Timeline
+                {
+                    TblTimeLineObjTeile = new DataTable();     // Timeline ObjektTeile
+                    MySdTimeLineObjTeile = new MySqlDataAdapter(com);
+                    MySdTimeLineObjTeile.Fill(TblTimeLineObjTeile);
+                }
                 if (piArt == 44)
                 {
                     TblTeilObjekte = new DataTable();     // Teilobjekte nach Objekt Id
@@ -848,6 +856,7 @@ namespace Ruddat_NK
             int liRows = 0;
             int liIndex = 0;
             int liObjektIdTmp = 0;
+            int liObjektTeilIdTmp = 0;
 
             string lsTmp = "";
             string lsSql = "";
@@ -1039,7 +1048,7 @@ namespace Ruddat_NK
                     lsSql = RdQueries.GetSqlSelect(3, giFiliale, gsItemHeader, "2", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
                     liId = FetchData(lsSql, 4, giDb, gsConnect);
 
-                    // Eine DummyTimeline zu schreiben aus einer Funktion
+                    // Eine DummyTimeline zum schreiben in einer Funktion
                     lsSql = RdQueries.GetSqlSelect(43, 0, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
                     liRows = FetchData(lsSql, 43, giDb, gsConnect);
 
@@ -1108,20 +1117,17 @@ namespace Ruddat_NK
                     lsSql = RdQueries.GetSqlSelect(11, liIndex, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
                     liRows = FetchData(lsSql, 11, giDb, gsConnect);
 
-                    // Eine DummyTimeline zu schreiben aus einer Funktion
-                    lsSql = RdQueries.GetSqlSelect(43, 0, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
-                    liRows = FetchData(lsSql, 43, giDb, gsConnect);
-
                     // Die Mieter ID ermitteln
                     lsSql = RdQueries.GetSqlSelect(3, giFiliale, gsItemHeader, "3", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
                     liId = FetchData(lsSql, 5, giDb, gsConnect);
 
                     // Die Objekt Id für die Darstellung der ObjektKosten besorgen
                     liObjektIdTmp = Timeline.GetIdObj(liId, gsConnect, 1);
+                    liObjektTeilIdTmp = Timeline.GetIdObjTeil(liId, gsConnect); 
 
                     // Rechnungen zeigen  Art 10 = Rechungen zeigen für Mieter Datum aktiv
                     lsSql = RdQueries.GetSqlSelect(10, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
-                    liRows = FetchData(lsSql, 9, giDb, gsConnect);
+                    _ = FetchData(lsSql, 9, giDb, gsConnect);
                     lsSqlRechnungen = RdQueries.GetSqlSelect(110, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);  // Report
 
                     // Zahlungen zeigen Art 13 Zahlungen für Mieter
@@ -1130,13 +1136,21 @@ namespace Ruddat_NK
                     lsSqlZahlungen = RdQueries.GetSqlSelect(123, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);     // Report
                     lsSqlSumme = RdQueries.GetSqlSelect(115, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);         // Report Summendarstellung Zahlbetrag
 
+                    // Eine DummyTimeline nur zum beschreiben in Funktion CreateTimeline Mieter
+                    lsSql = RdQueries.GetSqlSelect(43, 0, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
+                    liRows = FetchData(lsSql, 43, giDb, gsConnect);
+
+                    // Timeline des Teilobjekts holen
+                    lsSql = RdQueries.GetSqlSelect(432, liObjektTeilIdTmp, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
+                    liRows = FetchData(lsSql, 432, giDb, gsConnect);
+
                     // Timeline Rechnungen erzeugen für Mieter
                     // Quelle ist die Timline der ObjektTeile
-                    //RdAfterfetch.CreateTimeline(0, 0, 0, liId, 1,
-                    //     MySdRechnungen, TblRechnungen,
-                    //     MySdTeilObj, TblTeilObjekte,
-                    //     MySdTimeLine, TblTimeLine,
-                    //     gsConnect);
+                    RdAfterfetch.CreateTimelineMieter(0, liObjektIdTmp, liObjektTeilIdTmp, liId, 1,
+                         MySdRechnungen, TblRechnungen,
+                         MySdTimeLineObjTeile, TblTimeLineObjTeile,
+                         MySdTimeLine, TblTimeLine,
+                         gsConnect);
 
                     // TimeLine holen für Mieter
                     lsSql = RdQueries.GetSqlSelect(7, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
