@@ -664,254 +664,87 @@ namespace Ruddat_NK
             }
         }
 
-        internal static void CreateTimelineMieter(int AiReserve, int AiObjektIdTmp, int AiObjektTeilIdTmp, int AiMieterId, int AiArtRelation, 
+        internal static void CreateTimelineMieter(int AiReserve, int AiObjektId, int AiObjektTeilId, int AiMieterId, int AiArtRelation, 
             MySqlDataAdapter ASdRechnungen, DataTable ATblRechnungen, 
             MySqlDataAdapter ASdTimeLineObjTeile, DataTable ATblTimeLineObjTeile, 
             MySqlDataAdapter ASdTimeLine, DataTable ATblTimeLine, 
             string AsConnect)
         {
+            int LiMieterId = 0;
 
-            int LiOk = 0;
 
-            DateTime LdtStart = DateTime.MinValue;
-            DateTime LdtEnd = DateTime.MinValue;
-            DateTime ldtMonat = DateTime.MinValue;
-            DateTime ldtVertrag = DateTime.MinValue;
-            DateTime Ldtrechnung = DateTime.MinValue;
-
-            int liObjekt = 0;
-            int liObjektTeil = 0;
-            int liMieter = 0;
-            int LiKsa = 0; // Kostenstellenart
-            int liMonths = 0; //Anzahl der einzutragenden Monate
-            int liDaysStart = 0; // Anzahl der Tages Startmonats
-            int liDaysEnd = 0; // Anzahl der Tages EndMonats
-            // int liDaysInMonth = 0; // Tage im Monat aus Vertrag
-            int liSave = 1;  // Freigabe
-            int LiArtRelation = AiArtRelation;      // 1= Rechnung, 2=Zahlung, 3=Zähler
-
-            decimal ldBetragNetto = 0;
-            decimal ldBetragSollNetto = 0;
-            decimal ldBetragBrutto = 0;
-            decimal ldBetragSollBrutto = 0;
-            decimal ldGesamtflaeche = 0;
-            decimal ldZs = 0;            // Zählerstand
-            // decimal ldVerbrauch = 0;    // Zähler Verbrauch
-            decimal[] ladBetraege = new decimal[12];
-
-            int zl = 0;
-            int LiMwstId = 0;
-            int liZlgOrRg = 0;
-            int LiSourceId = 0;
-            int liVerteilungId = 0;     // Id Kostenverteilung
-            //int liRechnungId = 0;
-            //int liZahlungId = 0;
-            //int liZaehlerstandId = 0;
-            //int liOk = 0;
-            //int liAnzPersonenObj = 0;
-            //int liAnzPersonenObt = 0;
-            //int liFlTml = 0;            // Flag TimeLine in Zahlungen
-            //int liImportId = 0;         // Import Id
-
-            //int liRgId = 0;             // Rechnungs ID
-            //int liZsId = 0;             // Zähler Id
-
-            string LsVerteilung = "";
-            string LsRgNr = "";
-            string LsFirma = "";
+            DateTime LdtVertragsMonat = DateTime.MinValue;
+            DateTime LdtVertragsInfo = DateTime.MinValue;
 
             // Erstmal alle Einträge der Timeline auf Mieterebene löschen
             Timeline.DeleteTimeline(AiMieterId, "M", AsConnect);
+
+
+            
 
             // Hier wird die ganze Timeline des Teilobjekts auf den Mieter übertragen
             // Einschränkung: Gucken, obder Vertrag existiert
             // Todo prüfen: Es werden auch Zählerwerte miterfasst 
             for (int i = 0; i < ATblTimeLineObjTeile.Rows.Count; i++)
             {
-                    if (ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(7) != DBNull.Value)
-                        LiMwstId = int.Parse(ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(7).ToString());
-                    if (ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(8) != DBNull.Value)
-                        liObjekt = (int)ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(8);
-                    if (ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(9) != DBNull.Value)
-                        liObjektTeil = (int)ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(9);
-                    if (ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(10) != DBNull.Value)
-                        liMieter = (int)ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(10);
-                    if (ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(11) != DBNull.Value)
-                        LsRgNr = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(11).ToString();
-                    if (ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(12) != DBNull.Value)
-                        LsFirma = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(12).ToString();
-                    if (ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(5) != DBNull.Value)
-                        ldBetragNetto = (decimal)ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(5);
-                    if (ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(6) != DBNull.Value)
-                        ldBetragBrutto = (decimal)ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(6);
-                    if (ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(2) != DBNull.Value)
-                        Ldtrechnung = (DateTime)ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(2);
-                    if (ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(3) != DBNull.Value)
-                        LdtStart = (DateTime)ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(3);
-                    if (ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(4) != DBNull.Value)
-                        LdtEnd = (DateTime)ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(4);
-                    if (ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(1) != DBNull.Value)
-                        LiKsa = (int)ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(1);
-                    if (ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(16) != DBNull.Value)
-                        liVerteilungId = (int)ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(16);
+                LiMieterId = 0;
+                // Hat der Mieter einen Vertrag
+                LiMieterId = Timeline.GetAktMieter((int)ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(5), 
+                                                    (DateTime)ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(13), AsConnect, 2);
 
-                    // Anzahl der Tage des ersten Monats        99 ist der volle Monat
-                    liDaysStart = Timeline.GetDaysStart(LdtStart);
-                    // Anzahl der Tage des letzten Monats       99 ist der volle Monat
-                    liDaysEnd = Timeline.GetDaysEnd(LdtEnd);
-                    // Anzahl der einzutragenden Monate ermitteln
-                    liMonths = Timeline.GetMonths(LdtStart, LdtEnd);
-                    // Zahlung oder Rechnung 1= Zahlung 2= Rechnung
-                    liZlgOrRg = 2;
-
-                    // Monatsbeträge ermitteln (Brutto und Netto) und evtl. erster und letzter Monat nicht voll
-                    ladBetraege = Timeline.GetBetraege(liMonths, liDaysStart, liDaysEnd,
-                    ldBetragNetto, ldBetragBrutto,
-                            ldBetragSollNetto, ldBetragSollBrutto, liZlgOrRg, LdtStart, LdtEnd);
-
-                    // Den ersten Monat ermitteln
-                    string dt = (LdtStart.Year.ToString()) + "-" + LdtStart.Month.ToString() + "-01";
-                    ldtMonat = DateTime.Parse(dt);                 // Datetime mit erstem Tag des Monats
-
-                    // Ermitteln der VerteilungsId aus Tabelle Rechnungen
-                    liVerteilungId = Timeline.GetVerteilungsId(AsConnect, LiSourceId);
-                    // Ermitteln, wie verteilt werden soll aus der Tabelle art_verteilung
-                    LsVerteilung = Timeline.GetVerteilung(AsConnect, liVerteilungId);
-                    // Gesamtfläche aus Tabelle Objekt holen
-                    ldGesamtflaeche = Timeline.GetObjektflaeche(liObjekt, liObjektTeil, liMieter, AsConnect);
-
-                    // Timeline für das Objekt oder Objektteil erzeugen
-                    for (int ii = 1; ii <= liMonths; ii++)
-                    {
-                        DataRow DrTimeline = ATblTimeLine.NewRow();
-
-                        DrTimeline[1] = LiSourceId;
-                        DrTimeline[4] = liObjekt;
-                        DrTimeline[5] = liObjektTeil;              // (int)ATblTeilobjekte.Rows[i].ItemArray.GetValue(0); // Objekt Id
-                        DrTimeline[6] = liMieter;
-                        DrTimeline[7] = LiKsa;
-                        //---------------------------------------------
-                        if (liDaysStart != 99 && zl == 1)
-                        {
-                            DrTimeline[8] = ladBetraege[5];         // Netto erster Monat bei späterem Beginn
-                            DrTimeline[10] = ladBetraege[6];         // Brutto
-                        }
-                        //---------------------------------------------
-                        else if (liDaysEnd != 99 && zl == liMonths)
-                        {
-                            DrTimeline[8] = ladBetraege[9];         // Netto letzter Monat bei früherem Ende
-                            DrTimeline[10] = ladBetraege[10];         // Brutto
-                        }
-                        else
-                        {
-                            DrTimeline[8] = ladBetraege[0];
-                            DrTimeline[10] = ladBetraege[1];
-                        }
-                        //---------------------------------------------
-                        DrTimeline[9] = ladBetraege[3];
-                        DrTimeline[11] = ladBetraege[4];
-                        DrTimeline[12] = ldZs;                  // Zählerstand
-
-                        if (ii == 1)                            // erster Monat
-                            DrTimeline[13] = LdtStart;
-                        else if (ii == liMonths)                // letzter Monat Letzten Tag eintragen
-                            DrTimeline[13] = LdtEnd;
-                        else
-                            DrTimeline[13] = ldtMonat;          // Der Timelinemonat
-
-                        DrTimeline[14] = 0;
-                        DrTimeline[15] = 0;
-
-                        ATblTimeLine.Rows.Add(DrTimeline);
-
-                    }
-                    // Ab in die Datenbank
-                    MySqlCommandBuilder commandBuilder = new MySqlCommandBuilder(ASdTimeLine);
-                    ASdTimeLine.Update(ATblTimeLine);
-
-                    LiOk = 1;
-
-                // Anzahl der Tage des ersten Monats        99 ist der volle Monat
-                liDaysStart = Timeline.GetDaysStart(LdtStart);
-                // Anzahl der Tage des letzten Monats       99 ist der volle Monat
-                liDaysEnd = Timeline.GetDaysEnd(LdtEnd);
-                // Anzahl der einzutragenden Monate ermitteln
-                liMonths = Timeline.GetMonths(LdtStart, LdtEnd);
-                // Zahlung oder Rechnung 1= Zahlung 2= Rechnung
-                liZlgOrRg = 2;
-
-                // Monatsbeträge ermitteln (Brutto und Netto) und evtl. erster und letzter Monat nicht voll
-                ladBetraege = Timeline.GetBetraege(liMonths, liDaysStart, liDaysEnd,
-                ldBetragNetto, ldBetragBrutto,
-                        ldBetragSollNetto, ldBetragSollBrutto, liZlgOrRg, LdtStart, LdtEnd);
-
-                // Den ersten Monat ermitteln
-                dt = (LdtStart.Year.ToString()) + "-" + LdtStart.Month.ToString() + "-01";
-                ldtMonat = DateTime.Parse(dt);                 // Datetime mit erstem Tag des Monats
-
-                // Ermitteln der VerteilungsId aus Tabelle Rechnungen
-                liVerteilungId = Timeline.GetVerteilungsId(AsConnect, LiSourceId);
-                // Ermitteln, wie verteilt werden soll aus der Tabelle art_verteilung
-                LsVerteilung = Timeline.GetVerteilung(AsConnect, liVerteilungId);
-                // Gesamtfläche aus Tabelle Objekt holen
-                ldGesamtflaeche = Timeline.GetObjektflaeche(liObjekt, liObjektTeil, liMieter, AsConnect);
-
-                // Timeline für das Objekt oder Objektteil erzeugen
-                for (int ii = 1; ii <= liMonths; ii++)
+                if (AiMieterId == LiMieterId)
                 {
                     DataRow DrTimeline = ATblTimeLine.NewRow();
 
-                    DrTimeline[1] = LiSourceId;
-                    DrTimeline[4] = liObjekt;
-                    DrTimeline[5] = liObjektTeil;              // (int)ATblTeilobjekte.Rows[i].ItemArray.GetValue(0); // Objekt Id
-                    DrTimeline[6] = liMieter;
-                    DrTimeline[7] = LiKsa;
-                    //---------------------------------------------
-                    if (liDaysStart != 99 && zl == 1)
-                    {
-                        DrTimeline[8] = ladBetraege[5];         // Netto erster Monat bei späterem Beginn
-                        DrTimeline[10] = ladBetraege[6];         // Brutto
-                    }
-                    //---------------------------------------------
-                    else if (liDaysEnd != 99 && zl == liMonths)
-                    {
-                        DrTimeline[8] = ladBetraege[9];         // Netto letzter Monat bei früherem Ende
-                        DrTimeline[10] = ladBetraege[10];         // Brutto
-                    }
-                    else
-                    {
-                        DrTimeline[8] = ladBetraege[0];
-                        DrTimeline[10] = ladBetraege[1];
-                    }
-                    //---------------------------------------------
-                    DrTimeline[9] = ladBetraege[3];
-                    DrTimeline[11] = ladBetraege[4];
-                    DrTimeline[12] = ldZs;                  // Zählerstand
+                    DrTimeline[1] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(1);
+                    DrTimeline[2] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(2);
+                    DrTimeline[3] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(3);
+                    DrTimeline[4] = 0;                                                      // kein Objekt
+                    DrTimeline[5] = 0;                                                      // Kein Teilobjekt
+                    DrTimeline[6] = AiMieterId;                                             // Mieter
+                    DrTimeline[7] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(7);
+                    DrTimeline[8] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(8);
+                    DrTimeline[9] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(9);
+                    DrTimeline[10] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(10);
+                    DrTimeline[11] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(11);
+                    DrTimeline[12] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(12);
+                    DrTimeline[13] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(13);
+                    DrTimeline[14] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(14);
+                    DrTimeline[15] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(15);
+                    DrTimeline[16] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(16);
 
-                    if (ii == 1)                            // erster Monat
-                        DrTimeline[13] = LdtStart;
-                    else if (ii == liMonths)                // letzter Monat Letzten Tag eintragen
-                        DrTimeline[13] = LdtEnd;
-                    else
-                        DrTimeline[13] = ldtMonat;          // Der Timelinemonat
-
-                    DrTimeline[14] = 0;
-                    DrTimeline[15] = 0;
                     ATblTimeLine.Rows.Add(DrTimeline);
-                    // + Monat 
-                    ldtMonat = ldtMonat.AddMonths(1);
-
                 }
-                // Ab in die Datenbank
-                MySqlCommandBuilder commandBuilder2 = new MySqlCommandBuilder(ASdTimeLine);
-                ASdTimeLine.Update(ATblTimeLine);
+                else
+                {
+                    if (LiMieterId == 0)            // Todo Leerstand buchen
+                    {
+                        DataRow DrTimeline = ATblTimeLine.NewRow();
 
-                LiOk = 1;
+                        DrTimeline[1] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(1);
+                        DrTimeline[2] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(2);
+                        DrTimeline[3] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(3);
+                        DrTimeline[4] = 0;                                                      // kein Objekt
+                        DrTimeline[5] = AiObjektTeilId;                                         // Teilobjekt bei Leerstand
+                        DrTimeline[6] = 0;                                                      // kein Mieter
+                        DrTimeline[7] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(7);
+                        DrTimeline[8] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(8);
+                        DrTimeline[9] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(9);
+                        DrTimeline[10] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(10);
+                        DrTimeline[11] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(11);
+                        DrTimeline[12] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(12);
+                        DrTimeline[13] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(13);
+                        DrTimeline[14] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(14);
+                        DrTimeline[15] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(15);
+                        DrTimeline[16] = AiObjektTeilId;
 
-
-
-
+                        ATblTimeLine.Rows.Add(DrTimeline);
+                    }
+                }
             }
+            // Ab in die Datenbank
+            MySqlCommandBuilder commandBuilder = new MySqlCommandBuilder(ASdTimeLine);
+            ASdTimeLine.Update(ATblTimeLine);
         }
     }
 }

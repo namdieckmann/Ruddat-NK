@@ -1883,6 +1883,7 @@ namespace Ruddat_NK
 
         // Verteilungsinformationen für die Nebenkostenabrechnung ermitteln
         // aiId Rechnung ist die Rechnungs Id aus extern Timeline ID ACHTUNG!!
+        // Todo überprüfen, wo das verwendete wird!!
         public static object GetVerteilungsInfo(string asConnect, int aiIdRechnung, int aiArtVerteilungId,
             int aiObjektId, int aiTObjektId, int aiMieterId,
             string asDatVon, string asDatBis, int aiIdExternTimelineZaehlerstand, int aiDetailGrad)
@@ -2017,8 +2018,6 @@ namespace Ruddat_NK
                                         "Mietfläche: " + ldFlaecheTObjekt.ToString("0.##") + "m²";
                                     break;
                             }
-
-
                         }
                     }
                     else

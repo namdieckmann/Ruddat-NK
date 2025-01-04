@@ -692,17 +692,19 @@ namespace Ruddat_NK
                     break;
                 case 41:
                     // Mieter Id aus Vertrag ermitteln
-                    //lsSql = @"Select id_mieter from vertrag
-                    //        Where id_objekt_teil = " + piId.ToString() + " AND vertrag_aktiv = 1 ";
+                    // lsSql = @"Select id_mieter from vertrag
+                    // Where id_objekt_teil = " + piId.ToString() + " AND vertrag_aktiv = 1 ";
                     lsSql = @"Select id_mieter from vertrag
                                 Where id_objekt_teil = " + piId.ToString();
-                    lsFieldFrom = "vertrag.datum_von";
-                    lsFieldTo = "vertrag.datum_bis";
+                    lsFieldFrom = " vertrag.datum_von ";
+                    lsFieldTo = " vertrag.datum_bis ";
                     lsWhereAdd2 = RdQueriesTime.GetDateQueryResultVertrag(adtWtStart, lsFieldFrom, lsFieldTo, liOne, aiDb);
                     lsSql = lsSql + lsWhereAdd2;
                     break;
                 case 42:
                     // Vertragsbeginn oder -ende
+                    // !!!!!!!!!!!!!!!!!!!!
+                    // Todo: Prüfen, wo das verwendet wird, ist das wirklich eindeutig?
                     switch (aiFiliale)      // Filiale wird hier verwendet, um Vetragsbeginn oder -ende zu ermitteln
                     {
                         case 1:
@@ -743,12 +745,13 @@ namespace Ruddat_NK
                             FROM timeline ";
                     switch (piArt)
                     {
-                        case 43:     // nur Timeline Schreiben
+                        case 43:     // nur Timeline Schreiben keine Datensätze holen
+                            lsWhereAdd = " WHERE id_timeline = 1 ";
                             break;
                         case 431:     // Id Rechnung
                             lsWhereAdd = " WHERE id_rechnung = " + piId.ToString() + " ";
                             break;
-                        case 432:
+                        case 432:     // Id ObjektTeil
                             lsWhereAdd = " WHERE id_objekt_teil = " + piId.ToString() + " ";
                             break;
                         default:
