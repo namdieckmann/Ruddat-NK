@@ -187,7 +187,8 @@ namespace Ruddat_NK
                     // Rückgabe des ZeitQueries für Rechnungen
                     lsFieldFrom = "rechnungen.datum_von";
                     lsFieldTo = "rechnungen.datum_bis";
-                    liOne = 3;
+                    liOne = 4;      // Rechnungen, die in dem Jahr liegen 
+                                    // auch die im vorherigen Jahr beginnen oder im nächsten Jahr enden
                     lsWhereAdd2 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsFieldFrom, lsFieldTo, lsAnd, liOne, aiDb);
 
                     lsSql = @"select 
@@ -219,7 +220,8 @@ namespace Ruddat_NK
                     lsAnd = " And ";
                     lsFieldFrom = "rechnungen.datum_von";
                     lsFieldTo = "rechnungen.datum_bis";
-                    liOne = 3;      // rechnungen von bis
+                    liOne = 4;      // Rechnungen, die in dem Jahr liegen 
+                                    // auch die im vorherigen Jahr beginnen oder im nächsten Jahr enden
                     lsWhereAdd2 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsFieldFrom, lsFieldFrom, lsAnd, liOne, aiDb);
 
                     lsSql = @"select 
@@ -276,7 +278,8 @@ namespace Ruddat_NK
                     lsAnd = " And ";
                     lsFieldFrom = "rechnungen.datum_von";
                     lsFieldTo = "rechnungen.datum_bis";
-                    liOne = 3;      // rechnungen von bis
+                    liOne = 4;      // Rechnungen, die in dem Jahr liegen 
+                                    // auch die im vorherigen Jahr beginnen oder im nächsten Jahr enden
                     lsWhereAdd2 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsFieldFrom, lsFieldFrom, lsAnd, liOne, aiDb);
 
                     lsSql = @"select id_rechnungen,

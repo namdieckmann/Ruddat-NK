@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Rebar;
 
 namespace Ruddat_NK
 {
@@ -69,6 +70,31 @@ namespace Ruddat_NK
             return (LsSql);
         }
 
+        // Die Information Year(AdtStart) = Year(FeldbezStart) ODER Year(feldBezEnde)
+        // Z.B für Rechungen die in dem Jahr beginnen oder enden
+        private static string GetDateQueryFour(string AsFieldFrom, string AsFieldTo, DateTime AdtStart, DateTime AdtEnd, int aiDb)
+        {
+            String LsSql = "";
+
+            switch (aiDb)
+            {
+                case 1:         // MsSql
+                    LsSql = "";
+                    break;
+                case 2:         // MySql
+                    //LsSql = @"str_to_date('" + AdtStart.ToString() + "','%d.%m.%Y')" + " " +
+                    //            " BETWEEN " + AsFieldFrom.ToString() + " AND " + AsFieldTo.ToString();
+
+                    LsSql = @"((YEAR(str_to_date('" + AdtStart.ToString() + "','%d.%m.%Y'))) = " + " YEAR(" + AsFieldFrom.ToString() + ")"
+                        + " OR (YEAR(str_to_date('" + AdtStart.ToString() + "', '%d.%m.%Y'))) = " + " YEAR(" + AsFieldTo.ToString() + "))";
+                    break;
+                default:
+                    break;
+            }
+
+            return LsSql;
+        }
+
         // Komplettes Ermitteln des DateQueries
         internal static string GetDateQueryResult(DateTime adtWtStart, DateTime adtWtEnd, DateTime adtStart, DateTime adtEnd, string asFieldFrom, string asFieldTo, string asAnd, int aiOne, int aiDb)
         {
@@ -106,8 +132,6 @@ namespace Ruddat_NK
 
                         lsWhere = RdQueriesTime.GetDateQueryTwo(asFieldFrom, adtWtStart, ldtAdd, aiDb);
                         lsWhere = asAnd + lsWhere;
-                        //" timeline.dt_monat >= Convert(DateTime," + "\'" + adtWtStart + "',104) "
-                        //            + "And timeline.dt_monat <= Convert(DateTime," + "\'" + ldtAdd + "',104)";
                     }
 
                     // Start und EndeDatum 
@@ -115,16 +139,12 @@ namespace Ruddat_NK
                     {
                         lsWhere = RdQueriesTime.GetDateQueryTwo(asFieldFrom, adtWtStart, adtWtEnd, aiDb);
                         lsWhere = asAnd + lsWhere;
-                        //    " timeline.dt_monat >= Convert(DateTime," + "\'" + adtWtStart + "',104) "
-                        //+ "And timeline.dt_monat <= Convert(DateTime," + "\'" + adtWtEnd + "',104)";
                     }
                     // Wurde kein Datum gewählt, aktuelles Jahr zeigen
                     else
                     {
                         lsWhere = RdQueriesTime.GetDateQueryTwo(asFieldFrom, adtStart, adtEnd, aiDb);
                         lsWhere = asAnd + lsWhere;
-                        //lsWhereAdd2 = lsAnd + " timeline.dt_monat >= Convert(DateTime," + "\'" + ldtStart + "',104) "
-                        //    + "And timeline.dt_monat <= Convert(DateTime," + "\'" + ldtEnd + "',104)";
                     }
                     break;
                 case 3:         // Es gibt das Feld from und To
@@ -133,18 +153,18 @@ namespace Ruddat_NK
                     {
                         lsWhere = RdQueriesTime.GetDateQueryThree(asFieldFrom, asFieldTo, adtWtStart, adtWtEnd, aiDb);
                         lsWhere = asAnd + lsWhere;
-                        //    " timeline.dt_monat >= Convert(DateTime," + "\'" + adtWtStart + "',104) "
-                        //+ "And timeline.dt_monat <= Convert(DateTime," + "\'" + adtWtEnd + "',104)";
                     }
                     // Wurde kein Datum gewählt, aktuelles Jahr zeigen
                     else
                     {
                         lsWhere = RdQueriesTime.GetDateQueryThree(asFieldFrom, asFieldTo, adtStart, adtEnd, aiDb);
                         lsWhere = asAnd + lsWhere;
-                        //lsWhereAdd2 = lsAnd + " timeline.dt_monat >= Convert(DateTime," + "\'" + ldtStart + "',104) "
-                        //    + "And timeline.dt_monat <= Convert(DateTime," + "\'" + ldtEnd + "',104)";
                     }
-
+                    break;
+                case 4: // z.B für Rechnungen es sollen alle Rechnungen aus dem Jahr gezeigt werden 
+                        // Also BeginnDatum im Jahr, oder EndeDatum in dem Jahr
+                    lsWhere = RdQueriesTime.GetDateQueryFour(asFieldFrom, asFieldTo, adtWtStart, adtWtEnd, aiDb);
+                    lsWhere = asAnd + lsWhere;
                     break;
                 default:
                     break;

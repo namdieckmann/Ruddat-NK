@@ -1007,6 +1007,22 @@ namespace Ruddat_NK
                     liRows = FetchData(lsSql, 18, giDb, gsConnect);
                     lsSqlLeerstand = RdQueries.GetSqlSelect(222, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);     // für Report
 
+                    // Timeline Rechnungen erzeugen für ObjektTeile
+                    // LiArtRelation = 1 für Rechnung (4. Argument
+                    RdAfterfetch.CreateTimeline(0, liId, 0, 0, 1,
+                         MySdRechnungen, TblRechnungen,
+                         MySdTeilObj, TblTeilObjekte,
+                         MySdTimeLine, TblTimeLine,
+                         gsConnect);
+
+                    // TimeLine holen für Objekte
+                    lsSql = RdQueries.GetSqlSelect(5, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
+                    liRows = FetchData(lsSql, 8, giDb, gsConnect);
+                    // Todo Reportdaten Queries testen
+                    lsSqlTimeline = RdQueries.GetSqlSelect(106, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);      // Report
+                    lsSqlTimeline2 = RdQueries.GetSqlSelect(116, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);     // Darstellung der ObjektKosten in der NKA
+                    lsSqlTimeline3 = RdQueries.GetSqlSelect(140, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);     // Für das Einsetzen der Rechnungsnummer in die Timeline
+
                     // Db Header für Report befüllen für Objekte x_abr_info
                     lsSqlHeader = RdQueries.GetSqlSelect(201, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
                     liRows = FetchData(lsSqlHeader, 17, giDb, gsConnect);
@@ -1068,6 +1084,13 @@ namespace Ruddat_NK
                     // Report Zählerstände
                     lsSqlZaehlerstd = RdQueries.GetSqlSelect(135, liId, "", "", "", ldtFromZaehler, ldtTo,giFiliale,gsConnect, giDb);   // Report
 
+                    // Tabelle Leerstand befüllen
+                    DgrLeerDetail.ItemsSource = null;
+                    lsSql = RdQueries.GetSqlSelect(213, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
+                    liRows = FetchData(lsSql, 18, giDb, gsConnect);
+                    // Detaillierter Leerstand
+                    lsSqlLeerstand = RdQueries.GetSqlSelect(223, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);     // für Report
+
                     // Timeline Rechnungen erzeugen für ObjektTeile
                     // LiArtRelation = 1 für Rechnung (4. Argument
                     RdAfterfetch.CreateTimeline(0, 0, liId, 0, 1,
@@ -1086,13 +1109,6 @@ namespace Ruddat_NK
                     // Db Header für Report befüllen für ObjektTeile x_abr_info
                     lsSqlHeader = RdQueries.GetSqlSelect(202, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
                     liRows = FetchData(lsSqlHeader, 17, giDb, gsConnect);
-
-                    // Tabelle Leerstand befüllen
-                    DgrLeerDetail.ItemsSource = null;
-                    lsSql = RdQueries.GetSqlSelect(213, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
-                    liRows = FetchData(lsSql, 18, giDb, gsConnect);
-                    // Detaillierter Leerstand
-                    lsSqlLeerstand = RdQueries.GetSqlSelect(223, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);     // für Report
 
                     // Global TeilObjekt Id
                     GiObjektId = 0;
