@@ -534,7 +534,25 @@ namespace Ruddat_NK
                     lsSql = @" Select id_verteilung
                                 ,bez as b
                                 ,kb 
+                                ,objekt
+                                ,teilobjekt
+                                ,mieter
                             from art_verteilung";
+                    switch (piId)
+                    {
+                        case 1:
+                            lsWhereAdd = " WHERE objekt = 1";
+                            break;
+                        case 2:
+                            lsWhereAdd = " WHERE teilobjekt = 1";
+                            break;
+                        case 3:
+                            lsWhereAdd = " WHERE mieter = 1";
+                            break;
+                        default:
+                            break;
+                    }
+                    lsSql = lsSql + lsWhereAdd;
                     break;
                 case 17:
                     // InfoTablelle für den Druck der Abrechnungen

@@ -342,7 +342,7 @@
         <Calendar x:Name="clFrom" HorizontalAlignment="Left" Margin="113,0,0,-0.143" VerticalAlignment="Bottom" SelectedDatesChanged="clFrom_SelectedDatesChanged" Grid.Column="1"/>
         <Calendar x:Name="clTo" HorizontalAlignment="Left" Margin="297,0,0,-0.143" VerticalAlignment="Bottom" SelectedDatesChanged="clTo_SelectedDatesChanged" Grid.Column="1"/>
         <Calendar x:Name="clYear" HorizontalAlignment="Left" Margin="1078,0,0,4.857" VerticalAlignment="Bottom" Grid.Column="1" DisplayMode="Decade"  
-                  SelectedDatesChanged="ClYear_SelectedDatesChanged"/>
+                  DisplayModeChanged="YearCalendar_DisplayModeChanged" />
         <Label x:Name="lbl2" Content="Gewählt:" HorizontalAlignment="Left" Margin="10,0,0,9.857" RenderTransformOrigin="-8.353,3.03" Width="60" Height="23" VerticalAlignment="Bottom"/>
         <TextBox x:Name="tbNameSearch" HorizontalAlignment="Left" Height="23" Margin="75,0,0,9.857" TextWrapping="Wrap" Width="232" VerticalAlignment="Bottom" Grid.ColumnSpan="2"/>
         <CheckBox x:Name="cbCal" Content="Kalender anwählen" Margin="481,0,0,144.857" VerticalAlignment="Bottom" HorizontalAlignment="Left" Checked="cbCal_Checked" Unchecked="cbCal_Unchecked" Grid.Column="1"/>

@@ -1173,7 +1173,7 @@ namespace Ruddat_NK
         }
 
         // Verteilungs ID aus art_verteilung ermitteln
-        public static int GetIdArtVerteilung(string asBez, string asConnect)
+        public static int GetVerteilungIdAusArtVerteilung(string asBez, string asConnect)
         {
             int liVerteilungId = 0;
             String lsSql = "";
@@ -1492,7 +1492,7 @@ namespace Ruddat_NK
                     else if (TblTimeline.Rows[i].ItemArray.GetValue(18) != DBNull.Value)                      // Art der Verteilung für Zähler ermitteln "zl"
                     {
                         liIdExternTimelineZaehlerstand = Convert.ToInt16(TblTimeline.Rows[i].ItemArray.GetValue(18));
-                        liIdArtVerteilung = Timeline.GetIdArtVerteilung("zl", asConnect);
+                        liIdArtVerteilung = Timeline.GetVerteilungIdAusArtVerteilung("zl", asConnect);
                     }
                     if (TblTimeline.Rows[i].ItemArray.GetValue(2) != DBNull.Value)
                     {
@@ -1675,7 +1675,7 @@ namespace Ruddat_NK
                         else if (TblTimelineObjKst.Rows[i].ItemArray.GetValue(18) != DBNull.Value)                      // Art der Verteilung für Zähler ermitteln "zl"
                         {
                             liIdExternTimelineZaehlerstand = Convert.ToInt16(TblTimelineObjKst.Rows[i].ItemArray.GetValue(18));
-                            liIdArtVerteilung = Timeline.GetIdArtVerteilung("zl", asConnect);
+                            liIdArtVerteilung = Timeline.GetVerteilungIdAusArtVerteilung("zl", asConnect);
                         }
 
                         //// Hier nicht zeigen
@@ -2240,6 +2240,18 @@ namespace Ruddat_NK
             liId = FetchData(lsSql, "", "", 26, asConnect);
 
             return (liId);
+        }
+
+        // Prozentsatz der Verteilung aus der Mietfläche holen
+        internal static decimal GetProzentFromObjTeil(int AiObjektTeilId, string asConnect)
+        {
+            lsSql = "";
+            decimal LdProzent = 0;
+
+            lsSql = RdQueriesFunctions.GetSql(53, AiObjektTeilId, "", "", 0);
+            LdProzent = FetchDataDecimal(lsSql, "",  1, asConnect);
+
+            return LdProzent;
         }
 
         // ermitteln des des aktuellen Mandanten

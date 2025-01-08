@@ -929,9 +929,7 @@ namespace Ruddat_NK
             // Combobox Mwst in Rechnungen befüllen Art = 11
             lsSql = RdQueries.GetSqlSelect(12, 0, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
             liRows = FetchData(lsSql, 12, giDb, gsConnect);
-            // Combobox Kostenverteilung in Rechnungen befüllen Art = 16
-            lsSql = RdQueries.GetSqlSelect(16, 0, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
-            liRows = FetchData(lsSql, 16, giDb, gsConnect);
+
             // Combobox Kostenart in Zahlungen befüllen Art = 11/15 Objekt Kennung 4
             lsSql = RdQueries.GetSqlSelect(11, 4, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
             liRows = FetchData(lsSql, 15, giDb, gsConnect);
@@ -967,6 +965,10 @@ namespace Ruddat_NK
                     // Die zugehörigen Teilobjekte holen
                     lsSql = RdQueries.GetSqlSelect(44, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
                     liRows = FetchData(lsSql, 44, giDb, gsConnect);
+
+                    // Combobox Kostenverteilung in Rechnungen befüllen Art = 16 1 = Objekte
+                    lsSql = RdQueries.GetSqlSelect(16, 1, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
+                    liRows = FetchData(lsSql, 16, giDb, gsConnect);
 
                     // Combobox Kostenart in rechnungen befüllen Art = 11 Objekt Kennung 1
                     lsSql = RdQueries.GetSqlSelect(11, liIndex, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
@@ -1056,6 +1058,10 @@ namespace Ruddat_NK
                     lsSql = RdQueries.GetSqlSelect(11, liIndex, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
                     liRows = FetchData(lsSql, 11, giDb, gsConnect);
 
+                    // Combobox Kostenverteilung in Rechnungen befüllen Art = 16, 2 = TeilObjekte
+                    lsSql = RdQueries.GetSqlSelect(16, 2, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
+                    liRows = FetchData(lsSql, 16, giDb, gsConnect);
+
                     // Combobox Zählernummern und mwst in Zähler
                     lsSql = RdQueries.GetSqlSelect(2222, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
                     liRows = FetchData(lsSql, 22, giDb, gsConnect);
@@ -1132,6 +1138,10 @@ namespace Ruddat_NK
                     // Combobox Kostenart in rechnungen befüllen Art = 11
                     lsSql = RdQueries.GetSqlSelect(11, liIndex, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
                     liRows = FetchData(lsSql, 11, giDb, gsConnect);
+
+                    // Combobox Kostenverteilung in Rechnungen befüllen Art = 16 3= Mieter
+                    lsSql = RdQueries.GetSqlSelect(16, 3, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
+                    liRows = FetchData(lsSql, 16, giDb, gsConnect);
 
                     // Die Mieter ID ermitteln
                     lsSql = RdQueries.GetSqlSelect(3, giFiliale, gsItemHeader, "3", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
@@ -2433,8 +2443,7 @@ namespace Ruddat_NK
             //gdtZahlung = ldtZlg;
         }
 
-        // Das Abrechnungsjahr kann gewählt werden
-        private void ClYear_SelectedDatesChanged(object sender, SelectionChangedEventArgs e)
+        private void YearCalendar_DisplayModeChanged(object sender, CalendarModeChangedEventArgs e)
         {
             int liRows = 0;
             string lsSql = "";
@@ -2443,40 +2452,42 @@ namespace Ruddat_NK
             DateTime ldtFrom = DateTime.MinValue;
             DateTime ldtTo = DateTime.MinValue;
 
-            ldtYear = clYear.SelectedDate.Value;
+            if (clYear.SelectedDate != null)
+            {
+                // Hier können Sie das ausgewählte Jahr verarbeiten
+                ldtYear = clYear.DisplayDate;
+                gdtYear = ldtYear;              // Global machen
 
-            gdtYear = ldtYear;      // Clobal
+                ldtFrom = Timeline.GetYear(ldtYear, 1);
+                ldtTo = Timeline.GetYear(ldtYear, 2);
 
-            ldtFrom = Timeline.GetYear(ldtYear, 1);
-            ldtTo = Timeline.GetYear(ldtYear, 2);
+                tbDateFrom.Text = ldtFrom.ToString("dd-MM-yyyy HH:mm");
+                tbDateTo.Text = ldtTo.ToString("dd-MM-yyyy HH:mm");
 
-            tbDateFrom.Text = ldtFrom.ToString("dd-MM-yyyy HH:mm");
-            tbDateTo.Text = ldtTo.ToString("dd-MM-yyyy HH:mm");
+                clFrom.SelectedDate = ldtFrom;
+                clFrom.DisplayDate = ldtFrom;
 
-            // clFrom.DisplayDate = ldtFrom;
-            clFrom.SelectedDate = ldtFrom;
-            clFrom.DisplayDate = ldtFrom;
-            // gdtFrom = ldtFrom;          // Global
+                clTo.SelectedDate = ldtTo;
+                clTo.DisplayDate = ldtTo;
 
-            // clTo.DisplayDate = ldtTo;
-            clTo.SelectedDate = ldtTo;
-            clTo.DisplayDate = ldtTo;
-            // gdtTo = ldtTo;              // Global
+                // Calender Year aus
+                clYear.IsEnabled = false;
+                cbYear.IsChecked = false;
 
-            // Calender Year aus
-            clYear.IsEnabled = false;
-            cbYear.IsChecked = false;
+                ////Das CalendarControl den Modus "Decade"
+                //if (clYear.DisplayMode != CalendarMode.Decade)
+                //    clYear.DisplayMode = CalendarMode.Decade;
 
-            // Treeview befüllen 
-            lsSql = RdQueries.GetSqlSelect(2, giFiliale, "", "", "", DateTime.Today, DateTime.Today, giFiliale, gsConnect, giDb);
+                // Treeview befüllen 
+                lsSql = RdQueries.GetSqlSelect(2, giFiliale, "", "", "", DateTime.Today, DateTime.Today, giFiliale, gsConnect, giDb);
 
-            // Daten holen 
-            liRows = FetchData(lsSql, 2, giDb, gsConnect);                          // Aufruf Art 2 ist Treeview befüllen   
+                // Daten holen 
+                liRows = FetchData(lsSql, 2, giDb, gsConnect);                          // Aufruf Art 2 ist Treeview befüllen   
 
-            // Tabelle Leerstand befüllen
-            lsSql = RdQueries.GetSqlSelect(211, giFiliale, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
-            liRows = FetchData(lsSql, 18, giDb, gsConnect);
-
+                // Tabelle Leerstand befüllen
+                lsSql = RdQueries.GetSqlSelect(211, giFiliale, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
+                liRows = FetchData(lsSql, 18, giDb, gsConnect);
+            }
         }
 
         // Todo Menü Rechnungen importieren
