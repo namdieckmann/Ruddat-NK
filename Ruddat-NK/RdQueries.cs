@@ -139,7 +139,7 @@ namespace Ruddat_NK
                             Right Join art_kostenart on timeline.id_ksa = art_kostenart.id_ksa";
                     lsGroup = @" Group by art_kostenart.bez,art_kostenart.sort,timeline.id_rechnung,timeline.id_vorauszahlung,
                                 timeline.wtl_aus_objekt,timeline.wtl_aus_objteil,timeline.id_zaehlerstand  ";
-                    lsOrder = " Order by art_kostenart.sort ";
+                    lsOrder = " Order by timeline.wtl_aus_objekt, timeline.wtl_aus_objteil";
                     // Objekt ID
                     if (piId > 0)
                     {

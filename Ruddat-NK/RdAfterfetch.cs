@@ -148,13 +148,13 @@ namespace Ruddat_NK
                                     AsdaTimeline, ATblTimeline,
                                     asConnect);
                                 break;
-                            //case 3:         // Mieter
-                            //    CreateTimeline(LiSourceId, liObjekt, liObjektTeil, liMieter, liArtRelation,
-                            //        ASdaRechnungenTmp, ATblRechnungenTmp,
-                            //        AsdaObjektTeile, ATblObjektTeile,
-                            //        AsdaTimeline, ATblTimeline,
-                            //        asConnect);
-                            //    break;
+                            case 3:         // Mieterkosten direkt, der Mieter ist klar, deshalb diese Funktion
+                                CreateTimeline(LiSourceId, liObjekt, liObjektTeil, liMieter, liArtRelation,
+                                    ASdaRechnungenTmp, ATblRechnungenTmp,
+                                    AsdaObjektTeile, ATblObjektTeile,
+                                    AsdaTimeline, ATblTimeline,
+                                    asConnect);
+                                break;
                             default:
                                 break;
                         }
@@ -309,7 +309,7 @@ namespace Ruddat_NK
                     // Gesamtfläche aus Tabelle Objekt holen
                     ldGesamtflaeche = Timeline.GetObjektflaeche(liObjekt, liObjektTeil, liMieter, AsConnect);
 
-                    // Timeline für das Objekt oder Objektteil erzeugen
+                    // Timeline für das Objekt, Objektteil oder Mieter erzeugen
                     for (int ii = 1; ii <= liMonths; ii++)
                     {
                         DataRow DrTimeline = ATblTimeline.NewRow();
@@ -318,7 +318,7 @@ namespace Ruddat_NK
                         DrTimeline[4] = liObjekt;
                         DrTimeline[5] = liObjektTeil;              // (int)ATblTeilobjekte.Rows[i].ItemArray.GetValue(0); // Objekt Id
                         DrTimeline[6] = liMieter;
-                        DrTimeline[7] = LiKsa;
+                        DrTimeline[7] = LiKsa;                     // Kostenart
                         //---------------------------------------------
                         if (liDaysStart != 99 && zl == 1)
                         {
@@ -361,7 +361,6 @@ namespace Ruddat_NK
                     ASdaTimeline.Update(ATblTimeline);
 
                     LiOk = 1;
-                    // Todo Die Rechnungsverschiebung testen
                 }
                 else
                 {
@@ -796,7 +795,5 @@ namespace Ruddat_NK
                 aTblRechnungen.Rows.Add(DrRechnung);
             }
         }
-
-
     }
 }

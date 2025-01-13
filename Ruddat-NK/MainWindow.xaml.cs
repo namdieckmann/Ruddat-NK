@@ -163,8 +163,8 @@ namespace Ruddat_NK
             ldtFrom = Timeline.GetYear(ldtYear, 1);
             ldtTo = Timeline.GetYear(ldtYear, 2);
 
-            tbDateFrom.Text = ldtFrom.ToString("dd-MM-yyyy HH:mm");
-            tbDateTo.Text = ldtTo.ToString("dd-MM-yyyy HH:mm");
+            LblDateFrom.Content = ldtFrom.ToString("dd-MM-yyyy HH:mm");
+            LblDateTo.Content = ldtTo.ToString("dd-MM-yyyy HH:mm");
 
             // clFrom.DisplayDate = ldtFrom;
             clFrom.SelectedDate = ldtFrom;
@@ -767,8 +767,8 @@ namespace Ruddat_NK
             ldtFrom = Timeline.GetYear(ldtYear, 1);
             ldtTo = Timeline.GetYear(ldtYear, 2);
 
-            tbDateFrom.Text = ldtFrom.ToString("dd-MM-yyyy HH:mm");
-            tbDateTo.Text = ldtTo.ToString("dd-MM-yyyy HH:mm");
+            LblDateFrom.Content = ldtFrom.ToString("dd-MM-yyyy HH:mm");
+            LblDateTo.Content = ldtTo.ToString("dd-MM-yyyy HH:mm");
 
             // clFrom.DisplayDate = ldtFrom;
             clFrom.SelectedDate = ldtFrom;
@@ -784,18 +784,22 @@ namespace Ruddat_NK
             clYear.SelectedDate = ldtYear;
             clYear.DisplayDate = ldtYear;
 
-            tbDateTo.Text = ldtTo.ToString("dd-MM-yyyy HH:mm");
+            LblDateTo.Content = ldtTo.ToString("dd-MM-yyyy HH:mm");
         }
 
         // Abrechnungsjahr ein
         private void CbYear_Checked(object sender, RoutedEventArgs e)
         {
             clYear.IsEnabled = true;
+            clYear.SelectedDate = clFrom.SelectedDate;
         }
         // Abrechnungsjahr aus
         private void CbYear_Unchecked(object sender, RoutedEventArgs e)
         {
             clYear.IsEnabled = false;
+            //Das CalendarControl den Modus "Decade"
+            if (clYear.DisplayMode != CalendarMode.Decade)
+                clYear.DisplayMode = CalendarMode.Decade;
         }
 
         // Datum gewählt Kalender From
@@ -811,7 +815,7 @@ namespace Ruddat_NK
             {
                 ldtFrom = clFrom.SelectedDate.Value;
                 lsDateFrom = ldtFrom.ToString("dd-MM-yyyy HH:mm");
-                tbDateFrom.Text = lsDateFrom;
+                LblDateFrom.Content = lsDateFrom;
             }
 
             // Alle DataGrids aktualisieren
@@ -832,11 +836,11 @@ namespace Ruddat_NK
             {
                 ldtFrom = clFrom.SelectedDate.Value;
                 lsDateFrom = ldtFrom.ToString("dd-MM-yyyy HH:mm");
-                tbDateFrom.Text = lsDateFrom;
+                LblDateFrom.Content = lsDateFrom;
 
                 ldtTo = clTo.SelectedDate.Value;
                 lsDateTo = ldtTo.ToString("dd-MM-yyyy HH:mm");
-                tbDateTo.Text = lsDateTo;
+                LblDateTo.Content = lsDateTo;
 
                 // Alle DataGrids aktualisieren
                 liOk = updateAllDataGrids(0);
@@ -854,6 +858,7 @@ namespace Ruddat_NK
             int liOk = 0;
             int liId = 0;
             int liRows = 0;
+            int LiRowsRechnungenMieter = 0;
             int liIndex = 0;
             int liObjektIdTmp = 0;
             int liObjektTeilIdTmp = 0;
@@ -1153,7 +1158,7 @@ namespace Ruddat_NK
 
                     // Rechnungen zeigen  Art 10 = Rechungen zeigen für Mieter Datum aktiv
                     lsSql = RdQueries.GetSqlSelect(10, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
-                    _ = FetchData(lsSql, 9, giDb, gsConnect);
+                    LiRowsRechnungenMieter = FetchData(lsSql, 9, giDb, gsConnect);
                     lsSqlRechnungen = RdQueries.GetSqlSelect(110, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);  // Report
 
                     // Zahlungen zeigen Art 13 Zahlungen für Mieter
@@ -1178,8 +1183,19 @@ namespace Ruddat_NK
                          MySdTimeLine, TblTimeLine,
                          gsConnect);
 
+                    // Wenn es direkte Mieterrechnungen gibt, auch dafür eine Timeline erzeugen
+                    if (LiRowsRechnungenMieter > 0)
+                    {
+                        RdAfterfetch.CreateTimeline(0, 0, 0, liId, 1,
+                             MySdRechnungen, TblRechnungen,
+                             MySdTeilObj, TblTeilObjekte,
+                             MySdTimeLine, TblTimeLine,
+                             gsConnect);
+                    }
+
                     // TimeLine holen für Mieter
                     lsSql = RdQueries.GetSqlSelect(7, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
+
                     liRows = FetchData(lsSql, 8, giDb, gsConnect);
                     lsSqlTimeline = RdQueries.GetSqlSelect(107, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);               // Report Nebenkosten Hauptteil
                     lsSqlTimeline2 = RdQueries.GetSqlSelect(116, liObjektIdTmp, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);     // Darstellung der ObjektKosten in der NKA
@@ -1960,7 +1976,7 @@ namespace Ruddat_NK
                 {
                     ldtFrom = clFrom.SelectedDate.Value;
                     lsDateFrom = ldtFrom.ToString("dd-MM-yyyy HH:mm");
-                    tbDateFrom.Text = lsDateFrom;
+                    LblDateFrom.Content = lsDateFrom;
 
                     ldtTo = clTo.SelectedDate.Value;
                     // Enddatum bis 23:59:59
@@ -1968,7 +1984,7 @@ namespace Ruddat_NK
                     //ldtTo = ldtTo.AddMinutes(59);
                     //ldtTo = ldtTo.AddSeconds(59);
                     lsDateTo = ldtTo.ToString("dd-MM-yyyy HH:mm");
-                    tbDateTo.Text = lsDateTo;
+                    LblDateTo.Content = lsDateTo;
 
                 }
                 // nur das Startdatum wurde gewählt; EndeDatum ist heutiger Tag
@@ -1976,7 +1992,7 @@ namespace Ruddat_NK
                 {
                     ldtFrom = clFrom.SelectedDate.Value;
                     lsDateFrom = ldtFrom.ToString("dd-MM-yyyy HH:mm");
-                    tbDateFrom.Text = lsDateFrom;
+                    LblDateFrom.Content = lsDateFrom;
                     ldtTo = DateTime.Today;
                 }
 
@@ -2369,7 +2385,7 @@ namespace Ruddat_NK
                 {
                     ldtFrom = clFrom.SelectedDate.Value;
                     lsDateFrom = ldtFrom.ToString("dd-MM-yyyy HH:mm");
-                    tbDateFrom.Text = lsDateFrom;
+                    LblDateFrom.Content = lsDateFrom;
 
                     ldtTo = clTo.SelectedDate.Value;
                     // Enddatum bis 23:59:59
@@ -2377,14 +2393,14 @@ namespace Ruddat_NK
                     ldtTo = ldtTo.AddMinutes(59);
                     ldtTo = ldtTo.AddSeconds(59);
                     lsDateTo = ldtTo.ToString("dd-MM-yyyy HH:mm");
-                    tbDateTo.Text = lsDateTo;
+                    LblDateTo.Content = lsDateTo;
                 }
                 // nur das Startdatum wurde gewählt; EndeDatum ist heutiger Tag
                 else if (clTo.SelectedDate.HasValue)
                 {
                     ldtFrom = clFrom.SelectedDate.Value;
                     lsDateFrom = ldtFrom.ToString("dd-MM-yyyy HH:mm");
-                    tbDateFrom.Text = lsDateFrom;
+                    LblDateFrom.Content = lsDateFrom;
                     ldtTo = DateTime.Today;
                 }
 
@@ -2461,8 +2477,8 @@ namespace Ruddat_NK
                 ldtFrom = Timeline.GetYear(ldtYear, 1);
                 ldtTo = Timeline.GetYear(ldtYear, 2);
 
-                tbDateFrom.Text = ldtFrom.ToString("dd-MM-yyyy HH:mm");
-                tbDateTo.Text = ldtTo.ToString("dd-MM-yyyy HH:mm");
+                LblDateFrom.Content = ldtFrom.ToString("dd-MM-yyyy HH:mm");
+                LblDateTo.Content = ldtTo.ToString("dd-MM-yyyy HH:mm");
 
                 clFrom.SelectedDate = ldtFrom;
                 clFrom.DisplayDate = ldtFrom;
@@ -2473,10 +2489,6 @@ namespace Ruddat_NK
                 // Calender Year aus
                 clYear.IsEnabled = false;
                 cbYear.IsChecked = false;
-
-                ////Das CalendarControl den Modus "Decade"
-                //if (clYear.DisplayMode != CalendarMode.Decade)
-                //    clYear.DisplayMode = CalendarMode.Decade;
 
                 // Treeview befüllen 
                 lsSql = RdQueries.GetSqlSelect(2, giFiliale, "", "", "", DateTime.Today, DateTime.Today, giFiliale, gsConnect, giDb);
