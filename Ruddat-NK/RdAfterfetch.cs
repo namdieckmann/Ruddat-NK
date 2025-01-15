@@ -252,10 +252,12 @@ namespace Ruddat_NK
                     }
                     else if (ATblRechnungen.Rows[i].ItemArray.GetValue(0) != DBNull.Value)     // Rechnungs Id Objekt
                     {
+                        // Timeline löschen
+                        Timeline.DeleteTimeline((int)ATblRechnungen.Rows[i].ItemArray.GetValue(0), "R", AsConnect);
                         // Weiterleitungen Rechnung aus Objekt
                         if (AiObjektId > 0)
                         {
-                            Timeline.DeleteTimeline((int)ATblRechnungen.Rows[i].ItemArray.GetValue(0), "R", AsConnect);
+
                             LiWtlObjekt = 1;
                         }
                         // Rechnung aus Teilobjekt
@@ -404,7 +406,9 @@ namespace Ruddat_NK
             DateTime LdtVertragsInfo = DateTime.MinValue;
 
             // Erstmal alle Einträge der Timeline auf Mieterebene löschen
-            Timeline.DeleteTimeline(AiMieterId, "M", AsConnect);
+            // Todo : Das geht nicht, du kannst nicht die komplette Timeline des Mieters löschen
+            // Da muss dir was besseres einfallen
+            // Timeline.DeleteTimeline(AiMieterId, "M", AsConnect);
 
             // Ermitteln, welche Kostenart für prozentuale Weiterleitung zum Mieter id 2?
             LsVerteilung = "pz";
