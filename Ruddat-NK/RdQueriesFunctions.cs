@@ -70,12 +70,12 @@ namespace Ruddat_NK
                     lsSql = @"delete FROM timeline
 					         WHERE id_zaehlerstand = " + lsWhereAdd;
                     break;
-                case 203:
-                    // Timeline löschen Mieter
+                case 205:
+                    // Timeline löschen Source Rechnungsnummer
                     lsWhereAdd = piId.ToString() + " ";
 
                     lsSql = @"delete FROM timeline
-					         WHERE id_mieter = " + lsWhereAdd;
+					         WHERE id_rg_nr = " + lsWhereAdd;
                     break;
                 case 3:
                     // Timeline neu erzeugen in ps2 steht, welches Feld beschrieben werden soll

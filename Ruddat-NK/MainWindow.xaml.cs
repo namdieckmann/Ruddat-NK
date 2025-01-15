@@ -1414,7 +1414,7 @@ namespace Ruddat_NK
             // aktualisiert Rechnungen TblRechnungen
             FetchData("", 35, giDb, gsConnect);
             // Update DataGrids
-            updateAllDataGrids(0);
+            // updateAllDataGrids(0);
 
             // Die gewählte Rechnung holen
             LsSql = RdQueries.GetSqlSelect(45, GiRechnungTmpId, "", "", "", DateTime.MinValue, DateTime.MinValue, giFiliale, gsConnect, giDb);

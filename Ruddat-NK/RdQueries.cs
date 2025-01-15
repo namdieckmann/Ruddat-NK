@@ -762,7 +762,8 @@ namespace Ruddat_NK
                                 wtl_aus_objekt,
                                 wtl_aus_objteil,
                                 leerstand,
-                                id_import
+                                id_import,
+                                id_rg_nr
                             FROM timeline ";
                     switch (piArt)
                     {

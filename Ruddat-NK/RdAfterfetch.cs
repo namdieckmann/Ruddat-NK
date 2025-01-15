@@ -17,7 +17,7 @@ namespace Ruddat_NK
         // AiTeil wird Art der Aufteilung?
         // ----------------------------------------------------------------------------------------
         public static int MakeAfterFetch(int aiArt, int aiTeil, int ai1, int ai2, string asConnect, 
-            MySqlDataAdapter ASdaRechnungenTmp, DataTable ATblRechnungenTmp,
+            MySqlDataAdapter ASdaRechnungenTmp, DataTable ATblRechnungen,
             MySqlDataAdapter AsdaObjektTeile, DataTable ATblObjektTeile,
             MySqlDataAdapter AsdaMieter, DataTable ATblMieter,
             MySqlDataAdapter AsdaTimeline, DataTable ATblTimeline
@@ -70,94 +70,104 @@ namespace Ruddat_NK
             //string lsObjektBezS = "";
             int LiReturn = 0;
 
-            for (int i = 0; i < ATblRechnungenTmp.Rows.Count; i++)
+            for (int i = 0; i < ATblRechnungen.Rows.Count; i++)
             {
                 // ID aus der Rechnung ermitteln 
-                if (ATblRechnungenTmp.Rows[i].ItemArray.GetValue(14) != DBNull.Value)
+                if (ATblRechnungen.Rows[i].ItemArray.GetValue(14) != DBNull.Value)
                 {
-                    if (int.Parse(ATblRechnungenTmp.Rows[i].ItemArray.GetValue(14).ToString()) == ai1)     // Nur der zugefügte oder editierte Datensatz
+                    if (int.Parse(ATblRechnungen.Rows[i].ItemArray.GetValue(14).ToString()) == ai1)     // Nur der zugefügte oder editierte Datensatz
                     {
                         // Die Original Id der Rechnung
-                        LiSourceId = int.Parse(ATblRechnungenTmp.Rows[i].ItemArray.GetValue(0).ToString());
+                        LiSourceId = int.Parse(ATblRechnungen.Rows[i].ItemArray.GetValue(0).ToString());
 
                         // Erzeugte Untergeordnete Rechnungen löschen
+
                         // Alle mit der Id der Hauptrechnung in id_rechnung_source löschen
                         Timeline.DeleteRechnung(LiSourceId, "R", asConnect);
-                        // Delete Timeline mit dieser Rechnungs id
-                        Timeline.DeleteTimeline(LiSourceId, "R", asConnect);
 
-                        // Objekt Rechnung > Timeline erzeugen
-                        if (ATblRechnungenTmp.Rows[i].ItemArray.GetValue(8) != DBNull.Value)
-                            if ((int)ATblRechnungenTmp.Rows[i].ItemArray.GetValue(8) > 0)
+                        // Objekt Rechnung
+                        if (ATblRechnungen.Rows[i].ItemArray.GetValue(8) != DBNull.Value)
+                            if ((int)ATblRechnungen.Rows[i].ItemArray.GetValue(8) > 0)
                             {
-                                LiKsa = (int)ATblRechnungenTmp.Rows[i].ItemArray.GetValue(1);                  // Kostenart
-                                liObjekt = (int)ATblRechnungenTmp.Rows[i].ItemArray.GetValue(8);               // Objekt
-                                LiSwitch = 1;
+                                LiKsa = (int)ATblRechnungen.Rows[i].ItemArray.GetValue(1);                  // Kostenart
+                                liObjekt = (int)ATblRechnungen.Rows[i].ItemArray.GetValue(8);               // Objekt
+                                liArtRelation = 1;                                                             // Rechnung
+
+                                if (Timeline.GetWeiterleitung(1, LiKsa, asConnect) == 1)
+                                {
+                                    liArtRelation = 1;          // Rechnung
+                                                                // Rechnungen und Timeline für alle zugehörigen Objektteile erzeugen
+                                    CreateRechnungenObjTeile(LiSourceId, liObjekt, liObjektTeil, liMieter, liArtRelation,
+                                        ASdaRechnungenTmp, ATblRechnungen,
+                                        AsdaObjektTeile, ATblObjektTeile,
+                                        AsdaTimeline, ATblTimeline,
+                                        asConnect
+                                        );
+                                }
+                            }
+                        // Teilobjekt Rechnung
+                        if (ATblRechnungen.Rows[i].ItemArray.GetValue(9) != DBNull.Value)
+                            if ((int)ATblRechnungen.Rows[i].ItemArray.GetValue(9) > 0)
+                            {
+                                LiKsa = (int)ATblRechnungen.Rows[i].ItemArray.GetValue(1);                  // Kostenart
+                                liObjektTeil = (int)ATblRechnungen.Rows[i].ItemArray.GetValue(9);           // ObjektTeil
                                 liArtRelation = 1;                                                             // Rechnung
                             }
-                        // Teilobjekt Rechnung und Timeline erzeugen
-                        if (ATblRechnungenTmp.Rows[i].ItemArray.GetValue(9) != DBNull.Value)
-                            if ((int)ATblRechnungenTmp.Rows[i].ItemArray.GetValue(9) > 0)
+                        // Mieter Rechnung
+                        if (ATblRechnungen.Rows[i].ItemArray.GetValue(10) != DBNull.Value)
+                            if ((int)ATblRechnungen.Rows[i].ItemArray.GetValue(10) > 0)
                             {
-                                LiKsa = (int)ATblRechnungenTmp.Rows[i].ItemArray.GetValue(1);                  // Kostenart
-                                liObjektTeil = (int)ATblRechnungenTmp.Rows[i].ItemArray.GetValue(9);           // ObjektTeil
-                                LiSwitch = 2;
-                                liArtRelation = 1;                                                             // Rechnung
-                            }
-                        // Mieter Rechnung und Timeline erzeugen
-                        if (ATblRechnungenTmp.Rows[i].ItemArray.GetValue(10) != DBNull.Value)
-                            if ((int)ATblRechnungenTmp.Rows[i].ItemArray.GetValue(10) > 0)
-                            {
-                                LiKsa = (int)ATblRechnungenTmp.Rows[i].ItemArray.GetValue(1);                   // Kostenart
-                                liMieter = (int)ATblRechnungenTmp.Rows[i].ItemArray.GetValue(10);               // Mieter
-                                LiSwitch = 3;
+                                LiKsa = (int)ATblRechnungen.Rows[i].ItemArray.GetValue(1);                   // Kostenart
+                                liMieter = (int)ATblRechnungen.Rows[i].ItemArray.GetValue(10);               // Mieter
                                 liArtRelation = 1;                                                              // Rechnung
                             }
 
-                        switch (LiSwitch)
-                        {
-                            case 1:         // Objekte nach Anlegen einer Rechnung in Objekten
-                                            // Timeline für Objekte
-                                if (CreateTimeline(LiSourceId, liObjekt, liObjektTeil, liMieter, liArtRelation,
-                                    ASdaRechnungenTmp, ATblRechnungenTmp,
-                                    AsdaObjektTeile, ATblObjektTeile,
-                                    AsdaTimeline, ATblTimeline,
-                                    asConnect
-                                    ) == 1)
-                                {
-                                    // Weiterleitung an ObjektTeil aus der Kostenart ermitteln
-                                    // 1 = Weiterleitung an Teilobjekt
-                                    if (Timeline.GetWeiterleitung(1, LiKsa, asConnect) == 1)
-                                    {
-                                        liArtRelation = 1;          // Rechnung
-                                                                    // Rechnungen und Timeline für alle zugehörigen Objektteile erzeugen
-                                        CreateRechnungenObjTeile(LiSourceId, liObjekt, liObjektTeil, liMieter, liArtRelation,
-                                            ASdaRechnungenTmp, ATblRechnungenTmp,
-                                            AsdaObjektTeile, ATblObjektTeile,
-                                            AsdaTimeline, ATblTimeline,
-                                            asConnect
-                                            );
-                                    }
-                                }
-                                break;
-                            case 2:         // Teilobjekte nach Anlegen oder ändern einer Rechnung Timeline erzeugen
-                                // Timeline erstellen
-                                CreateTimeline(LiSourceId, liObjekt, liObjektTeil, liMieter, liArtRelation,
-                                    ASdaRechnungenTmp, ATblRechnungenTmp,
-                                    AsdaObjektTeile, ATblObjektTeile,
-                                    AsdaTimeline, ATblTimeline,
-                                    asConnect);
-                                break;
-                            case 3:         // Mieterkosten direkt, der Mieter ist klar, deshalb diese Funktion
-                                CreateTimeline(LiSourceId, liObjekt, liObjektTeil, liMieter, liArtRelation,
-                                    ASdaRechnungenTmp, ATblRechnungenTmp,
-                                    AsdaObjektTeile, ATblObjektTeile,
-                                    AsdaTimeline, ATblTimeline,
-                                    asConnect);
-                                break;
-                            default:
-                                break;
-                        }
+
+
+                        //switch (LiSwitch)
+                        //{
+                        //    case 1:         // Objekte nach Anlegen einer Rechnung in Objekten
+                        //                    // Timeline für Objekte
+                        //        if (CreateTimeline(LiSourceId, liObjekt, liObjektTeil, liMieter, liArtRelation,
+                        //            ASdaRechnungenTmp, ATblRechnungenTmp,
+                        //            AsdaObjektTeile, ATblObjektTeile,
+                        //            AsdaTimeline, ATblTimeline,
+                        //            asConnect
+                        //            ) == 1)
+                        //        {
+                        //            // Weiterleitung an ObjektTeil aus der Kostenart ermitteln
+                        //            // 1 = Weiterleitung an Teilobjekt
+                        //            if (Timeline.GetWeiterleitung(1, LiKsa, asConnect) == 1)
+                        //            {
+                        //                liArtRelation = 1;          // Rechnung
+                        //                                            // Rechnungen und Timeline für alle zugehörigen Objektteile erzeugen
+                        //                CreateRechnungenObjTeile(LiSourceId, liObjekt, liObjektTeil, liMieter, liArtRelation,
+                        //                    ASdaRechnungenTmp, ATblRechnungenTmp,
+                        //                    AsdaObjektTeile, ATblObjektTeile,
+                        //                    AsdaTimeline, ATblTimeline,
+                        //                    asConnect
+                        //                    );
+                        //            }
+                        //        }
+                        //        break;
+                        //    case 2:         // Teilobjekte nach Anlegen oder ändern einer Rechnung Timeline erzeugen
+                        //        // Timeline erstellen
+                        //        CreateTimeline(LiSourceId, liObjekt, liObjektTeil, liMieter, liArtRelation,
+                        //            ASdaRechnungenTmp, ATblRechnungenTmp,
+                        //            AsdaObjektTeile, ATblObjektTeile,
+                        //            AsdaTimeline, ATblTimeline,
+                        //            asConnect);
+                        //        break;
+                        //    case 3:         // Mieterkosten direkt, der Mieter ist klar, deshalb diese Funktion
+                        //        CreateTimeline(LiSourceId, liObjekt, liObjektTeil, liMieter, liArtRelation,
+                        //            ASdaRechnungenTmp, ATblRechnungenTmp,
+                        //            AsdaObjektTeile, ATblObjektTeile,
+                        //            AsdaTimeline, ATblTimeline,
+                        //            asConnect);
+                        //        break;
+                        //    default:
+                        //        break;
+                        //}
                     }
                 }
             }
@@ -191,6 +201,7 @@ namespace Ruddat_NK
             // int liDaysInMonth = 0; // Tage im Monat aus Vertrag
             int liSave = 1;  // Freigabe
             int LiArtRelation = AiArtRelation;      // 1= Rechnung, 2=Zahlung, 3=Zähler
+            int LiRgIdSource = 0;
 
             decimal ldBetragNetto = 0;
             decimal ldBetragSollNetto = 0;
@@ -205,7 +216,7 @@ namespace Ruddat_NK
             int LiMwstId = 0;
             int liZlgOrRg = 0;
             int liVerteilungId = 0;     // Id Kostenverteilung
-
+            int LiRechnungId = 0;         // RechnnungsId
             //int liRechnungId = 0;
             //int liZahlungId = 0;
             //int liZaehlerstandId = 0;
@@ -228,23 +239,23 @@ namespace Ruddat_NK
                 {
                     int LiWtlObjekt = 0;            // Weiterleitungen
                     int LiWtlObjektTeil = 0;
-                    int LiSourceId = 0;
+
                     // Eine Rechnung aus dem Teilobjekt?
-                    if (ATblRechnungen.Rows[i].ItemArray.GetValue(17) != DBNull.Value)
+                    if (ATblRechnungen.Rows[i].ItemArray.GetValue(17) != DBNull.Value)          // Rechnungs Source Id Quelle Weiterleitung 
                     {
-                        LiSourceId = (int)ATblRechnungen.Rows[i].ItemArray.GetValue(17);        // Source Rechnungs Id Quelle bei Teilobjekten
                         if (AiObjektTeilId > 0)
                         {
                             LiWtlObjekt = 1;
+                            // Timeline mit der SouceId löschen
+                            Timeline.DeleteTimeline((int)ATblRechnungen.Rows[i].ItemArray.GetValue(17), "S", AsConnect);
                         }
                     }
-                    if (ATblRechnungen.Rows[i].ItemArray.GetValue(0) != DBNull.Value)
+                    else if (ATblRechnungen.Rows[i].ItemArray.GetValue(0) != DBNull.Value)     // Rechnungs Id Objekt
                     {
-                        LiSourceId = (int)ATblRechnungen.Rows[i].ItemArray.GetValue(0);        // Rechnungs Id in Objekten
-
                         // Weiterleitungen Rechnung aus Objekt
                         if (AiObjektId > 0)
                         {
+                            Timeline.DeleteTimeline((int)ATblRechnungen.Rows[i].ItemArray.GetValue(0), "R", AsConnect);
                             LiWtlObjekt = 1;
                         }
                         // Rechnung aus Teilobjekt
@@ -253,9 +264,9 @@ namespace Ruddat_NK
                            LiWtlObjektTeil = 1;
                         }
                     }
-
-                    // Delete Timeline mit dieser Rechnungs id
-                    Timeline.DeleteTimeline(LiSourceId, "R", AsConnect);
+                    
+                    // RechnungId
+                    LiRechnungId = (int)ATblRechnungen.Rows[i].ItemArray.GetValue(0);
 
                     if (ATblRechnungen.Rows[i].ItemArray.GetValue(7) != DBNull.Value)
                         LiMwstId = int.Parse(ATblRechnungen.Rows[i].ItemArray.GetValue(7).ToString());
@@ -283,6 +294,8 @@ namespace Ruddat_NK
                         LiKsa = (int)ATblRechnungen.Rows[i].ItemArray.GetValue(1);
                     if (ATblRechnungen.Rows[i].ItemArray.GetValue(16) != DBNull.Value)
                         liVerteilungId = (int)ATblRechnungen.Rows[i].ItemArray.GetValue(16);
+                    if (ATblRechnungen.Rows[i].ItemArray.GetValue(17) != DBNull.Value)
+                        LiRgIdSource = (int)ATblRechnungen.Rows[i].ItemArray.GetValue(17);
 
                     // Anzahl der Tage des ersten Monats        99 ist der volle Monat
                     liDaysStart = Timeline.GetDaysStart(LdtStart);
@@ -303,7 +316,7 @@ namespace Ruddat_NK
                     ldtMonat = DateTime.Parse(dt);                 // Datetime mit erstem Tag des Monats
 
                     // Ermitteln der VerteilungsId aus Tabelle Rechnungen
-                    liVerteilungId = Timeline.GetVerteilungsId(AsConnect, LiSourceId);
+                    liVerteilungId = Timeline.GetVerteilungsId(AsConnect, LiRechnungId);
                     // Ermitteln, wie verteilt werden soll aus der Tabelle art_verteilung
                     LsVerteilung = Timeline.GetVerteilung(AsConnect, liVerteilungId);
                     // Gesamtfläche aus Tabelle Objekt holen
@@ -314,7 +327,7 @@ namespace Ruddat_NK
                     {
                         DataRow DrTimeline = ATblTimeline.NewRow();
 
-                        DrTimeline[1] = LiSourceId;
+                        DrTimeline[1] = LiRechnungId;
                         DrTimeline[4] = liObjekt;
                         DrTimeline[5] = liObjektTeil;              // (int)ATblTeilobjekte.Rows[i].ItemArray.GetValue(0); // Objekt Id
                         DrTimeline[6] = liMieter;
@@ -336,10 +349,10 @@ namespace Ruddat_NK
                             DrTimeline[8] = ladBetraege[0];
                             DrTimeline[10] = ladBetraege[1];
                         }
-                        //---------------------------------------------
+                        //---------------------------------------------  
                         DrTimeline[9] = ladBetraege[3];
                         DrTimeline[11] = ladBetraege[4];
-                        DrTimeline[12] = ldZs;                  // Zählerstand
+                        DrTimeline[12] = ldZs;                  // Zählerä.fgöl,stand
 
                         if (ii == 1)                            // erster Monat
                             DrTimeline[13] = LdtStart;
@@ -350,6 +363,7 @@ namespace Ruddat_NK
 
                         DrTimeline[14] = LiWtlObjekt;           // Weiterleitung aus Objekt
                         DrTimeline[15] = LiWtlObjektTeil;       // weiterleitung aus Teilobjekt
+                        DrTimeline[18] = LiRgIdSource;          // Rechnunsquelle
 
                         ATblTimeline.Rows.Add(DrTimeline);
                         // + Monat 
@@ -451,6 +465,7 @@ namespace Ruddat_NK
                     DrTimeline[14] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(14);
                     DrTimeline[15] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(15);
                     DrTimeline[16] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(16);
+                    DrTimeline[18] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(18);
 
                     ATblTimeLine.Rows.Add(DrTimeline);
                 }
@@ -476,7 +491,7 @@ namespace Ruddat_NK
                         DrTimeline[14] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(14);
                         DrTimeline[15] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(15);
                         DrTimeline[16] = AiObjektTeilId;                                        // Leerstand auf das Teilobjekt buchen
-
+                        DrTimeline[18] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(18);   // Rechnungsquelle
                         ATblTimeLine.Rows.Add(DrTimeline);
                     }
                 }
@@ -536,7 +551,8 @@ namespace Ruddat_NK
             //int liAnzPersonenObjTeil = 0;
             //int liFlTml = 0;            // Flag TimeLine in Zahlungen
             //int liImportId = 0;         // Import Id
-            int liVerteilungId = 0;     // Id Kostenverteilung
+            int liVerteilungId = 0;         // Id Kostenverteilung
+            int LiVerteilungsIdNew = 0;     // VerteilungsId muss evtl. umgewandelt werden
             //int liRgId = 0;             // Rechnungs ID
             //int liZsId = 0;             // Zähler Id
 
@@ -547,6 +563,7 @@ namespace Ruddat_NK
             if (ATblRechnungen.Rows[0].ItemArray.GetValue(0) != DBNull.Value)
             {
                 LiSourceId = (int)ATblRechnungen.Rows[0].ItemArray.GetValue(0);        // Rechnungs Id Quelle
+
                 if (ATblRechnungen.Rows[0].ItemArray.GetValue(7) != DBNull.Value)
                     LiMwstId = int.Parse(ATblRechnungen.Rows[0].ItemArray.GetValue(7).ToString());
                 if (ATblRechnungen.Rows[0].ItemArray.GetValue(8) != DBNull.Value)
@@ -571,7 +588,7 @@ namespace Ruddat_NK
                     LdtEnd = (DateTime)ATblRechnungen.Rows[0].ItemArray.GetValue(4);
                 if (ATblRechnungen.Rows[0].ItemArray.GetValue(1) != DBNull.Value)
                     LiKsa = (int)ATblRechnungen.Rows[0].ItemArray.GetValue(1);
-                if (ATblRechnungen.Rows[0].ItemArray.GetValue(16) != DBNull.Value)              //Todo Aus Fläche muss Direkt werden
+                if (ATblRechnungen.Rows[0].ItemArray.GetValue(16) != DBNull.Value)              
                     liVerteilungId = (int)ATblRechnungen.Rows[0].ItemArray.GetValue(16);
 
                 // Anzahl der Tage des ersten Monats        99 ist der volle Monat
@@ -596,6 +613,22 @@ namespace Ruddat_NK
                 liVerteilungId = Timeline.GetVerteilungsId(AsConnect, LiSourceId);
                 // Ermitteln, wie verteilt werden soll aus der Tabelle art_verteilung
                 LsVerteilung = Timeline.GetVerteilung(AsConnect, liVerteilungId);
+
+                // Wenn vom Objekt eine Verteilung Fläche oder Prozent kommt,
+                // mus das im ObjektTeil zu direkter Kostenverteilung werden
+                switch (LsVerteilung)
+                {
+                    case "fl":
+                        LiVerteilungsIdNew =  Timeline.GetVerteilungIdAusArtVerteilung("di", AsConnect);
+                        break;
+                    case "pz":
+                        LiVerteilungsIdNew = Timeline.GetVerteilungIdAusArtVerteilung("di", AsConnect);
+                        break;
+                    default:
+                        LiVerteilungsIdNew = liVerteilungId;
+                        break;
+                }
+
                 // Gesamtfläche aus Tabelle Objekt holen
                 LdGesamtflaeche = Timeline.GetObjektflaeche(liObjekt, 0, 0, AsConnect);
 
@@ -609,13 +642,13 @@ namespace Ruddat_NK
                     DrRechnung[3] = LdtStart;
                     DrRechnung[4] = LdtEnd;
                     DrRechnung[7] = LiMwstId;
-                    // DrRechnung[8] = AiObjektId;      // Darf hier nicht eingesetzt werden
+                    // DrRechnung[8] = AiObjektId;          // Darf hier nicht eingesetzt werden
                     DrRechnung[9] = (int)ATblTeilobjekte.Rows[i].ItemArray.GetValue(0);
                     DrRechnung[10] = AiMieterid;
                     DrRechnung[11] = LsRgNr;
                     DrRechnung[12] = LsFirma;
-                    DrRechnung[15] = 1;                 // Flag für Timelinebearbeitung erzeugen
-                    DrRechnung[16] = liVerteilungId;
+                    DrRechnung[15] = 1;                     // Flag für Timelinebearbeitung erzeugen
+                    DrRechnung[16] = LiVerteilungsIdNew;
                     DrRechnung[17] = AiSourceId;
 
                     switch (LsVerteilung)

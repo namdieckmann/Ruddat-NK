@@ -668,8 +668,8 @@ namespace Ruddat_NK
                 case "Z":   // Zählerstand
                     lsSql = RdQueriesFunctions.GetSql(202, AiSourceId, "", "", 0);
                     break;
-                case "M":   // Timeline Mieter
-                    lsSql = RdQueriesFunctions.GetSql(203, AiSourceId, "", "", 0);
+                case "S":   // SourceRechnungsnummer ID in Timeline
+                    lsSql = RdQueriesFunctions.GetSql(205, AiSourceId, "", "", 0);
                     break;
                 default:
                     break;
