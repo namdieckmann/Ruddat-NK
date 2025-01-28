@@ -77,6 +77,12 @@ namespace Ruddat_NK
                     lsSql = @"delete FROM timeline
 					         WHERE id_rg_nr = " + lsWhereAdd;
                     break;
+                case 206:
+                    lsWhereAdd = piId.ToString() + " ";
+
+                    lsSql = @"delete FROM timeline
+					         WHERE id_mieter = " + lsWhereAdd;
+                    break;
                 case 3:
                     // Timeline neu erzeugen in ps2 steht, welches Feld beschrieben werden soll
                     lsWhereAdd = piId.ToString() + " ";

@@ -397,7 +397,6 @@ namespace Ruddat_NK
             string AsConnect)
         {
             int LiMieterId = 0;
-
             int LiArtVerteilungId = 0;
             decimal LdProzent = 0;
             string LsVerteilung = ""; // Kurzstring verteilung
@@ -406,76 +405,34 @@ namespace Ruddat_NK
             DateTime LdtVertragsInfo = DateTime.MinValue;
 
             // Erstmal alle Einträge der Timeline auf Mieterebene löschen
-            // Todo : Das geht nicht, du kannst nicht die komplette Timeline des Mieters löschen
-            // Da muss dir was besseres einfallen
-            // Timeline.DeleteTimeline(AiMieterId, "M", AsConnect);
-
-            // Ermitteln, welche Kostenart für prozentuale Weiterleitung zum Mieter id 2?
-            LsVerteilung = "pz";
-            LiArtVerteilungId = Timeline.GetVerteilungIdAusArtVerteilung(LsVerteilung, AsConnect);
-
-            // Hier wird die ganze Timeline des Teilobjekts auf den Mieter übertragen
-            // Einschränkung: Gucken, ob der Vertrag existiert
-            // Todo prüfen: Es werden auch Zählerwerte miterfasst 
-            for (int i = 0; i < ATblTimeLineObjTeile.Rows.Count; i++)
+            if (Timeline.DeleteTimeline(AiMieterId, "M", AsConnect) == 1)
             {
-                LiMieterId = 0;
-                LdProzent = 0;
-                // Hat der Mieter einen Vertrag
-                LiMieterId = Timeline.GetAktMieter((int)ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(5),
-                                                    (DateTime)ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(13), AsConnect, 2);
+                // Ermitteln, welche Kostenart für prozentuale Weiterleitung zum Mieter id 2?
+                LsVerteilung = "pz";
+                LiArtVerteilungId = Timeline.GetVerteilungIdAusArtVerteilung(LsVerteilung, AsConnect);
 
-                // Teilobjekt Id
-                if (ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(5) != DBNull.Value && ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(1) != DBNull.Value)
+                // Hier wird die ganze Timeline des Teilobjekts auf den Mieter übertragen
+                // Einschränkung: Gucken, ob der Vertrag existiert
+                // Todo später prüfen: Es werden auch Zählerwerte miterfasst 
+                for (int i = 0; i < ATblTimeLineObjTeile.Rows.Count; i++)
                 {
-                    if (Timeline.GetVerteilungsId(AsConnect, (int)ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(1)) == LiArtVerteilungId)
+                    LiMieterId = 0;
+                    LdProzent = 0;
+                    // Hat der Mieter einen Vertrag
+                    LiMieterId = Timeline.GetAktMieter((int)ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(5),
+                                                        (DateTime)ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(13), AsConnect, 2);
+                    // Teilobjekt Id
+                    if (ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(5) != DBNull.Value && ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(1) != DBNull.Value)
                     {
-                        // Gibt es einen Prozentsatz in dem Teilobjekt
-                        // Welcher Prozentsatz ist bei der Mietfläche hinterlegt?
-                        LdProzent = Timeline.GetProzentFromObjTeil((int)ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(5), AsConnect);
-                    }
-                }
-
-                if (AiMieterId == LiMieterId)
-                {
-                    DataRow DrTimeline = ATblTimeLine.NewRow();
-
-                    DrTimeline[1] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(1);
-                    DrTimeline[2] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(2);
-                    DrTimeline[3] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(3);
-                    DrTimeline[4] = 0;                                                      // kein Objekt
-                    DrTimeline[5] = 0;                                                      // Kein Teilobjekt
-                    DrTimeline[6] = AiMieterId;                                             // Mieter
-                    DrTimeline[7] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(7);
-
-
-                    if (LdProzent > 0)  // Prozentuale Weiterleitung
-                    {
-                        DrTimeline[8] = ((decimal)ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(8) / 100) * LdProzent;     // NettoBetrag
-                        DrTimeline[9] = ((decimal)ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(9) / 100) * LdProzent;
-                        DrTimeline[10] = ((decimal)ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(10) / 100) * LdProzent;    // BruttoBetrag
-                        DrTimeline[11] = ((decimal)ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(11) / 100) * LdProzent;
-                    }
-                    else
-                    {
-                        DrTimeline[8] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(8);     // NettoBetrag
-                        DrTimeline[9] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(9);
-                        DrTimeline[10] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(10);    // BruttoBetrag
-                        DrTimeline[11] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(11);
+                        if (Timeline.GetVerteilungsId(AsConnect, (int)ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(1)) == LiArtVerteilungId)
+                        {
+                            // Gibt es einen Prozentsatz in dem Teilobjekt
+                            // Welcher Prozentsatz ist bei der Mietfläche hinterlegt?
+                            LdProzent = Timeline.GetProzentFromObjTeil((int)ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(5), AsConnect);
+                        }
                     }
 
-                    DrTimeline[12] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(12);
-                    DrTimeline[13] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(13);
-                    DrTimeline[14] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(14);
-                    DrTimeline[15] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(15);
-                    DrTimeline[16] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(16);
-                    DrTimeline[18] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(18);
-
-                    ATblTimeLine.Rows.Add(DrTimeline);
-                }
-                else
-                {
-                    if (LiMieterId == 0)            // Todo Leerstand buchen
+                    if (AiMieterId == LiMieterId)
                     {
                         DataRow DrTimeline = ATblTimeLine.NewRow();
 
@@ -483,26 +440,70 @@ namespace Ruddat_NK
                         DrTimeline[2] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(2);
                         DrTimeline[3] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(3);
                         DrTimeline[4] = 0;                                                      // kein Objekt
-                        DrTimeline[5] = 0;                                                      // kein Teilobjekt
-                        DrTimeline[6] = 0;                                                      // kein Mieter
+                        DrTimeline[5] = 0;                                                      // Kein Teilobjekt
+                        DrTimeline[6] = AiMieterId;                                             // Mieter
                         DrTimeline[7] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(7);
-                        DrTimeline[8] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(8);
-                        DrTimeline[9] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(9);
-                        DrTimeline[10] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(10);
-                        DrTimeline[11] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(11);
+
+
+                        if (LdProzent > 0)  // Prozentuale Weiterleitung
+                        {
+                            DrTimeline[8] = ((decimal)ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(8) / 100) * LdProzent;     // NettoBetrag
+                            DrTimeline[9] = ((decimal)ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(9) / 100) * LdProzent;
+                            DrTimeline[10] = ((decimal)ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(10) / 100) * LdProzent;    // BruttoBetrag
+                            DrTimeline[11] = ((decimal)ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(11) / 100) * LdProzent;
+                        }
+                        else
+                        {
+                            DrTimeline[8] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(8);     // NettoBetrag
+                            DrTimeline[9] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(9);
+                            DrTimeline[10] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(10);    // BruttoBetrag
+                            DrTimeline[11] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(11);
+                        }
+
                         DrTimeline[12] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(12);
                         DrTimeline[13] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(13);
                         DrTimeline[14] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(14);
                         DrTimeline[15] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(15);
-                        DrTimeline[16] = AiObjektTeilId;                                        // Leerstand auf das Teilobjekt buchen
-                        DrTimeline[18] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(18);   // Rechnungsquelle
+                        DrTimeline[16] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(16);
+                        DrTimeline[18] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(18);
+
                         ATblTimeLine.Rows.Add(DrTimeline);
                     }
+                    else
+                    {
+                        if (LiMieterId == 0)            // Todo Leerstand buchen
+                        {
+                            DataRow DrTimeline = ATblTimeLine.NewRow();
+
+                            DrTimeline[1] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(1);
+                            DrTimeline[2] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(2);
+                            DrTimeline[3] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(3);
+                            DrTimeline[4] = 0;                                                      // kein Objekt
+                            DrTimeline[5] = 0;                                                      // kein Teilobjekt
+                            DrTimeline[6] = 0;                                                      // kein Mieter
+                            DrTimeline[7] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(7);
+                            DrTimeline[8] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(8);
+                            DrTimeline[9] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(9);
+                            DrTimeline[10] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(10);
+                            DrTimeline[11] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(11);
+                            DrTimeline[12] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(12);
+                            DrTimeline[13] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(13);
+                            DrTimeline[14] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(14);
+                            DrTimeline[15] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(15);
+                            DrTimeline[16] = AiObjektTeilId;                                        // Leerstand auf das Teilobjekt buchen
+                            DrTimeline[18] = ATblTimeLineObjTeile.Rows[i].ItemArray.GetValue(18);   // Rechnungsquelle
+                            ATblTimeLine.Rows.Add(DrTimeline);
+                        }
+                    }
                 }
+                // Ab in die Datenbank
+                MySqlCommandBuilder commandBuilder = new MySqlCommandBuilder(ASdTimeLine);
+                ASdTimeLine.Update(ATblTimeLine);
             }
-            // Ab in die Datenbank
-            MySqlCommandBuilder commandBuilder = new MySqlCommandBuilder(ASdTimeLine);
-            ASdTimeLine.Update(ATblTimeLine);
+            else
+            {
+                MessageBox.Show("Löschen von Daten fehlgeschlagen (TimeLLine Mieter)", "Datenfehler", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
 

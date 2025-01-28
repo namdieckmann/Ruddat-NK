@@ -161,11 +161,9 @@ namespace Ruddat_NK
             DateTime ldtVertrag = DateTime.MinValue;
 
             int liExternId;
-            int liOk = 0;
+            int LiReturn = 0;
 
             decimal[] ladBetraege = new decimal[12];
-
-            Int32 liReturn = 0;
 
             try
             {
@@ -186,14 +184,25 @@ namespace Ruddat_NK
                         TblTimeline = new DataTable();
                         MySdTimeline = new MySqlDataAdapter(command03);
 
-                        liOk = RdAfterfetch.MakeAfterFetch(piArt, 1, 0, 0, asConnect, 
+                        LiReturn = RdAfterfetch.MakeAfterFetch(piArt, 1, 0, 0, asConnect, 
                             MySdRechnungen, TblRechnungen,
                             MySdObjektTeile, TblObjektTeile,
                             MySdMieter, TblMieter,
                             MySdTimeline, TblTimeline);
                         break;
                     case 2:     // Datensatz löschen
-                        MySqlDataReader queryCommandReader = command01.ExecuteReader();
+                        // MySqlDataReader queryCommandReader = command01.ExecuteReader();
+                        using (MySqlDataReader queryCommandReader = command01.ExecuteReader())
+                            {
+                                if (queryCommandReader.HasRows)
+                                {
+                                    LiReturn = 0;
+                                }
+                                else
+                                {
+                                    LiReturn = 1;
+                                }
+                            }
                         break;
                     case 3:     // Rechnungen und Timeline erzeugen
                         TblRechnungen = new DataTable();         // Rechnung 
@@ -205,7 +214,7 @@ namespace Ruddat_NK
                         //TblTimeline = new DataTable();
                         //MySdTimeline = new MySqlDataAdapter(command03);
 
-                        liOk = RdAfterfetch.MakeAfterFetch(piArt, 1, 0, 0, asConnect,
+                        LiReturn = RdAfterfetch.MakeAfterFetch(piArt, 1, 0, 0, asConnect,
                             MySdRechnungen, TblRechnungen,
                             MySdObjektTeile, TblObjektTeile,
                             MySdMieter, TblMieter,
@@ -339,11 +348,11 @@ namespace Ruddat_NK
                         var lvGetId = command01.ExecuteScalar();
                         if (lvGetId != null)
                         {
-                            Int32.TryParse(lvGetId.ToString(), out liReturn);
+                            Int32.TryParse(lvGetId.ToString(), out LiReturn);
                         }
                         else
                         {
-                            liReturn = 0;
+                            LiReturn = 0;
                         }
                         break;
                     case 27:    // Hier checken, ob schon eine Rechnungsnmmerfür das Anschreiben drin ist
@@ -408,7 +417,7 @@ namespace Ruddat_NK
                 MessageBox.Show("Verarbeitungsfehler ERROR fetchdata RdFunctions MySql \n piArt = " + piArt.ToString(),
                         "Achtung");
             }
-            return (liReturn);
+            return (LiReturn);
         }
 
         // Daten aus der Db holen hier nur Dezimalwerte
@@ -651,7 +660,7 @@ namespace Ruddat_NK
         }
 
         // Alle Datensätze der Timeline mit der Source ID zunächst löschen
-        public static int DeleteTimeline(int AiSourceId, string asArt, string asConnect)
+        public static int DeleteTimeline(int AiDeleteId, string asArt, string asConnect)
         {
             int liOk = 0;
             string lsSql = "";
@@ -660,16 +669,19 @@ namespace Ruddat_NK
             switch (asArt)
             {
                 case "R":   // Rechnung
-                    lsSql = RdQueriesFunctions.GetSql(200, AiSourceId, "", "", 0);
+                    lsSql = RdQueriesFunctions.GetSql(200, AiDeleteId, "", "", 0);
                     break;
                 case "A":   // Zahlung
-                    lsSql = RdQueriesFunctions.GetSql(201, AiSourceId, "", "", 0);
+                    lsSql = RdQueriesFunctions.GetSql(201, AiDeleteId, "", "", 0);
                     break;
                 case "Z":   // Zählerstand
-                    lsSql = RdQueriesFunctions.GetSql(202, AiSourceId, "", "", 0);
+                    lsSql = RdQueriesFunctions.GetSql(202, AiDeleteId, "", "", 0);
                     break;
                 case "S":   // SourceRechnungsnummer ID in Timeline
-                    lsSql = RdQueriesFunctions.GetSql(205, AiSourceId, "", "", 0);
+                    lsSql = RdQueriesFunctions.GetSql(205, AiDeleteId, "", "", 0);
+                    break;
+                case "M":   // Timeline Mieter Id
+                    lsSql = RdQueriesFunctions.GetSql(206, AiDeleteId, "", "", 0);
                     break;
                 default:
                     break;
