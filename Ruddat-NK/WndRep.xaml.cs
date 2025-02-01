@@ -52,6 +52,9 @@ namespace Ruddat_NK
             string lsDatBis = "";
             Int32 liRows = 0;
 
+            DateTime ldtVon = DateTime.MinValue;
+            DateTime ldtBis = DateTime.MaxValue;    
+
             gsPath = lsPath;
 
             // ConnectString global
@@ -82,10 +85,12 @@ namespace Ruddat_NK
                 lsSqlSum = DbReadSql(lsPath, 4);            // Art 4 = Summendarstellung Kosten Zahlungen
                 lsDatVon = DbReadVal(lsPath, 1);            // Art 1 = Datum Von lesen
                 lsDatBis = DbReadVal(lsPath, 2);            // Art 2 = Datum bis lesen
+                ldtVon = DateTime.Parse(lsDatVon);
+                ldtBis = DateTime.Parse(lsDatBis);
             }
             // Report füllen
             liRows = fetchData(lsSqlDirekt, lsSqlHeader, lsSqlFadr, lsSqlZahlungen, lsSqlSum,
-                lsSqlContent, lsSqlContent2, gsReportName, lsDatVon, lsDatBis, lsSqlRgNr, aiDb);
+                lsSqlContent, lsSqlContent2, gsReportName, ldtVon, ldtBis, lsSqlRgNr, aiDb);
         }
 
         // Sql Scripts erstellen
@@ -204,7 +209,7 @@ namespace Ruddat_NK
 
         // Daten aus der Datenbank holen und zeigen 
         private Int32 fetchData(string asSql, string asSqlHeader, string asSqlFadr, string asSqlZahlungen, string asSqlSumme,
-            string asSqlContent, string asSqlContent2, string asReportName, string asDatVon, string asDatBis, string asSqlRgNr, int aiDb)
+            string asSqlContent, string asSqlContent2, string asReportName, DateTime adtVon, DateTime adtBis, string asSqlRgNr, int aiDb)
         {
             int liRows = 0;
             int liOk = 0;
@@ -347,7 +352,7 @@ namespace Ruddat_NK
                                 if (asReportName == "kosten" || asReportName == "kostenteilobjekt")  // Nebenkostenabrecnung
                                 {
                                     // Die Tabelle x_abr_content muss befüllt werden
-                                    liOk = Timeline.FillContent(asSql, asSqlContent, asSqlContent2, asDatVon, asDatBis, gsConnect, "", 0);
+                                    liOk = Timeline.FillContent(asSql, asSqlContent, asSqlContent2, adtVon, adtBis, gsConnect, "", 0);
                                     // Dann die Tabelle laden 
                                     // Hauptcontent für Abrechnung holen
                                     lsSqlContentShow = getSql("", 3, 0);
@@ -383,7 +388,7 @@ namespace Ruddat_NK
                                 if (asReportName == "kostendetail")  // Nebenkostenabrecnung detailliert
                                 {
                                     // Die Tabelle x_abr_content muss befüllt werden
-                                    liOk = Timeline.FillContent(asSql, asSqlContent, asSqlContent2, asDatVon, asDatBis, gsConnect, "", 0);
+                                    liOk = Timeline.FillContent(asSql, asSqlContent, asSqlContent2, adtVon, adtBis, gsConnect, "", 0);
                                     // Dann die Tabelle laden 
                                     // Hauptcontent für Abrechnung holen
                                     lsSqlContentShow = getSql("", 3, 0);
@@ -420,7 +425,7 @@ namespace Ruddat_NK
                                 {
 
                                     // Die Tabelle x_abr_content muss befüllt werden
-                                    liOk = Timeline.FillContent(asSql, asSqlContent, asSqlContent2, asDatVon, asDatBis, gsConnect, asSqlRgNr, 1);
+                                    liOk = Timeline.FillContent(asSql, asSqlContent, asSqlContent2, adtVon, adtBis, gsConnect, asSqlRgNr, 1);
                                     // Dann die Tabelle laden 
                                     // Hauptcontent für Abrechnung holen
                                     lsSqlContentShow = getSql("", 3, 0);
@@ -590,7 +595,7 @@ namespace Ruddat_NK
                                 if (asReportName == "kosten" || asReportName == "kostenteilobjekt")  // Nebenkostenabrecnung
                                 {
                                     // Die Tabelle x_abr_content muss befüllt werden
-                                    liOk = Timeline.FillContent(asSql, asSqlContent, asSqlContent2, asDatVon, asDatBis, gsConnect, "", 0);
+                                    liOk = Timeline.FillContent(asSql, asSqlContent, asSqlContent2, adtVon, adtBis, gsConnect, "", 0);
                                     // Dann die Tabelle laden 
                                     // Hauptcontent für Abrechnung holen
                                     lsSqlContentShow = getSql("", 3, 0);
@@ -626,7 +631,7 @@ namespace Ruddat_NK
                                 if (asReportName == "kostendetail")  // Nebenkostenabrecnung detailliert
                                 {
                                     // Die Tabelle x_abr_content muss befüllt werden
-                                    liOk = Timeline.FillContent(asSql, asSqlContent, asSqlContent2, asDatVon, asDatBis, gsConnect, "", 0);
+                                    liOk = Timeline.FillContent(asSql, asSqlContent, asSqlContent2, adtVon, adtBis, gsConnect, "", 0);
                                     // Dann die Tabelle laden 
                                     // Hauptcontent für Abrechnung holen
                                     lsSqlContentShow = getSql("", 3, 0);
@@ -663,7 +668,7 @@ namespace Ruddat_NK
                                 {
 
                                     // Die Tabelle x_abr_content muss befüllt werden
-                                    liOk = Timeline.FillContent(asSql, asSqlContent, asSqlContent2, asDatVon, asDatBis, gsConnect, asSqlRgNr, 1);
+                                    liOk = Timeline.FillContent(asSql, asSqlContent, asSqlContent2, adtVon, adtBis, gsConnect, asSqlRgNr, 1);
                                     // Dann die Tabelle laden 
                                     // Hauptcontent für Abrechnung holen
                                     lsSqlContentShow = getSql("", 3, 0);

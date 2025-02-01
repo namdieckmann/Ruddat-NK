@@ -695,7 +695,7 @@ namespace Ruddat_NK
         }
 
         // Berechnen der monatlichen Beträge für die Timeline
-        public static decimal[] GetBetraege(int liMonths, int liDaysStart, int liDaysEnd,
+        public static decimal[] GetMonatsBetraege(int liMonths, int liDaysStart, int liDaysEnd,
                         decimal ldBetragNetto, decimal ldBetragBrutto, decimal ldBetragSollNetto, decimal ldBetragSollBrutto,
                         int liZlgOrRg, DateTime ldtStart, DateTime ldtEnd)
         {
@@ -1100,7 +1100,7 @@ namespace Ruddat_NK
         // Gesucht wird nach aktiven Verträgen in einem Objekt, Objektteil
         // Wird benötigt, um eine Kostenaufteilung nach Personen zu machen
         // Das Flag soll die fehlenden Informationen holen 0 = nix; 1 = ObjektId; 2 = TeilobjektId
-        public static decimal GetAktPersonen(int aiObjekt, int aiObjektTeil, int aiMieterId, string asDatVon, string asDatBis, int aiFlag, string asConnect)
+        public static decimal GetAktPersonen(int aiObjekt, int aiObjektTeil, int aiMieterId, DateTime adtStart, DateTime adtEnd, int aiFlag, string asConnect)
         {
             int liObjId = 0;
             int liObTId = 0;
@@ -1115,7 +1115,7 @@ namespace Ruddat_NK
                 {
                     lsSql = @"SELECT sum(vertrag.anzahl_personen) FROM vertrag  WHERE vertrag.vertrag_aktiv = 1 And vertrag.id_objekt = " + aiObjekt.ToString();
                 }
-                if (aiObjektTeil > 0)
+                else if (aiObjektTeil > 0)
                 {
                     lsSql = @"SELECT sum(vertrag.anzahl_personen) FROM vertrag  WHERE vertrag.vertrag_aktiv = 1 And vertrag.id_objekt_teil = " + aiObjektTeil.ToString();
                 }
@@ -1135,8 +1135,8 @@ namespace Ruddat_NK
                 lsSql = @"SELECT sum(vertrag.anzahl_personen) FROM vertrag  WHERE vertrag.vertrag_aktiv = 1 And vertrag.id_objekt_teil = " + liObTId.ToString();
             }
 
-            lsSqlAdd = " And vertrag.datum_von <= Convert(DateTime," + "\'" + asDatVon + "',104) "
-                                 + "And vertrag.datum_bis >= Convert(DateTime," + "\'" + asDatBis + "',104)";
+            lsSqlAdd = " And vertrag.datum_von <= str_to_date(\"" + adtStart.ToString("dd.MM.yyyy") + "\",\"%d.%m.%Y %H:%i:%s\") "
+                                 + "And vertrag.datum_bis >= str_to_date(\"" + adtEnd.ToString("dd.MM.yyyy") + "\",\"%d.%m.%Y %H:%i:%s\")";
 
             lsSql = lsSql + lsSqlAdd;
 
@@ -1347,7 +1347,7 @@ namespace Ruddat_NK
         // Die Tabelle x_abr_content wird gefüllt
         // asSql ist die Timeline
         // asSqlContent ist die Zieltabelle. Sie zeigt das Content des Reports Nebenkostenabrechnung
-        internal static int FillContent(string asSql, string asSqlContent, string asSql2, string asDatVon, string asDatBis, string asConnect, string asSqlRgNr, int aiAnschreiben)
+        internal static int FillContent(string asSql, string asSqlContent, string asSql2, DateTime adtVon, DateTime adtBis, string asConnect, string asSqlRgNr, int aiAnschreiben)
         {
             int liOk = 0;
             int liIdExternTimeline = 0;
@@ -1524,7 +1524,7 @@ namespace Ruddat_NK
                     if (liIdArtVerteilung > 0)
                     {
                         // Verteilungsinfos ermittlen; letztes Argument ist der Detailgrad 2 = Alles TODO Ulf!!!
-                        dr[26] = Timeline.GetVerteilungsInfo(asConnect, liIdExternTimeline, liIdArtVerteilung, liIdObj, liIdObjt, liIdMieter, asDatVon, asDatBis, liIdExternTimelineZaehlerstand, 1);
+                        dr[26] = Timeline.GetVerteilungsInfo(asConnect, liIdExternTimeline, liIdArtVerteilung, liIdObj, liIdObjt, liIdMieter, adtVon, adtBis, liIdExternTimelineZaehlerstand, 1);
                     }
 
                     // Rechnung aus Objekt oder Teilobjekt
@@ -1704,7 +1704,7 @@ namespace Ruddat_NK
                         if (liIdArtVerteilung > 0)
                         {
                             // Verteilungsinfos ermitteln letztes Argument ist der Detailgrad 2 ist alles
-                            dr[26] = Timeline.GetVerteilungsInfo(asConnect, liIdExternTimeline, liIdArtVerteilung, liIdObj, liIdObjt, liIdMieter, asDatVon, asDatBis, liIdExternTimelineZaehlerstand, 1);
+                            dr[26] = Timeline.GetVerteilungsInfo(asConnect, liIdExternTimeline, liIdArtVerteilung, liIdObj, liIdObjt, liIdMieter, adtVon, adtBis, liIdExternTimelineZaehlerstand, 1);
                         }
 
                         // Rechnung aus Objekt oder Teilobjekt
@@ -1898,7 +1898,7 @@ namespace Ruddat_NK
         // Todo überprüfen, wo das verwendete wird!!
         public static object GetVerteilungsInfo(string asConnect, int aiIdRechnung, int aiArtVerteilungId,
             int aiObjektId, int aiTObjektId, int aiMieterId,
-            string asDatVon, string asDatBis, int aiIdExternTimelineZaehlerstand, int aiDetailGrad)
+            DateTime adtVon, DateTime adtBis, int aiIdExternTimelineZaehlerstand, int aiDetailGrad)
         {
             string lsVertInfo = "";
             string lsVerteilung = "";
@@ -1960,8 +1960,8 @@ namespace Ruddat_NK
             // Personenanzahl für den aktuellen Monat berechnen
             if (lsVerteilung == "ps")
             {
-                ldAnzPersonen = GetAktPersonen(aiObjektId, aiTObjektId, aiMieterId, asDatVon, asDatBis, 2, asConnect);
-                ldAnzPersonenGesamt = GetAktPersonen(aiObjektId, aiTObjektId, aiMieterId, asDatVon, asDatBis, 1, asConnect);
+                ldAnzPersonen = GetAktPersonen(aiObjektId, aiTObjektId, aiMieterId, adtVon, adtBis, 2, asConnect);
+                ldAnzPersonenGesamt = GetAktPersonen(aiObjektId, aiTObjektId, aiMieterId, adtVon, adtBis, 1, asConnect);
                 if (ldAnzPersonen > 0)
                 {
                     lsVertInfo = @"Personen gesamt: " + ldAnzPersonenGesamt.ToString() + " / " +

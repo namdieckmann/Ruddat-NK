@@ -309,7 +309,7 @@ namespace Ruddat_NK
                     liZlgOrRg = 2;
 
                     // Monatsbeträge ermitteln (Brutto und Netto) und evtl. erster und letzter Monat nicht voll
-                    ladBetraege = Timeline.GetBetraege(liMonths, liDaysStart, liDaysEnd,
+                    ladBetraege = Timeline.GetMonatsBetraege(liMonths, liDaysStart, liDaysEnd,
                     ldBetragNetto, ldBetragBrutto,
                             ldBetragSollNetto, ldBetragSollBrutto, liZlgOrRg, LdtStart, LdtEnd);
 
@@ -540,9 +540,11 @@ namespace Ruddat_NK
             decimal ldBetragBrutto = 0;
             decimal ldBetragSollBrutto = 0;
             decimal LdGesamtflaeche = 0;
+            decimal LdAnzPersonenObj = 0;
+            decimal LdAnzPersonenObjTeil = 0;
             decimal ldZs = 0;            // Zählerstand
             decimal ldVerbrauch = 0;     // Zähler Verbrauch
-            decimal[] LadBetragMonat = new decimal[12];
+            decimal[] LadBetragteil = new decimal[12];
 
             int zl = 0;
             int LiMwstId = 0;
@@ -552,8 +554,6 @@ namespace Ruddat_NK
             //int liZahlungId = 0;
             //int liZaehlerstandId = 0;
             //int liOk = 0;
-            //int liAnzPersonenObj = 0;
-            //int liAnzPersonenObjTeil = 0;
             //int liFlTml = 0;            // Flag TimeLine in Zahlungen
             //int liImportId = 0;         // Import Id
             int liVerteilungId = 0;         // Id Kostenverteilung
@@ -564,6 +564,7 @@ namespace Ruddat_NK
             string LsVerteilung = "";
             string LsRgNr = "";
             string LsFirma = "";
+            string LsText = "";
 
             if (ATblRechnungen.Rows[0].ItemArray.GetValue(0) != DBNull.Value)
             {
@@ -581,6 +582,8 @@ namespace Ruddat_NK
                     LsRgNr = ATblRechnungen.Rows[0].ItemArray.GetValue(11).ToString();
                 if (ATblRechnungen.Rows[0].ItemArray.GetValue(12) != DBNull.Value)
                     LsFirma = ATblRechnungen.Rows[0].ItemArray.GetValue(12).ToString();
+                if (ATblRechnungen.Rows[0].ItemArray.GetValue(13) != DBNull.Value)
+                    LsText = ATblRechnungen.Rows[0].ItemArray.GetValue(13).ToString();
                 if (ATblRechnungen.Rows[0].ItemArray.GetValue(5) != DBNull.Value)
                     ldBetragNetto = (decimal)ATblRechnungen.Rows[0].ItemArray.GetValue(5);
                 if (ATblRechnungen.Rows[0].ItemArray.GetValue(6) != DBNull.Value)
@@ -606,9 +609,10 @@ namespace Ruddat_NK
                 liZlgOrRg = 2;
 
                 // Monatsbeträge ermitteln (Brutto und Netto) und evtl. erster und letzter Monat nicht voll
-                LadBetragMonat = Timeline.GetBetraege(liMonths, liDaysStart, liDaysEnd,
-                ldBetragNetto, ldBetragBrutto,
-                        ldBetragSollNetto, ldBetragSollBrutto, liZlgOrRg, LdtStart, LdtEnd);
+                LadBetragteil = Timeline.GetMonatsBetraege(liMonths, liDaysStart, liDaysEnd,
+                                                        ldBetragNetto, ldBetragBrutto,
+                                                        ldBetragSollNetto, ldBetragSollBrutto, 
+                                                        liZlgOrRg, LdtStart, LdtEnd);
 
                 // Den ersten Monat ermitteln
                 string dt = (LdtStart.Year.ToString()) + "-" + LdtStart.Month.ToString() + "-01";
@@ -623,10 +627,13 @@ namespace Ruddat_NK
                 // mus das im ObjektTeil zu direkter Kostenverteilung werden
                 switch (LsVerteilung)
                 {
-                    case "fl":
+                    case "fl":      // Fläche wird zu direkt
                         LiVerteilungsIdNew =  Timeline.GetVerteilungIdAusArtVerteilung("di", AsConnect);
                         break;
-                    case "pz":
+                    case "pz":      // Prozent wird zu direkt
+                        LiVerteilungsIdNew = Timeline.GetVerteilungIdAusArtVerteilung("di", AsConnect);
+                        break;
+                    case "ps":      // Personen wird zu direkt
                         LiVerteilungsIdNew = Timeline.GetVerteilungIdAusArtVerteilung("di", AsConnect);
                         break;
                     default:
@@ -636,6 +643,8 @@ namespace Ruddat_NK
 
                 // Gesamtfläche aus Tabelle Objekt holen
                 LdGesamtflaeche = Timeline.GetObjektflaeche(liObjekt, 0, 0, AsConnect);
+                // Anzahl der Personen aus Tabelle Objekt holen Flag 0 für Objekt Id
+                LdAnzPersonenObj = Timeline.GetAktPersonen(liObjekt, 0, 0, LdtStart, LdtEnd, 0, AsConnect);
 
                 // Schleife durch alle Teilobjekte
                 for (int i = 0; i < ATblTeilobjekte.Rows.Count; i++)
@@ -652,6 +661,7 @@ namespace Ruddat_NK
                     DrRechnung[10] = AiMieterid;
                     DrRechnung[11] = LsRgNr;
                     DrRechnung[12] = LsFirma;
+                    DrRechnung[13] = "";
                     DrRechnung[15] = 1;                     // Flag für Timelinebearbeitung erzeugen
                     DrRechnung[16] = LiVerteilungsIdNew;
                     DrRechnung[17] = AiSourceId;
@@ -659,15 +669,15 @@ namespace Ruddat_NK
                     switch (LsVerteilung)
                     {
                         case "fl":          // Berechnung Kosten MietFläche
-                            if (ATblTeilobjekte.Rows[0].ItemArray.GetValue(6) != DBNull.Value)
+                            if (ATblTeilobjekte.Rows[i].ItemArray.GetValue(6) != DBNull.Value)
                             {
-                                if ((decimal)ATblTeilobjekte.Rows[0].ItemArray.GetValue(6) > 0) // Fläche Teilobjekt
+                                if ((decimal)ATblTeilobjekte.Rows[i].ItemArray.GetValue(6) > 0) // Fläche Teilobjekt
                                 {
-                                    decimal LdteilFlaeche = (decimal)ATblTeilobjekte.Rows[0].ItemArray.GetValue(6);
+                                    decimal LdteilFlaeche = (decimal)ATblTeilobjekte.Rows[i].ItemArray.GetValue(6);
                                     decimal[] LdaBetrag = new decimal[2];
 
-                                    LdaBetrag[0] = LadBetragMonat[0] / (LdGesamtflaeche / LdteilFlaeche);           // Netto    
-                                    LdaBetrag[1] = LadBetragMonat[1] / (LdGesamtflaeche / LdteilFlaeche);           // Brutto
+                                    LdaBetrag[0] = LadBetragteil[0] / (LdGesamtflaeche / LdteilFlaeche);           // Netto    
+                                    LdaBetrag[1] = LadBetragteil[1] / (LdGesamtflaeche / LdteilFlaeche);           // Brutto
 
                                     DrRechnung[5] = LdaBetrag[0];           // Netto    
                                     DrRechnung[6] = LdaBetrag[1];           // Brutto
@@ -677,15 +687,15 @@ namespace Ruddat_NK
                             }
                             break;
                         case "pz":          // Berechung nach Prozent
-                            if (ATblTeilobjekte.Rows[0].ItemArray.GetValue(7) != DBNull.Value)
+                            if (ATblTeilobjekte.Rows[i].ItemArray.GetValue(7) != DBNull.Value)
                             {
-                                if ((decimal)ATblTeilobjekte.Rows[0].ItemArray.GetValue(7) > 0)     //  Prozent
+                                if ((decimal)ATblTeilobjekte.Rows[i].ItemArray.GetValue(7) > 0)     //  Prozent
                                 {
-                                    decimal LdteilProzent = (decimal)ATblTeilobjekte.Rows[0].ItemArray.GetValue(7);
+                                    decimal LdteilProzent = (decimal)ATblTeilobjekte.Rows[i].ItemArray.GetValue(7);
                                     decimal[] LdaBetrag = new decimal[2];
 
-                                    LdaBetrag[0] = LadBetragMonat[0] / (100 / LdteilProzent);           // Netto    
-                                    LdaBetrag[1] = LadBetragMonat[1] / (100 / LdteilProzent);           // Brutto
+                                    LdaBetrag[0] = LadBetragteil[0] / (100 / LdteilProzent);           // Netto    
+                                    LdaBetrag[1] = LadBetragteil[1] / (100 / LdteilProzent);           // Brutto
 
                                     DrRechnung[5] = LdaBetrag[0];           // Netto    
                                     DrRechnung[6] = LdaBetrag[1];           // Brutto
@@ -694,8 +704,28 @@ namespace Ruddat_NK
                                 }
                             }
                             break;
-                        case "ps":
-                            LiPersonenFlag = 1;
+                        case "ps":      // Berechnung nach Personenzahl
+                            if (ATblTeilobjekte.Rows[i].ItemArray.GetValue(8) != DBNull.Value)
+                            {
+                                if (int.Parse(ATblTeilobjekte.Rows[i].ItemArray.GetValue(8).ToString()) == 1)
+                                {
+                                    LdAnzPersonenObjTeil = Timeline.GetAktPersonen(0, (int)ATblTeilobjekte.Rows[i].ItemArray.GetValue(0), 0, LdtStart, LdtEnd, 0, AsConnect);
+
+                                    if (LdAnzPersonenObj > LdAnzPersonenObjTeil)
+                                    {
+                                        decimal LdTeilPersonen = LdAnzPersonenObj / LdAnzPersonenObjTeil;
+                                        decimal[] LdaBetrag = new decimal[2];
+
+                                        LdaBetrag[0] = LadBetragteil[0] / LdTeilPersonen;           // Netto    
+                                        LdaBetrag[1] = LadBetragteil[1] / LdTeilPersonen;           // Brutto
+
+                                        DrRechnung[5] = LdaBetrag[0];           // Netto    
+                                        DrRechnung[6] = LdaBetrag[1];           // Brutto
+
+                                        ATblRechnungen.Rows.Add(DrRechnung);
+                                    }
+                                }
+                            }
                             break;
                         case "zl":      // Verteilung nach Zählerwert
                             break;
@@ -711,11 +741,13 @@ namespace Ruddat_NK
                 }
 
                 // Meldung Personenverteilung
-                if (LiPersonenFlag == 1)
-                {
-                    MessageBox.Show("Keine Beredchnung nach Personenanzahl möglich", "Verteilung auf Personen");
-                    LiPersonenFlag = 0;
-                }
+                //if (LiPersonenFlag == 1)
+                //{
+                //    MessageBox.Show("Keine Berechnung nach Personenanzahl möglich", "Verteilung auf Personen");
+                //    LiPersonenFlag = 0;
+                //}
+
+
                 // Daten in die Datenbank schreiben
                 MySqlCommandBuilder commandBuilder = new MySqlCommandBuilder(ASdaRechnungen);
                 ASdaRechnungen.Update(ATblRechnungen);
