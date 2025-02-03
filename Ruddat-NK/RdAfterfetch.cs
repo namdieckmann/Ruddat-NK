@@ -608,16 +608,6 @@ namespace Ruddat_NK
                 // Zahlung oder Rechnung 1= Zahlung 2= Rechnung
                 liZlgOrRg = 2;
 
-                // Monatsbeträge ermitteln (Brutto und Netto) und evtl. erster und letzter Monat nicht voll
-                LadBetragteil = Timeline.GetMonatsBetraege(liMonths, liDaysStart, liDaysEnd,
-                                                        ldBetragNetto, ldBetragBrutto,
-                                                        ldBetragSollNetto, ldBetragSollBrutto, 
-                                                        liZlgOrRg, LdtStart, LdtEnd);
-
-                // Den ersten Monat ermitteln
-                string dt = (LdtStart.Year.ToString()) + "-" + LdtStart.Month.ToString() + "-01";
-                ldtMonat = DateTime.Parse(dt);                 // Datetime mit erstem Tag des Monats
-
                 // Ermitteln der VerteilungsId aus der übergordneten Rechnungen
                 liVerteilungId = Timeline.GetVerteilungsId(AsConnect, LiSourceId);
                 // Ermitteln, wie verteilt werden soll aus der Tabelle art_verteilung
@@ -661,7 +651,7 @@ namespace Ruddat_NK
                     DrRechnung[10] = AiMieterid;
                     DrRechnung[11] = LsRgNr;
                     DrRechnung[12] = LsFirma;
-                    DrRechnung[13] = "";
+                    DrRechnung[13] = LsText;
                     DrRechnung[15] = 1;                     // Flag für Timelinebearbeitung erzeugen
                     DrRechnung[16] = LiVerteilungsIdNew;
                     DrRechnung[17] = AiSourceId;
@@ -674,13 +664,9 @@ namespace Ruddat_NK
                                 if ((decimal)ATblTeilobjekte.Rows[i].ItemArray.GetValue(6) > 0) // Fläche Teilobjekt
                                 {
                                     decimal LdteilFlaeche = (decimal)ATblTeilobjekte.Rows[i].ItemArray.GetValue(6);
-                                    decimal[] LdaBetrag = new decimal[2];
 
-                                    LdaBetrag[0] = LadBetragteil[0] / (LdGesamtflaeche / LdteilFlaeche);           // Netto    
-                                    LdaBetrag[1] = LadBetragteil[1] / (LdGesamtflaeche / LdteilFlaeche);           // Brutto
-
-                                    DrRechnung[5] = LdaBetrag[0];           // Netto    
-                                    DrRechnung[6] = LdaBetrag[1];           // Brutto
+                                    DrRechnung[5] = ldBetragNetto   / (LdGesamtflaeche / LdteilFlaeche);           // Netto    
+                                    DrRechnung[6] = ldBetragBrutto  / (LdGesamtflaeche / LdteilFlaeche);           // Brutto
 
                                     ATblRechnungen.Rows.Add(DrRechnung);
                                 }
@@ -692,13 +678,9 @@ namespace Ruddat_NK
                                 if ((decimal)ATblTeilobjekte.Rows[i].ItemArray.GetValue(7) > 0)     //  Prozent
                                 {
                                     decimal LdteilProzent = (decimal)ATblTeilobjekte.Rows[i].ItemArray.GetValue(7);
-                                    decimal[] LdaBetrag = new decimal[2];
 
-                                    LdaBetrag[0] = LadBetragteil[0] / (100 / LdteilProzent);           // Netto    
-                                    LdaBetrag[1] = LadBetragteil[1] / (100 / LdteilProzent);           // Brutto
-
-                                    DrRechnung[5] = LdaBetrag[0];           // Netto    
-                                    DrRechnung[6] = LdaBetrag[1];           // Brutto
+                                    DrRechnung[5] = ldBetragNetto / (100 / LdteilProzent);           // Netto    
+                                    DrRechnung[6] = ldBetragBrutto / (100 / LdteilProzent);           // Brutto
 
                                     ATblRechnungen.Rows.Add(DrRechnung);
                                 }
@@ -714,13 +696,9 @@ namespace Ruddat_NK
                                     if (LdAnzPersonenObj > LdAnzPersonenObjTeil)
                                     {
                                         decimal LdTeilPersonen = LdAnzPersonenObj / LdAnzPersonenObjTeil;
-                                        decimal[] LdaBetrag = new decimal[2];
 
-                                        LdaBetrag[0] = LadBetragteil[0] / LdTeilPersonen;           // Netto    
-                                        LdaBetrag[1] = LadBetragteil[1] / LdTeilPersonen;           // Brutto
-
-                                        DrRechnung[5] = LdaBetrag[0];           // Netto    
-                                        DrRechnung[6] = LdaBetrag[1];           // Brutto
+                                        DrRechnung[5] = ldBetragNetto / LdTeilPersonen;           // Netto    
+                                        DrRechnung[6] = ldBetragBrutto / LdTeilPersonen;           // Brutto
 
                                         ATblRechnungen.Rows.Add(DrRechnung);
                                     }
@@ -731,22 +709,29 @@ namespace Ruddat_NK
                             break;
                         case "nl":      // Keine Verteilung
                             break;
-                        case "di":      // Direkt und alles
+                        case "di":      // Direkt auf Anzahl der Objekte
+
+                            int LiRows = ATblTeilobjekte.Rows.Count;
+
+                            DrRechnung[5] = ldBetragNetto / LiRows;           // Netto    
+                            DrRechnung[6] = ldBetragBrutto / LiRows;           // Brutto
+
+                            ATblRechnungen.Rows.Add(DrRechnung);
+
                             break;
                         case "fa":      // Verteilung nach Flächenauswahl
+                            // Todo Parts: Nur die betroffnenen Räume speichern mit Flag Fläche beibehalten
+                            // Bezug ist die Rechnungsnummer also um id_rechnung erweitern
+                            // Schleife durch Teilobjekte
+                            // Prüfen, ob es einen Eintrag der Rechungsnummer in objekt_mix_parts gibt
+                            // Wenn die Gesamtfläche bleiben soll sofort den Teil rechnen
+                            // Sonst zunächst Gesamtfläche der Auswahl rechnen 
+
                             break;
                         default:
                             break;
                     }
                 }
-
-                // Meldung Personenverteilung
-                //if (LiPersonenFlag == 1)
-                //{
-                //    MessageBox.Show("Keine Berechnung nach Personenanzahl möglich", "Verteilung auf Personen");
-                //    LiPersonenFlag = 0;
-                //}
-
 
                 // Daten in die Datenbank schreiben
                 MySqlCommandBuilder commandBuilder = new MySqlCommandBuilder(ASdaRechnungen);

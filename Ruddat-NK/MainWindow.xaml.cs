@@ -1439,10 +1439,12 @@ namespace Ruddat_NK
         // Rechnungen Beginn Eingabe
         private void DgrRechnungen_BeginningEdit(object sender, DataGridBeginningEditEventArgs e)
         {
-
             // gewählten Datensatz ermitteln
+            int liOk;
             int LiRgId = 0;
             int LiSel = DgrRechnungen.SelectedIndex;
+            string lsArtVerteilung = "";
+            string lsArtVertKurz = "";
 
             if (LiSel >= 0)
             {

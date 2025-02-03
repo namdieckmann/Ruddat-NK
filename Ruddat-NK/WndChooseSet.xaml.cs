@@ -49,6 +49,7 @@ namespace Ruddat_NK
             string lsSql = "";
             string lsWhereAdd = "";
             string lsWhereAdd2 = "";
+            string LsOrder = "";
 
             switch (aiArt)          
             {
@@ -58,7 +59,8 @@ namespace Ruddat_NK
                                     from objekt_mix_parts";
                     lsWhereAdd = " where id_timeline is null "; // + giTimeLineId.ToString() + " ";
                     lsWhereAdd2 = " and id_objekt = " + giObjektId.ToString() + " ";
-                    lsSql = lsSql + lsWhereAdd + lsWhereAdd2;
+                    LsOrder = " ORDER BY bez ";
+                    lsSql = lsSql + lsWhereAdd + lsWhereAdd2 + LsOrder;
                     break;
                 case 2:         // objekt Mix parts editieren
                     lsSql = @"select Id_obj_mix_parts,id_objekt_mix,id_objekt,id_objekt_teil,bez,sel,flaeche_anteil,    
@@ -66,7 +68,8 @@ namespace Ruddat_NK
                                     from objekt_mix_parts";
                     lsWhereAdd = " where id_timeline = " + giTimeLineId.ToString() + " ";
                     lsWhereAdd2 = " and id_objekt = " + giObjektId.ToString() + " ";
-                    lsSql = lsSql + lsWhereAdd + lsWhereAdd2;
+                    LsOrder = " ORDER BY bez ";
+                    lsSql = lsSql + lsWhereAdd + lsWhereAdd2 + LsOrder;
                     break;
                 default:
                     break;
