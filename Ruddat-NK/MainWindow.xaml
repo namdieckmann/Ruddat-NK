@@ -163,7 +163,7 @@
                         <TextBox x:Name="tbZlObjektId" HorizontalAlignment="Left" Height="23" Margin="344,7,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="235" IsEnabled="False" Visibility="Hidden" Grid.ColumnSpan="2"/>
                         <TextBox x:Name="tbZlObjektTeilId" HorizontalAlignment="Left" Height="23" Margin="344,35,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="235" IsEnabled="False" Visibility="Hidden" Grid.ColumnSpan="2"/>
                         <TextBox x:Name="tbZlMieterId" HorizontalAlignment="Left" Height="23" Margin="344,63,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="235" IsEnabled="False" Visibility="Hidden" Grid.ColumnSpan="2"/>
-                        <Button x:Name="btnZlSave" Content="Speichern" Margin="0,0,474,10" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="134" RenderTransformOrigin="0.538,0.909" Click="btnZlSave_Click" Grid.Column="1"/>
+                        <Button x:Name="btnZlSave" Content="Speichern" Margin="0,0,474,10" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="134" RenderTransformOrigin="0.538,0.909" Click="BtnZlSave_Click" Grid.Column="1"/>
                         <Button x:Name="btnZlAdd" Content="Zufügen" HorizontalAlignment="Right" Margin="0,0,613,10" VerticalAlignment="Bottom" Width="75" Click="btnZlAdd_Click" Grid.Column="1" />
                         <Button x:Name="btnZlDel" Content="Löschen" HorizontalAlignment="Right" Margin="0,0,693,10" VerticalAlignment="Bottom" Width="75" Click="btnZlDel_Click" Grid.ColumnSpan="2" />
                     </Grid>

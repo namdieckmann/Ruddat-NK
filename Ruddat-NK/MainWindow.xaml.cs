@@ -33,7 +33,7 @@ namespace Ruddat_NK
         private int giDelZlWertId = 0;              // Zählerwert löschen
         private int giZlId = 0;                     // Zähler Id
         private int GiRechnungTmpId = 0;               // TimelineId für löschen
-        private int GiFlagTimeline = 0;             // Flag TimeLinebearbeitung
+        // private int GiFlagTimelineNew = 0;             // Flag TimeLinebearbeitung
         private int giIndex = 0;                    // Index > Objekt, Teil oder Mieter 1,2,3
         private int giMwstSatzZl = 99;              // Für Zähler
         private int giDb = 2;                       // Datenbank 1 = MsqSql 2= Mysql
@@ -1014,8 +1014,8 @@ namespace Ruddat_NK
                     liRows = FetchData(lsSql, 18, giDb, gsConnect);
                     lsSqlLeerstand = RdQueries.GetSqlSelect(222, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);     // für Report
 
-                    // Timeline Rechnungen erzeugen für ObjektTeile
-                    // LiArtRelation = 1 für Rechnung (4. Argument
+                    // Timeline Rechnungen erzeugen 
+                    // LiArtRelation = 1 für Rechnung (4. Argument)
                     RdAfterfetch.CreateTimeline(0, liId, 0, 0, 1,
                          MySdRechnungen, TblRechnungen,
                          MySdTeilObj, TblTeilObjekte,
@@ -1103,7 +1103,7 @@ namespace Ruddat_NK
                     lsSqlLeerstand = RdQueries.GetSqlSelect(223, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);     // für Report
 
                     // Timeline Rechnungen erzeugen für ObjektTeile
-                    // LiArtRelation = 1 für Rechnung (4. Argument
+                    // LiArtRelation = 1 für Rechnung (4. Argument)
                     RdAfterfetch.CreateTimeline(0, 0, liId, 0, 1,
                          MySdRechnungen, TblRechnungen,
                          MySdTeilObj, TblTeilObjekte,
@@ -1408,13 +1408,9 @@ namespace Ruddat_NK
         private void btnRgSave_Click(object sender, RoutedEventArgs e)
         {
             string LsSql = "";
-            //int liOk = 0;
-            //int LiObkjektId = 0;
 
             // aktualisiert Rechnungen TblRechnungen
             FetchData("", 35, giDb, gsConnect);
-            // Update DataGrids
-            // updateAllDataGrids(0);
 
             // Die gewählte Rechnung holen
             LsSql = RdQueries.GetSqlSelect(45, GiRechnungTmpId, "", "", "", DateTime.MinValue, DateTime.MinValue, giFiliale, gsConnect, giDb);
@@ -1428,6 +1424,7 @@ namespace Ruddat_NK
                     MySdTimeLine, TblTimeLine);
 
             // Die IDs und Flags zurücksetzen
+            // Todo ? wofür
             GiRechnungTmpId = 0;
 
             // save Button Rechnungen wieder aus
@@ -1440,11 +1437,8 @@ namespace Ruddat_NK
         private void DgrRechnungen_BeginningEdit(object sender, DataGridBeginningEditEventArgs e)
         {
             // gewählten Datensatz ermitteln
-            int liOk;
             int LiRgId = 0;
             int LiSel = DgrRechnungen.SelectedIndex;
-            string lsArtVerteilung = "";
-            string lsArtVertKurz = "";
 
             if (LiSel >= 0)
             {
@@ -1454,7 +1448,6 @@ namespace Ruddat_NK
                     LiRgId = Int32.Parse(dr[14].ToString());                // RechnungsId holen
                 }
                 GiRechnungTmpId = LiRgId;
-                GiFlagTimeline = 1;                                         // 1 = Rechnung bearbeiten
             }
 
             // Save Button auf
@@ -1474,7 +1467,7 @@ namespace Ruddat_NK
             dr[9] = GiObjektTeilId;
             dr[10] = GiMieterId;
             dr[14] = liTmpId;
-            dr[15] = 1;                 // Flag für Bearbeitung erzeugen
+            dr[15] = 1;                 // Flag für Bearbeitet erzeugen, es muss eine neue Timline erzeugt werden
 
             TblRechnungen.Rows.Add(dr);
             btnRgAdd.IsEnabled = false;
@@ -1484,9 +1477,6 @@ namespace Ruddat_NK
         private void btnRgDel_Click(object sender, RoutedEventArgs e)
         {
             int LiSel = DgrRechnungen.SelectedIndex;
-            int LiDelId = 0;
-            int LiOk = 0;
-            string LsSql = string.Empty;    
 
             if (LiSel >= 0)
             {
@@ -1496,13 +1486,13 @@ namespace Ruddat_NK
                 {
                     case MessageBoxResult.Yes:
                         DataRow dr = TblRechnungen.Rows[LiSel];
-                        LiDelId = (int)(dr[0]);                // Id des zu löschenden Datensatzes
+                        int LiDelId = (int)(dr[0]);                // Id des zu löschenden Datensatzes
 
                         if (LiDelId >= 0)
                         {
                             TblRechnungen.Rows.Remove(dr);
 
-                            LsSql = RdQueries.GetSqlSelect(36, LiDelId, "", "", "", DateTime.MinValue, DateTime.MinValue, giFiliale, gsConnect, giDb);
+                            string LsSql = RdQueries.GetSqlSelect(36, LiDelId, "", "", "", DateTime.MinValue, DateTime.MinValue, giFiliale, gsConnect, giDb);
                             FetchData(LsSql, 36, giDb, gsConnect);
 
                             // Erzeugte Untergeordnete Rechnungen löschen
@@ -1513,29 +1503,25 @@ namespace Ruddat_NK
 
                             // delete Button zu
                             btnRgDel.IsEnabled = false;
+                            // Update
+                            updateAllDataGrids(0);
                         }
                         break;
-               
                 }
             }
         }
 
         // Zahlung Save
-        private void btnZlSave_Click(object sender, RoutedEventArgs e)
+        private void BtnZlSave_Click(object sender, RoutedEventArgs e)
         {
-            int liOk = 0;
-            int liRows = 0;
             // int liNkId = 0;
-            int liTimelineId = 0;
             string lsSql = "";
 
             // Datenverbindung
-            liOk = FetchData(lsSql, 37, giDb, gsConnect);
+            FetchData(lsSql, 37, giDb, gsConnect);
 
-            // Timeline bearbeiten Art 11 = Zahlungen ändern
-            int liFlagTimeline = 11;
             // Timeline.editTimeline(giTimelineId, giFlagTimeline, gsConnect, giDb);
-            liRows = TblZahlungen.Rows.Count;
+            int liRows = TblZahlungen.Rows.Count;
 
             if (liRows > 0)
             {
@@ -1544,19 +1530,14 @@ namespace Ruddat_NK
                 {
                     if (TblZahlungen.Rows[i][0] == DBNull.Value)        // Id ist noch leer
                     {
-                        Int32.TryParse(TblZahlungen.Rows[i][10].ToString(), out liTimelineId);       // Timeline Id holen
-
-                        Timeline.EditRechung(liTimelineId, 0,liFlagTimeline, 0, gsConnect);   // Timeline aktualisieren
+                        // Todo Zahlung speichern
+                        // Int32.TryParse(TblZahlungen.Rows[i][10].ToString(), out liTimelineId);       // Timeline Id holen
                     }
                 }
             }
 
             // Update der Daten
-            liOk = updateAllDataGrids(0);
-
-            // Die IDs und Flags zurücksetzen
-            giDelZlId = 0;
-            GiRechnungTmpId = 0;
+            updateAllDataGrids(0);
 
             // save Button Zahlungen wieder aus
             btnZlSave.IsEnabled = false;
@@ -1604,8 +1585,6 @@ namespace Ruddat_NK
                 }
 
                 GiRechnungTmpId = liTimelineId;
-                GiFlagTimeline = 11;                                         // 11 = Zahlung bearbeiten
-
                 btnZlSave.IsEnabled = true;
             }
 
@@ -1661,7 +1640,6 @@ namespace Ruddat_NK
                 }
 
                 GiRechnungTmpId = liTimelineId;
-                GiFlagTimeline = 11;                                         // 11 = Zahlung bearbeiten
                 btnZlSave.IsEnabled = true;
             }
 
@@ -1671,8 +1649,6 @@ namespace Ruddat_NK
         private void btnZlDel_Click(object sender, RoutedEventArgs e)
         {
             int liTimelineId = 0;
-
-            GiFlagTimeline = 12;                // 12 = Zahlung löschen
 
             // Durch alle zum Löschen gewählten Datensätze
             if (DgrZahlungen.SelectedItems.Count > 0)
@@ -1685,9 +1661,6 @@ namespace Ruddat_NK
                     giDelZlId = (int)selectedFile.Row.ItemArray[0];
                     liTimelineId = (int)selectedFile.Row.ItemArray[10];          // TimeLine ID holen                    
 
-                    // Timeline bearbeiten Art 12 = Zahlungen löschen
-                    Timeline.EditRechung(liTimelineId, 0, GiFlagTimeline, 0, gsConnect);
-
                     // Delete Kommando muss extra erzeugt werden
                     // Gibt es eine Datensatz ID zum Löschen
                     if (giDelZlId > 0)
@@ -1697,9 +1670,8 @@ namespace Ruddat_NK
                     }
                 }
             }
-
             // Update der Daten
-            int liOk1 = updateAllDataGrids(0);
+            updateAllDataGrids(0);
         }
 
         // Falls Zahlung angewählt ist, mit einem Click wegnehmen
@@ -1735,8 +1707,6 @@ namespace Ruddat_NK
                     btnCntSave.Content = "wirklich löschen?";
                     btnCntSave.IsEnabled = true;
                     btnCntAdd.IsEnabled = false;
-
-                    GiFlagTimeline = 22;                 // Zählerwert löschen
                     // delete Button zu
                     btnCntDel.IsEnabled = false;
                 }
@@ -1782,9 +1752,6 @@ namespace Ruddat_NK
 
             // Update
             liOk = FetchData("", 39, giDb, gsConnect);
-
-            // Timeline bearbeiten Art 21 = Zähler   
-            Timeline.EditRechung(GiRechnungTmpId, 0, GiFlagTimeline, 0, gsConnect);
 
             // Delete Kommando muss extra erzeugt werden
             // Gibt es eine Datensatz ID zum Löschen (button btnCntDel)
@@ -2199,8 +2166,6 @@ namespace Ruddat_NK
                     liTimelineId = Int32.Parse(dr[10].ToString());           // TimeLine ID holen
                 }
                 GiRechnungTmpId = liTimelineId;
-                GiFlagTimeline = 11;                                         // 11 = Zahlung bearbeiten
-
             }
             // Button Save auf
             btnZlSave.IsEnabled = true;
@@ -2233,7 +2198,6 @@ namespace Ruddat_NK
                 {
                     liTimelineId = Int32.Parse(dr[7].ToString());                  // TimeLine ID holen
                     GiRechnungTmpId = liTimelineId;
-                    GiFlagTimeline = 21;                                           // 21 = Zähler bearbeiten
                 }
             }
             // Button Save auf

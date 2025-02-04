@@ -81,7 +81,6 @@ namespace Ruddat_NK
                         LiSourceId = int.Parse(ATblRechnungen.Rows[i].ItemArray.GetValue(0).ToString());
 
                         // Erzeugte Untergeordnete Rechnungen löschen
-
                         // Alle mit der Id der Hauptrechnung in id_rechnung_source löschen
                         Timeline.DeleteRechnung(LiSourceId, "R", asConnect);
 
@@ -91,7 +90,7 @@ namespace Ruddat_NK
                             {
                                 LiKsa = (int)ATblRechnungen.Rows[i].ItemArray.GetValue(1);                  // Kostenart
                                 liObjekt = (int)ATblRechnungen.Rows[i].ItemArray.GetValue(8);               // Objekt
-                                liArtRelation = 1;                                                             // Rechnung
+                                liArtRelation = 1;                                                          // Rechnung
 
                                 if (Timeline.GetWeiterleitung(1, LiKsa, asConnect) == 1)
                                 {
@@ -101,8 +100,7 @@ namespace Ruddat_NK
                                         ASdaRechnungenTmp, ATblRechnungen,
                                         AsdaObjektTeile, ATblObjektTeile,
                                         AsdaTimeline, ATblTimeline,
-                                        asConnect
-                                        );
+                                        asConnect, liObjektTeil);
                                 }
                             }
                         // Teilobjekt Rechnung
@@ -513,7 +511,7 @@ namespace Ruddat_NK
                 MySqlDataAdapter ASdaRechnungen, System.Data.DataTable ATblRechnungen,
                 MySqlDataAdapter ASdaTeilobjekte, System.Data.DataTable ATblTeilobjekte,
                 MySqlDataAdapter ASdaTimeline, System.Data.DataTable ATblTimeline,
-                string AsConnect)
+                string AsConnect, int liObjektTeil)
         {
             int LiOk = 0;
 
@@ -524,7 +522,7 @@ namespace Ruddat_NK
             DateTime Ldtrechnung = DateTime.MinValue;
 
             int liObjekt = 0;
-            int liObjektTeil = 0;
+            // int liObjektTeil = 0;
             int liMieter = 0;
             int LiKsa = 0; // Kostenstellenart
             int liMonths = 0; //Anzahl der einzutragenden Monate
@@ -575,9 +573,9 @@ namespace Ruddat_NK
                 if (ATblRechnungen.Rows[0].ItemArray.GetValue(8) != DBNull.Value)
                     liObjekt = (int)ATblRechnungen.Rows[0].ItemArray.GetValue(8);
                 if (ATblRechnungen.Rows[0].ItemArray.GetValue(9) != DBNull.Value)
-                    liObjektTeil = (int)ATblRechnungen.Rows[0].ItemArray.GetValue(9);
+                    _ = (int)ATblRechnungen.Rows[0].ItemArray.GetValue(9);
                 if (ATblRechnungen.Rows[0].ItemArray.GetValue(10) != DBNull.Value)
-                    liMieter = (int)ATblRechnungen.Rows[0].ItemArray.GetValue(10);
+                    _ = (int)ATblRechnungen.Rows[0].ItemArray.GetValue(10);
                 if (ATblRechnungen.Rows[0].ItemArray.GetValue(11) != DBNull.Value)
                     LsRgNr = ATblRechnungen.Rows[0].ItemArray.GetValue(11).ToString();
                 if (ATblRechnungen.Rows[0].ItemArray.GetValue(12) != DBNull.Value)
@@ -648,7 +646,7 @@ namespace Ruddat_NK
                     DrRechnung[7] = LiMwstId;
                     // DrRechnung[8] = AiObjektId;          // Darf hier nicht eingesetzt werden
                     DrRechnung[9] = (int)ATblTeilobjekte.Rows[i].ItemArray.GetValue(0);
-                    DrRechnung[10] = AiMieterid;
+                    // DrRechnung[10] = AiMieterid;         // nicht einsetzen
                     DrRechnung[11] = LsRgNr;
                     DrRechnung[12] = LsFirma;
                     DrRechnung[13] = LsText;
