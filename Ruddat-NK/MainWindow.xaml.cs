@@ -1014,7 +1014,7 @@ namespace Ruddat_NK
                     liRows = FetchData(lsSql, 18, giDb, gsConnect);
                     lsSqlLeerstand = RdQueries.GetSqlSelect(222, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);     // für Report
 
-                    // Timeline Rechnungen erzeugen 
+                    // Timeline Rechnungen erzeugen, aber nur wenn eine Rechnung geändert wurde
                     // LiArtRelation = 1 für Rechnung (4. Argument)
                     RdAfterfetch.CreateTimeline(0, liId, 0, 0, 1,
                          MySdRechnungen, TblRechnungen,
