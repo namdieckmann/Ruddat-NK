@@ -11,6 +11,7 @@ using System.Windows.Input;
 using static System.Windows.Forms.LinkLabel;
 using System.Runtime.Remoting.Messaging;
 using System.Windows.Media;
+using System.Dynamic;
 
 
 namespace Ruddat_NK
@@ -1014,13 +1015,16 @@ namespace Ruddat_NK
                     liRows = FetchData(lsSql, 18, giDb, gsConnect);
                     lsSqlLeerstand = RdQueries.GetSqlSelect(222, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);     // für Report
 
-                    // Timeline Rechnungen erzeugen, aber nur wenn eine Rechnung geändert wurde
-                    // LiArtRelation = 1 für Rechnung (4. Argument)
-                    RdAfterfetch.CreateTimeline(0, liId, 0, 0, 1,
-                         MySdRechnungen, TblRechnungen,
-                         MySdTeilObj, TblTeilObjekte,
-                         MySdTimeLine, TblTimeLine,
-                         gsConnect);
+                    // Timeline Rechnungen erzeugen, aber nur wenn eine Rechnung/Zahlung geändert wurde
+                    if (asArt == 2)
+                    {
+                        // LiArtRelation = 1 für Rechnung (4. Argument)
+                        RdAfterfetch.CreateTimeline(0, liId, 0, 0, 1,
+                             MySdRechnungen, TblRechnungen,
+                             MySdTeilObj, TblTeilObjekte,
+                             MySdTimeLine, TblTimeLine,
+                             gsConnect);
+                    }
 
                     // TimeLine holen für Objekte
                     lsSql = RdQueries.GetSqlSelect(5, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
@@ -1102,13 +1106,16 @@ namespace Ruddat_NK
                     // Detaillierter Leerstand
                     lsSqlLeerstand = RdQueries.GetSqlSelect(223, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);     // für Report
 
-                    // Timeline Rechnungen erzeugen für ObjektTeile
-                    // LiArtRelation = 1 für Rechnung (4. Argument)
-                    RdAfterfetch.CreateTimeline(0, 0, liId, 0, 1,
-                         MySdRechnungen, TblRechnungen,
-                         MySdTeilObj, TblTeilObjekte,
-                         MySdTimeLine, TblTimeLine,
-                         gsConnect);
+                    if (asArt == 2)
+                    {
+                        // Timeline Rechnungen erzeugen für ObjektTeile
+                        // LiArtRelation = 1 für Rechnung (4. Argument)
+                        RdAfterfetch.CreateTimeline(0, 0, liId, 0, 1,
+                             MySdRechnungen, TblRechnungen,
+                             MySdTeilObj, TblTeilObjekte,
+                             MySdTimeLine, TblTimeLine,
+                             gsConnect);
+                    }
 
                     // TimeLine holen für ObjektTeile
                     lsSql = RdQueries.GetSqlSelect(6, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
@@ -1175,22 +1182,25 @@ namespace Ruddat_NK
                     lsSql = RdQueries.GetSqlSelect(432, liObjektTeilIdTmp, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
                     liRows = FetchData(lsSql, 432, giDb, gsConnect);
 
-                    // Timeline Rechnungen erzeugen für Mieter
-                    // Quelle ist die Timline der ObjektTeile
-                    RdAfterfetch.CreateTimelineMieter(0, liObjektIdTmp, liObjektTeilIdTmp, liId, 1,
-                         MySdRechnungen, TblRechnungen,
-                         MySdTimeLineObjTeile, TblTimeLineObjTeile,
-                         MySdTimeLine, TblTimeLine,
-                         gsConnect);
-
-                    // Wenn es direkte Mieterrechnungen gibt, auch dafür eine Timeline erzeugen
-                    if (LiRowsRechnungenMieter > 0)
+                    if (asArt == 2)
                     {
-                        RdAfterfetch.CreateTimeline(0, 0, 0, liId, 1,
+                        // Timeline Rechnungen erzeugen für Mieter
+                        // Quelle ist die Timline der ObjektTeile
+                        RdAfterfetch.CreateTimelineMieter(0, liObjektIdTmp, liObjektTeilIdTmp, liId, 1,
                              MySdRechnungen, TblRechnungen,
-                             MySdTeilObj, TblTeilObjekte,
+                             MySdTimeLineObjTeile, TblTimeLineObjTeile,
                              MySdTimeLine, TblTimeLine,
                              gsConnect);
+
+                        // Wenn es direkte Mieterrechnungen gibt, auch dafür eine Timeline erzeugen
+                        if (LiRowsRechnungenMieter > 0)
+                        {
+                            RdAfterfetch.CreateTimeline(0, 0, 0, liId, 1,
+                                 MySdRechnungen, TblRechnungen,
+                                 MySdTeilObj, TblTeilObjekte,
+                                 MySdTimeLine, TblTimeLine,
+                                 gsConnect);
+                        }
                     }
 
                     // TimeLine holen für Mieter
@@ -1430,7 +1440,7 @@ namespace Ruddat_NK
             // save Button Rechnungen wieder aus
             btnRgSave.IsEnabled = false;
             btnRgAdd.IsEnabled = true;
-            updateAllDataGrids(0);
+            updateAllDataGrids(2);      // 2 = Timeline neu
         }
 
         // Rechnungen Beginn Eingabe
@@ -1503,8 +1513,8 @@ namespace Ruddat_NK
 
                             // delete Button zu
                             btnRgDel.IsEnabled = false;
-                            // Update
-                            updateAllDataGrids(0);
+                            // Update 2 = timeline neu
+                            updateAllDataGrids(2);
                         }
                         break;
                 }
@@ -1536,8 +1546,8 @@ namespace Ruddat_NK
                 }
             }
 
-            // Update der Daten
-            updateAllDataGrids(0);
+            // Update der Daten 2= Timeline neu
+            updateAllDataGrids(2);
 
             // save Button Zahlungen wieder aus
             btnZlSave.IsEnabled = false;
@@ -1914,6 +1924,23 @@ namespace Ruddat_NK
                             oDataRowView.Row[5] = ldNetto;                                      // Nettowert schreiben
                         }
                     }
+                }
+            }
+        }
+
+        // Zeilen gegen editieren sperren > Rechnungen aus Weiterleitung
+        private void DgrRechnungen_LoadingRow(object sender, DataGridRowEventArgs e)
+        {
+            int y = e.Row.GetIndex();
+            e.Row.IsEnabled = true;
+
+            // Es ist eine Rechnungs Id Source vorhanden, dann darf nicht mehr editiert werden
+            if (TblRechnungen.Rows[y].ItemArray.GetValue(17) != DBNull.Value )
+            {
+                int LiObjId = (int)TblRechnungen.Rows[y].ItemArray.GetValue(17);
+                if (LiObjId > 0)
+                {
+                    e.Row.IsEnabled = false;
                 }
             }
         }
