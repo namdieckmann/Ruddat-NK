@@ -1106,16 +1106,13 @@ namespace Ruddat_NK
                     // Detaillierter Leerstand
                     lsSqlLeerstand = RdQueries.GetSqlSelect(223, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);     // für Report
 
-                    if (asArt == 2)
-                    {
-                        // Timeline Rechnungen erzeugen für ObjektTeile
-                        // LiArtRelation = 1 für Rechnung (4. Argument)
-                        RdAfterfetch.CreateTimeline(0, 0, liId, 0, 1,
-                             MySdRechnungen, TblRechnungen,
-                             MySdTeilObj, TblTeilObjekte,
-                             MySdTimeLine, TblTimeLine,
-                             gsConnect);
-                    }
+                    // Timeline Rechnungen erzeugen für ObjektTeile
+                    // LiArtRelation = 1 für Rechnung (4. Argument)
+                    RdAfterfetch.CreateTimeline(0, 0, liId, 0, 1,
+                            MySdRechnungen, TblRechnungen,
+                            MySdTeilObj, TblTeilObjekte,
+                            MySdTimeLine, TblTimeLine,
+                            gsConnect);
 
                     // TimeLine holen für ObjektTeile
                     lsSql = RdQueries.GetSqlSelect(6, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
@@ -1182,25 +1179,22 @@ namespace Ruddat_NK
                     lsSql = RdQueries.GetSqlSelect(432, liObjektTeilIdTmp, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
                     liRows = FetchData(lsSql, 432, giDb, gsConnect);
 
-                    if (asArt == 2)
-                    {
-                        // Timeline Rechnungen erzeugen für Mieter
-                        // Quelle ist die Timline der ObjektTeile
-                        RdAfterfetch.CreateTimelineMieter(0, liObjektIdTmp, liObjektTeilIdTmp, liId, 1,
-                             MySdRechnungen, TblRechnungen,
-                             MySdTimeLineObjTeile, TblTimeLineObjTeile,
-                             MySdTimeLine, TblTimeLine,
-                             gsConnect);
+                    // Timeline Rechnungen erzeugen für Mieter
+                    // Quelle ist die Timline der ObjektTeile
+                    RdAfterfetch.CreateTimelineMieter(0, liObjektIdTmp, liObjektTeilIdTmp, liId, 1,
+                            MySdRechnungen, TblRechnungen,
+                            MySdTimeLineObjTeile, TblTimeLineObjTeile,
+                            MySdTimeLine, TblTimeLine,
+                            gsConnect);
 
-                        // Wenn es direkte Mieterrechnungen gibt, auch dafür eine Timeline erzeugen
-                        if (LiRowsRechnungenMieter > 0)
-                        {
-                            RdAfterfetch.CreateTimeline(0, 0, 0, liId, 1,
-                                 MySdRechnungen, TblRechnungen,
-                                 MySdTeilObj, TblTeilObjekte,
-                                 MySdTimeLine, TblTimeLine,
-                                 gsConnect);
-                        }
+                    // Wenn es direkte Mieterrechnungen gibt, auch dafür eine Timeline erzeugen
+                    if (LiRowsRechnungenMieter > 0)
+                    {
+                        RdAfterfetch.CreateTimeline(0, 0, 0, liId, 1,
+                                MySdRechnungen, TblRechnungen,
+                                MySdTeilObj, TblTeilObjekte,
+                                MySdTimeLine, TblTimeLine,
+                                gsConnect);
                     }
 
                     // TimeLine holen für Mieter

@@ -109,7 +109,7 @@ namespace Ruddat_NK
                             {
                                 LiKsa = (int)ATblRechnungen.Rows[i].ItemArray.GetValue(1);                  // Kostenart
                                 liObjektTeil = (int)ATblRechnungen.Rows[i].ItemArray.GetValue(9);           // ObjektTeil
-                                liArtRelation = 1;                                                             // Rechnung
+                                liArtRelation = 1;                                                          // Rechnung
                             }
                         // Mieter Rechnung
                         if (ATblRechnungen.Rows[i].ItemArray.GetValue(10) != DBNull.Value)
@@ -117,7 +117,7 @@ namespace Ruddat_NK
                             {
                                 LiKsa = (int)ATblRechnungen.Rows[i].ItemArray.GetValue(1);                   // Kostenart
                                 liMieter = (int)ATblRechnungen.Rows[i].ItemArray.GetValue(10);               // Mieter
-                                liArtRelation = 1;                                                              // Rechnung
+                                liArtRelation = 1;                                                           // Rechnung
                             }
 
 
@@ -233,7 +233,7 @@ namespace Ruddat_NK
 
             for (int i = 0; i < ATblRechnungen.Rows.Count; i++)
             {
-                if (ATblRechnungen.Rows[i].ItemArray.GetValue(0) != DBNull.Value)
+                if (ATblRechnungen.Rows[i].ItemArray.GetValue(0) != DBNull.Value)       // Todo und timelineflag in Rechnungen = 1
                 {
 
                     int LiWtlObjekt = 0;            // Weiterleitungen
