@@ -591,6 +591,13 @@ namespace Ruddat_NK
                     MySdRechnungenTmp = new MySqlDataAdapter(com);
                     MySdRechnungenTmp.Fill(TblRechnungenTmp);
                 }
+                if (piArt == 46)
+                {
+                    // Rechnung in Objekt speichern
+                    MySqlCommandBuilder commandBuilder46 = new MySqlCommandBuilder(MySdRechnungenTmp);
+                    MySdRechnungenTmp.Update(TblRechnungenTmp);
+                }
+
                 // db close
                 con.Close();
             }
@@ -1413,16 +1420,20 @@ namespace Ruddat_NK
         {
             string LsSql = "";
 
-            // aktualisiert Rechnungen TblRechnungen
+            // aktualisiert Rechnungen TblRechnungen für die Darstellung
             FetchData("", 35, giDb, gsConnect);
 
             // Die gewählte Rechnung holen
             LsSql = RdQueries.GetSqlSelect(45, GiRechnungTmpId, "", "", "", DateTime.MinValue, DateTime.MinValue, giFiliale, gsConnect, giDb);
             FetchData(LsSql, 45, giDb, gsConnect);
 
+            // TimelineFlag setzen
+            TblRechnungenTmp.Rows[0][15] = 1;
+            FetchData("", 46, giDb, gsConnect);
+
             // Art 1 = Rechnung
             RdAfterfetch.MakeAfterFetch(1, 1, GiRechnungTmpId, 0, gsConnect,
-                    MySdRechnungenTmp, TblRechnungenTmp,        // Temporäre Rechnungen nach Anwahl in Rechnungensfenster
+                    MySdRechnungenTmp, TblRechnungenTmp,                        // Temporäre Rechnungen nach Anwahl in Rechnungensfenster
                     MySdTeilObjekte, TblTeilObjekte,
                     null, null,
                     MySdTimeLine, TblTimeLine);

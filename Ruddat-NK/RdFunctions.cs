@@ -1392,8 +1392,8 @@ namespace Ruddat_NK
                     liIdRgNr = GetRgNrFromPool(asConnect);          // ID Rechnungsnummer aus dem Pool besorgen
                     if (liIdRgNr > 0)
                     {
-                        liOk = SetRgNrToTml(liIdRgNr, asSqlRgNr, asConnect);       // ID Rechnungsnummer in Timeline einsetzen
-                        liOk = SetRgNrFromPool(liIdRgNr, asConnect);    // Die Rechnungsnummer als besetzt kennzeichnen 
+                        liOk = SetRgNrToTml(liIdRgNr, asSqlRgNr, asConnect);        // ID Rechnungsnummer in Timeline einsetzen
+                        liOk = SetRgNrFromPool(liIdRgNr, asConnect);                // Die Rechnungsnummer als besetzt kennzeichnen 
                     }
                     else
                     {
