@@ -1022,16 +1022,12 @@ namespace Ruddat_NK
                     liRows = FetchData(lsSql, 18, giDb, gsConnect);
                     lsSqlLeerstand = RdQueries.GetSqlSelect(222, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);     // für Report
 
-                    // Timeline Rechnungen erzeugen, aber nur wenn eine Rechnung/Zahlung geändert wurde
-                    if (asArt == 2)
-                    {
-                        // LiArtRelation = 1 für Rechnung (4. Argument)
-                        RdAfterfetch.CreateTimeline(0, liId, 0, 0, 1,
-                             MySdRechnungen, TblRechnungen,
-                             MySdTeilObj, TblTeilObjekte,
-                             MySdTimeLine, TblTimeLine,
-                             gsConnect);
-                    }
+                    // LiArtRelation = 1 für Rechnung (4. Argument)
+                    RdAfterfetch.CreateTimeline(0, liId, 0, 0, 1,
+                            MySdRechnungen, TblRechnungen,
+                            MySdTeilObj, TblTeilObjekte,
+                            MySdTimeLine, TblTimeLine,
+                            gsConnect);
 
                     // TimeLine holen für Objekte
                     lsSql = RdQueries.GetSqlSelect(5, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
@@ -1515,7 +1511,8 @@ namespace Ruddat_NK
                             Timeline.DeleteRechnung(LiDelId, "R", gsConnect);
                             // Delete Timeline mit der Rechnungs id
                             Timeline.DeleteTimeline(LiDelId, "R", gsConnect);
-
+                            // Delete Timeline mit der Rechnungs Source id (aus untergeordneten Rechnungen)
+                            Timeline.DeleteTimeline(LiDelId, "S", gsConnect);
                             // delete Button zu
                             btnRgDel.IsEnabled = false;
                             // Update 2 = timeline neu
