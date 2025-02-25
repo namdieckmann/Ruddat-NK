@@ -87,7 +87,9 @@ namespace Ruddat_NK
         // Zählerstände
         // Flag = 21 > ändern
         // Flag = 22 > löschen
-        // Todo 2412 Ohne Editrechnung auskommen Besser MakeAfterFetch mit Datenbankübergabe
+        // Todo 2412 Ohne Editrechnung auskommen Besser mit MakeAfterFetch mit Datenbankübergabe
+
+
         public static void EditRechung(int LiIdRechnungTmp, int LiObjektId, int LiTeilObjektId, int liFlagAdd, string asConnect)
         {
             string LsSql = "";
@@ -188,7 +190,8 @@ namespace Ruddat_NK
                             MySdRechnungen, TblRechnungen,
                             MySdObjektTeile, TblObjektTeile,
                             MySdMieter, TblMieter,
-                            MySdTimeline, TblTimeline);
+                            MySdTimeline, TblTimeline,
+                            null, null);
                         break;
                     case 2:     // Datensatz löschen
                         // MySqlDataReader queryCommandReader = command01.ExecuteReader();
@@ -218,7 +221,8 @@ namespace Ruddat_NK
                             MySdRechnungen, TblRechnungen,
                             MySdObjektTeile, TblObjektTeile,
                             MySdMieter, TblMieter,
-                            MySdTimeline, TblTimeline);
+                            MySdTimeline, TblTimeline,
+                            null, null);
 
                         //TblRechnungenTimeline = new DataTable();         // Rechnungen
                         //MySqlCommand command3 = new MySqlCommand(psSql2, connect);
@@ -320,19 +324,19 @@ namespace Ruddat_NK
                         TblCnt = new DataTable();
                         mysdCnt = new MySqlDataAdapter(command01);
                         mysdCnt.Fill(TblCnt);
-                        // liOk = Afterfetch.MakeAfterFetch(piArt, 0, 0, 0, asConnect, aiDb);
+                        // liOk = RdAfterfetch.MakeAfterFetch(piArt, 0, 0, 0, asConnect, aiDb);
                         break;
                     case 23:        // Zählerstände Timeline Create
-                        TblCntNew = new DataTable();         // Zahlungen
+                        TblCntNew = new DataTable();        
                         MySqlCommand command23 = new MySqlCommand(psSql2, connect);
                         mysdCntNew = new MySqlDataAdapter(command23);
                         mysdCntNew.Fill(TblCntNew);
-                        // Timeline neue Datensätze erzeugen
-                        MySqlCommand command231 = new MySqlCommand(psSql, connect);
-                        TblTml = new DataTable();
-                        MySdTimeline = new MySqlDataAdapter(command231);
-                        MySdTimeline.Fill(TblTml);
-                        // liOk = Afterfetch.MakeAfterFetch(piArt, 0, 0, 0, asConnect, aiDb, sda );
+                        LiReturn = RdAfterfetch.MakeAfterFetch(piArt, 1, 0, 0, asConnect,
+                                    MySdRechnungen, TblRechnungen,
+                                    MySdObjektTeile, TblObjektTeile,
+                                    MySdMieter, TblMieter,
+                                    MySdTimeline, TblTimeline,
+                                    null, null);
                         break;
                     case 24:            // Zählerinformationen für Report Nebenkostenabrechnungen
                         TblZlInfo = new DataTable();
@@ -616,6 +620,7 @@ namespace Ruddat_NK
         }
 
         // Timeline neu erzeugen
+        // Todo Achtung, wird nicht mehr genutzt nochmal kontrolle
         public static int TimelineCreate(int liExternId, string asField, string asConnect, int aiDb)
         {
             int liOk = 0;
@@ -652,7 +657,7 @@ namespace Ruddat_NK
             string LsSql;
             int LiOk = 0;
 
-            // Rechnungen löschen
+            // Untergeordnete Rechnungen löschen
             LsSql = RdQueriesFunctions.GetSql(150, AiSourceId, "", "", 0);
             LiOk = Timeline.FetchData(LsSql, "", "", 34, asConnect);
 

@@ -677,7 +677,8 @@ namespace Ruddat_NK
                                     zaehlerstaende.id_objekt_teil,
                                     zaehlerstaende.id_zaehler,
                                     zaehlerstaende.id_ksa,
-                                    zaehlerstaende.id_verteilung as id_verteilung_zl
+                                    zaehlerstaende.id_verteilung as id_verteilung_zl,
+                                    zaehlerstaende.flag_timeline
 				            from zaehlerstaende
 				            where zaehlerstaende.id_objekt = " + piId.ToString() + lsWhereAdd2;
                     }
@@ -696,7 +697,8 @@ namespace Ruddat_NK
                                     zaehlerstaende.id_objekt_teil,
                                     zaehlerstaende.id_zaehler,
                                     zaehlerstaende.id_ksa,
-                                    zaehlerstaende.id_verteilung as id_verteilung_zl
+                                    zaehlerstaende.id_verteilung as id_verteilung_zl,
+                                    zaehlerstaende.flag_timeline
 				            from zaehlerstaende
 				            where zaehlerstaende.id_objekt_teil = " + piId.ToString() + lsWhereAdd2;
                     }
@@ -1142,7 +1144,8 @@ namespace Ruddat_NK
                                         zaehler.zaehlernummer as zlnum,
                                         zaehler.zaehlerort as zlort,
                                         art_zaehler.bez as bezart,
-                                        art_einheit.bez as bezeinheit
+                                        art_einheit.bez as bezeinheit,
+                                        zählerstaende.flag_timeline
 				                from zaehlerstaende
                                         Left join zaehler On zaehler.Id_zaehler = zaehlerstaende.Id_zaehler
                                         Left Join art_zaehler On zaehler.Id_zaehler_art = art_zaehler.Id_zaehler_art
@@ -1167,7 +1170,8 @@ namespace Ruddat_NK
                                             zaehler.zaehlernummer as zlnum,
                                             zaehler.zaehlerort as zlort,
                                             art_zaehler.bez as bezart,
-                                            art_einheit.bez as bezeinheit
+                                            art_einheit.bez as bezeinheit,
+                                            zählerstaende.flag_timeline
 				                    from zaehlerstaende
                                             Left join zaehler On zaehler.Id_zaehler = zaehlerstaende.Id_zaehler
                                             Left Join art_zaehler On zaehler.Id_zaehler_art = art_zaehler.Id_zaehler_art

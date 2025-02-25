@@ -52,7 +52,7 @@ namespace Ruddat_NK
         DataTable TblRechnungenTmp;
         DataTable TblTmlDetail;
         DataTable TblFilialen;
-        DataTable TblTeilObj;
+        DataTable TblTreeView;
         DataTable TblTeilObjekte;
         DataTable TblZlgKostenart;
         DataTable TblRgMwst;
@@ -82,7 +82,7 @@ namespace Ruddat_NK
         MySqlDataAdapter MySdRechnungenTmp;
         MySqlDataAdapter MySdTmlDetail;
         MySqlDataAdapter MySdFilialen;
-        MySqlDataAdapter MySdTeilObj;
+        MySqlDataAdapter MySdTreeView;
         MySqlDataAdapter MySdTeilObjekte;
         MySqlDataAdapter MySdZlgKostArt;
         MySqlDataAdapter MySdRgMwst;
@@ -323,6 +323,8 @@ namespace Ruddat_NK
             Int32 liRows = 0;
             string lsObjektBez = "", lsObjektTeilBez = "";
             string lsObjektBezS = "";
+            int LiObjBez = 0;
+            int LiObjBezS = 0;
 
             try
             {
@@ -345,20 +347,21 @@ namespace Ruddat_NK
                 // Für aktive Verträge
                 if (piArt == 2)
                 {
-                    TblTeilObj = new DataTable();    // Objekte Teilobjekte
-                    MySdTeilObj = new MySqlDataAdapter(com);
-                    MySdTeilObj.Fill(TblTeilObj);
+                    TblTreeView = new DataTable();    // Objekte Teilobjekte
+                    MySdTreeView = new MySqlDataAdapter(com);
+                    MySdTreeView.Fill(TblTreeView);
 
-                    if (TblTeilObj.Rows.Count > 0)
+                    if (TblTreeView.Rows.Count > 0)
                     {
                         int i = 0;
                         tvMain.Items.Clear();
 
                         //  Eine Schleife durch die Tabelle, um das Treview zu befüllen
-                        for (i = 0; i < TblTeilObj.Rows.Count; i++)
+                        for (i = 0; i < TblTreeView.Rows.Count; i++)
                         {
-                            lsObjektBez = TblTeilObj.Rows[i].ItemArray.GetValue(4).ToString().Trim() + ":" + TblTeilObj.Rows[i].ItemArray.GetValue(0).ToString().Trim();
-                            lsObjektTeilBez = TblTeilObj.Rows[i].ItemArray.GetValue(1).ToString();
+                            lsObjektBez = TblTreeView.Rows[i].ItemArray.GetValue(4).ToString().Trim() + ":" + TblTreeView.Rows[i].ItemArray.GetValue(0).ToString().Trim();
+                            // lsObjektTeilBez = TblTreeView.Rows[i].ItemArray.GetValue(1).ToString();
+                            LiObjBez = (int)TblTreeView.Rows[i].ItemArray.GetValue(5);
 
                             TreeViewItem root = new TreeViewItem
                             {
@@ -366,12 +369,12 @@ namespace Ruddat_NK
                             };
 
                             // Nur, wenn ein neues Objekt und Teilobjekt in der Liste steht
-                            if (lsObjektBez != lsObjektBezS)
+                            if (LiObjBez != LiObjBezS)
                             {
                                 tvMain.Items.Add(root);
-                                lsObjektBezS = lsObjektBez;
+                                LiObjBezS = LiObjBez;
                             }
-                            PopulateTree(i, root, TblTeilObj);
+                            PopulateTree(i, root, TblTreeView);     // TreeView befüllen aus TblTreeeView
                             i++;
                         }
                     }
@@ -384,34 +387,34 @@ namespace Ruddat_NK
                 // Die Id aus Objekt holen
                 if (piArt == 3)
                 {
-                    TblTeilObj = new DataTable();    // Objekte Teilobjekte
-                    MySdTeilObj = new MySqlDataAdapter(com);
-                    MySdTeilObj.Fill(TblTeilObj);
-                    if (TblTeilObj.Rows.Count > 0)
+                    TblTreeView = new DataTable();    // Objekte Teilobjekte
+                    MySdTreeView = new MySqlDataAdapter(com);
+                    MySdTreeView.Fill(TblTreeView);
+                    if (TblTreeView.Rows.Count > 0)
                     {
-                        liRows = Convert.ToInt16(TblTeilObj.Rows[0].ItemArray.GetValue(5).ToString());
+                        liRows = Convert.ToInt16(TblTreeView.Rows[0].ItemArray.GetValue(5).ToString());
                     }
                 }
                 // Die Id aus Teilobjekt holen
                 if (piArt == 4)
                 {
-                    TblTeilObj = new DataTable();    // Objekte Teilobjekte
-                    MySdTeilObj = new MySqlDataAdapter(com);
-                    MySdTeilObj.Fill(TblTeilObj);
-                    if (TblTeilObj.Rows.Count > 0)
+                    TblTreeView = new DataTable();    // Objekte Teilobjekte
+                    MySdTreeView = new MySqlDataAdapter(com);
+                    MySdTreeView.Fill(TblTreeView);
+                    if (TblTreeView.Rows.Count > 0)
                     {
-                        liRows = Convert.ToInt16(TblTeilObj.Rows[0].ItemArray.GetValue(6).ToString());
+                        liRows = Convert.ToInt16(TblTreeView.Rows[0].ItemArray.GetValue(6).ToString());
                     }
                 }
                 // Die Id aus Mieter holen
                 if (piArt == 5)
                 {
-                    TblTeilObj = new DataTable();    // Objekte Teilobjekte
-                    MySdTeilObj = new MySqlDataAdapter(com);
-                    MySdTeilObj.Fill(TblTeilObj);
-                    if (TblTeilObj.Rows.Count > 0)
+                    TblTreeView = new DataTable();    // Objekte Teilobjekte
+                    MySdTreeView = new MySqlDataAdapter(com);
+                    MySdTreeView.Fill(TblTreeView);
+                    if (TblTreeView.Rows.Count > 0)
                     {
-                        liRows = Convert.ToInt16(TblTeilObj.Rows[0].ItemArray.GetValue(7).ToString());
+                        liRows = Convert.ToInt16(TblTreeView.Rows[0].ItemArray.GetValue(7).ToString());
                     }
                 }
                 // DataGrid Timline Summen
@@ -613,67 +616,77 @@ namespace Ruddat_NK
         }
 
         // Teilobjekte Children für TreeView
-        public void PopulateTree(int i, TreeViewItem pNode, DataTable dt)
+        public void PopulateTree(int i, TreeViewItem pNode, DataTable TblTreeView)
         {
             string lsObjektTeilBez = "";
-            string lsObjektTeilBezS = "";
-            string lsObjektBez = "";
-            string lsObjektBezGet = dt.Rows[i].ItemArray.GetValue(0).ToString();
+            int LiObjektId = 0;
+            int LiObjektIdSave = (int)TblTreeView.Rows[i].ItemArray.GetValue(5);
+            int LiObjektTeilId = 0;
+            int LiObjektTeilIdSave = 0; // (int)TblTreeView.Rows[i].ItemArray.GetValue(6);
+
             // int liVertragAktiv = 0;
 
-            for (int ii = 0; ii < dt.Rows.Count; ii++)
+            for (int ii = 0; ii < TblTreeView.Rows.Count; ii++)
             {
-                lsObjektTeilBez = dt.Rows[ii].ItemArray.GetValue(1).ToString();
-                lsObjektBez = dt.Rows[ii].ItemArray.GetValue(0).ToString();
+                lsObjektTeilBez = TblTreeView.Rows[ii].ItemArray.GetValue(1).ToString();
+                LiObjektId = (int)TblTreeView.Rows[ii].ItemArray.GetValue(5);
+                LiObjektTeilId = (int)TblTreeView.Rows[ii].ItemArray.GetValue(6);
 
-                if (lsObjektBezGet == lsObjektBez)
+                if (LiObjektIdSave == LiObjektId)
                 {
-                    if (lsObjektTeilBez != lsObjektTeilBezS)
+                    if (LiObjektTeilId != LiObjektTeilIdSave)
                     {
+                        // TreeView Teilobjekt
                         TreeViewItem cChild = new TreeViewItem
                         {
                             Header = lsObjektTeilBez
                         };
                         pNode.Items.Add(cChild);
-                        lsObjektTeilBezS = lsObjektTeilBez;
-                        PopulateTree2(ii, cChild, dt);
+
+                        // Speichern
+                        LiObjektTeilIdSave = LiObjektTeilId;
+
+                        // Dritte Ebene TreeView
+                        PopulateTree2(ii, cChild, TblTreeView);
                     }
                 }
             }
         }
 
         // Mieter Children für TreeView
-        public void PopulateTree2(int i, TreeViewItem pNode, DataTable dt)
+        public void PopulateTree2(int i, TreeViewItem pNode, DataTable TblTreeView)
         {
             string lsMieter = "";
             // string lsMieterS = "";
             string lsObjektTeilBez = "";
-            string lsObjektTeilBezGet = dt.Rows[i].ItemArray.GetValue(1).ToString();
-            int liObjTeil = 0;
+            string lsObjektTeilBezSave = TblTreeView.Rows[i].ItemArray.GetValue(1).ToString();
+            int LiObjektTeilId = 0;
+            int LiObjektteilIdSave = (int)TblTreeView.Rows[i].ItemArray.GetValue(6);
             int liMieterId = 0;
             int liVertragAktiv = 0;
             DateTime ldtVon = DateTime.Today;
 
-            for (int ii = i; ii < dt.Rows.Count; ii++)
+            for (int ii = i; ii < TblTreeView.Rows.Count; ii++)
             {
                 lsMieter = "Kein Mieter";
                 // liVertragAktiv = 0;
                 lsObjektTeilBez = "";
-                if (dt.Rows[ii].ItemArray.GetValue(1) != DBNull.Value)
-                    lsObjektTeilBez = dt.Rows[ii].ItemArray.GetValue(1).ToString();
-                if (dt.Rows[ii].ItemArray.GetValue(6) != DBNull.Value)
-                    liObjTeil = (int)dt.Rows[ii].ItemArray.GetValue(6);
-                if (dt.Rows[ii].ItemArray.GetValue(7) != DBNull.Value)
-                    liMieterId = (int)dt.Rows[ii].ItemArray.GetValue(7);
-                if (dt.Rows[ii].ItemArray.GetValue(8) != DBNull.Value)
-                    liVertragAktiv = (int)dt.Rows[ii].ItemArray.GetValue(8);
-                if (dt.Rows[ii].ItemArray.GetValue(2) != DBNull.Value)
-                    lsMieter = dt.Rows[ii].ItemArray.GetValue(2).ToString();
+                if (TblTreeView.Rows[ii].ItemArray.GetValue(1) != DBNull.Value)
+                    lsObjektTeilBez = TblTreeView.Rows[ii].ItemArray.GetValue(1).ToString();
+                if (TblTreeView.Rows[ii].ItemArray.GetValue(6) != DBNull.Value)
+                    LiObjektTeilId = (int)TblTreeView.Rows[ii].ItemArray.GetValue(6);
+                if (TblTreeView.Rows[ii].ItemArray.GetValue(7) != DBNull.Value)
+                    liMieterId = (int)TblTreeView.Rows[ii].ItemArray.GetValue(7);
+                if (TblTreeView.Rows[ii].ItemArray.GetValue(8) != DBNull.Value)
+                    liVertragAktiv = (int)TblTreeView.Rows[ii].ItemArray.GetValue(8);
+                if (TblTreeView.Rows[ii].ItemArray.GetValue(2) != DBNull.Value)
+                    lsMieter = TblTreeView.Rows[ii].ItemArray.GetValue(2).ToString();
+
                 if (rbAktEmps.IsChecked == true)    // nur aktuelle Mieter
                 {
                     if (liMieterId != 0 && liVertragAktiv == 1)
                     {
-                        if (lsObjektTeilBezGet == lsObjektTeilBez)
+                        if (LiObjektteilIdSave == LiObjektTeilId)
                         {
                             TreeViewItem cChild = new TreeViewItem
                             {
@@ -681,14 +694,14 @@ namespace Ruddat_NK
                             };
                             pNode.Items.Add(cChild);
 
-                            lsObjektTeilBezGet = lsObjektTeilBez;
+                            LiObjektteilIdSave = LiObjektTeilId;
                         }
                     }
                 }
 
                 if (rbAllEmps.IsChecked == true)    // Alle Mieter
                 {
-                    if (lsObjektTeilBezGet == lsObjektTeilBez)
+                    if (lsObjektTeilBezSave == lsObjektTeilBez)
                     {
                         TreeViewItem cChild = new TreeViewItem
                         {
@@ -696,7 +709,7 @@ namespace Ruddat_NK
                         };
                         pNode.Items.Add(cChild);
 
-                        lsObjektTeilBezGet = lsObjektTeilBez;
+                        LiObjektteilIdSave = LiObjektTeilId;
                     }
                 }
             }
@@ -733,9 +746,8 @@ namespace Ruddat_NK
             {
                 // Treeview befüllen 
                 lsSql = RdQueries.GetSqlSelect(2, liFiliale, "", "", "", DateTime.Today, DateTime.Today, giFiliale, gsConnect, giDb);
-
-                // Daten holen 
-                liRows = FetchData(lsSql, 2, giDb, lsConnect);                          // Aufruf Art 2 ist Treeview befüllen   
+                // Daten bereitstellen, TreeViw füllen
+                liRows = FetchData(lsSql, 2, giDb, lsConnect);                          // Aufruf Art 2 ist Treeview befüllen > TblTeilObj  
 
                 // Tabelle Leerstand befüllen
                 lsSql = RdQueries.GetSqlSelect(211, liFiliale, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
@@ -1025,7 +1037,7 @@ namespace Ruddat_NK
                     // LiArtRelation = 1 für Rechnung (4. Argument)
                     RdAfterfetch.CreateTimeline(0, liId, 0, 0, 1,
                             MySdRechnungen, TblRechnungen,
-                            MySdTeilObj, TblTeilObjekte,
+                            MySdTreeView, TblTeilObjekte,
                             MySdTimeLine, TblTimeLine,
                             gsConnect);
 
@@ -1074,13 +1086,13 @@ namespace Ruddat_NK
                     lsSql = RdQueries.GetSqlSelect(16, 2, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
                     liRows = FetchData(lsSql, 16, giDb, gsConnect);
 
-                    // Combobox Zählernummern und mwst in Zähler
-                    lsSql = RdQueries.GetSqlSelect(2222, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
-                    liRows = FetchData(lsSql, 22, giDb, gsConnect);
-
                     // Die TeilObjekt ID ermitteln
                     lsSql = RdQueries.GetSqlSelect(3, giFiliale, gsItemHeader, "2", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
                     liId = FetchData(lsSql, 4, giDb, gsConnect);
+
+                    // Combobox Zählernummern und mwst in Zähler
+                    lsSql = RdQueries.GetSqlSelect(2222, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
+                    liRows = FetchData(lsSql, 22, giDb, gsConnect);
 
                     // Eine DummyTimeline zum schreiben in einer Funktion
                     lsSql = RdQueries.GetSqlSelect(43, 0, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
@@ -1113,7 +1125,7 @@ namespace Ruddat_NK
                     // LiArtRelation = 1 für Rechnung (4. Argument)
                     RdAfterfetch.CreateTimeline(0, 0, liId, 0, 1,
                             MySdRechnungen, TblRechnungen,
-                            MySdTeilObj, TblTeilObjekte,
+                            MySdTreeView, TblTeilObjekte,
                             MySdTimeLine, TblTimeLine,
                             gsConnect);
 
@@ -1195,7 +1207,7 @@ namespace Ruddat_NK
                     {
                         RdAfterfetch.CreateTimeline(0, 0, 0, liId, 1,
                                 MySdRechnungen, TblRechnungen,
-                                MySdTeilObj, TblTeilObjekte,
+                                MySdTreeView, TblTeilObjekte,
                                 MySdTimeLine, TblTimeLine,
                                 gsConnect);
                     }
@@ -1333,50 +1345,67 @@ namespace Ruddat_NK
                     index++;
                     TreeViewItem item = tree.SelectedItem as TreeViewItem;
                     ItemsControl parent = ItemsControl.ItemsControlFromItemContainer(item);
+
+                    // Anzeige des gewählten Items
                     tbNameSearch.Text = item.Header.ToString();
+
                     while (parent != null && parent.GetType() == typeof(TreeViewItem))
                     {
                         index++;
                         parent = ItemsControl.ItemsControlFromItemContainer(parent);
                     }
 
-                    // gibt es gewählte Kalender, dann hier Daten einsetzen
-                    if (cbCal.IsChecked == true)
-                    {
-                        // nur StartDatum
-                        if (clFrom.SelectedDate != null)
-                        {
-                            if (clFrom.SelectedDate.Value > DateTime.MinValue)
-                            {
-                                ldtFrom = clFrom.SelectedDate.Value;
-                            }
-                        }
+                    // Der Index wird nochmal bei TimeLine Details benötigt
+                    giIndex = index;                                // Die TreeViewEbene
+                    gsItemHeader = item.Header.ToString().Trim();
 
-                        // Start und EndeDatum angegeben
-                        if (clFrom.SelectedDate != null && clTo.SelectedDate != null)
-                        {
-                            if (clFrom.SelectedDate.Value > DateTime.MinValue && clTo.SelectedDate.Value > DateTime.MinValue)
-                            {
-                                ldtFrom = clFrom.SelectedDate.Value;
-                                ldtTo = clTo.SelectedDate.Value;
-                            }
-                        }
+                    if (gsItemHeader != "Kein Mieter")
+                    {
+                        updateAllDataGrids(0);      // alle grids aktualisieren
                     }
                     else
                     {
-                        // Der Index wird nochmal bei TimeLine Details benötigt
-                        giIndex = index;
-                        gsItemHeader = item.Header.ToString().Trim();
-
-                        if (gsItemHeader != "Kein Mieter")
-                        {
-                            updateAllDataGrids(0);      // alle grids aktualisieren
-                        }
-                        else
-                        {
-                            updateAllDataGrids(11);     // Treview zurücksetzen ohne Auswahl
-                        }
+                        updateAllDataGrids(11);     // Treview zurücksetzen ohne Auswahl
                     }
+
+                    // Todo prüfen. Kann das hier weg? Erfolgt in UpdateAll
+                    ////// gibt es gewählte Kalender, dann hier Daten einsetzen
+                    //if (cbCal.IsChecked == true)
+                    //{
+                    //    // nur StartDatum
+                    //    if (clFrom.SelectedDate != null)
+                    //    {
+                    //        if (clFrom.SelectedDate.Value > DateTime.MinValue)
+                    //        {
+                    //            ldtFrom = clFrom.SelectedDate.Value;
+                    //        }
+                    //    }
+
+                    //    // Start und EndeDatum angegeben
+                    //    if (clFrom.SelectedDate != null && clTo.SelectedDate != null)
+                    //    {
+                    //        if (clFrom.SelectedDate.Value > DateTime.MinValue && clTo.SelectedDate.Value > DateTime.MinValue)
+                    //        {
+                    //            ldtFrom = clFrom.SelectedDate.Value;
+                    //            ldtTo = clTo.SelectedDate.Value;
+                    //        }
+                    //    }
+                    //}
+                    //else
+                    //{
+                    //    // Der Index wird nochmal bei TimeLine Details benötigt
+                    //    giIndex = index;
+                    //    gsItemHeader = item.Header.ToString().Trim();
+
+                    //    if (gsItemHeader != "Kein Mieter")
+                    //    {
+                    //        updateAllDataGrids(0);      // alle grids aktualisieren
+                    //    }
+                    //    else
+                    //    {
+                    //        updateAllDataGrids(11);     // Treview zurücksetzen ohne Auswahl
+                    //    }
+                    //}
                 }
              }
         }
@@ -1384,7 +1413,6 @@ namespace Ruddat_NK
         // Rechnungen DataGrid 
         private void DgrRechnungen_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            string LsSql = "";
             int LiExternId = 0;
 
             if (DgrRechnungen.SelectedIndex >= 0)
@@ -1432,7 +1460,8 @@ namespace Ruddat_NK
                     MySdRechnungenTmp, TblRechnungenTmp,                        // Temporäre Rechnungen nach Anwahl in Rechnungensfenster
                     MySdTeilObjekte, TblTeilObjekte,
                     null, null,
-                    MySdTimeLine, TblTimeLine);
+                    MySdTimeLine, TblTimeLine,
+                    null, null);
 
             // Die IDs und Flags zurücksetzen
             // Todo ? wofür
@@ -1610,47 +1639,66 @@ namespace Ruddat_NK
             int liTimelineId = 0;
             int liNkId = 0;
             int liRows = TblZahlungen.Rows.Count;
+            int LiMieterIdTmp = 0;
+            int LiObjektTeilId = 0;
             DateTime ldtZlg = DateTime.MinValue;
 
             // Datum vorbelegen erst ab dem 2 ten Datensatz
             // Der neueste ist immer der oberste 0
-            if (liRows > 0 && TblZahlungen.Rows[0][4] != DBNull.Value && DgrZahlungen.SelectedIndex != 0)
+            if (liRows > 0 && TblZahlungen.Rows[0][4] != DBNull.Value)
             {
-                // Kostenart ID ermitteln Art 1 = Nebenkostenzahlungen
-                liNkId = Timeline.GetKsaId(1, gsConnect);
-
-                // ID für Timeline ermitteln Art 2 = Zahlungs ID
-                liTimelineId = Timeline.getTmpId(gsConnect, 2) + 1;
-
-                // Monat der vorhandenen Zahlung
-                ldtZlg = Convert.ToDateTime(TblZahlungen.Rows[0][4]);
-
-                for (int i = liRows; i < 12; i++)           // Ende bei 12 Monate
+                if (DgrZahlungen.SelectedIndex != 0)
                 {
-                    DataRow dr = TblZahlungen.NewRow();
-                    dr[2] = GiObjektId;
-                    dr[3] = GiObjektTeilId;
-                    dr[1] = GiMieterId;
-                    dr[10] = liTimelineId;      // ID für Timeline
-                    dr[11] = 1;                 // Flag für Timelinebearbeitung erzeugen
-                    dr[12] = liNkId;            // Kostenart Nebenkosten
-                    dr[4] = ldtZlg.AddMonths(i);       // Datum
+                    // Kostenart ID ermitteln Art 1 = Nebenkostenzahlungen
+                    liNkId = Timeline.GetKsaId(1, gsConnect);
 
-                    if (TblZahlungen.Rows[0][6] != DBNull.Value)   // Netto
+                    // ID für Timeline ermitteln Art 2 = Zahlungs ID
+                    liTimelineId = Timeline.getTmpId(gsConnect, 2) + 1;
+
+                    // Monat der vorhandenen Zahlung
+                    ldtZlg = Convert.ToDateTime(TblZahlungen.Rows[0][4]);
+
+                    for (int i = liRows; i < 12; i++)           // Ende bei 12 Monate
                     {
-                        dr[6] = TblZahlungen.Rows[0][6];
+                        // Nur eintragen, wenn Mietvertrag besteht
+                        LiMieterIdTmp = Timeline.GetAktMieter(GiObjektTeilId, ldtZlg, gsConnect, 2);
+
+                        if (TblTreeView.Rows[0][7] != DBNull.Value)
+                        {
+
+                            if (TblZahlungen.Rows[0][1] != DBNull.Value)   // Mieter Id in Zahlungen
+                            {
+                                // Hat der Mieter einen Vertrag für den Monat?
+                                LiMieterIdTmp = Timeline.GetAktMieter((int)TblTreeView.Rows[0][6], ldtZlg, gsConnect, 2);
+
+                                if (LiMieterIdTmp == (int)TblZahlungen.Rows[0][1])
+                                {
+                                    DataRow dr = TblZahlungen.NewRow();
+                                    // dr[2] = (int)TblTreeView.Rows[0][5];    // Objekt Id
+                                    // dr[3] = (int)TblTreeView.Rows[0][6];    // TeilObjektId
+                                    dr[1] = (int)TblTreeView.Rows[0][7];    // MieterId
+                                    dr[10] = liTimelineId;      // ID für Timeline
+                                    dr[11] = 1;                 // Flag für Timelinebearbeitung erzeugen
+                                    dr[12] = liNkId;            // Kostenart Nebenkosten
+                                    dr[4] = ldtZlg.AddMonths(i);       // Datum
+
+                                    if (TblZahlungen.Rows[0][6] != DBNull.Value)   // Netto
+                                    {
+                                        dr[6] = TblZahlungen.Rows[0][6];
+                                    }
+
+                                    if (TblZahlungen.Rows[0][7] != DBNull.Value)   // Brutto
+                                    {
+                                        dr[7] = TblZahlungen.Rows[0][7];
+                                    }
+
+                                    TblZahlungen.Rows.Add(dr);
+                                    liTimelineId++;
+                                }
+                            }
+                        }
                     }
-
-                    if (TblZahlungen.Rows[0][7] != DBNull.Value)   // Brutto
-                    {
-                        dr[7] = TblZahlungen.Rows[0][7];
-                    }
-
-                    TblZahlungen.Rows.Add(dr);
-
-                    liTimelineId++;
                 }
-
                 GiRechnungTmpId = liTimelineId;
                 btnZlSave.IsEnabled = true;
             }
@@ -1699,8 +1747,9 @@ namespace Ruddat_NK
         // Zählerstand löschen
         private void btnCntDel_Click(object sender, RoutedEventArgs e)
         {
-            int liTimelineId = 0;
-            int liTest = 1;
+            int liTimelineId = 0;            int giDelZlWertId = 0;
+
+            string LsSql = "";
 
             int liSel = DgrCounters.SelectedIndex;
             if (liSel >= 0)
@@ -1709,12 +1758,15 @@ namespace Ruddat_NK
                 DataRow dr = TblZlWerte.Rows[liSel];
                 giDelZlWertId = (int)(dr[0]);                // Id des zu löschenden Datensatzes
 
-
-                if (dr[7] != DBNull.Value || liTest == 1)
+                if (dr[7] != DBNull.Value)
                 {
                     liTimelineId = (int)dr[7];          // TimeLine ID holen                    
-                    GiRechnungTmpId = liTimelineId;
-                    TblZlWerte.Rows.Remove(dr);
+
+                    LsSql = RdQueries.GetSqlSelect(40, giDelZlWertId, "", "", "", DateTime.MinValue, DateTime.MinValue, giFiliale, gsConnect, giDb);
+                    FetchData(LsSql, 40, giDb, gsConnect);
+
+                    //GiRechnungTmpId = liTimelineId;
+                    //TblZlWerte.Rows.Remove(dr);
 
                     btnCntSave.Content = "wirklich löschen?";
                     btnCntSave.IsEnabled = true;
@@ -1759,23 +1811,34 @@ namespace Ruddat_NK
         // Zählerstand speichern
         private void btnCntSave_Click(object sender, RoutedEventArgs e)
         {
-            int liOk = 0;
-            string lsSql = "";
+            int LiIdZs = 0;
+
+            // flag Timeline neu erzeugen setzten
+            TblZlWerte.Rows[DgrCounters.SelectedIndex][13] = 1;
 
             // Update
-            liOk = FetchData("", 39, giDb, gsConnect);
+            FetchData("", 39, giDb, gsConnect);
 
-            // Delete Kommando muss extra erzeugt werden
-            // Gibt es eine Datensatz ID zum Löschen (button btnCntDel)
-            if (giDelZlWertId > 0)
+            int LiSel = DgrCounters.SelectedIndex;
+
+            // Id des gewählten Zählerstands übergeben
+            if (LiSel >= 0)
             {
-                // Den Zählerstand löschen
-                lsSql = RdQueries.GetSqlSelect(40, giDelZlWertId, "", "", "", DateTime.MinValue, DateTime.MinValue, giFiliale, gsConnect, giDb);
-                liOk = FetchData(lsSql, 40, giDb, gsConnect);
+                LiIdZs = (int)TblZlWerte.Rows[LiSel][0];
 
+                // Art 2 = Zählerwerte
+                RdAfterfetch.MakeAfterFetch(2, 1, LiIdZs, 0, gsConnect,
+                        MySdRechnungenTmp, TblRechnungenTmp,                        // Temporäre Rechnungen nach Anwahl in Rechnungensfenster
+                        MySdTeilObjekte, TblTeilObjekte,
+                        null, null,
+                        MySdTimeLine, TblTimeLine,
+                        MySdZlWert, TblZlWerte);
             }
+
+
+
             // Update der Daten
-            liOk = updateAllDataGrids(0);
+            updateAllDataGrids(0);
 
             // Die IDs und Flags zurücksetzen
             giDelZlWertId = 0;
@@ -2243,6 +2306,7 @@ namespace Ruddat_NK
             string lsBrutto = "";
             string lsZlStand = "";
             string lsZlName = "";
+            string lsMwstSatz = "";
             decimal ldNetto = 0;
             decimal ldBrutto = 0;
             decimal ldZlStand = 0;
@@ -2299,47 +2363,66 @@ namespace Ruddat_NK
                 if (x == 6)     // NettoPreis !! Achtung: Der Displayindex ist die Darstellung im 
                 // DGR und nicht die Itemliste
                 {
-                    // MwstSatz holen
-                    if (TblZlWerte.Rows[liSel][10] == DBNull.Value && giZlId >= 0)
+                    // MwstSatz auslesen
+                    var cellInfo = DgrCounters.SelectedCells[8];
+                    var cellContent = cellInfo.Column.GetCellContent(cellInfo.Item) as ComboBox;
+
+                    if (cellContent != null)
                     {
-                        liMwstSatz = Timeline.GetMwstSatzZaehler(giZlId, gsConnect, giDb);
+                        lsMwstSatz = cellContent.Text.ToString(); // Sichtbarer Text in der ComboBox
                     }
-                    else
+                    if (lsMwstSatz == "")
                     {
-                        liMwstSatz = Timeline.GetMwstSatzZaehler(Convert.ToInt32(TblZlWerte.Rows[liSel][10]), gsConnect, giDb);
+                        lsMwstSatz = "0";
                     }
+                    liMwstSatz = Convert.ToInt16(lsMwstSatz);
+
                     // Element holen
                     TextBox t1 = e.EditingElement as TextBox;
                     lsNetto = t1.Text.ToString();
+
+
                     if (lsNetto.Length > 0 && lsNetto.Substring(lsNetto.Length - 1, 1) == "€")                             // Das Eurozeichen muss raus
                     {
                         lsNetto = lsNetto.Substring(0, lsNetto.Length - 2);
+                        // Eurozeichen muss raus
                     }
                     if (lsNetto.Length > 0)
                     {
                         ldNetto = Convert.ToDecimal(lsNetto);
                         ldBrutto = ldNetto + (ldNetto / 100) * liMwstSatz;                          // Bruttobetrag
-                        DataRowView oDataRowView = DgrCounters.SelectedItem as DataRowView;
-                        oDataRowView.Row[6] = ldBrutto;
+                        if (lsNetto.Length >0)
+                        {
+                            // Bruttowert schreiben
+                            DataRowView oDataRowView = DgrCounters.SelectedItem as DataRowView;
+                            oDataRowView.Row[6] = ldBrutto;
+                        }
                     }
                 }
                 if (x == 7)     // Brutto
                 {
-                    // MwstSatz holen
-                    if (TblZlWerte.Rows[liSel][10] == DBNull.Value && giZlId >= 0)
+                    // Mwst Satz auslesen
+                    var cellInfo = DgrCounters.SelectedCells[8];
+                    var cellContent = cellInfo.Column.GetCellContent(cellInfo.Item) as ComboBox;
+
+                    if (cellContent != null)
                     {
-                        liMwstSatz = Timeline.GetMwstSatzZaehler(giZlId, gsConnect, giDb);
+                        lsMwstSatz = cellContent.Text.ToString(); // Sichtbarer Text in der ComboBox
                     }
-                    else
+                    if (lsMwstSatz == "")
                     {
-                        liMwstSatz = Timeline.GetMwstSatzZaehler(Convert.ToInt32(TblZlWerte.Rows[liSel][10]), gsConnect, giDb);
+                        lsMwstSatz = "0";
                     }
+                    liMwstSatz = Convert.ToInt16(lsMwstSatz);
+
                     // Element holen
                     TextBox t2 = e.EditingElement as TextBox;
                     lsBrutto = t2.Text.ToString();
+
                     if (lsBrutto.Length > 0 && lsBrutto.Substring(lsBrutto.Length - 1, 1) == "€")
                     {
-                        lsBrutto = lsBrutto.Substring(0, lsBrutto.Length - 2);                   // Das Eurozeichen muss raus                            
+                        lsBrutto = lsBrutto.Substring(0, lsBrutto.Length - 2);
+                        // Das Eurozeichen muss raus                            
                     }
                     if (lsBrutto.Length > 0)
                     {

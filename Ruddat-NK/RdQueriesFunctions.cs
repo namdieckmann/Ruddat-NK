@@ -359,7 +359,8 @@ namespace Ruddat_NK
                             id_extern_timeline,
                             id_objekt,
                             id_objekt_teil,
-                            id_ksa
+                            id_ksa,
+                            flag_timeline
                         FROM zaehlerstaende  WHERE " + lsWhereAdd;
                     break;
                 case 24:
@@ -379,7 +380,8 @@ namespace Ruddat_NK
                             zaehlerstaende.id_ksa,
                             zaehler.zaehlernummer,
                             zaehler.zaehlerort,
-							art_einheit.bez
+							art_einheit.bez,
+                            zaehlerstaende.flag_timeline
                         FROM zaehlerstaende
                         left join zaehler on zaehler.Id_zaehler = zaehlerstaende.id_zaehler
                         left join art_einheit on zaehler.id_einheit = art_einheit.Id_einheit "
