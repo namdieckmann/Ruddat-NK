@@ -1812,6 +1812,7 @@ namespace Ruddat_NK
         private void btnCntSave_Click(object sender, RoutedEventArgs e)
         {
             int LiIdZs = 0;
+            string LsSql = "";
 
             // flag Timeline neu erzeugen setzten
             TblZlWerte.Rows[DgrCounters.SelectedIndex][13] = 1;
@@ -1824,18 +1825,21 @@ namespace Ruddat_NK
             // Id des gewählten Zählerstands übergeben
             if (LiSel >= 0)
             {
+                // Id Zählerstand
                 LiIdZs = (int)TblZlWerte.Rows[LiSel][0];
+
+                // Eine leere Rechnungstabelle holen
+                LsSql = RdQueries.GetSqlSelect(92, LiIdZs, "", "", "", DateTime.MinValue, DateTime.MinValue, giFiliale, gsConnect, giDb);
+                FetchData(LsSql, 9, giDb, gsConnect);
 
                 // Art 2 = Zählerwerte
                 RdAfterfetch.MakeAfterFetch(2, 1, LiIdZs, 0, gsConnect,
-                        MySdRechnungenTmp, TblRechnungenTmp,                        // Temporäre Rechnungen nach Anwahl in Rechnungensfenster
+                        MySdRechnungen, TblRechnungen,                        
                         MySdTeilObjekte, TblTeilObjekte,
                         null, null,
                         MySdTimeLine, TblTimeLine,
                         MySdZlWert, TblZlWerte);
             }
-
-
 
             // Update der Daten
             updateAllDataGrids(0);

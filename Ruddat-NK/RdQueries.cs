@@ -211,7 +211,8 @@ namespace Ruddat_NK
                                 id_verteilung,
                                 id_rechnung_source,
                                 flag_editable,
-                                editiert
+                                editiert,
+                                id_zaehlerwert
 					        from rechnungen
 					        where id_objekt = " + piId.ToString() + lsWhereAdd2 +
                                 " Order by rechnungen.datum_rechnung desc";
@@ -245,13 +246,14 @@ namespace Ruddat_NK
                                 id_verteilung,
                                 id_rechnung_source,
                                 flag_editable,
-                                editiert
+                                editiert,
+                                id_zaehlerwert
 					        from rechnungen
 					        where id_objekt_teil = " + piId.ToString() + lsWhereAdd2 +
                                 " Order by rechnungen.datum_rechnung desc";
                     break;
                 case 91:
-                    // Zum Ertellen von Untergeordneten Rechnungen aus TeilObjekte für Mieter
+                    // Zum Erstellen von Untergeordneten Rechnungen aus TeilObjekte für Mieter
                     lsSql = @"select 
                                 id_rechnungen,
                                 id_ksa,
@@ -272,10 +274,47 @@ namespace Ruddat_NK
                                 id_verteilung,
                                 id_rechnung_source,
                                 flag_editable,
-                                editiert
+                                editiert,
+                                id_zaehlerwert
 					        from rechnungen
 					        where id_rechnungen = 1";
                     break;
+                case 92:
+                    // Rechnungsdarstellung für Zähler
+                    lsAnd = " And ";
+                    lsFieldFrom = "rechnungen.datum_von";
+                    lsFieldTo = "rechnungen.datum_bis";
+                    liOne = 4;      // Rechnungen, die in dem Jahr liegen 
+                                    // auch die im vorherigen Jahr beginnen oder im nächsten Jahr enden
+                    lsWhereAdd2 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsFieldFrom, lsFieldFrom, lsAnd, liOne, aiDb);
+
+                    lsSql = @"select 
+                                id_rechnungen,
+                                id_ksa,
+                                datum_rechnung as datum,
+                                datum_von as von,
+                                datum_bis as bis,
+                                betrag_netto netto,
+                                betrag_brutto brutto,
+                                id_mwst_art,
+                                id_objekt,
+                                id_objekt_teil,
+                                id_mieter,
+                                rg_nr,
+                                firma,
+                                text,
+                                id_extern_timeline,
+                                flag_timeline,
+                                id_verteilung,
+                                id_rechnung_source,
+                                flag_editable,
+                                editiert,
+                                id_zaehlerwert
+					        from rechnungen
+					        where id_zaehlerwert = " + piId.ToString() + lsWhereAdd2 +
+                                " Order by rechnungen.datum_rechnung desc";
+                    break;
+
                 case 10:
                     // Rechnungsdarstellung für Mieter
                     lsAnd = " And ";
@@ -304,7 +343,8 @@ namespace Ruddat_NK
                                     id_verteilung,
                                     id_rechnung_source,
                                     flag_editable,
-                                    editiert
+                                    editiert,
+                                    id_zaehlerwert
                             from rechnungen
 					        where id_mieter = " + piId.ToString() + lsWhereAdd2 +
                                 " Order by rechnungen.datum_rechnung desc";
@@ -825,7 +865,8 @@ namespace Ruddat_NK
                                     id_verteilung,
                                     id_rechnung_source,
                                     flag_editable,
-                                    editiert
+                                    editiert,
+                                    id_zaehlerwert
                             FROM rechnungen
 					         WHERE id_extern_timeline = " + lsWhereAdd +
                           " ORDER BY rechnungen.datum_rechnung desc";
@@ -956,7 +997,8 @@ namespace Ruddat_NK
                                     flag_timeline,
                                     id_rechnung_souce,
                                     flag_editable,
-                                    editiert
+                                    editiert,
+                                    id_zaehlerwert
 				            from rechnungen
                                     left join art_kostenart on rechnungen.id_ksa = art_kostenart.id_ksa
                                     left join art_mwst on rechnungen.id_mwst_art = art_mwst.id_mwst_art
@@ -990,7 +1032,8 @@ namespace Ruddat_NK
                                     flag_timeline,
                                     id_rechnung_source,
                                     flag_editable,
-                                    editiert
+                                    editiert,
+                                    id_zaehlerwert
 				            from rechnungen
                                     left join art_kostenart on rechnungen.id_ksa = art_kostenart.id_ksa
                                     left join art_mwst on rechnungen.id_mwst_art = art_mwst.id_mwst_art
@@ -1024,7 +1067,8 @@ namespace Ruddat_NK
                                     flag_timeline,
                                     id_rechnung_source,
                                     flag_editable,
-                                    editiert
+                                    editiert,
+                                    id_zaehlerwert
 				            from rechnungen
                                     left join art_kostenart on rechnungen.id_ksa = art_kostenart.id_ksa
                                     left join art_mwst on rechnungen.id_mwst_art = art_mwst.id_mwst_art

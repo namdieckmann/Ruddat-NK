@@ -657,10 +657,21 @@ namespace Ruddat_NK
             string LsSql;
             int LiOk = 0;
 
-            // Untergeordnete Rechnungen löschen
-            LsSql = RdQueriesFunctions.GetSql(150, AiSourceId, "", "", 0);
-            LiOk = Timeline.FetchData(LsSql, "", "", 34, asConnect);
-
+            switch (asArt)
+            {
+                case "R":
+                    // Untergeordnete Rechnungen löschen
+                    LsSql = RdQueriesFunctions.GetSql(150, AiSourceId, "", "", 0);
+                    LiOk = Timeline.FetchData(LsSql, "", "", 34, asConnect);
+                    break;
+                case "Z":
+                    // ZaehlerRechnungen löschen
+                    LsSql = RdQueriesFunctions.GetSql(151, AiSourceId, "", "", 0);
+                    LiOk = Timeline.FetchData(LsSql, "", "", 34, asConnect);
+                    break;
+                default:
+                    break;
+            }
             return LiOk;
         }
 

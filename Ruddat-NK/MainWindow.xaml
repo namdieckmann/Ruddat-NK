@@ -174,12 +174,13 @@
                     <Grid Background="#FFE5E5E5">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="69*"/>
-                            <ColumnDefinition Width="1082*"/>
+                            <ColumnDefinition Width="160*"/>
+                            <ColumnDefinition Width="923*"/>
                         </Grid.ColumnDefinitions>
-                        <DataGrid x:Name="DgrRechnungen" Margin="10,101,10.2,37.4" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" ToolTip="Rechnungen" RenderTransformOrigin="0.5,0.5" 
+                        <DataGrid x:Name="DgrRechnungen" Margin="10,101,10,37" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" ToolTip="Rechnungen" RenderTransformOrigin="0.5,0.5" 
                                   HorizontalContentAlignment="Stretch" SelectionChanged="DgrRechnungen_SelectionChanged" RowEditEnding="DgrRechnungen_RowEditEnding" 
                                   BeginningEdit="DgrRechnungen_BeginningEdit" CellEditEnding="DgrRechnungen_CellEditEnding" LoadingRow="DgrRechnungen_LoadingRow"
-                                  VerticalScrollBarVisibility="Visible" MinColumnWidth="50" MaxColumnWidth="500" Grid.ColumnSpan="2" >
+                                  VerticalScrollBarVisibility="Visible" MinColumnWidth="50" MaxColumnWidth="500" Grid.ColumnSpan="3" >
                             <DataGrid.Columns>
                                 <DataGridComboBoxColumn x:Name="kostenart" Header="Kostenart"
                                     DisplayMemberPath="bez"
@@ -230,18 +231,18 @@
                             </DataGrid.Columns>
                         </DataGrid>
 
-                        <TextBox x:Name="tbObjekt" HorizontalAlignment="Left" Height="23" Margin="35.2,7,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="235" IsEnabled="False" Grid.Column="1"/>
+                        <TextBox x:Name="tbObjekt" HorizontalAlignment="Left" Height="23" Margin="35,7,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="235" IsEnabled="False" Grid.Column="1" Grid.ColumnSpan="2"/>
                         <TextBlock x:Name="txObjekt" HorizontalAlignment="Left" Margin="10,14,0,0" TextWrapping="Wrap" Text="Objekt:" VerticalAlignment="Top"/>
-                        <TextBox x:Name="tbObjektTeil" HorizontalAlignment="Left" Height="23" Margin="35.2,35,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="235" IsEnabled="False" Grid.Column="1"/>
-                        <TextBox x:Name="tbMieter" HorizontalAlignment="Left" Height="23" Margin="35.2,63,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="235" IsEnabled="False" Grid.Column="1"/>
+                        <TextBox x:Name="tbObjektTeil" HorizontalAlignment="Left" Height="23" Margin="35,35,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="235" IsEnabled="False" Grid.Column="1" Grid.ColumnSpan="2"/>
+                        <TextBox x:Name="tbMieter" HorizontalAlignment="Left" Height="23" Margin="35,63,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="235" IsEnabled="False" Grid.Column="1" Grid.ColumnSpan="2"/>
                         <TextBlock x:Name="txObjektTeil" HorizontalAlignment="Left" Margin="10,42,0,0" TextWrapping="Wrap" Text="Objekt-Teil:" VerticalAlignment="Top" Grid.ColumnSpan="2"/>
                         <TextBlock x:Name="txObjektTeil_Copy" HorizontalAlignment="Left" Margin="10,70,0,0" TextWrapping="Wrap" Text="Mieter:" VerticalAlignment="Top"/>
-                        <TextBox x:Name="tbObjektId" HorizontalAlignment="Left" Height="23" Margin="275.2,7,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="235" IsEnabled="False" Visibility="Hidden" Grid.Column="1"/>
-                        <TextBox x:Name="tbObjektTeilId" HorizontalAlignment="Left" Height="23" Margin="275.2,35,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="235" IsEnabled="False" Visibility="Hidden" Grid.Column="1"/>
-                        <TextBox x:Name="tbMieterId" HorizontalAlignment="Left" Height="23" Margin="275.2,63,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="235" IsEnabled="False" Visibility="Hidden" Grid.Column="1"/>
-                        <Button x:Name="btnRgSave" Content="Speichern" Margin="0,0,10.2,10.4" Click="btnRgSave_Click" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="134" RenderTransformOrigin="0.538,0.909" Grid.Column="1"/>
-                        <Button x:Name="btnRgAdd" Content="Zufügen" HorizontalAlignment="Right" Margin="0,0,149.2,10.4" VerticalAlignment="Bottom" Width="75" Click="btnRgAdd_Click" Grid.Column="1"/>
-                        <Button x:Name="btnRgDel" Content="Löschen" HorizontalAlignment="Right" Margin="0,0,229.2,10.4" VerticalAlignment="Bottom" Width="75" Click="btnRgDel_Click" Grid.Column="1"/>
+                        <TextBox x:Name="tbObjektId" HorizontalAlignment="Left" Height="23" Margin="115,7,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="235" IsEnabled="False" Visibility="Hidden" Grid.Column="2"/>
+                        <TextBox x:Name="tbObjektTeilId" HorizontalAlignment="Left" Height="23" Margin="115,35,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="235" IsEnabled="False" Visibility="Hidden" Grid.Column="2"/>
+                        <TextBox x:Name="tbMieterId" HorizontalAlignment="Left" Height="23" Margin="115,63,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="235" IsEnabled="False" Visibility="Hidden" Grid.Column="2"/>
+                        <Button x:Name="btnRgSave" Content="Speichern" Margin="0,0,10,10" Click="btnRgSave_Click" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="134" RenderTransformOrigin="0.538,0.909" Grid.Column="2"/>
+                        <Button x:Name="btnRgAdd" Content="Zufügen" HorizontalAlignment="Right" Margin="0,0,149,10" VerticalAlignment="Bottom" Width="75" Click="btnRgAdd_Click" Grid.Column="2"/>
+                        <Button x:Name="btnRgDel" Content="Löschen" HorizontalAlignment="Right" Margin="0,0,229,10" VerticalAlignment="Bottom" Width="75" Click="btnRgDel_Click" Grid.Column="2"/>
 
                     </Grid>
                 </TabItem.Content>

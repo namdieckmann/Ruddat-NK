@@ -41,13 +41,6 @@ namespace Ruddat_NK
             int liArtRelation = 0;          // 1= Rechnung, 2=Zahlung, 3=Zähler
             int LiSwitch = 0;               // Auswahl Obj, TeilObj, Mieter
 
-            //decimal ldBetragNetto = 0;
-            //decimal ldBetragSollNetto = 0;
-            //decimal ldBetragBrutto = 0;
-            //decimal ldBetragSollBrutto = 0;
-            //decimal ldGesamtflaeche = 0;
-            //decimal ldZs = 0;               // Zählerstand
-            //decimal ldVerbrauch = 0;        // Zähler Verbrauch
             decimal[] ladBetraege = new decimal[12];
 
             //int zl = 0;
@@ -98,10 +91,10 @@ namespace Ruddat_NK
 
                                         if (Timeline.GetWeiterleitung(1, LiKsa, asConnect) == 1)
                                         {
-                                            liArtRelation = 1;          // Rechnung
-                                                                        // Rechnungen und Timeline für alle zugehörigen Objektteile erzeugen
+                                            // Rechnungen und Timeline für alle zugehörigen Objektteile erzeugen
                                             CreateRechnungenObjTeile(LiSourceId, liObjekt, liObjektTeil, liMieter, liArtRelation,
                                                 ASdaRechnungen, ATblRechnungen,
+                                                AsdaZaehlerWerte, ATblZaehlerWerte,
                                                 AsdaObjektTeile, ATblObjektTeile,
                                                 AsdaTimeline, ATblTimeline,
                                                 asConnect, liObjektTeil);
@@ -140,47 +133,53 @@ namespace Ruddat_NK
                                 LiSourceId = int.Parse(ATblZaehlerWerte.Rows[j].ItemArray.GetValue(0).ToString());
 
                                 // Erzeugte Zählerrechnung > Rechnungen löschen
-                                // Alle mit der Id der Hauptrechnung in id_rechnung_source löschen
-                                Timeline.DeleteRechnung(LiSourceId, "R", asConnect);
+                                // Alle mit der Id der Hauptrechnung in id_zaehler löschen
+                                Timeline.DeleteRechnung(LiSourceId, "Z", asConnect);
 
+                                // Umgang mit flag_timeline in Zählerwerten?
+                                // Rechnung erzeugen auf gleicher Ebene 
+                                // Untergeordnete Rechnungen erzeugen
+                                // Timline erzeugen aber nur auf der Zählerstandsebene
+                                // Untergeordnete Timlines werden ad-hoc erzeugt
 
+                                // Zähler aus Objekt Rechnung erzeugen
+                                //if (ATblZaehlerWerte.Rows[j].ItemArray.GetValue(8) != DBNull.Value)
+                                //    if ((int)ATblZaehlerWerte.Rows[j].ItemArray.GetValue(8) > 0)
+                                //    {
+                                //        LiKsa = (int)ATblZaehlerWerte.Rows[j].ItemArray.GetValue(1);                    // Kostenart
+                                //        liObjekt = (int)ATblZaehlerWerte.Rows[j].ItemArray.GetValue(8);                 // Objekt
+                                //        liArtRelation = 1;                                                              // Rechnung
 
-                                // Objekt Rechnung
-                                if (ATblZaehlerWerte.Rows[j].ItemArray.GetValue(8) != DBNull.Value)
-                                    if ((int)ATblZaehlerWerte.Rows[j].ItemArray.GetValue(8) > 0)
-                                    {
-                                        LiKsa = (int)ATblZaehlerWerte.Rows[j].ItemArray.GetValue(1);                    // Kostenart
-                                        liObjekt = (int)ATblZaehlerWerte.Rows[j].ItemArray.GetValue(8);                 // Objekt
-                                        liArtRelation = 1;                                                              // Rechnung
+                                //        if (Timeline.GetWeiterleitung(1, LiKsa, asConnect) == 1)
+                                //        {
+                                //            liArtRelation = 2;          // Zähler
+                                //                                        // Rechnungen und Timeline für alle zugehörigen Objektteile erzeugen
+                                //            CreateRechnungenObjTeile(LiSourceId, liObjekt, liObjektTeil, liMieter, liArtRelation,
+                                //                ASdaRechnungen, ATblRechnungen,
+                                //                AsdaZaehlerWerte, ATblZaehlerWerte,
+                                //                AsdaObjektTeile, ATblObjektTeile,
+                                //                AsdaTimeline, ATblTimeline,
+                                //                asConnect, liObjektTeil);
+                                //        }
+                                //    }
 
-                                        if (Timeline.GetWeiterleitung(1, LiKsa, asConnect) == 1)
-                                        {
-                                            liArtRelation = 1;          // Rechnung
-                                                                        // Rechnungen und Timeline für alle zugehörigen Objektteile erzeugen
-                                            CreateRechnungenObjTeile(LiSourceId, liObjekt, liObjektTeil, liMieter, liArtRelation,
-                                                ASdaRechnungen, ATblZaehlerWerte,
-                                                AsdaObjektTeile, ATblObjektTeile,
-                                                AsdaTimeline, ATblTimeline,
-                                                asConnect, liObjektTeil);
-                                        }
-                                    }
-
-                                // Teilobjekt Rechnung
+                                // Teilobjekt ZählerRechnung
                                 if (ATblZaehlerWerte.Rows[j].ItemArray.GetValue(9) != DBNull.Value)
                                     if ((int)ATblZaehlerWerte.Rows[j].ItemArray.GetValue(9) > 0)
                                     {
-                                        LiKsa = (int)ATblZaehlerWerte.Rows[j].ItemArray.GetValue(1);                  // Kostenart
-                                        liObjektTeil = (int)ATblZaehlerWerte.Rows[j].ItemArray.GetValue(9);           // ObjektTeil
-                                        liArtRelation = 1;                                                          // Rechnung
+                                        CreateRechnungenZaehler(ASdaRechnungen, ATblRechnungen,
+                                                                AsdaZaehlerWerte, ATblZaehlerWerte,
+                                                                AsdaObjektTeile, ATblObjektTeile,
+                                                                LiSourceId, asConnect);
                                     }
-                                // Mieter Rechnung
-                                if (ATblZaehlerWerte.Rows[j].ItemArray.GetValue(10) != DBNull.Value)
-                                    if ((int)ATblZaehlerWerte.Rows[j].ItemArray.GetValue(10) > 0)
-                                    {
-                                        LiKsa = (int)ATblZaehlerWerte.Rows[j].ItemArray.GetValue(1);                   // Kostenart
-                                        liMieter = (int)ATblZaehlerWerte.Rows[j].ItemArray.GetValue(10);               // Mieter
-                                        liArtRelation = 1;                                                           // Rechnung
-                                    }
+                                // Mieter ZählerrechnungRechnung
+                                //if (ATblZaehlerWerte.Rows[j].ItemArray.GetValue(10) != DBNull.Value)
+                                //    if ((int)ATblZaehlerWerte.Rows[j].ItemArray.GetValue(10) > 0)
+                                //    {
+                                //        LiKsa = (int)ATblZaehlerWerte.Rows[j].ItemArray.GetValue(1);                    // Kostenart
+                                //        liMieter = (int)ATblZaehlerWerte.Rows[j].ItemArray.GetValue(10);                // Mieter
+                                //        liArtRelation = 2;                                                              // Zähler
+                                //    }
                             }
                         }
 
@@ -189,9 +188,6 @@ namespace Ruddat_NK
                 default:
                     break;
             }
-
-
-
             return LiReturn;
         }
 
@@ -560,6 +556,7 @@ namespace Ruddat_NK
         private static int CreateRechnungenObjTeile(int AiSourceId, int AiObjektId, int AiObjektTeilId,
                 int AiMieterid, int AiArtRelation,
                 MySqlDataAdapter ASdaRechnungen, System.Data.DataTable ATblRechnungen,
+                MySqlDataAdapter ASdaZaehlerWerte, System.Data.DataTable ATblZaehlerWerte,
                 MySqlDataAdapter ASdaTeilobjekte, System.Data.DataTable ATblTeilobjekte,
                 MySqlDataAdapter ASdaTimeline, System.Data.DataTable ATblTimeline,
                 string AsConnect, int liObjektTeil)
@@ -907,6 +904,55 @@ namespace Ruddat_NK
                 DrRechnung[17] = LiSourceId;
 
                 aTblRechnungen.Rows.Add(DrRechnung);
+            }
+        }
+
+        internal static void CreateRechnungenZaehler(
+                MySqlDataAdapter ASdaRechnungen, System.Data.DataTable ATblRechnungen,
+                MySqlDataAdapter ASdaZaehlerWerte, System.Data.DataTable ATblZaehlerWerte,
+                MySqlDataAdapter ASdaTeilobjekte, System.Data.DataTable ATblTeilobjekte,
+                int AiSourceId, string asConnect)
+        {
+
+            for (int i = 0; i < ATblZaehlerWerte.Rows.Count; i++)
+            {
+                if ((int)ATblZaehlerWerte.Rows[i][13] == 1 && (int)ATblZaehlerWerte.Rows[i][0] == AiSourceId)
+                {
+                    // Neue Rechnung erzeugen
+                    DataRow DrRechnung = ATblRechnungen.NewRow();
+
+                    DrRechnung[1] = (int)ATblZaehlerWerte.Rows[i][11];      // id Ksa
+                    DrRechnung[2] = (DateTime)ATblZaehlerWerte.Rows[i][1];  // Datum
+                    DrRechnung[3] = (DateTime)ATblZaehlerWerte.Rows[i][1];  // Datum Von 
+                    DrRechnung[4] = ((DateTime)ATblZaehlerWerte.Rows[i][1]).AddMonths(1);   
+                                        
+                    // Todo Zeitraum für die Rechung ermitteln
+                    
+                    DrRechnung[5] = (decimal)ATblZaehlerWerte.Rows[i][3] * (decimal)ATblZaehlerWerte.Rows[i][5];    // Netto
+                    DrRechnung[6] = (decimal)ATblZaehlerWerte.Rows[i][3] * (decimal)ATblZaehlerWerte.Rows[i][6];    // Brutto
+                                                                                                                    //DrRechnung[7] = LiMwstId;
+                    DrRechnung[8] = (int)ATblZaehlerWerte.Rows[i][8];      // Objekt
+                    DrRechnung[9] = (int)ATblZaehlerWerte.Rows[i][9];      // TeilObjekt
+                                                                           //DrRechnung[10] = 0; // AiMieterid;                                            
+                                                                           //DrRechnung[11] = LsRgNr;
+                                                                           //DrRechnung[12] = LsFirma;
+                    DrRechnung[15] = (int)ATblZaehlerWerte.Rows[i][13];         // Flag für Timelinebearbeitung
+                    DrRechnung[16] = (int)ATblZaehlerWerte.Rows[i][12];         // VerteilungsId
+                    DrRechnung[20] = (int)ATblZaehlerWerte.Rows[i][0];          // LiSourceId;
+
+                    ATblRechnungen.Rows.Add(DrRechnung);
+                }
+            }
+            try
+            {
+                // Daten in die Datenbank schreiben
+                MySqlCommandBuilder commandBuilder = new MySqlCommandBuilder(ASdaRechnungen);
+                ASdaRechnungen.Update(ATblRechnungen);
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("Erzeugen von Rechnungen fehlgeschlagen (Rechnungen Zähler)", "Datenfehler", MessageBoxButton.OK, MessageBoxImage.Error);
+                throw;
             }
         }
     }

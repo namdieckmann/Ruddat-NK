@@ -44,7 +44,8 @@ namespace Ruddat_NK
                                     flag_timeline,
                                     id_verteilung,
                                     id_rechnung_source,
-                                    flag_editable
+                                    flag_editable,
+                                    id_zaehlerwert
                             FROM rechnungen
 					         WHERE id_extern_timeline = " + lsWhereAdd +
                           " ORDER BY rechnungen.datum_rechnung desc";
@@ -360,7 +361,7 @@ namespace Ruddat_NK
                             id_objekt,
                             id_objekt_teil,
                             id_ksa,
-                            flag_timeline
+                            flag_timeline,
                         FROM zaehlerstaende  WHERE " + lsWhereAdd;
                     break;
                 case 24:
@@ -536,6 +537,9 @@ namespace Ruddat_NK
                     break;
                 case 150:        // Unterrechnungen löschen
                     lsSql = @"Delete FROM rechnungen  WHERE id_rechnung_source = " + piId.ToString();
+                    break;
+                case 151:
+                    lsSql = @"Delete FROM rechnungen  WHERE id_zaehlerwert = " + piId.ToString();
                     break;
                 default:
                     break;
