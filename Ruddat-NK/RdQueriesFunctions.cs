@@ -535,6 +535,12 @@ namespace Ruddat_NK
                 case 53:         // ProzentAnteil aus Teilobjekt
                     lsSql = @"SELECT prozent_anteil FROM objekt_teil WHERE Id_objekt_teil = " + piId.ToString();
                     break;
+                case 54:        // ZählerWert Id
+                    lsSql = @"SELECT Id_zs FROM zaehlerstaende  WHERE id_extern_timeline = '" + piId.ToString() + "\'";
+                    break;
+                case 55:        // Zählerbezeichnung aus Zähler ID
+                    lsSql = @"Select zaehlernummer From zaehler WHERE Id_zaehler = " + piId.ToString();
+                    break;
                 case 150:        // Unterrechnungen löschen
                     lsSql = @"Delete FROM rechnungen  WHERE id_rechnung_source = " + piId.ToString();
                     break;

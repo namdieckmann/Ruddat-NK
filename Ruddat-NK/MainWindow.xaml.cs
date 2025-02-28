@@ -93,7 +93,7 @@ namespace Ruddat_NK
         MySqlDataAdapter MySdVerteilung;
         MySqlDataAdapter MySdAbrInfo;
         MySqlDataAdapter MySdLeerstand;
-        MySqlDataAdapter MySdZlWert;
+        MySqlDataAdapter MySdZlWerte;
         MySqlDataAdapter MySdZlNummer;
 
         // Datenübergabe an WndChooseSet
@@ -522,8 +522,8 @@ namespace Ruddat_NK
                 if (piArt == 21)
                 {
                     TblZlWerte = new DataTable();    // Zählerwert
-                    MySdZlWert = new MySqlDataAdapter(com);
-                    MySdZlWert.Fill(TblZlWerte);
+                    MySdZlWerte = new MySqlDataAdapter(com);
+                    MySdZlWerte.Fill(TblZlWerte);
                     DgrCounters.ItemsSource = TblZlWerte.DefaultView;
                 }
                 // Combobox Zählernummern
@@ -562,8 +562,8 @@ namespace Ruddat_NK
                 if (piArt == 39)
                 {
                     // Zählerstände
-                    MySqlCommandBuilder commandBuilder39 = new MySqlCommandBuilder(MySdZlWert);
-                    MySdZlWert.Update(TblZlWerte);
+                    MySqlCommandBuilder commandBuilder39 = new MySqlCommandBuilder(MySdZlWerte);
+                    MySdZlWerte.Update(TblZlWerte);
                 }
                 if (piArt == 40)
                 {
@@ -1795,10 +1795,10 @@ namespace Ruddat_NK
                 DataRow dr = TblZlWerte.NewRow();
 
                 TblZlWerte.Rows.Add(dr);
-                dr[7] = liTmpId;       // ID für Timeline
-                dr[8] = GiObjektId;           // Objekt
-                dr[9] = GiObjektTeilId;       // Teilobjekt
-                dr[11] = liKsaId;           // Kostenstellenart einsetzen
+                dr[7] = liTmpId;                // ID für Timeline
+                dr[8] = GiObjektId;             // Objekt
+                dr[9] = GiObjektTeilId;         // Teilobjekt
+                dr[11] = liKsaId;               // Kostenstellenart einsetzen
 
                 btnCntAdd.IsEnabled = false;
             }
@@ -1812,22 +1812,32 @@ namespace Ruddat_NK
         private void btnCntSave_Click(object sender, RoutedEventArgs e)
         {
             int LiIdZs = 0;
+            int LiZlTimelineId = 0;
+            int LiSel = 0;
             string LsSql = "";
 
-            // flag Timeline neu erzeugen setzten
-            TblZlWerte.Rows[DgrCounters.SelectedIndex][13] = 1;
+            // FetchData("", 39, 2, gsConnect);
+            LiSel = DgrCounters.SelectedIndex;
 
-            // Update
-            FetchData("", 39, giDb, gsConnect);
-
-            int LiSel = DgrCounters.SelectedIndex;
-
-            // Id des gewählten Zählerstands übergeben
             if (LiSel >= 0)
             {
-                // Id Zählerstand
-                LiIdZs = (int)TblZlWerte.Rows[LiSel][0];
+                // Timline Flag setzen
+                TblZlWerte.Rows[DgrCounters.SelectedIndex][13] = 1;
+                FetchData("", 39, 2, gsConnect);
 
+                // Zählereintrag neu holen, wenn er neu erzeugt wurde > keine Id
+                if (TblZlWerte.Rows[DgrCounters.SelectedIndex][0] == DBNull.Value)
+                {
+                    LiZlTimelineId = (int)TblZlWerte.Rows[DgrCounters.SelectedIndex][7];
+                }
+            }
+
+            // Update der Daten
+            updateAllDataGrids(0);
+
+            // Id des gewählten Zählerstands übergeben
+            if (TblZlWerte.Rows.Count > 0)
+            {
                 // Eine leere Rechnungstabelle holen
                 LsSql = RdQueries.GetSqlSelect(92, LiIdZs, "", "", "", DateTime.MinValue, DateTime.MinValue, giFiliale, gsConnect, giDb);
                 FetchData(LsSql, 9, giDb, gsConnect);
@@ -1838,11 +1848,8 @@ namespace Ruddat_NK
                         MySdTeilObjekte, TblTeilObjekte,
                         null, null,
                         MySdTimeLine, TblTimeLine,
-                        MySdZlWert, TblZlWerte);
+                        MySdZlWerte, TblZlWerte);
             }
-
-            // Update der Daten
-            updateAllDataGrids(0);
 
             // Die IDs und Flags zurücksetzen
             giDelZlWertId = 0;

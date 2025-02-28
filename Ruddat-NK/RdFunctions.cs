@@ -327,6 +327,7 @@ namespace Ruddat_NK
                         // liOk = RdAfterfetch.MakeAfterFetch(piArt, 0, 0, 0, asConnect, aiDb);
                         break;
                     case 23:        // Zählerstände Timeline Create
+                        // Todo Kann das weg? 28.2.25
                         TblCntNew = new DataTable();        
                         MySqlCommand command23 = new MySqlCommand(psSql2, connect);
                         mysdCntNew = new MySqlDataAdapter(command23);
@@ -1845,6 +1846,18 @@ namespace Ruddat_NK
             liZlId = FetchData(lsSql, "", "", 26, asConnect);
 
             return liZlId;
+        }
+
+        // Zählername aus Id des Zählers ermitteln
+        internal static string GetZlName(int AiZlId, string asConnect, int aiDb)
+        {
+            String lsSql = "";
+            string LsName = "";
+
+            lsSql = RdQueriesFunctions.GetSql(55, AiZlId, "", "", 0);
+            LsName = fetchDataString(lsSql, "", 1, asConnect);
+
+            return LsName;
         }
 
         // Mehrwertsteuersatz für Zähler holen (aus ZählerId)
