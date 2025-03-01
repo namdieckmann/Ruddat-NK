@@ -213,9 +213,9 @@
                                 <DataGridTextColumn Header="Firma"
             			            Binding="{Binding firma}"/>
                                 <DataGridComboBoxColumn x:Name="mwst" Header="% Mwst"
-                        DisplayMemberPath="mwst"
-                        SelectedValuePath="id_mwst_art"
-                        SelectedValueBinding="{Binding id_mwst_art}" />
+                                    DisplayMemberPath="mwst"
+                                    SelectedValuePath="id_mwst_art"
+                                    SelectedValueBinding="{Binding id_mwst_art}" />
                                 <DataGridTextColumn Header="Betrag Netto" CellStyle="{StaticResource NameCellStyle}" 
             			            Binding="{Binding netto, StringFormat ={}{0:c},ConverterCulture=de-DE}"/>
                                 <DataGridTextColumn Header="Betrag Brutto" CellStyle="{StaticResource NameCellStyle}"
@@ -256,15 +256,13 @@
                             <ColumnDefinition Width="29*"/>
                             <ColumnDefinition Width="983*"/>
                         </Grid.ColumnDefinitions>
-                        <DataGrid x:Name="DgrCounters" Margin="10,101,10,37" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" ToolTip="Zählerstände" 
-                                  RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" ColumnWidth="*" Grid.ColumnSpan="4" 
+                        <DataGrid x:Name="DgrCounters" Margin="20,101,0,37" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" ToolTip="Zählerstände" 
+                                  RenderTransformOrigin="0.5,0.5" HorizontalContentAlignment="Stretch" ColumnWidth="*" Grid.ColumnSpan="4" 
                                   SelectionChanged="DgrCounters_SelectionChanged" RowEditEnding="DgrCounters_RowEditEnding" 
                                   BeginningEdit="DgrCounters_BeginningEdit" CellEditEnding="DgrCounters_CellEditEnding" >
                             <DataGrid.Columns>
-                                <DataGridComboBoxColumn x:Name="zlNummer" Header="Zählernummer" 
-                                    DisplayMemberPath="zn"
-                                    SelectedValuePath="id_zl"
-                                    SelectedValueBinding="{Binding id_zaehler}" />
+                                <DataGridComboBoxColumn x:Name="zlNummer" Header="Zählernummer"
+                                     SelectedValueBinding = "{Binding id_zaehler}" />
                                 <DataGridComboBoxColumn x:Name="kostenvertZl" Header="Kostenverteilung"
                                     DisplayMemberPath="b"
                                     SelectedValuePath="id_verteilung"
@@ -276,17 +274,13 @@
                                 <DataGridTextColumn Header="Verbrauch" CellStyle="{StaticResource NameCellStyle}"
             			            Binding="{Binding verb, ConverterCulture='de-DE', StringFormat=N2}"/>
                                 <DataGridComboBoxColumn x:Name="zleh" Header="Einheit"
-                                    DisplayMemberPath="zleh"
-                                    SelectedValuePath="id_zl"
-                                    SelectedValueBinding="{Binding id_zaehler}"/>
+                                    SelectedValueBinding="{Binding id_einheit}"/>
+                                <DataGridComboBoxColumn x:Name="zlmw" Header="Mwst (%)"
+                                    SelectedValueBinding="{Binding id_mwst_art}"/>                                
                                 <DataGridTextColumn x:Name="prNetto" Header="Betrag/Einheit Netto" CellStyle="{StaticResource NameCellStyle}" 
             			            Binding="{Binding prnetto, StringFormat ={}{0:c4},ConverterCulture=de-DE}"/>
                                 <DataGridTextColumn x:Name="prBrutto" Header="Betrag/Einheit Brutto" CellStyle="{StaticResource NameCellStyle}" 
             			            Binding="{Binding prbrutto, StringFormat ={}{0:c4},ConverterCulture=de-DE}"/>
-                                <DataGridComboBoxColumn x:Name="zlmw" Header="Mwst (%)"
-                                    DisplayMemberPath="zlmw"
-                                    SelectedValuePath="id_zl"
-                                    SelectedValueBinding="{Binding id_zaehler}"/>
                             </DataGrid.Columns>
                         </DataGrid>
                         <TextBox x:Name="tbCntObjekt" HorizontalAlignment="Left" Height="23" Margin="104,7,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="235" IsEnabled="False" Grid.ColumnSpan="4"/>

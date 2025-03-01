@@ -1,8 +1,10 @@
-﻿using System;
+﻿using Mysqlx.Crud;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls.Primitives;
 
 namespace Ruddat_NK
 {
@@ -540,6 +542,16 @@ namespace Ruddat_NK
                     break;
                 case 55:        // Zählerbezeichnung aus Zähler ID
                     lsSql = @"Select zaehlernummer From zaehler WHERE Id_zaehler = " + piId.ToString();
+                    break;
+                case 56:        // Das Datum der vorherigen Zählerablesung ermitteln für ZählerRechung Rechnung
+                    DateTime LdtEnd = DateTime.Parse(ps2);
+                    string LsDtEnd = "str_to_date(\"" + LdtEnd.ToString("dd.MM.yyyy") + "\",\"%d.%m.%Y %H:%i:%s\")";
+                    lsSql = @"Select datum_von From zaehlerstaende WHERE Id_zaehler = " + piId.ToString() +" and datum_von < " 
+                                + LsDtEnd
+                                + " Order By Id_zs desc ";
+                    break;
+                case 57:        // Die Mehrwertsteuer Id eines Zählers ermitteln
+                    lsSql = @"SELECT id_mwst_art FROM zaehler  WHERE id_zaehler = '" + piId.ToString() + "\'";
                     break;
                 case 150:        // Unterrechnungen löschen
                     lsSql = @"Delete FROM rechnungen  WHERE id_rechnung_source = " + piId.ToString();

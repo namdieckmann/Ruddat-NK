@@ -526,15 +526,34 @@ namespace Ruddat_NK
                     MySdZlWerte.Fill(TblZlWerte);
                     DgrCounters.ItemsSource = TblZlWerte.DefaultView;
                 }
-                // Combobox Zählernummern
+                // Combobox Zählernummer Einheit  Mwst
                 if (piArt == 22)
                 {
-                    TblZlNummern = new DataTable();    // Kostenart
+                    TblZlNummern = new DataTable();    // Zähler Mwst
                     MySdZlNummer = new MySqlDataAdapter(com);
                     MySdZlNummer.Fill(TblZlNummern);
                     zlNummer.ItemsSource = TblZlNummern.DefaultView;
+                    zlNummer.DisplayMemberPath = "zn";
+                    zlNummer.SelectedValuePath = "id_zl";
+                }
+                if (piArt == 23)
+                {
+                    TblZlNummern = new DataTable();    // Zähler Mwst
+                    MySdZlNummer = new MySqlDataAdapter(com);
+                    MySdZlNummer.Fill(TblZlNummern);
                     zleh.ItemsSource = TblZlNummern.DefaultView;
+                    zleh.DisplayMemberPath = "zleh";
+                    zleh.SelectedValuePath = "vzlehid";
+                }
+
+                if (piArt == 24)
+                {
+                    TblZlNummern = new DataTable();    // Zähler Mwst
+                    MySdZlNummer = new MySqlDataAdapter(com);
+                    MySdZlNummer.Fill(TblZlNummern);
                     zlmw.ItemsSource = TblZlNummern.DefaultView;
+                    zlmw.DisplayMemberPath = "zlmw";
+                    zlmw.SelectedValuePath = "zlmwid";
                 }
                 if (piArt == 35)
                 {
@@ -999,9 +1018,13 @@ namespace Ruddat_NK
                     lsSql = RdQueries.GetSqlSelect(11, liIndex, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
                     liRows = FetchData(lsSql, 11, giDb, gsConnect);
 
-                    // Combobox Zählernummern und Mwst in Zähler
+                    // Combobox Nummer in Zähler
                     lsSql = RdQueries.GetSqlSelect(22, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
                     liRows = FetchData(lsSql, 22, giDb, gsConnect);
+                    // Combobox Einheit in Zähler
+                    liRows = FetchData(lsSql, 23, giDb, gsConnect);
+                    // Combobox Mwsz in Zähler
+                    liRows = FetchData(lsSql, 24, giDb, gsConnect);
 
                     // Eine DummyTimeline zu schreiben aus einer Funktion
                     lsSql = RdQueries.GetSqlSelect(43, 0, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
@@ -1090,9 +1113,13 @@ namespace Ruddat_NK
                     lsSql = RdQueries.GetSqlSelect(3, giFiliale, gsItemHeader, "2", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
                     liId = FetchData(lsSql, 4, giDb, gsConnect);
 
-                    // Combobox Zählernummern und mwst in Zähler
+                    // Combobox Mwst Einheit Nummer in Zähler
                     lsSql = RdQueries.GetSqlSelect(2222, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
                     liRows = FetchData(lsSql, 22, giDb, gsConnect);
+                    // Combobox Einheit in Zähler
+                    liRows = FetchData(lsSql, 23, giDb, gsConnect);
+                    // Combobox Mwsz in Zähler
+                    liRows = FetchData(lsSql, 24, giDb, gsConnect);
 
                     // Eine DummyTimeline zum schreiben in einer Funktion
                     lsSql = RdQueries.GetSqlSelect(43, 0, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);
@@ -2313,10 +2340,10 @@ namespace Ruddat_NK
             int liMwstSatz = 99;
             int liZlId = 0;
             int liFlagNew = 0;
+            string lsSql = "";  
             string lsNetto = "";
             string lsBrutto = "";
             string lsZlStand = "";
-            string lsZlName = "";
             string lsMwstSatz = "";
             decimal ldNetto = 0;
             decimal ldBrutto = 0;
@@ -2332,14 +2359,20 @@ namespace Ruddat_NK
                 int x = e.Column.DisplayIndex;
                 int y = e.Row.GetIndex();
 
-                if (x == 0)       // Gewählter Zähler Id ermitteln
+                if (x == 0)       // Gewählter Zähler Id ermitteln: Einheit und MwstSatz setzen
                 {
-                    lsZlName = getCurrentCellValue((ComboBox)e.EditingElement);
-                    liZlId = Timeline.GetZlId(lsZlName, gsConnect, giDb);
-                    // Das Feld Zähler Id befüllen
-                    TblZlWerte.Rows[liSel][10] = liZlId;
-
-                    giZlId = liZlId;
+                    if (e.Column is DataGridComboBoxColumn comboBoxColumn)
+                    {
+                        if (e.EditingElement is ComboBox comboBox)
+                        {
+                            liZlId = (int)comboBox.SelectedValue;
+                            // Die ComboBoxen Einheit und MwstSatz einschränken
+                            // Combobox Mwst Einheit Nummer in Zähler
+                            lsSql = RdQueries.GetSqlSelect(2223, liZlId, "", "", "", DateTime.MinValue, DateTime.MinValue, giFiliale, gsConnect, giDb);
+                            FetchData(lsSql, 23, giDb, gsConnect);
+                            FetchData(lsSql, 24, giDb, gsConnect);
+                        }
+                    }
                 }
 
                 if (x == 3)     // Zählerstand wurde eingegeben
@@ -2369,9 +2402,9 @@ namespace Ruddat_NK
                     }
                 }
 
-                // x == 5 ist die Einheit
 
-                if (x == 6)     // NettoPreis !! Achtung: Der Displayindex ist die Darstellung im 
+
+                if (x == 7)     // NettoPreis !! Achtung: Der Displayindex ist die Darstellung im 
                 // DGR und nicht die Itemliste
                 {
                     // MwstSatz auslesen
@@ -2410,7 +2443,7 @@ namespace Ruddat_NK
                         }
                     }
                 }
-                if (x == 7)     // Brutto
+                if (x == 8)     // Brutto
                 {
                     // Mwst Satz auslesen
                     var cellInfo = DgrCounters.SelectedCells[8];

@@ -608,6 +608,7 @@ namespace Ruddat_NK
                     break;
                 case 22:
                 case 2222:
+                case 2223:
                     // Combobox Zählernummern für Objekte und ObjektTeile
                     switch (piArt)
                     {
@@ -617,13 +618,18 @@ namespace Ruddat_NK
                         case 2222:
                             lsWhereAdd = " Where zaehler.Id_objekt_teil = " + piId.ToString();
                             break;
+                        case 2223:
+                            lsWhereAdd = " Where zaehler.Id_zaehler = " + piId.ToString();
+                            break;
                         default:
                             break;
                     }
                     lsSql = @" Select id_zaehler as id_zl
                                 , zaehlernummer as zn
                                 , art_einheit.bez as zleh
-                                , art_mwst.mwst as zlmw 
+                                , art_mwst.mwst as zlmw
+                                , art_einheit.id_einheit as vzlehid
+                                , art_mwst.Id_mwst_art as zlmwid
                                 from zaehler
                         left join art_mwst on zaehler.id_mwst_art = art_mwst.Id_mwst_art
                         left join art_einheit on zaehler.id_einheit = art_einheit.id_einheit";
@@ -718,7 +724,8 @@ namespace Ruddat_NK
                                     zaehlerstaende.id_zaehler,
                                     zaehlerstaende.id_ksa,
                                     zaehlerstaende.id_verteilung as id_verteilung_zl,
-                                    zaehlerstaende.flag_timeline
+                                    zaehlerstaende.flag_timeline,
+                                    zaehlerstaende.id_mwst_art
 				            from zaehlerstaende
 				            where zaehlerstaende.id_objekt = " + piId.ToString() + lsWhereAdd2;
                     }
@@ -738,7 +745,8 @@ namespace Ruddat_NK
                                     zaehlerstaende.id_zaehler,
                                     zaehlerstaende.id_ksa,
                                     zaehlerstaende.id_verteilung as id_verteilung_zl,
-                                    zaehlerstaende.flag_timeline
+                                    zaehlerstaende.flag_timeline,
+                                    zaehlerstaende.id_mwst_art
 				            from zaehlerstaende
 				            where zaehlerstaende.id_objekt_teil = " + piId.ToString() + lsWhereAdd2;
                     }
@@ -1189,7 +1197,8 @@ namespace Ruddat_NK
                                         zaehler.zaehlerort as zlort,
                                         art_zaehler.bez as bezart,
                                         art_einheit.bez as bezeinheit,
-                                        zählerstaende.flag_timeline
+                                        zaehlerstaende.flag_timeline,
+                                        zaehlerstaende.id_mwst_art
 				                from zaehlerstaende
                                         Left join zaehler On zaehler.Id_zaehler = zaehlerstaende.Id_zaehler
                                         Left Join art_zaehler On zaehler.Id_zaehler_art = art_zaehler.Id_zaehler_art
@@ -1215,7 +1224,8 @@ namespace Ruddat_NK
                                             zaehler.zaehlerort as zlort,
                                             art_zaehler.bez as bezart,
                                             art_einheit.bez as bezeinheit,
-                                            zählerstaende.flag_timeline
+                                            zaehlerstaende.flag_timeline,
+                                            zaehlerstaende.id_mwst_art
 				                    from zaehlerstaende
                                             Left join zaehler On zaehler.Id_zaehler = zaehlerstaende.Id_zaehler
                                             Left Join art_zaehler On zaehler.Id_zaehler_art = art_zaehler.Id_zaehler_art

@@ -895,37 +895,54 @@ namespace Ruddat_NK
                 MySqlDataAdapter ASdaTeilobjekte, System.Data.DataTable ATblTeilobjekte,
                 int AiSourceId, int AiSwicth, string asConnect)
         {
+            int LiZaehlerId = 0;
+            int LiMwstId = 0;
+            int LiEinheitId = 0;
             string LsRgNr = "";
+            string LsEinheit = "";
             string LsText = "";
-
+            DateTime LdtStart = DateTime.MinValue;
+            DateTime LdtEnd = DateTime.MinValue;
 
 
             for (int i = 0; i < ATblZaehlerWerte.Rows.Count; i++)
             {
                 if ((int)ATblZaehlerWerte.Rows[i][13] == 1 && (int)ATblZaehlerWerte.Rows[i][0] == AiSourceId)
                 {
-
+                    // Zählernummer ermitteln
                     LsRgNr = Timeline.GetZlName((int)ATblZaehlerWerte.Rows[i][10], asConnect, 2);
+                    LiZaehlerId = (int)ATblZaehlerWerte.Rows[i][10];
+                    LdtEnd = (DateTime)ATblZaehlerWerte.Rows[i][1];             // Datum Ablesung
+                    LdtStart = Timeline.GetZlStartDatum(LiZaehlerId, LdtEnd, asConnect);                  // Startdatum
+                    LiMwstId = Timeline.GetZlMwstId(LiZaehlerId, asConnect, 2);      // MwstId
+                    LiEinheitId = (int)ATblZaehlerWerte.Rows[i][4];
+                    LsEinheit = Timeline.GetEinheit(LiEinheitId, asConnect, 2);
+
+                    LsText = @"Verbrauch: " + ATblZaehlerWerte.Rows[i][3].ToString()  
+                                        + LsEinheit 
+                                        + " - "
+                                        + ATblZaehlerWerte.Rows[i][5].ToString() + "€ Netto " 
+                                        + ATblZaehlerWerte.Rows[i][6].ToString() + "€ Brutto";
 
                     // Neue Rechnung erzeugen
                     DataRow DrRechnung = ATblRechnungen.NewRow();
 
                     DrRechnung[1] = (int)ATblZaehlerWerte.Rows[i][11];      // id Ksa
-                    DrRechnung[2] = (DateTime)ATblZaehlerWerte.Rows[i][1];  // Datum
-                    DrRechnung[3] = (DateTime)ATblZaehlerWerte.Rows[i][1];  // Datum Von 
-                    DrRechnung[4] = ((DateTime)ATblZaehlerWerte.Rows[i][1]).AddMonths(1);   
-                                        
+                    DrRechnung[2] = DateTime.Now;  // Datum
+                    DrRechnung[3] = LdtStart;  // Datum Von vorherige Ablesung
+                    DrRechnung[4] = LdtEnd;  // Datum Bis Ablesung
+
                     // Todo Zeitraum für die Rechung ermitteln
-                    
+
                     DrRechnung[5] = (decimal)ATblZaehlerWerte.Rows[i][3] * (decimal)ATblZaehlerWerte.Rows[i][5];    // Netto
                     DrRechnung[6] = (decimal)ATblZaehlerWerte.Rows[i][3] * (decimal)ATblZaehlerWerte.Rows[i][6];    // Brutto
-                                                                                                                    //DrRechnung[7] = LiMwstId;
+                    DrRechnung[7] = LiMwstId;
                     DrRechnung[8] = (int)ATblZaehlerWerte.Rows[i][8];           // Objekt
                     DrRechnung[9] = (int)ATblZaehlerWerte.Rows[i][9];           // TeilObjekt
-                                                                                // DrRechnung[10] = AiMieterid;                                            
+                    DrRechnung[10] = 0;
                     DrRechnung[11] = LsRgNr;
-                                                                                // DrRechnung[12] = LsFirma;
-                                                                                // DrRechnung[13] = Lstext;
+                    DrRechnung[12] = "";                                        // LsFirma;
+                    DrRechnung[13] = LsText;
                     DrRechnung[15] = (int)ATblZaehlerWerte.Rows[i][13];         // Flag für Timelinebearbeitung
                     DrRechnung[16] = (int)ATblZaehlerWerte.Rows[i][12];         // VerteilungsId
                     DrRechnung[20] = (int)ATblZaehlerWerte.Rows[i][0];          // LiSourceId;

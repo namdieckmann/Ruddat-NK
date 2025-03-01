@@ -1860,6 +1860,20 @@ namespace Ruddat_NK
             return LsName;
         }
 
+        // Das vorherige Datum der Zählerablesung ermitteln
+        internal static DateTime GetZlStartDatum(int AiZlId, DateTime ldtEnd, string asConnect)
+        {
+
+            String lsSql = "";
+            DateTime ldtStart = DateTime.MinValue;
+
+            lsSql = RdQueriesFunctions.GetSql(56, AiZlId, ldtEnd.ToString(), "", 0);
+            ldtStart = fetchDataDate(lsSql,"",1,asConnect,2);
+
+            return ldtStart;
+        }
+
+
         // Mehrwertsteuersatz für Zähler holen (aus ZählerId)
         internal static int GetMwstSatzZaehler(int aiZlId, string asConnect, int aiDb)
         {
@@ -1870,6 +1884,18 @@ namespace Ruddat_NK
             liMwstSatz = FetchData(lsSql, "", "", 26, asConnect);
 
             return liMwstSatz;
+        }
+
+        // Mehrwertsteuer Id für Zähler holen (aus ZählerId)
+        internal static int GetZlMwstId(int aiZlId, string asConnect, int v)
+        {
+            String lsSql = "";
+            int liMwstId = 0;
+
+            lsSql = RdQueriesFunctions.GetSql(57, aiZlId, "", "", 0);
+            liMwstId = FetchData(lsSql, "", "", 26, asConnect);
+
+            return liMwstId;
         }
 
         // Für die bedingte Weiterleitung
@@ -2333,6 +2359,12 @@ namespace Ruddat_NK
                     break;
             }
             return adtYear;
+        }
+
+        // Einheit aus Einheit Id holen
+        internal static string GetEinheit(int liEinheitId, string asConnect, int v)
+        {
+            throw new NotImplementedException();
         }
     }
 }
