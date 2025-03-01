@@ -2340,6 +2340,8 @@ namespace Ruddat_NK
             int liMwstSatz = 99;
             int liZlId = 0;
             int liFlagNew = 0;
+            int liRowsEinheit = 0;
+            int liRowsMwst = 0;
             string lsSql = "";  
             string lsNetto = "";
             string lsBrutto = "";
@@ -2365,12 +2367,20 @@ namespace Ruddat_NK
                     {
                         if (e.EditingElement is ComboBox comboBox)
                         {
-                            liZlId = (int)comboBox.SelectedValue;
-                            // Die ComboBoxen Einheit und MwstSatz einschränken
-                            // Combobox Mwst Einheit Nummer in Zähler
-                            lsSql = RdQueries.GetSqlSelect(2223, liZlId, "", "", "", DateTime.MinValue, DateTime.MinValue, giFiliale, gsConnect, giDb);
-                            FetchData(lsSql, 23, giDb, gsConnect);
-                            FetchData(lsSql, 24, giDb, gsConnect);
+
+                            // Todo Comboboxen synchronisieren
+
+                            //liZlId = (int)comboBox.SelectedValue;
+                            //// Die ComboBoxen Einheit und MwstSatz einschränken
+                            //// Combobox Mwst Einheit Nummer in Zähler
+                            //lsSql = RdQueries.GetSqlSelect(2223, liZlId, "", "", "", DateTime.MinValue, DateTime.MinValue, giFiliale, gsConnect, giDb);
+                            //liRowsEinheit = FetchData(lsSql, 23, giDb, gsConnect);
+                            //liRowsMwst = FetchData(lsSql, 24, giDb, gsConnect);
+
+                            //DataRowView oDataRowView = DgrCounters.SelectedItem as DataRowView;
+                            //oDataRowView.Row[4] = 1;
+                            //oDataRowView.Row[14] = 1;
+            
                         }
                     }
                 }

@@ -553,6 +553,9 @@ namespace Ruddat_NK
                 case 57:        // Die Mehrwertsteuer Id eines Zählers ermitteln
                     lsSql = @"SELECT id_mwst_art FROM zaehler  WHERE id_zaehler = '" + piId.ToString() + "\'";
                     break;
+                case 58:        // Die Einheit aus Einheit ID ermitteln
+                    lsSql = @"SELECT bez FROM art_einheit WHERE Id_einheit = " + piId.ToString();
+                    break;
                 case 150:        // Unterrechnungen löschen
                     lsSql = @"Delete FROM rechnungen  WHERE id_rechnung_source = " + piId.ToString();
                     break;

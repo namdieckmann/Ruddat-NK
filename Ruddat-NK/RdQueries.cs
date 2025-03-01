@@ -750,7 +750,7 @@ namespace Ruddat_NK
 				            from zaehlerstaende
 				            where zaehlerstaende.id_objekt_teil = " + piId.ToString() + lsWhereAdd2;
                     }
-                    lsOrder = " Order by datum_von desc ";
+                    lsOrder = " Order by id_zaehler, datum_von desc ";
                     lsSql = lsSql + lsOrder;
                     break;
                 case 36:

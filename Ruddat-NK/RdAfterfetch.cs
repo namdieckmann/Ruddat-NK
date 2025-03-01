@@ -919,7 +919,7 @@ namespace Ruddat_NK
                     LsEinheit = Timeline.GetEinheit(LiEinheitId, asConnect, 2);
 
                     LsText = @"Verbrauch: " + ATblZaehlerWerte.Rows[i][3].ToString()  
-                                        + LsEinheit 
+                                        + " " + LsEinheit 
                                         + " - "
                                         + ATblZaehlerWerte.Rows[i][5].ToString() + "€ Netto " 
                                         + ATblZaehlerWerte.Rows[i][6].ToString() + "€ Brutto";

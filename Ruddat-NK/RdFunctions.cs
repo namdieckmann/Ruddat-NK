@@ -468,7 +468,7 @@ namespace Ruddat_NK
         }
 
         // Daten aus der Db holen hier nur Strings
-        public static string fetchDataString(string psSql, string psSql2, int piArt, string asConnectString)
+        public static string FetchDataString(string psSql, string psSql2, int piArt, string asConnectString)
         {
             DateTime ldtStart = DateTime.MinValue;
             DateTime ldtEnd = DateTime.MinValue;
@@ -1184,7 +1184,7 @@ namespace Ruddat_NK
             String lsSql = "";
 
             lsSql = @"SELECT kb FROM art_verteilung  WHERE id_verteilung = " + aiVerteilungId.ToString();
-            lsVerteilung = fetchDataString(lsSql, "", 1, asConnect);
+            lsVerteilung = FetchDataString(lsSql, "", 1, asConnect);
 
             return lsVerteilung;
         }
@@ -1221,7 +1221,7 @@ namespace Ruddat_NK
             String lsSql = "";
 
             lsSql = @"SELECT kb FROM art_verteilung  WHERE bez = '" + asVerteilung.ToString().Trim() + " '";
-            lsVerteilung = fetchDataString(lsSql, "", 1, asConnect);
+            lsVerteilung = FetchDataString(lsSql, "", 1, asConnect);
 
             return lsVerteilung;
         }
@@ -1855,7 +1855,7 @@ namespace Ruddat_NK
             string LsName = "";
 
             lsSql = RdQueriesFunctions.GetSql(55, AiZlId, "", "", 0);
-            LsName = fetchDataString(lsSql, "", 1, asConnect);
+            LsName = FetchDataString(lsSql, "", 1, asConnect);
 
             return LsName;
         }
@@ -2166,7 +2166,7 @@ namespace Ruddat_NK
                     break;
             }
 
-            lsRgInfo = fetchDataString(lsSql, "", 1, asConnect);
+            lsRgInfo = FetchDataString(lsSql, "", 1, asConnect);
 
             return lsRgInfo;
         }
@@ -2343,6 +2343,17 @@ namespace Ruddat_NK
             return (liId);
         }
 
+        // Einheit aus Einheit Id holen
+        internal static string GetEinheit(int aiEinheitId, string asConnect, int v)
+        {
+            string lsEinheit = "";
+
+            lsSql = RdQueriesFunctions.GetSql(58, aiEinheitId, "", "", 0);
+            lsEinheit = FetchDataString(lsSql, "", 1, asConnect);
+
+            return (lsEinheit);
+        }
+
         // Ermitteln des Start und Endedatum eines Jahres
         internal static DateTime GetYear(DateTime adtYear, int aiArt)
         {
@@ -2359,12 +2370,6 @@ namespace Ruddat_NK
                     break;
             }
             return adtYear;
-        }
-
-        // Einheit aus Einheit Id holen
-        internal static string GetEinheit(int liEinheitId, string asConnect, int v)
-        {
-            throw new NotImplementedException();
         }
     }
 }
