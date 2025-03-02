@@ -256,7 +256,7 @@
                             <ColumnDefinition Width="29*"/>
                             <ColumnDefinition Width="983*"/>
                         </Grid.ColumnDefinitions>
-                        <DataGrid x:Name="DgrCounters" Margin="20,101,0,37" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" ToolTip="Zählerstände" 
+                        <DataGrid x:Name="DgrCounters" Margin="15,103,10,38" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" ToolTip="Zählerstände" 
                                   RenderTransformOrigin="0.5,0.5" HorizontalContentAlignment="Stretch" ColumnWidth="*" Grid.ColumnSpan="4" 
                                   SelectionChanged="DgrCounters_SelectionChanged" RowEditEnding="DgrCounters_RowEditEnding" 
                                   BeginningEdit="DgrCounters_BeginningEdit" CellEditEnding="DgrCounters_CellEditEnding" >
@@ -273,9 +273,9 @@
             			            Binding="{Binding zs, ConverterCulture='de-DE', StringFormat=N2}"/>
                                 <DataGridTextColumn Header="Verbrauch" CellStyle="{StaticResource NameCellStyle}"
             			            Binding="{Binding verb, ConverterCulture='de-DE', StringFormat=N2}"/>
-                                <DataGridComboBoxColumn x:Name="zleh" Header="Einheit"
+                                <DataGridComboBoxColumn x:Name="zleh" Header="Einheit" IsReadOnly="True"
                                     SelectedValueBinding="{Binding id_einheit}"/>
-                                <DataGridComboBoxColumn x:Name="zlmw" Header="Mwst (%)"
+                                <DataGridComboBoxColumn x:Name="zlmw" Header="Mwst (%)" IsReadOnly="True"
                                     SelectedValueBinding="{Binding id_mwst_art}"/>                                
                                 <DataGridTextColumn x:Name="prNetto" Header="Betrag/Einheit Netto" CellStyle="{StaticResource NameCellStyle}" 
             			            Binding="{Binding prnetto, StringFormat ={}{0:c4},ConverterCulture=de-DE}"/>

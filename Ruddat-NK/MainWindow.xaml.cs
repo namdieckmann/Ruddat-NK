@@ -529,12 +529,13 @@ namespace Ruddat_NK
                 // Combobox Zählernummer Einheit  Mwst
                 if (piArt == 22)
                 {
-                    TblZlNummern = new DataTable();    // Zähler Mwst
+                    TblZlNummern = new DataTable();    // Zähler Nummer
                     MySdZlNummer = new MySqlDataAdapter(com);
                     MySdZlNummer.Fill(TblZlNummern);
                     zlNummer.ItemsSource = TblZlNummern.DefaultView;
                     zlNummer.DisplayMemberPath = "zn";
                     zlNummer.SelectedValuePath = "id_zl";
+                    liRows = TblZlNummern.Rows.Count;
                 }
                 if (piArt == 23)
                 {
@@ -544,6 +545,7 @@ namespace Ruddat_NK
                     zleh.ItemsSource = TblZlNummern.DefaultView;
                     zleh.DisplayMemberPath = "zleh";
                     zleh.SelectedValuePath = "vzlehid";
+                    liRows = TblZlNummern.Rows.Count;
                 }
 
                 if (piArt == 24)
@@ -554,6 +556,7 @@ namespace Ruddat_NK
                     zlmw.ItemsSource = TblZlNummern.DefaultView;
                     zlmw.DisplayMemberPath = "zlmw";
                     zlmw.SelectedValuePath = "zlmwid";
+                    liRows = TblZlNummern.Rows.Count;
                 }
                 if (piArt == 35)
                 {
@@ -2368,19 +2371,24 @@ namespace Ruddat_NK
                         if (e.EditingElement is ComboBox comboBox)
                         {
 
-                            // Todo Comboboxen synchronisieren
+                            int selectedIndex = comboBox.SelectedIndex;
+                            liZlId = (int)comboBox.SelectedValue;
 
-                            //liZlId = (int)comboBox.SelectedValue;
-                            //// Die ComboBoxen Einheit und MwstSatz einschränken
-                            //// Combobox Mwst Einheit Nummer in Zähler
-                            //lsSql = RdQueries.GetSqlSelect(2223, liZlId, "", "", "", DateTime.MinValue, DateTime.MinValue, giFiliale, gsConnect, giDb);
-                            //liRowsEinheit = FetchData(lsSql, 23, giDb, gsConnect);
-                            //liRowsMwst = FetchData(lsSql, 24, giDb, gsConnect);
+                            lsSql = RdQueries.GetSqlSelect(2223, liZlId, "", "", "", DateTime.MinValue, DateTime.MinValue, giFiliale, gsConnect, giDb);
 
-                            //DataRowView oDataRowView = DgrCounters.SelectedItem as DataRowView;
-                            //oDataRowView.Row[4] = 1;
-                            //oDataRowView.Row[14] = 1;
-            
+                            liRowsEinheit = FetchData(lsSql, 23, giDb, gsConnect);
+                            liRowsMwst = FetchData(lsSql, 24, giDb, gsConnect);
+
+                            if (liRowsEinheit > 0 && liRowsMwst > 0)
+                            {
+                                if (e.Row.Item is DataRowView rowView)
+                                {
+                                    // Werte setzen
+                                    rowView[4] = TblZlNummern.Rows[0][4];    // Einheit
+                                    rowView[10] = TblZlNummern.Rows[0][0];   // Zähler Id
+                                    rowView[14] = TblZlNummern.Rows[0][5];   // Mwst id
+                                }
+                            }
                         }
                     }
                 }
@@ -2412,24 +2420,24 @@ namespace Ruddat_NK
                     }
                 }
 
-
-
                 if (x == 7)     // NettoPreis !! Achtung: Der Displayindex ist die Darstellung im 
                 // DGR und nicht die Itemliste
                 {
                     // MwstSatz auslesen
-                    var cellInfo = DgrCounters.SelectedCells[8];
+                    var cellInfo = DgrCounters.SelectedCells[6];
                     var cellContent = cellInfo.Column.GetCellContent(cellInfo.Item) as ComboBox;
 
-                    if (cellContent != null)
+                    lsMwstSatz = cellContent.Text.ToString(); // Sichtbarer Text in der ComboBox
+                    if (lsMwstSatz.Length > 0)
                     {
-                        lsMwstSatz = cellContent.Text.ToString(); // Sichtbarer Text in der ComboBox
+                        liMwstSatz = Convert.ToInt16(lsMwstSatz);
                     }
-                    if (lsMwstSatz == "")
+
+                    // Bei einem neuen Datensatz steht hier noch nix. Dann Wert aus RowView oder TblzlNummern holen
+                    if (lsMwstSatz == "" && TblZlNummern.Rows[0][3] != DBNull.Value)
                     {
-                        lsMwstSatz = "0";
+                        liMwstSatz = Convert.ToInt32(TblZlNummern.Rows[0][3]);
                     }
-                    liMwstSatz = Convert.ToInt16(lsMwstSatz);
 
                     // Element holen
                     TextBox t1 = e.EditingElement as TextBox;
@@ -2456,18 +2464,20 @@ namespace Ruddat_NK
                 if (x == 8)     // Brutto
                 {
                     // Mwst Satz auslesen
-                    var cellInfo = DgrCounters.SelectedCells[8];
+                    var cellInfo = DgrCounters.SelectedCells[6];
                     var cellContent = cellInfo.Column.GetCellContent(cellInfo.Item) as ComboBox;
 
-                    if (cellContent != null)
+                    lsMwstSatz = cellContent.Text.ToString(); // Sichtbarer Text in der ComboBox
+                    if (lsMwstSatz.Length > 0)
                     {
-                        lsMwstSatz = cellContent.Text.ToString(); // Sichtbarer Text in der ComboBox
+                        liMwstSatz = Convert.ToInt16(lsMwstSatz);
                     }
-                    if (lsMwstSatz == "")
+
+                    // Bei einem neuen Datensatz steht hier noch nix. Dann Wert aus RowView oder TblzlNummern holen
+                    if (lsMwstSatz == "" && TblZlNummern.Rows[0][3] != DBNull.Value)
                     {
-                        lsMwstSatz = "0";
+                        liMwstSatz = Convert.ToInt32(TblZlNummern.Rows[0][3]);
                     }
-                    liMwstSatz = Convert.ToInt16(lsMwstSatz);
 
                     // Element holen
                     TextBox t2 = e.EditingElement as TextBox;
