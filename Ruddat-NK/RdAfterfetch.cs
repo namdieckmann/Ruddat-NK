@@ -39,7 +39,6 @@ namespace Ruddat_NK
             // int liDaysInMonth = 0;       // Tage im Monat aus Vertrag
             int liSave = 1;                 // Freigabe
             int liArtRelation = 0;          // 1= Rechnung, 2=Zahlung, 3=Zähler
-            int LiSwitch = 0;               // Auswahl Obj, TeilObj, Mieter
 
             decimal[] ladBetraege = new decimal[12];
 
@@ -135,32 +134,53 @@ namespace Ruddat_NK
                                 // Alle mit der Id der Hauptrechnung in id_zaehler löschen
                                 Timeline.DeleteRechnung(LiSourceId, "Z", asConnect);
 
+
                                 // Umgang mit flag_timeline in Zählerwerten?
                                 // Rechnung erzeugen auf gleicher Ebene 
                                 // Untergeordnete Rechnungen erzeugen
                                 // Timline erzeugen aber nur auf der Zählerstandsebene
                                 // Untergeordnete Timlines werden bei Anwahl erzeugt
 
+
                                 // Objekt Zählerrechnung
                                 if (ATblZaehlerWerte.Rows[j].ItemArray.GetValue(8) != DBNull.Value)
                                     if ((int)ATblZaehlerWerte.Rows[j].ItemArray.GetValue(8) > 0)
                                     {
-                                        LiSwitch = 1;   // Rechnung aus Objekt
                                         CreateRechnungenZaehler(ASdaRechnungen, ATblRechnungen,
                                                                 AsdaZaehlerWerte, ATblZaehlerWerte,
                                                                 AsdaObjektTeile, ATblObjektTeile,
-                                                                LiSourceId, LiSwitch, asConnect);
+                                                                LiSourceId, asConnect);
+
+                                        if (ATblRechnungen.Rows[0][0] != DBNull.Value)
+                                        {
+                                            LiKsa = (int)ATblRechnungen.Rows[0].ItemArray.GetValue(1);                  // Kostenart
+
+                                            // Untergeordnete Rechnungen erzeugen
+                                            if (Timeline.GetWeiterleitung(1, LiKsa, asConnect) == 1)
+                                            {
+
+                                                // Alle mit der Id der Hauptrechnung in id_zähler löschen
+                                                Timeline.DeleteRechnung(LiSourceId, "R", asConnect);
+
+                                                // Rechnungen und Timeline für alle zugehörigen Objektteile erzeugen
+                                                CreateRechnungenObjTeile(LiSourceId, liObjekt, liObjektTeil, liMieter, liArtRelation,
+                                                    ASdaRechnungen, ATblRechnungen,
+                                                    AsdaZaehlerWerte, ATblZaehlerWerte,
+                                                    AsdaObjektTeile, ATblObjektTeile,
+                                                    AsdaTimeline, ATblTimeline,
+                                                    asConnect, liObjektTeil);
+                                            }
+                                        }
                                     }
 
-                                // Teilobjekt ZählerRechnung
+                                // Teilobjekt ZählerRechnung keine weitere Verteilung
                                 if (ATblZaehlerWerte.Rows[j].ItemArray.GetValue(9) != DBNull.Value)
                                     if ((int)ATblZaehlerWerte.Rows[j].ItemArray.GetValue(9) > 0)
                                     {
-                                        LiSwitch = 2;   // Rechnung aus TeilObjekt
                                         CreateRechnungenZaehler(ASdaRechnungen, ATblRechnungen,
                                                                 AsdaZaehlerWerte, ATblZaehlerWerte,
                                                                 AsdaObjektTeile, ATblObjektTeile,
-                                                                LiSourceId, LiSwitch, asConnect);
+                                                                LiSourceId, asConnect);
                                     }
                             }
                         }
@@ -250,6 +270,7 @@ namespace Ruddat_NK
                                 Timeline.DeleteTimeline((int)ATblRechnungen.Rows[i].ItemArray.GetValue(17), "S", AsConnect);
                             }
                         }
+                        // // Rechnungs Id Objekt
                         else if (ATblRechnungen.Rows[i].ItemArray.GetValue(0) != DBNull.Value)     // Rechnungs Id Objekt
                         {
                             // Timeline löschen
@@ -893,7 +914,7 @@ namespace Ruddat_NK
                 MySqlDataAdapter ASdaRechnungen, System.Data.DataTable ATblRechnungen,
                 MySqlDataAdapter ASdaZaehlerWerte, System.Data.DataTable ATblZaehlerWerte,
                 MySqlDataAdapter ASdaTeilobjekte, System.Data.DataTable ATblTeilobjekte,
-                int AiSourceId, int AiSwicth, string asConnect)
+                int AiSourceId, string asConnect)
         {
             int LiZaehlerId = 0;
             int LiMwstId = 0;
@@ -918,6 +939,7 @@ namespace Ruddat_NK
                     LiEinheitId = (int)ATblZaehlerWerte.Rows[i][4];
                     LsEinheit = Timeline.GetEinheit(LiEinheitId, asConnect, 2);
 
+                    // Rechnungstext für Zählerrechnung
                     LsText = @"Verbrauch: " + ATblZaehlerWerte.Rows[i][3].ToString()  
                                         + " " + LsEinheit 
                                         + " - "
@@ -931,9 +953,6 @@ namespace Ruddat_NK
                     DrRechnung[2] = DateTime.Now;  // Datum
                     DrRechnung[3] = LdtStart;  // Datum Von vorherige Ablesung
                     DrRechnung[4] = LdtEnd;  // Datum Bis Ablesung
-
-                    // Todo Zeitraum für die Rechung ermitteln
-
                     DrRechnung[5] = (decimal)ATblZaehlerWerte.Rows[i][3] * (decimal)ATblZaehlerWerte.Rows[i][5];    // Netto
                     DrRechnung[6] = (decimal)ATblZaehlerWerte.Rows[i][3] * (decimal)ATblZaehlerWerte.Rows[i][6];    // Brutto
                     DrRechnung[7] = LiMwstId;
@@ -941,11 +960,11 @@ namespace Ruddat_NK
                     DrRechnung[9] = (int)ATblZaehlerWerte.Rows[i][9];           // TeilObjekt
                     DrRechnung[10] = 0;
                     DrRechnung[11] = LsRgNr;
-                    DrRechnung[12] = "";                                        // LsFirma;
+                    DrRechnung[12] = "Zählerrechnung";                          // LsFirma;
                     DrRechnung[13] = LsText;
                     DrRechnung[15] = (int)ATblZaehlerWerte.Rows[i][13];         // Flag für Timelinebearbeitung
                     DrRechnung[16] = (int)ATblZaehlerWerte.Rows[i][12];         // VerteilungsId
-                    DrRechnung[20] = (int)ATblZaehlerWerte.Rows[i][0];          // LiSourceId;
+                    DrRechnung[20] = (int)ATblZaehlerWerte.Rows[i][0];          // LiSourceId wird auf id Zaehlerwert gesetzt
 
                     ATblRechnungen.Rows.Add(DrRechnung);
                 }

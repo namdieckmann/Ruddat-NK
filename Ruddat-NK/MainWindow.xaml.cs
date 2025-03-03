@@ -1060,7 +1060,7 @@ namespace Ruddat_NK
                     liRows = FetchData(lsSql, 18, giDb, gsConnect);
                     lsSqlLeerstand = RdQueries.GetSqlSelect(222, liId, "", "", "", ldtFrom, ldtTo, giFiliale, gsConnect, giDb);     // für Report
 
-                    // LiArtRelation = 1 für Rechnung (4. Argument)
+                    // LiArtRelation = 1 für Rechnung(4.Argument)
                     RdAfterfetch.CreateTimeline(0, liId, 0, 0, 1,
                             MySdRechnungen, TblRechnungen,
                             MySdTreeView, TblTeilObjekte,
@@ -2037,14 +2037,25 @@ namespace Ruddat_NK
         // Zeilen gegen editieren sperren > Rechnungen aus Weiterleitung
         private void DgrRechnungen_LoadingRow(object sender, DataGridRowEventArgs e)
         {
+            int LiSourceId = 0;
+
             int y = e.Row.GetIndex();
             e.Row.IsEnabled = true;
 
             // Es ist eine Rechnungs Id Source vorhanden, dann darf nicht mehr editiert werden
             if (TblRechnungen.Rows[y].ItemArray.GetValue(17) != DBNull.Value )
             {
-                int LiObjId = (int)TblRechnungen.Rows[y].ItemArray.GetValue(17);
-                if (LiObjId > 0)
+                LiSourceId = (int)TblRechnungen.Rows[y].ItemArray.GetValue(17);
+                if (LiSourceId > 0)
+                {
+                    e.Row.IsEnabled = false;
+                }
+            }
+            // Rechnung aus Zählerwert
+            if (TblRechnungen.Rows[y].ItemArray.GetValue(20) != DBNull.Value)
+            {
+                LiSourceId = (int)TblRechnungen.Rows[y].ItemArray.GetValue(20);
+                if (LiSourceId > 0)
                 {
                     e.Row.IsEnabled = false;
                 }

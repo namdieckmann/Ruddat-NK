@@ -1861,14 +1861,19 @@ namespace Ruddat_NK
         }
 
         // Das vorherige Datum der Zählerablesung ermitteln
-        internal static DateTime GetZlStartDatum(int AiZlId, DateTime ldtEnd, string asConnect)
+        internal static DateTime GetZlStartDatum(int AiZlId, DateTime adtEnd, string asConnect)
         {
-
             String lsSql = "";
             DateTime ldtStart = DateTime.MinValue;
 
-            lsSql = RdQueriesFunctions.GetSql(56, AiZlId, ldtEnd.ToString(), "", 0);
+            lsSql = RdQueriesFunctions.GetSql(56, AiZlId, adtEnd.ToString(), "", 0);
             ldtStart = fetchDataDate(lsSql,"",1,asConnect,2);
+
+            // Falls es der Erste Zählereintrag ist
+            if (ldtStart == DateTime.MinValue)
+            {
+                ldtStart = adtEnd;
+            }
 
             return ldtStart;
         }

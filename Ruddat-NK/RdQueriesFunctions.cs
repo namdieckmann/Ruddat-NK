@@ -559,7 +559,7 @@ namespace Ruddat_NK
                 case 150:        // Unterrechnungen löschen
                     lsSql = @"Delete FROM rechnungen  WHERE id_rechnung_source = " + piId.ToString();
                     break;
-                case 151:
+                case 151:        // Zählerrechnung löschen
                     lsSql = @"Delete FROM rechnungen  WHERE id_zaehlerwert = " + piId.ToString();
                     break;
                 default:
