@@ -422,13 +422,14 @@ namespace Ruddat_NK
                 case 28:        // Weiterleitung Info holen
                     switch (piId2)
                     {
-                        case 1:
-                            // Weiterleitung an Objektteil
-                            lsSql = "SELECT wtl_obj_teil FROM dbo.art_kostenart WHERE Id_ksa =" + piId.ToString();
+                        case 1: // Weiterleitung an Objektteil
+                            lsSql = "SELECT wtl_obj_teil FROM dbo.art_kostenart WHERE Id_ksa = " + piId.ToString();
                             break;
-                            // Weiterleitung an Mieter
-                        case 2:
-                            lsSql = "SELECT wtl_mieter FROM dbo.art_kostenart WHERE Id_ksa =" + piId.ToString();
+                        case 2: // Weiterleitung an Mieter
+                            lsSql = "SELECT wtl_mieter FROM dbo.art_kostenart WHERE Id_ksa = " + piId.ToString();
+                            break;
+                        case 3: // Weiterleitung für Zähler
+                            lsSql = "SELECT ksa_zaehler FROM dbo.art_kostenart WHERE ksa_zaehler = 1 AND Id_ksa = " + piId.ToString();
                             break;
                         default:
                             break;

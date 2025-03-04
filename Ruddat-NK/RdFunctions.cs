@@ -749,62 +749,65 @@ namespace Ruddat_NK
                     int differenceInDays = ts.Days;
                     liDaysCount = ts.Days;
 
-                    // Tagessummen
-                    ldNettoDay = ldBetragNetto / liDaysCount;
-                    ldBruttoDay = ldBetragBrutto / liDaysCount;
-
-                    // Der Anfangsmonat wird anteilig gerechnet
-                    if (liDaysStart != 99)
+                    if (liDaysCount > 0)
                     {
-                        // Summen für 1. Monat
-                        LadBetraege[5] = liDaysStart * ldNettoDay;
-                        LadBetraege[6] = liDaysStart * ldBruttoDay;
+                        // Tagessummen
+                        ldNettoDay = ldBetragNetto / liDaysCount;
+                        ldBruttoDay = ldBetragBrutto / liDaysCount;
 
-                        // Anzahl der Monate reduzieren
-                        liMonths--;
+                        // Der Anfangsmonat wird anteilig gerechnet
+                        if (liDaysStart != 99)
+                        {
+                            // Summen für 1. Monat
+                            LadBetraege[5] = liDaysStart * ldNettoDay;
+                            LadBetraege[6] = liDaysStart * ldBruttoDay;
 
-                        // Beträge um den geteilten ersten Monat reduzieren 
-                        ldBetragNetto = ldBetragNetto - LadBetraege[5];
-                        ldBetragBrutto = ldBetragBrutto - LadBetraege[6];
+                            // Anzahl der Monate reduzieren
+                            liMonths--;
 
-                        // Tage korrigieren
-                        liDaysCount = liDaysCount - liDaysStart;
+                            // Beträge um den geteilten ersten Monat reduzieren 
+                            ldBetragNetto = ldBetragNetto - LadBetraege[5];
+                            ldBetragBrutto = ldBetragBrutto - LadBetraege[6];
+
+                            // Tage korrigieren
+                            liDaysCount = liDaysCount - liDaysStart;
+                        }
+
+                        // Der Endmonat wird anteilig gerechnet
+                        if (liDaysEnd != 99)
+                        {
+                            // Summen für 1. Monat
+                            LadBetraege[9] = liDaysEnd * ldNettoDay;
+                            LadBetraege[10] = liDaysEnd * ldBruttoDay;
+
+                            // Anzahl der Monate reduzieren
+                            liMonths--;
+
+                            // Beträge um den geteilten ersten Monat reduzieren 
+                            ldBetragNetto = ldBetragNetto - LadBetraege[9];
+                            ldBetragBrutto = ldBetragBrutto - LadBetraege[10];
+
+                            // Tage korrigieren
+                            liDaysCount = liDaysCount - liDaysStart;
+                        }
+
+                        // Die verbleibende Summe wird auf die verbleibenden Monate verteilt
+                        LadBetraege[0] = ldBetragNetto / liMonths;
+                        LadBetraege[1] = ldBetragBrutto / liMonths;
                     }
-
-                    // Der Endmonat wird anteilig gerechnet
-                    if (liDaysEnd != 99)
-                    {
-                        // Summen für 1. Monat
-                        LadBetraege[9] = liDaysEnd * ldNettoDay;
-                        LadBetraege[10] = liDaysEnd * ldBruttoDay;
-
-                        // Anzahl der Monate reduzieren
-                        liMonths--;
-
-                        // Beträge um den geteilten ersten Monat reduzieren 
-                        ldBetragNetto = ldBetragNetto - LadBetraege[9];
-                        ldBetragBrutto = ldBetragBrutto - LadBetraege[10];
-
-                        // Tage korrigieren
-                        liDaysCount = liDaysCount - liDaysStart;
-                    }
-
-                    // Die verbleibende Summe wird auf die verbleibenden Monate verteilt
-                    LadBetraege[0] = ldBetragNetto / liMonths;
-                    LadBetraege[1] = ldBetragBrutto / liMonths;
                 }
             }
 
             // Das ist eine Vorrauszahlung
             if (liZlgOrRg == 2)
             {
-                //TODO Vorrauszahlung
+                //TODO Vorrauszahlung wird das noch gebraucht?
             }
 
             // Das ist ein Zählerstand
             if (liZlgOrRg == 3)
             {
-                //TODO Zählerstand
+                //TODO Zählerstand wird das noch gebraucht?
             }
             return LadBetraege;
         }

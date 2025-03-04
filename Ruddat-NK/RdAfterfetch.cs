@@ -151,14 +151,14 @@ namespace Ruddat_NK
                                                                 AsdaObjektTeile, ATblObjektTeile,
                                                                 LiSourceId, asConnect);
 
-                                        if (ATblRechnungen.Rows[0][0] != DBNull.Value)
+                                        if (ATblRechnungen.Rows[j][20] != DBNull.Value)                                 // Zähler Id vorhenden
                                         {
-                                            LiKsa = (int)ATblRechnungen.Rows[0].ItemArray.GetValue(1);                  // Kostenart
+                                            LiKsa = (int)ATblRechnungen.Rows[j].ItemArray.GetValue(1);                  // Kostenart
 
                                             // Untergeordnete Rechnungen erzeugen
-                                            if (Timeline.GetWeiterleitung(1, LiKsa, asConnect) == 1)
+                                            // Parameter: 3 = Zähler
+                                            if (Timeline.GetWeiterleitung(3, LiKsa, asConnect) == 1)
                                             {
-
                                                 // Alle mit der Id der Hauptrechnung in id_zähler löschen
                                                 Timeline.DeleteRechnung(LiSourceId, "R", asConnect);
 
@@ -220,6 +220,7 @@ namespace Ruddat_NK
             int liSave = 1;  // Freigabe
             int LiArtRelation = AiArtRelation;      // 1= Rechnung, 2=Zahlung, 3=Zähler
             int LiRgIdSource = 0;
+            int LiRgZaehlerWertSource = 0;          // Zählereintrag Id Source
 
             decimal ldBetragNetto = 0;
             decimal ldBetragSollNetto = 0;
@@ -255,32 +256,34 @@ namespace Ruddat_NK
             {
                 if (ATblRechnungen.Rows[i].ItemArray.GetValue(0) != DBNull.Value)       // Todo und timelineflag in Rechnungen = 1
                 {
-                    if ((int)ATblRechnungen.Rows[i].ItemArray.GetValue(15) == 1)        // Timeline Flag ist gesetzt > Timeline erzeugen
+                    if ((int)ATblRechnungen.Rows[i].ItemArray.GetValue(15) == 1)        // Timeline Flag ist gesetzt > Timeline neu erzeugen
                     {
                         int LiWtlObjekt = 0;            // Weiterleitungen
                         int LiWtlObjektTeil = 0;
 
-                        // Eine Rechnung aus dem Teilobjekt?
+                        // Eine Rechnung aus dem Objekt weitergeleitet hat source id? kann auch Zählerwert sein
                         if (ATblRechnungen.Rows[i].ItemArray.GetValue(17) != DBNull.Value)          // Rechnungs Source Id Quelle Weiterleitung 
                         {
                             if (AiObjektTeilId > 0)
                             {
-                                LiWtlObjekt = 1;
+                                LiWtlObjekt = 1;        // Weiterleitung aus Objekt
                                 // Timeline mit der SouceId löschen
                                 Timeline.DeleteTimeline((int)ATblRechnungen.Rows[i].ItemArray.GetValue(17), "S", AsConnect);
                             }
                         }
-                        // // Rechnungs Id Objekt
-                        else if (ATblRechnungen.Rows[i].ItemArray.GetValue(0) != DBNull.Value)     // Rechnungs Id Objekt
+
+                        // Rechnungs Id Objekt oder Teilobjekt
+                        if (ATblRechnungen.Rows[i].ItemArray.GetValue(0) != DBNull.Value)     // Rechnungs Id Objekt
                         {
                             // Timeline löschen
                             Timeline.DeleteTimeline((int)ATblRechnungen.Rows[i].ItemArray.GetValue(0), "R", AsConnect);
+
                             // Weiterleitungen Rechnung aus Objekt
                             if (AiObjektId > 0)
                             {
-
                                 LiWtlObjekt = 1;
                             }
+
                             // Rechnung aus Teilobjekt
                             if (AiObjektTeilId > 0 && LiWtlObjekt == 0)
                             {
@@ -288,9 +291,17 @@ namespace Ruddat_NK
                             }
                         }
 
+                        // Wenn es eine Zählerwert ID gibt, die Timeline löschen
+                        if (ATblRechnungen.Rows[i].ItemArray.GetValue(20) != DBNull.Value)
+                        {
+                            if ((int)ATblRechnungen.Rows[i].ItemArray.GetValue(20) > 0)
+                            {
+                                Timeline.DeleteTimeline((int)ATblRechnungen.Rows[i].ItemArray.GetValue(20), "Z", AsConnect);
+                            }
+                        }
+
                         // RechnungId
                         LiRechnungId = (int)ATblRechnungen.Rows[i].ItemArray.GetValue(0);
-
                         if (ATblRechnungen.Rows[i].ItemArray.GetValue(7) != DBNull.Value)
                             LiMwstId = int.Parse(ATblRechnungen.Rows[i].ItemArray.GetValue(7).ToString());
                         if (ATblRechnungen.Rows[i].ItemArray.GetValue(8) != DBNull.Value)
@@ -319,6 +330,8 @@ namespace Ruddat_NK
                             liVerteilungId = (int)ATblRechnungen.Rows[i].ItemArray.GetValue(16);
                         if (ATblRechnungen.Rows[i].ItemArray.GetValue(17) != DBNull.Value)
                             LiRgIdSource = (int)ATblRechnungen.Rows[i].ItemArray.GetValue(17);
+                        if (ATblRechnungen.Rows[i].ItemArray.GetValue(20) != DBNull.Value)
+                            LiRgZaehlerWertSource = (int)ATblRechnungen.Rows[i].ItemArray.GetValue(20);
 
                         // Anzahl der Tage des ersten Monats        99 ist der volle Monat
                         liDaysStart = Timeline.GetDaysStart(LdtStart);
@@ -351,6 +364,7 @@ namespace Ruddat_NK
                             DataRow DrTimeline = ATblTimeline.NewRow();
 
                             DrTimeline[1] = LiRechnungId;
+                            DrTimeline[3] = LiRgZaehlerWertSource;
                             DrTimeline[4] = liObjekt;
                             DrTimeline[5] = liObjektTeil;              // (int)ATblTeilobjekte.Rows[i].ItemArray.GetValue(0); // Objekt Id
                             DrTimeline[6] = liMieter;
