@@ -429,7 +429,7 @@ namespace Ruddat_NK
                 // Datagrid für Rechnungen
                 if (piArt == 9)
                 {
-                    TblRechnungen = new DataTable();     // Rechnungen
+                    TblRechnungen = new DataTable();                // Rechnungen
                     MySdRechnungen = new MySqlDataAdapter(com);
                     MySdRechnungen.Fill(TblRechnungen);
                     DgrRechnungen.ItemsSource = TblRechnungen.DefaultView;
@@ -457,7 +457,7 @@ namespace Ruddat_NK
                     TblRgMwst = new DataTable();     // mwst
                     MySdRgMwst = new MySqlDataAdapter(com);
                     MySdRgMwst.Fill(TblRgMwst);
-                    mwst.ItemsSource = TblRgMwst.DefaultView;                // Rechnungen
+                    mwst.ItemsSource = TblRgMwst.DefaultView;                // Rechnungen Mwst
                 }
                 // DataGrid Timline Detail
                 if (piArt == 13)
@@ -1860,25 +1860,27 @@ namespace Ruddat_NK
                 {
                     LiZlTimelineId = (int)TblZlWerte.Rows[DgrCounters.SelectedIndex][7];
                 }
-            }
 
-            // Update der Daten
-            updateAllDataGrids(0);
+                // Update der Daten
+                updateAllDataGrids(0);
 
-            // Id des gewählten Zählerstands übergeben
-            if (TblZlWerte.Rows.Count > 0)
-            {
-                // Eine leere Rechnungstabelle holen
-                LsSql = RdQueries.GetSqlSelect(92, LiIdZs, "", "", "", DateTime.MinValue, DateTime.MinValue, giFiliale, gsConnect, giDb);
-                FetchData(LsSql, 9, giDb, gsConnect);
+                // Id des gewählten Zählerstands übergeben
+                if (TblZlWerte.Rows.Count == 1)
+                {
+                    LiIdZs = (int)TblZlWerte.Rows[0][0];        // Zählerwert Id holen
 
-                // Art 2 = Zählerwerte
-                RdAfterfetch.MakeAfterFetch(2, 1, LiIdZs, 0, gsConnect,
-                        MySdRechnungen, TblRechnungen,                        
-                        MySdTeilObjekte, TblTeilObjekte,
-                        null, null,
-                        MySdTimeLine, TblTimeLine,
-                        MySdZlWerte, TblZlWerte);
+                    // Eine Rechnungstabelle mit der Zähler Id holen
+                    LsSql = RdQueries.GetSqlSelect(92, LiIdZs, "", "", "", DateTime.MinValue, DateTime.MinValue, giFiliale, gsConnect, giDb);
+                    FetchData(LsSql, 9, giDb, gsConnect);
+
+                    // Art 2 = Zählerwerte
+                    RdAfterfetch.MakeAfterFetch(2, 1, LiIdZs, 0, gsConnect,
+                            MySdRechnungen, TblRechnungen,
+                            MySdTeilObjekte, TblTeilObjekte,
+                            null, null,
+                            MySdTimeLine, TblTimeLine,
+                            MySdZlWerte, TblZlWerte);
+                }
             }
 
             // Die IDs und Flags zurücksetzen

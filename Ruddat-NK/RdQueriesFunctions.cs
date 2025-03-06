@@ -557,11 +557,17 @@ namespace Ruddat_NK
                 case 58:        // Die Einheit aus Einheit ID ermitteln
                     lsSql = @"SELECT bez FROM art_einheit WHERE Id_einheit = " + piId.ToString();
                     break;
+                case 59:        // RechnungsId aus der Zählerwert Id ermitteln
+                    lsSql = @"SELECT Id_rechnungen FROM rechnungen WHERE id_zaehlerwert = " + piId.ToString();
+                    break;
                 case 150:        // Unterrechnungen löschen
                     lsSql = @"Delete FROM rechnungen  WHERE id_rechnung_source = " + piId.ToString();
                     break;
-                case 151:        // Zählerrechnung löschen
+                case 151:        // Zählerrechnungen löschen
                     lsSql = @"Delete FROM rechnungen  WHERE id_zaehlerwert = " + piId.ToString();
+                    break;
+                case 152:        // untergeordnete Zählerrechnungen löschen
+                    lsSql = @"Delete FROM rechnungen  WHERE id_rechnung_source > 0 AND id_zaehlerwert = " + piId.ToString();
                     break;
                 default:
                     break;

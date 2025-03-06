@@ -212,6 +212,7 @@ namespace Ruddat_NK
                         MySdRechnungen = new MySqlDataAdapter(command01);
                         TblObjektTeile = new DataTable();
                         MySdObjektTeile = new MySqlDataAdapter(command02);
+
                         //TblMieter = new DataTable();
                         //MySdMieter = new MySqlDataAdapter(command02);
                         //TblTimeline = new DataTable();
@@ -670,6 +671,12 @@ namespace Ruddat_NK
                     LsSql = RdQueriesFunctions.GetSql(151, AiSourceId, "", "", 0);
                     LiOk = Timeline.FetchData(LsSql, "", "", 34, asConnect);
                     break;
+                case "U":
+                    // Untergeordnete ZaehlerRechnungen löschen
+                    LsSql = RdQueriesFunctions.GetSql(152, AiSourceId, "", "", 0);
+                    LiOk = Timeline.FetchData(LsSql, "", "", 34, asConnect);
+                    break;
+
                 default:
                     break;
             }
@@ -1813,6 +1820,18 @@ namespace Ruddat_NK
             liIdRechnung = FetchData(asSqlTimeline, "", "", 16, asConnect);
 
             return (liIdRechnung);
+        }
+
+        // Rechnungs ID aus Zählerwert Id ermitteln
+        internal static int GetRgZlwId(int aiZlwId, string asConnect, int aiDb)
+        {
+            String lsSql = "";
+            int liRgid = 0;
+
+            lsSql = RdQueriesFunctions.GetSql(59, aiZlwId, "", "", 0);
+            liRgid = FetchData(lsSql, "", "", 26, asConnect);
+
+            return liRgid;
         }
 
         // Den Verbrauch aus dem Zählerstand ermitteln
