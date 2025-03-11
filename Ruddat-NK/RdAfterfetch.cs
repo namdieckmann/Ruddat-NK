@@ -128,12 +128,10 @@ namespace Ruddat_NK
                         {
                             if (int.Parse(ATblZaehlerWerte.Rows[j].ItemArray.GetValue(13).ToString()) == 1)     // Nur der zugefügte oder editierte Datensatz
                             {
-
                                 LiSourceId = (int)ATblZaehlerWerte.Rows[j][0];
                                 // Erzeugte Zählerrechnung > Rechnungen löschen
                                 // Alle mit der Id der Hauptrechnung in id_zaehler löschen
                                 Timeline.DeleteRechnung(LiSourceId, "Z", asConnect);
-
 
                                 // Umgang mit flag_timeline in Zählerwerten?
                                 // Rechnung erzeugen auf gleicher Ebene 
@@ -150,27 +148,40 @@ namespace Ruddat_NK
                                                                 AsdaObjektTeile, ATblObjektTeile,
                                                                 LiSourceId, asConnect);
 
-                                        if (ATblRechnungen.Rows[j][20] != DBNull.Value)                                 // Zählerwert Id vorhenden
+                                        // Schleife durch die Rechnungen
+                                        for (int k = 0; k < ATblRechnungen.Rows.Count; k++)
                                         {
-                                            LiKsa = (int)ATblRechnungen.Rows[j].ItemArray.GetValue(1);                  // Kostenart
-
-                                            // Untergeordnete Rechnungen erzeugen
-                                            // Parameter: 3 = Zähler
-                                            if (Timeline.GetWeiterleitung(3, LiKsa, asConnect) == 1)
+                                            // Ist es eine Zählerrrechnung ?
+                                            if (ATblRechnungen.Rows[k][20] != DBNull.Value)                                 // Zählerwert Id vorhenden
                                             {
-                                                // Alle mit der id_zähler löschen außer die Hauptrechnung
-                                                Timeline.DeleteRechnung((int)ATblRechnungen.Rows[0].ItemArray.GetValue(20), "U", asConnect);
 
-                                                // Rechnungs Id aus Zaehlerwert Id (id steht u.u. noch nicht in der Tabelle Rechnungen)
-                                                LiSourceId = Timeline.GetRgZlwId((int)ATblRechnungen.Rows[0].ItemArray.GetValue(20), asConnect, 2);
+                                                LiKsa = (int)ATblRechnungen.Rows[k].ItemArray.GetValue(1);                  // Kostenart
 
-                                                // Rechnungen und Timeline für alle zugehörigen Objektteile erzeugen
-                                                CreateRechnungenObjTeile(LiSourceId, liObjekt, liObjektTeil, liMieter, liArtRelation,
-                                                    ASdaRechnungen, ATblRechnungen,
-                                                    AsdaZaehlerWerte, ATblZaehlerWerte,
-                                                    AsdaObjektTeile, ATblObjektTeile,
-                                                    AsdaTimeline, ATblTimeline,
-                                                    asConnect, liObjektTeil);
+                                                // Untergeordnete Rechnungen erzeugen
+                                                // Parameter: 3 = Zähler
+                                                if (Timeline.GetWeiterleitung(3, LiKsa, asConnect) == 1)
+                                                {
+                                                    // Alle mit der id_zähler löschen außer die Hauptrechnung
+                                                    Timeline.DeleteRechnung((int)ATblRechnungen.Rows[k].ItemArray.GetValue(20), "U", asConnect);
+
+                                                    if (ATblRechnungen.Rows[k][0] == DBNull.Value)
+                                                    {
+                                                        // Rechnungs Id aus Zaehlerwert Id (id steht u.u. noch nicht in der Tabelle Rechnungen)
+                                                        LiSourceId = Timeline.GetRgZlwId((int)ATblRechnungen.Rows[k].ItemArray.GetValue(20), asConnect, 2);
+                                                    }
+                                                    else
+                                                    {
+                                                        LiSourceId = (int)ATblRechnungen.Rows[k][0];
+                                                    }
+
+                                                    // Rechnungen und Timeline für alle zugehörigen Objektteile erzeugen
+                                                    CreateRechnungenObjTeile(LiSourceId, liObjekt, liObjektTeil, liMieter, liArtRelation,
+                                                            ASdaRechnungen, ATblRechnungen,
+                                                            AsdaZaehlerWerte, ATblZaehlerWerte,
+                                                            AsdaObjektTeile, ATblObjektTeile,
+                                                            AsdaTimeline, ATblTimeline,
+                                                            asConnect, liObjektTeil);
+                                                }
                                             }
                                         }
                                     }

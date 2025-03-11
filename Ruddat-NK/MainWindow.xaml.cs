@@ -1807,7 +1807,7 @@ namespace Ruddat_NK
 
                         btnCntSave.IsEnabled = true;
                         btnCntAdd.IsEnabled = true;
-                        // delete Button zu
+                        // delete Button aus
                         btnCntDel.IsEnabled = false;
 
                         updateAllDataGrids(0);
@@ -1870,10 +1870,17 @@ namespace Ruddat_NK
                     // Zählerstand Id mit Timline Id holen
                     LiIdZs = Timeline.GetZlsId(LiZlTimelineId, gsConnect);
                 }
+                else
+                {
+                    LiIdZs = (int)TblZlWerte.Rows[DgrCounters.SelectedIndex][0];
+                }
 
-                // Eine Rechnungstabelle mit der Zähler Id holen (Bei neuem Satz leer
-                LsSql = RdQueries.GetSqlSelect(92, LiIdZs, "", "", "", DateTime.MinValue, DateTime.MinValue, giFiliale, gsConnect, giDb);
-                FetchData(LsSql, 9, giDb, gsConnect);
+                //// Eine Rechnungstabelle mit der Zähler Id holen (Bei neuem Satz leer
+                //LsSql = RdQueries.GetSqlSelect(92, LiIdZs, "", "", "", DateTime.MinValue, DateTime.MinValue, giFiliale, gsConnect, giDb);
+                //FetchData(LsSql, 9, giDb, gsConnect);
+
+                // Update der Daten
+                updateAllDataGrids(0);
 
                 // Art 2 = Zählerwerte
                 RdAfterfetch.MakeAfterFetch(2, 1, LiIdZs, 0, gsConnect,
@@ -1885,8 +1892,6 @@ namespace Ruddat_NK
 
             }
 
-            // Update der Daten
-            updateAllDataGrids(0);
 
             // Die IDs und Flags zurücksetzen
             giDelZlWertId = 0;
