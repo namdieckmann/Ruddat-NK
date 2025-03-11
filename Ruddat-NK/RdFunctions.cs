@@ -9,6 +9,7 @@ using System.Windows.Threading;
 using System.Drawing;
 using System.Diagnostics;
 using System.Linq.Expressions;
+using static System.Windows.Forms.LinkLabel;
 // using Microsoft.Office.Interop.Excel;
 
 namespace Ruddat_NK
@@ -676,7 +677,6 @@ namespace Ruddat_NK
                     LsSql = RdQueriesFunctions.GetSql(152, AiSourceId, "", "", 0);
                     LiOk = Timeline.FetchData(LsSql, "", "", 34, asConnect);
                     break;
-
                 default:
                     break;
             }
@@ -715,6 +715,17 @@ namespace Ruddat_NK
             // Info: hier werden auch alle Datensätze evtl untergeordneter Rubriken 
             // anteilige Kosten von Objektteilen und Mietern gelöscht,
             // weil alle datensätze betr. der Extern Id gelöscht werden
+            return liOk;
+        }
+
+        // Zählerstand löschen
+        internal static int DeleteZlWert(int AiDelZlWertId, string asConnect)
+        {
+            string LsSql = "";
+
+            LsSql = RdQueriesFunctions.GetSql(153, AiDelZlWertId, "", "", 0);
+            int liOk = Timeline.FetchData(LsSql, "", "", 2, asConnect);
+
             return liOk;
         }
 
@@ -802,11 +813,18 @@ namespace Ruddat_NK
                         LadBetraege[0] = ldBetragNetto / liMonths;
                         LadBetraege[1] = ldBetragBrutto / liMonths;
                     }
+                    // Es gibt keine Tage, dann Summe direkt eintragen
+                    if (liDaysCount == 0)
+                    {
+                        // Summen direkt eintragen
+                        LadBetraege[0] = ldBetragNetto;
+                        LadBetraege[1] = ldBetragBrutto;
+                    }
                 }
             }
 
             // Das ist eine Vorrauszahlung
-            if (liZlgOrRg == 2)
+            if (liZlgOrRg == 1)
             {
                 //TODO Vorrauszahlung wird das noch gebraucht?
             }
@@ -1832,6 +1850,18 @@ namespace Ruddat_NK
             liRgid = FetchData(lsSql, "", "", 26, asConnect);
 
             return liRgid;
+        }
+
+        // Id Zählerstand aus Timeline Id ermitteln
+        internal static int GetZlsId(int liZlTimelineId, string asConnect)
+        {
+            String lsSql = "";
+            int liZlwId = 0;
+
+            lsSql = RdQueriesFunctions.GetSql(60, liZlTimelineId, "", "", 0);
+            liZlwId = FetchData(lsSql, "", "", 26, asConnect);
+
+            return liZlwId;
         }
 
         // Den Verbrauch aus dem Zählerstand ermitteln

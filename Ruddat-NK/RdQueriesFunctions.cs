@@ -560,6 +560,9 @@ namespace Ruddat_NK
                 case 59:        // RechnungsId aus der Zählerwert Id ermitteln
                     lsSql = @"SELECT Id_rechnungen FROM rechnungen WHERE id_zaehlerwert = " + piId.ToString();
                     break;
+                case 60:        // ZählerwertId aus Timeline Id ermitteln
+                    lsSql = @"SELECT Id_zs FROM zaehlerstaende WHERE id_extern_timeline = " + piId.ToString();
+                    break;
                 case 150:        // Unterrechnungen löschen
                     lsSql = @"Delete FROM rechnungen  WHERE id_rechnung_source = " + piId.ToString();
                     break;
@@ -568,6 +571,9 @@ namespace Ruddat_NK
                     break;
                 case 152:        // untergeordnete Zählerrechnungen löschen
                     lsSql = @"Delete FROM rechnungen  WHERE id_rechnung_source > 0 AND id_zaehlerwert = " + piId.ToString();
+                    break;
+                case 153:        // ZählerWert löschen
+                    lsSql = @"Delete FROM zaehlerstaende  WHERE id_zs = " + piId.ToString();
                     break;
                 default:
                     break;

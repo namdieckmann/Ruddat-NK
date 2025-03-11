@@ -589,7 +589,7 @@ namespace Ruddat_NK
                 }
                 if (piArt == 40)
                 {
-                    // Zählerstände löschen
+                    // Datensätze löschen
                     MySqlDataReader queryCommandReader40 = com.ExecuteReader();
                 }
                 if (piArt == 43)
@@ -1777,33 +1777,42 @@ namespace Ruddat_NK
         // Zählerstand löschen
         private void btnCntDel_Click(object sender, RoutedEventArgs e)
         {
-            int liTimelineId = 0;            int giDelZlWertId = 0;
-
+            int liDelZlWertId = 0;
+            int LiOk = 0;
             string LsSql = "";
 
-            int liSel = DgrCounters.SelectedIndex;
-            if (liSel >= 0)
+
+            MessageBoxResult result = MessageBox.Show("Soll der Zählerstand wirklich gelöscht werden?", "Rechnungen", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+            switch (result)
             {
+                case MessageBoxResult.Yes:
+                    int liSel = DgrCounters.SelectedIndex;
+                    if (liSel >= 0)
+                    {
+                        liDelZlWertId = (int)(TblZlWerte.Rows[liSel][0]);                // Id des zu löschenden Datensatzes
 
-                DataRow dr = TblZlWerte.Rows[liSel];
-                giDelZlWertId = (int)(dr[0]);                // Id des zu löschenden Datensatzes
+                        // ZählerRechnung löschen
+                        LiOk = Timeline.DeleteRechnung(liDelZlWertId, "Z", gsConnect);
 
-                if (dr[7] != DBNull.Value)
-                {
-                    liTimelineId = (int)dr[7];          // TimeLine ID holen                    
+                        // Untergeordnete ZählerRechnungen löschen
+                        LiOk = Timeline.DeleteRechnung(liDelZlWertId, "U", gsConnect);
 
-                    LsSql = RdQueries.GetSqlSelect(40, giDelZlWertId, "", "", "", DateTime.MinValue, DateTime.MinValue, giFiliale, gsConnect, giDb);
-                    FetchData(LsSql, 40, giDb, gsConnect);
+                        // Timeline Zähler löschen
+                        LiOk = Timeline.DeleteTimeline(liDelZlWertId, "Z", gsConnect);
 
-                    //GiRechnungTmpId = liTimelineId;
-                    //TblZlWerte.Rows.Remove(dr);
+                        // Zählerstand löschen
+                        LiOk = Timeline.DeleteZlWert(liDelZlWertId, gsConnect);
 
-                    btnCntSave.Content = "wirklich löschen?";
-                    btnCntSave.IsEnabled = true;
-                    btnCntAdd.IsEnabled = false;
-                    // delete Button zu
-                    btnCntDel.IsEnabled = false;
-                }
+
+                        btnCntSave.IsEnabled = true;
+                        btnCntAdd.IsEnabled = true;
+                        // delete Button zu
+                        btnCntDel.IsEnabled = false;
+
+                        updateAllDataGrids(0);
+                    }
+                    break;
             }
         }
 
@@ -1843,45 +1852,41 @@ namespace Ruddat_NK
         {
             int LiIdZs = 0;
             int LiZlTimelineId = 0;
-            int LiSel = 0;
             string LsSql = "";
 
-            // FetchData("", 39, 2, gsConnect);
-            LiSel = DgrCounters.SelectedIndex;
-
-            if (LiSel >= 0)
+            if (DgrCounters.SelectedIndex >= 0)
             {
+                // Timeline Id holen
+                LiZlTimelineId = (int)TblZlWerte.Rows[DgrCounters.SelectedIndex][7];
+
                 // Timline Flag setzen
                 TblZlWerte.Rows[DgrCounters.SelectedIndex][13] = 1;
-                FetchData("", 39, 2, gsConnect);
 
-                // Zählereintrag neu holen, wenn er neu erzeugt wurde > keine Id
+                // Neuer Datensaatz noch keine Id vorhanden
                 if (TblZlWerte.Rows[DgrCounters.SelectedIndex][0] == DBNull.Value)
                 {
-                    LiZlTimelineId = (int)TblZlWerte.Rows[DgrCounters.SelectedIndex][7];
+                    // Update Zählerstand
+                    FetchData("", 39, 2, gsConnect);
+                    // Zählerstand Id mit Timline Id holen
+                    LiIdZs = Timeline.GetZlsId(LiZlTimelineId, gsConnect);
                 }
 
-                // Update der Daten
-                updateAllDataGrids(0);
+                // Eine Rechnungstabelle mit der Zähler Id holen (Bei neuem Satz leer
+                LsSql = RdQueries.GetSqlSelect(92, LiIdZs, "", "", "", DateTime.MinValue, DateTime.MinValue, giFiliale, gsConnect, giDb);
+                FetchData(LsSql, 9, giDb, gsConnect);
 
-                // Id des gewählten Zählerstands übergeben
-                if (TblZlWerte.Rows.Count == 1)
-                {
-                    LiIdZs = (int)TblZlWerte.Rows[0][0];        // Zählerwert Id holen
+                // Art 2 = Zählerwerte
+                RdAfterfetch.MakeAfterFetch(2, 1, LiIdZs, 0, gsConnect,
+                        MySdRechnungen, TblRechnungen,
+                        MySdTeilObjekte, TblTeilObjekte,
+                        null, null,
+                        MySdTimeLine, TblTimeLine,
+                        MySdZlWerte, TblZlWerte);
 
-                    // Eine Rechnungstabelle mit der Zähler Id holen
-                    LsSql = RdQueries.GetSqlSelect(92, LiIdZs, "", "", "", DateTime.MinValue, DateTime.MinValue, giFiliale, gsConnect, giDb);
-                    FetchData(LsSql, 9, giDb, gsConnect);
-
-                    // Art 2 = Zählerwerte
-                    RdAfterfetch.MakeAfterFetch(2, 1, LiIdZs, 0, gsConnect,
-                            MySdRechnungen, TblRechnungen,
-                            MySdTeilObjekte, TblTeilObjekte,
-                            null, null,
-                            MySdTimeLine, TblTimeLine,
-                            MySdZlWerte, TblZlWerte);
-                }
             }
+
+            // Update der Daten
+            updateAllDataGrids(0);
 
             // Die IDs und Flags zurücksetzen
             giDelZlWertId = 0;
@@ -1891,7 +1896,6 @@ namespace Ruddat_NK
 
             // Save Button Zähler wieder aus
             btnCntSave.IsEnabled = false;
-            btnCntSave.Content = "Speichern";
             btnCntAdd.IsEnabled = true;
         }
 

@@ -141,7 +141,6 @@ namespace Ruddat_NK
                                 // Timline erzeugen aber nur auf der Zählerstandsebene
                                 // Untergeordnete Timlines werden bei Anwahl erzeugt
 
-
                                 // Objekt Zählerrechnung
                                 if (ATblZaehlerWerte.Rows[j].ItemArray.GetValue(8) != DBNull.Value)
                                     if ((int)ATblZaehlerWerte.Rows[j].ItemArray.GetValue(8) > 0)
@@ -342,7 +341,7 @@ namespace Ruddat_NK
                         liDaysEnd = Timeline.GetDaysEnd(LdtEnd);
                         // Anzahl der einzutragenden Monate ermitteln
                         liMonths = Timeline.GetMonths(LdtStart, LdtEnd);
-                        // Zahlung oder Rechnung 1= Zahlung 2= Rechnung
+                        // Zahlung oder Rechnung 2 = Rechnung 1 = Zahlung 
                         liZlgOrRg = 2;
 
                         // Monatsbeträge ermitteln (Brutto und Netto) und evtl. erster und letzter Monat nicht voll
@@ -390,8 +389,8 @@ namespace Ruddat_NK
                                 DrTimeline[10] = ladBetraege[1];
                             }
                             //---------------------------------------------  
-                            DrTimeline[9] = ladBetraege[3];
-                            DrTimeline[11] = ladBetraege[4];
+                            DrTimeline[9] = ladBetraege[3];         // Soll Netto
+                            DrTimeline[11] = ladBetraege[4];        // Soll Brutto
                             DrTimeline[12] = ldZs;                  // Zählerä.fgöl,stand
 
                             if (ii == 1)                            // erster Monat
