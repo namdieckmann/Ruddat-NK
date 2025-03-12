@@ -1567,7 +1567,7 @@ namespace Ruddat_NK
 
                             // Erzeugte Untergeordnete Rechnungen löschen
                             // Alle mit der Id der Hauptrechnung in id_rechnung_source
-                            Timeline.DeleteRechnung(LiDelId, "R", gsConnect);
+                            Timeline.DeleteRechnung(LiDelId, "R", MySdRechnungen, TblRechnungen, gsConnect);
                             // Delete Timeline mit der Rechnungs id
                             Timeline.DeleteTimeline(LiDelId, "R", gsConnect);
                             // Delete Timeline mit der Rechnungs Source id (aus untergeordneten Rechnungen)
@@ -1793,10 +1793,10 @@ namespace Ruddat_NK
                         liDelZlWertId = (int)(TblZlWerte.Rows[liSel][0]);                // Id des zu löschenden Datensatzes
 
                         // ZählerRechnung löschen
-                        LiOk = Timeline.DeleteRechnung(liDelZlWertId, "Z", gsConnect);
+                        Timeline.DeleteRechnung(liDelZlWertId, "Z", MySdRechnungen, TblRechnungen , gsConnect);
 
                         // Untergeordnete ZählerRechnungen löschen
-                        LiOk = Timeline.DeleteRechnung(liDelZlWertId, "U", gsConnect);
+                        Timeline.DeleteRechnung(liDelZlWertId, "U", MySdRechnungen, TblRechnungen, gsConnect);
 
                         // Timeline Zähler löschen
                         LiOk = Timeline.DeleteTimeline(liDelZlWertId, "Z", gsConnect);
@@ -1861,37 +1861,30 @@ namespace Ruddat_NK
 
                 // Timline Flag setzen
                 TblZlWerte.Rows[DgrCounters.SelectedIndex][13] = 1;
-
-                // Neuer Datensaatz noch keine Id vorhanden
-                if (TblZlWerte.Rows[DgrCounters.SelectedIndex][0] == DBNull.Value)
-                {
-                    // Update Zählerstand
-                    FetchData("", 39, 2, gsConnect);
-                    // Zählerstand Id mit Timline Id holen
-                    LiIdZs = Timeline.GetZlsId(LiZlTimelineId, gsConnect);
-                }
-                else
-                {
-                    LiIdZs = (int)TblZlWerte.Rows[DgrCounters.SelectedIndex][0];
-                }
-
-                //// Eine Rechnungstabelle mit der Zähler Id holen (Bei neuem Satz leer
-                //LsSql = RdQueries.GetSqlSelect(92, LiIdZs, "", "", "", DateTime.MinValue, DateTime.MinValue, giFiliale, gsConnect, giDb);
-                //FetchData(LsSql, 9, giDb, gsConnect);
-
                 // Update der Daten
-                updateAllDataGrids(0);
+                FetchData("", 39, 2, gsConnect);
 
-                // Art 2 = Zählerwerte
-                RdAfterfetch.MakeAfterFetch(2, 1, LiIdZs, 0, gsConnect,
-                        MySdRechnungen, TblRechnungen,
-                        MySdTeilObjekte, TblTeilObjekte,
-                        null, null,
-                        MySdTimeLine, TblTimeLine,
-                        MySdZlWerte, TblZlWerte);
+                // Zählerstand neu holen über die Timeline Id
+                LsSql = RdQueries.GetSqlSelect(351, LiZlTimelineId, "", "", "", DateTime.MinValue, DateTime.MaxValue, giFiliale, gsConnect, giDb);
+                FetchData(LsSql, 21, 2, gsConnect);
 
+                if (TblZlWerte.Rows.Count > 0)
+                {   DgrCounters.SelectedIndex = 0;
+                    // Id Zählerstand holen
+                    LiIdZs = (int)TblZlWerte.Rows[DgrCounters.SelectedIndex][0];
+
+                    // Art 2 = Zählerwerte
+                    RdAfterfetch.MakeAfterFetch(2, 1, LiIdZs, 0, gsConnect,
+                            MySdRechnungen, TblRechnungen,
+                            MySdTeilObjekte, TblTeilObjekte,
+                            null, null,
+                            MySdTimeLine, TblTimeLine,
+                            MySdZlWerte, TblZlWerte);
+                }
             }
 
+            // Update der Daten
+            updateAllDataGrids(0);
 
             // Die IDs und Flags zurücksetzen
             giDelZlWertId = 0;
