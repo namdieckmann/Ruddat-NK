@@ -655,42 +655,32 @@ namespace Ruddat_NK
         }
 
         // Untergeordnete Rechungen löschen
-        internal static void DeleteRechnung(int AiSourceId, string asArt,
-            MySqlDataAdapter ASdaRechnungen, System.Data.DataTable ATblRechnungen, string asConnect)
+        internal static int DeleteRechnung(int AiSourceId, string asArt, string asConnect)
         {
+            string LsSql;
+            int LiOk = 0;
 
             switch (asArt)
             {
                 case "R":
                     // Untergeordnete Rechnungen löschen
-                    DataRow[] rowsR = ATblRechnungen.Select("id_rechnung_source = " + AiSourceId.ToString()); 
-                    foreach (DataRow row in rowsR)
-                    {
-                        row.Delete(); // Zeile als gelöscht markieren
-                    }
+                    LsSql = RdQueriesFunctions.GetSql(150, AiSourceId, "", "", 0);
+                    LiOk = Timeline.FetchData(LsSql, "", "", 34, asConnect);
                     break;
                 case "Z":
                     // ZaehlerRechnungen löschen
-                    DataRow[] rowsZ = ATblRechnungen.Select("id_zaehlerwert = " + AiSourceId.ToString()); // ID Zaehlerwert suchen
-                    foreach (DataRow row in rowsZ)
-                    {
-                        row.Delete(); // Zeile als gelöscht markieren
-                    }
+                    LsSql = RdQueriesFunctions.GetSql(151, AiSourceId, "", "", 0);
+                    LiOk = Timeline.FetchData(LsSql, "", "", 34, asConnect);
                     break;
                 case "U":
                     // Untergeordnete ZaehlerRechnungen löschen
-                    DataRow[] rowsU = ATblRechnungen.Select("id_rechnung_source > 0 AND id_zaehlerwert = " + AiSourceId.ToString()); 
-                    foreach (DataRow row in rowsU)
-                    {
-                        row.Delete(); // Zeile als gelöscht markieren
-                    }
+                    LsSql = RdQueriesFunctions.GetSql(152, AiSourceId, "", "", 0);
+                    LiOk = Timeline.FetchData(LsSql, "", "", 34, asConnect);
                     break;
                 default:
                     break;
             }
-
-            ASdaRechnungen.Update(ATblRechnungen);
-            return;
+            return LiOk;
         }
 
         // Alle Datensätze der Timeline mit der Source ID zunächst löschen

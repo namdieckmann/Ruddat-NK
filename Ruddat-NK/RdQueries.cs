@@ -703,17 +703,15 @@ namespace Ruddat_NK
                     break;
                 case 34:
                 case 35:
-                case 351:
                     // Zählerstände für Objekte, TeilObjekte, und die UpdateTabelle
                     lsAnd = " And ";
                     lsFieldFrom = "zaehlerstaende.datum_von";
                     liOne = 2;
                     lsWhereAdd2 = RdQueriesTime.GetDateQueryResult(adtWtStart, adtWtEnd, ldtStart, ldtEnd, lsFieldFrom, lsFieldFrom, lsAnd, liOne, aiDb);
 
-                    switch (piArt)
+                    if (piArt == 34)  // Zählerstände für Objekte
                     {
-                        case 34:    // Objekt
-                            lsSql = @"select id_zs,
+                        lsSql = @"select id_zs,
                                     zaehlerstaende.datum_von as von,
 						            zaehlerstaende.zs as zs,
 						            zaehlerstaende.verbrauch as verb,
@@ -730,9 +728,11 @@ namespace Ruddat_NK
                                     zaehlerstaende.id_mwst_art
 				            from zaehlerstaende
 				            where zaehlerstaende.id_objekt = " + piId.ToString() + lsWhereAdd2;
-                            break;  
-                        case 35:    // ObjkektTeil
-                            lsSql = @"select id_zs,
+                    }
+
+                    if (piArt == 35)  // Zählerstände für Teilobjekte
+                    {
+                        lsSql = @"select id_zs,
                                     zaehlerstaende.datum_von as von,
 						            zaehlerstaende.zs as zs,
 						            zaehlerstaende.verbrauch as verb,
@@ -749,30 +749,7 @@ namespace Ruddat_NK
                                     zaehlerstaende.id_mwst_art
 				            from zaehlerstaende
 				            where zaehlerstaende.id_objekt_teil = " + piId.ToString() + lsWhereAdd2;
-                            break;
-                        case 351:       // Rählerstand über Timeline Id
-                            lsSql = @"select id_zs,
-                                    zaehlerstaende.datum_von as von,
-						            zaehlerstaende.zs as zs,
-						            zaehlerstaende.verbrauch as verb,
-						            zaehlerstaende.id_einheit,
-                                    zaehlerstaende.preis_einheit_netto as prnetto,
-                                    zaehlerstaende.preis_einheit_brutto as prbrutto,
-						            zaehlerstaende.id_extern_timeline,
-						            zaehlerstaende.id_objekt,
-                                    zaehlerstaende.id_objekt_teil,
-                                    zaehlerstaende.id_zaehler,
-                                    zaehlerstaende.id_ksa,
-                                    zaehlerstaende.id_verteilung as id_verteilung_zl,
-                                    zaehlerstaende.flag_timeline,
-                                    zaehlerstaende.id_mwst_art
-				            from zaehlerstaende
-				            where zaehlerstaende.id_extern_timeline = " + piId.ToString();      // Hier Ohne Datum
-                            break;
-                        default:
-                            break;
                     }
-
                     lsOrder = " Order by id_zaehler, datum_von desc ";
                     lsSql = lsSql + lsOrder;
                     break;
