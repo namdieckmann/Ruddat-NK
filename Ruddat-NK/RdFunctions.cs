@@ -180,19 +180,21 @@ namespace Ruddat_NK
                 switch (piArt)
                 {
                     case 1:     // Rechnungen und Timeline Objektteile erzeugen bearbeiten
-                        TblRechnungen = new DataTable();
-                        MySdRechnungen = new MySqlDataAdapter(command01);
-                        TblObjektTeile = new DataTable();
-                        MySdObjektTeile = new MySqlDataAdapter(command02);
-                        TblTimeline = new DataTable();
-                        MySdTimeline = new MySqlDataAdapter(command03);
+                        //TblRechnungen = new DataTable();
+                        //MySdRechnungen = new MySqlDataAdapter(command01);
+                        //TblObjektTeile = new DataTable();
+                        //MySdObjektTeile = new MySqlDataAdapter(command02);
+                        //TblTimeline = new DataTable();
+                        //MySdTimeline = new MySqlDataAdapter(command03);
 
-                        LiReturn = RdAfterfetch.MakeAfterFetch(piArt, 1, 0, 0, asConnect, 
-                            MySdRechnungen, TblRechnungen,
-                            MySdObjektTeile, TblObjektTeile,
-                            MySdMieter, TblMieter,
-                            MySdTimeline, TblTimeline,
-                            null, null);
+                        //LiReturn = RdAfterfetch.MakeAfterFetch(piArt, 1, 0, 0, asConnect, 
+                        //    MySdRechnungen, TblRechnungen,
+                        //    MySdObjektTeile, TblObjektTeile,
+                        //    MySdMieter, TblMieter,
+                        //    MySdTimeline, TblTimeline,
+                        //    null, null,
+                        //    MySdRechnungenTeilObjekte, TblRechnungenTeilObjekte
+                        //    );
                         break;
                     case 2:     // Datensatz löschen
                         // MySqlDataReader queryCommandReader = command01.ExecuteReader();
@@ -209,22 +211,23 @@ namespace Ruddat_NK
                             }
                         break;
                     case 3:     // Rechnungen und Timeline erzeugen
-                        TblRechnungen = new DataTable();         // Rechnung 
-                        MySdRechnungen = new MySqlDataAdapter(command01);
-                        TblObjektTeile = new DataTable();
-                        MySdObjektTeile = new MySqlDataAdapter(command02);
+                        //TblRechnungen = new DataTable();         // Rechnung 
+                        //MySdRechnungen = new MySqlDataAdapter(command01);
+                        //TblObjektTeile = new DataTable();
+                        //MySdObjektTeile = new MySqlDataAdapter(command02);
 
                         //TblMieter = new DataTable();
                         //MySdMieter = new MySqlDataAdapter(command02);
                         //TblTimeline = new DataTable();
                         //MySdTimeline = new MySqlDataAdapter(command03);
 
-                        LiReturn = RdAfterfetch.MakeAfterFetch(piArt, 1, 0, 0, asConnect,
-                            MySdRechnungen, TblRechnungen,
-                            MySdObjektTeile, TblObjektTeile,
-                            MySdMieter, TblMieter,
-                            MySdTimeline, TblTimeline,
-                            null, null);
+                        //LiReturn = RdAfterfetch.MakeAfterFetch(piArt, 1, 0, 0, asConnect,
+                        //    MySdRechnungen, TblRechnungen,
+                        //    MySdObjektTeile, TblObjektTeile,
+                        //    MySdMieter, TblMieter,
+                        //    MySdTimeline, TblTimeline,
+                        //    null, null
+                        //    );
 
                         //TblRechnungenTimeline = new DataTable();         // Rechnungen
                         //MySqlCommand command3 = new MySqlCommand(psSql2, connect);
@@ -330,16 +333,16 @@ namespace Ruddat_NK
                         break;
                     case 23:        // Zählerstände Timeline Create
                         // Todo Kann das weg? 28.2.25
-                        TblCntNew = new DataTable();        
-                        MySqlCommand command23 = new MySqlCommand(psSql2, connect);
-                        mysdCntNew = new MySqlDataAdapter(command23);
-                        mysdCntNew.Fill(TblCntNew);
-                        LiReturn = RdAfterfetch.MakeAfterFetch(piArt, 1, 0, 0, asConnect,
-                                    MySdRechnungen, TblRechnungen,
-                                    MySdObjektTeile, TblObjektTeile,
-                                    MySdMieter, TblMieter,
-                                    MySdTimeline, TblTimeline,
-                                    null, null);
+                        //TblCntNew = new DataTable();        
+                        //MySqlCommand command23 = new MySqlCommand(psSql2, connect);
+                        //mysdCntNew = new MySqlDataAdapter(command23);
+                        //mysdCntNew.Fill(TblCntNew);
+                        //LiReturn = RdAfterfetch.MakeAfterFetch(piArt, 1, 0, 0, asConnect,
+                        //            MySdRechnungen, TblRechnungen,
+                        //            MySdObjektTeile, TblObjektTeile,
+                        //            MySdMieter, TblMieter,
+                        //            MySdTimeline, TblTimeline,
+                        //            null, null);
                         break;
                     case 24:            // Zählerinformationen für Report Nebenkostenabrechnungen
                         TblZlInfo = new DataTable();

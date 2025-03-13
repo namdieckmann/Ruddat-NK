@@ -50,6 +50,7 @@ namespace Ruddat_NK
         // Daten
         DataTable TblRechnungen;
         DataTable TblRechnungenTmp;
+        DataTable TblRechnungenTeilObjekte;
         DataTable TblTmlDetail;
         DataTable TblFilialen;
         DataTable TblTreeView;
@@ -80,6 +81,7 @@ namespace Ruddat_NK
         //SqlDataAdapter SdZlNummern;
         MySqlDataAdapter MySdRechnungen;
         MySqlDataAdapter MySdRechnungenTmp;
+        MySqlDataAdapter MySdRechnungenTeilObjekte;
         MySqlDataAdapter MySdTmlDetail;
         MySqlDataAdapter MySdFilialen;
         MySqlDataAdapter MySdTreeView;
@@ -621,6 +623,12 @@ namespace Ruddat_NK
                     // Rechnung in Objekt speichern
                     MySqlCommandBuilder commandBuilder46 = new MySqlCommandBuilder(MySdRechnungenTmp);
                     MySdRechnungenTmp.Update(TblRechnungenTmp);
+                }
+                if (piArt == 47)
+                {
+                    TblRechnungenTeilObjekte = new DataTable();     // Rechnungen Tmp nur der gewählte Datensatz
+                    MySdRechnungenTeilObjekte = new MySqlDataAdapter(com);
+                    MySdRechnungenTeilObjekte.Fill(TblRechnungenTeilObjekte);
                 }
 
                 // db close
@@ -1481,6 +1489,10 @@ namespace Ruddat_NK
             LsSql = RdQueries.GetSqlSelect(45, GiRechnungTmpId, "", "", "", DateTime.MinValue, DateTime.MinValue, giFiliale, gsConnect, giDb);
             FetchData(LsSql, 45, giDb, gsConnect);
 
+            // Leere Rechnungstabelle für Teilobjektrechnungen
+            LsSql = RdQueries.GetSqlSelect(45, 0, "", "", "", DateTime.MinValue, DateTime.MinValue, giFiliale, gsConnect, giDb);
+            FetchData(LsSql, 47, giDb, gsConnect);
+
             // TimelineFlag setzen
             TblRechnungenTmp.Rows[0][15] = 1;
             FetchData("", 46, giDb, gsConnect);
@@ -1491,7 +1503,9 @@ namespace Ruddat_NK
                     MySdTeilObjekte, TblTeilObjekte,
                     null, null,
                     MySdTimeLine, TblTimeLine,
-                    null, null);
+                    null, null,
+                    MySdRechnungenTeilObjekte, TblRechnungenTeilObjekte
+                    );
 
             // Die IDs und Flags zurücksetzen
             // Todo ? wofür
@@ -1560,18 +1574,20 @@ namespace Ruddat_NK
 
                         if (LiDelId >= 0)
                         {
-                            TblRechnungen.Rows.Remove(dr);
-
+                            TblRechnungen.Rows.Remove(dr);      // Zeile löschen
                             string LsSql = RdQueries.GetSqlSelect(36, LiDelId, "", "", "", DateTime.MinValue, DateTime.MinValue, giFiliale, gsConnect, giDb);
                             FetchData(LsSql, 36, giDb, gsConnect);
 
                             // Erzeugte Untergeordnete Rechnungen löschen
                             // Alle mit der Id der Hauptrechnung in id_rechnung_source
                             Timeline.DeleteRechnung(LiDelId, "R", gsConnect);
+
                             // Delete Timeline mit der Rechnungs id
                             Timeline.DeleteTimeline(LiDelId, "R", gsConnect);
+
                             // Delete Timeline mit der Rechnungs Source id (aus untergeordneten Rechnungen)
                             Timeline.DeleteTimeline(LiDelId, "S", gsConnect);
+
                             // delete Button zu
                             btnRgDel.IsEnabled = false;
                             // Update 2 = timeline neu
@@ -1875,9 +1891,9 @@ namespace Ruddat_NK
                     LiIdZs = (int)TblZlWerte.Rows[DgrCounters.SelectedIndex][0];
                 }
 
-                //// Eine Rechnungstabelle mit der Zähler Id holen (Bei neuem Satz leer
-                //LsSql = RdQueries.GetSqlSelect(92, LiIdZs, "", "", "", DateTime.MinValue, DateTime.MinValue, giFiliale, gsConnect, giDb);
-                //FetchData(LsSql, 9, giDb, gsConnect);
+                // Leere Rechnungstabelle für Teilobjektrechnungen
+                LsSql = RdQueries.GetSqlSelect(45, 0, "", "", "", DateTime.MinValue, DateTime.MinValue, giFiliale, gsConnect, giDb);
+                FetchData(LsSql, 47, giDb, gsConnect);
 
                 // Update der Daten
                 updateAllDataGrids(0);
@@ -1888,7 +1904,9 @@ namespace Ruddat_NK
                         MySdTeilObjekte, TblTeilObjekte,
                         null, null,
                         MySdTimeLine, TblTimeLine,
-                        MySdZlWerte, TblZlWerte);
+                        MySdZlWerte, TblZlWerte,
+                        MySdRechnungenTeilObjekte, TblRechnungenTeilObjekte
+                        );
 
             }
 
@@ -2818,7 +2836,6 @@ namespace Ruddat_NK
         }
 
         // Dialog Mandanten
-
         private void MnMasterMandanten_Click(object sender, RoutedEventArgs e)
         {
             WndMandanten frmMnd = new WndMandanten(this);
