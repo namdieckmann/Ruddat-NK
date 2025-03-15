@@ -658,33 +658,72 @@ namespace Ruddat_NK
         }
 
         // Untergeordnete Rechungen löschen
-        internal static int DeleteRechnung(int AiSourceId, string asArt, string asConnect)
+        internal static void DeleteRechnung(int AiSourceId, string asArt,
+            MySqlDataAdapter ASdaRechnungen, System.Data.DataTable ATblRechnungen,
+            MySqlDataAdapter ASdaRechnungenTeilObjs, System.Data.DataTable ATblRechnungenTeilObjs,
+            string asConnect)
         {
             string LsSql;
-            int LiOk = 0;
-
+            
             switch (asArt)
             {
                 case "R":
                     // Untergeordnete Rechnungen löschen
-                    LsSql = RdQueriesFunctions.GetSql(150, AiSourceId, "", "", 0);
-                    LiOk = Timeline.FetchData(LsSql, "", "", 34, asConnect);
+                    DataRow[] rowsR = ATblRechnungen.Select("id_rechnung_source = " + AiSourceId.ToString());
+                    foreach (DataRow row in rowsR)
+                    {
+                        row.Delete(); // Zeile als gelöscht markieren
+                    }
+                    ASdaRechnungen.Update(ATblRechnungen);
                     break;
                 case "Z":
                     // ZaehlerRechnungen löschen
-                    LsSql = RdQueriesFunctions.GetSql(151, AiSourceId, "", "", 0);
-                    LiOk = Timeline.FetchData(LsSql, "", "", 34, asConnect);
+                    DataRow[] rowsZ = ATblRechnungen.Select("id_zaehlerwert = " + AiSourceId.ToString()); // ID Zaehlerwert suchen
+                    foreach (DataRow row in rowsZ)
+                    {
+                        row.Delete(); // Zeile als gelöscht markieren
+                    }
+                    ASdaRechnungen.Update(ATblRechnungen);
                     break;
                 case "U":
                     // Untergeordnete ZaehlerRechnungen löschen
                     LsSql = RdQueriesFunctions.GetSql(152, AiSourceId, "", "", 0);
-                    LiOk = Timeline.FetchData(LsSql, "", "", 34, asConnect);
+                    Timeline.FetchData(LsSql, "", "", 34, asConnect);
                     break;
                 default:
                     break;
             }
-            return LiOk;
+            return;
         }
+
+        // Untergeordnete Rechungen löschen
+        //internal static int DeleteRechnung(int AiSourceId, string asArt, string asConnect)
+        //{
+        //    string LsSql;
+        //    int LiOk = 0;
+
+        //    switch (asArt)
+        //    {
+        //        case "R":
+        //            // Untergeordnete Rechnungen löschen
+        //            LsSql = RdQueriesFunctions.GetSql(150, AiSourceId, "", "", 0);
+        //            LiOk = Timeline.FetchData(LsSql, "", "", 34, asConnect);
+        //            break;
+        //        case "Z":
+        //            // ZaehlerRechnungen löschen
+        //            LsSql = RdQueriesFunctions.GetSql(151, AiSourceId, "", "", 0);
+        //            LiOk = Timeline.FetchData(LsSql, "", "", 34, asConnect);
+        //            break;
+        //        case "U":
+        //            // Untergeordnete ZaehlerRechnungen löschen
+        //            LsSql = RdQueriesFunctions.GetSql(152, AiSourceId, "", "", 0);
+        //            LiOk = Timeline.FetchData(LsSql, "", "", 34, asConnect);
+        //            break;
+        //        default:
+        //            break;
+        //    }
+        //    return LiOk;
+        //}
 
         // Alle Datensätze der Timeline mit der Source ID zunächst löschen
         public static int DeleteTimeline(int AiDeleteId, string asArt, string asConnect)

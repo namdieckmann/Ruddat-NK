@@ -1497,15 +1497,27 @@ namespace Ruddat_NK
             TblRechnungenTmp.Rows[0][15] = 1;
             FetchData("", 46, giDb, gsConnect);
 
-            // Art 1 = Rechnung
-            RdAfterfetch.MakeAfterFetch(1, 1, GiRechnungTmpId, 0, gsConnect,
-                    MySdRechnungenTmp, TblRechnungenTmp,                        // Temporäre Rechnungen nach Anwahl in Rechnungensfenster
-                    MySdTeilObjekte, TblTeilObjekte,
-                    null, null,
-                    MySdTimeLine, TblTimeLine,
-                    null, null,
-                    MySdRechnungenTeilObjekte, TblRechnungenTeilObjekte
-                    );
+            try
+            {
+                // Akzualisieren
+                MySqlCommandBuilder commandBuilder = new MySqlCommandBuilder(MySdRechnungenTmp);
+                MySdRechnungenTmp.Update(TblRechnungenTmp);
+
+                // Art 1 = Rechnung
+                RdAfterfetch.MakeAfterFetch(1, 1, GiRechnungTmpId, 0, gsConnect,
+                        MySdRechnungenTmp, TblRechnungenTmp,                        // Temporäre Rechnungen nach Anwahl in Rechnungensfenster
+                        MySdTeilObjekte, TblTeilObjekte,
+                        null, null,
+                        MySdTimeLine, TblTimeLine,
+                        null, null,
+                        MySdRechnungenTeilObjekte, TblRechnungenTeilObjekte
+                        );
+            }
+            catch (Exception)
+            {
+
+                MessageBox.Show("Fehler beim Speichern der Rechnung", "Rechnungen", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
 
             // Die IDs und Flags zurücksetzen
             // Todo ? wofür
@@ -1580,7 +1592,7 @@ namespace Ruddat_NK
 
                             // Erzeugte Untergeordnete Rechnungen löschen
                             // Alle mit der Id der Hauptrechnung in id_rechnung_source
-                            Timeline.DeleteRechnung(LiDelId, "R", gsConnect);
+                            Timeline.DeleteRechnung(LiDelId, "R", MySdRechnungen, TblRechnungen, null, null, gsConnect);
 
                             // Delete Timeline mit der Rechnungs id
                             Timeline.DeleteTimeline(LiDelId, "R", gsConnect);
@@ -1809,10 +1821,15 @@ namespace Ruddat_NK
                         liDelZlWertId = (int)(TblZlWerte.Rows[liSel][0]);                // Id des zu löschenden Datensatzes
 
                         // ZählerRechnung löschen
-                        LiOk = Timeline.DeleteRechnung(liDelZlWertId, "Z", gsConnect);
+                        Timeline.DeleteRechnung(liDelZlWertId, "Z", MySdRechnungen, TblRechnungen, null, null,gsConnect);
+
+                        // Rechnungstabelle für Teilobjektrechnungen holen
+                        LsSql = RdQueries.GetSqlSelect(46, liDelZlWertId, "", "", "", DateTime.MinValue, DateTime.MinValue, giFiliale, gsConnect, giDb);
+                        FetchData(LsSql, 47, giDb, gsConnect);
 
                         // Untergeordnete ZählerRechnungen löschen
-                        LiOk = Timeline.DeleteRechnung(liDelZlWertId, "U", gsConnect);
+                        Timeline.DeleteRechnung(liDelZlWertId, "U", MySdRechnungen, TblRechnungen, 
+                            MySdRechnungenTeilObjekte, TblRechnungenTeilObjekte, gsConnect);
 
                         // Timeline Zähler löschen
                         LiOk = Timeline.DeleteTimeline(liDelZlWertId, "Z", gsConnect);
@@ -1855,6 +1872,16 @@ namespace Ruddat_NK
                 dr[9] = GiObjektTeilId;         // Teilobjekt
                 dr[11] = liKsaId;               // Kostenstellenart einsetzen
 
+                //try
+                //{
+                //    MySqlCommandBuilder commandBuilder = new MySqlCommandBuilder(MySdZlWerte);
+                //    MySdZlWerte.Update(TblZlWerte);
+                //}
+                //catch (Exception)
+                //{
+                //    MessageBox.Show("Fehler beim Erzeugen des Zählerstandes", "Fehler");
+                //}
+
                 btnCntAdd.IsEnabled = false;
             }
             else
@@ -1878,38 +1905,33 @@ namespace Ruddat_NK
                 // Timline Flag setzen
                 TblZlWerte.Rows[DgrCounters.SelectedIndex][13] = 1;
 
-                // Neuer Datensaatz noch keine Id vorhanden
-                if (TblZlWerte.Rows[DgrCounters.SelectedIndex][0] == DBNull.Value)
-                {
-                    // Update Zählerstand
-                    FetchData("", 39, 2, gsConnect);
-                    // Zählerstand Id mit Timline Id holen
-                    LiIdZs = Timeline.GetZlsId(LiZlTimelineId, gsConnect);
-                }
-                else
-                {
-                    LiIdZs = (int)TblZlWerte.Rows[DgrCounters.SelectedIndex][0];
-                }
+                // Update Zählerstand
+                FetchData("", 39, 2, gsConnect);
 
-                // Leere Rechnungstabelle für Teilobjektrechnungen
-                LsSql = RdQueries.GetSqlSelect(45, 0, "", "", "", DateTime.MinValue, DateTime.MinValue, giFiliale, gsConnect, giDb);
-                FetchData(LsSql, 47, giDb, gsConnect);
+                //// Neuer Datensaatz noch keine Id vorhanden
+                //if (TblZlWerte.Rows[DgrCounters.SelectedIndex][0] == DBNull.Value)
+                //{
 
-                // Update der Daten
-                updateAllDataGrids(0);
+                //    // Zählerstand Id mit Timline Id holen
+                //    LiIdZs = Timeline.GetZlsId(LiZlTimelineId, gsConnect);
+                //}
+                //else
+                //{
+                //    LiIdZs = (int)TblZlWerte.Rows[DgrCounters.SelectedIndex][0];
+                //}
 
                 // Art 2 = Zählerwerte
                 RdAfterfetch.MakeAfterFetch(2, 1, LiIdZs, 0, gsConnect,
-                        MySdRechnungen, TblRechnungen,
-                        MySdTeilObjekte, TblTeilObjekte,
-                        null, null,
-                        MySdTimeLine, TblTimeLine,
-                        MySdZlWerte, TblZlWerte,
-                        MySdRechnungenTeilObjekte, TblRechnungenTeilObjekte
-                        );
+                            MySdRechnungen, TblRechnungen,
+                            MySdTeilObjekte, TblTeilObjekte,
+                            null, null,
+                            MySdTimeLine, TblTimeLine,
+                            MySdZlWerte, TblZlWerte,
+                            MySdRechnungenTeilObjekte, TblRechnungenTeilObjekte
+                            );
 
+                updateAllDataGrids(0);
             }
-
 
             // Die IDs und Flags zurücksetzen
             giDelZlWertId = 0;

@@ -79,7 +79,8 @@ namespace Ruddat_NK
 
                                 // Erzeugte Untergeordnete Rechnungen löschen
                                 // Alle mit der Id der Hauptrechnung in id_rechnung_source löschen
-                                Timeline.DeleteRechnung(LiSourceId, "R", asConnect);
+                                Timeline.DeleteRechnung(LiSourceId, "R", ASdaRechnungen, ATblRechnungen,
+                                    ASdaRechnungenTeilObjs, ATblRechnungenTeilObjs, asConnect);
 
                                 // Objekt Rechnung
                                 if (ATblRechnungen.Rows[i].ItemArray.GetValue(8) != DBNull.Value)
@@ -125,15 +126,24 @@ namespace Ruddat_NK
                 case 2:             // Zählerstände
                     for (int j = 0; j < ATblZaehlerWerte.Rows.Count; j++)
                     {
-                        // ID aus der Zählerablesung ermitteln 
-                        if (ATblZaehlerWerte.Rows[j].ItemArray.GetValue(0) != DBNull.Value)
+                        if (ATblZaehlerWerte.Rows[j].ItemArray.GetValue(7) != DBNull.Value)     // Timeline Id
                         {
                             if (int.Parse(ATblZaehlerWerte.Rows[j].ItemArray.GetValue(13).ToString()) == 1)     // Nur der zugefügte oder editierte Datensatz
                             {
-                                LiSourceId = (int)ATblZaehlerWerte.Rows[j][0];
+
+                                if (ATblZaehlerWerte.Rows[j].ItemArray.GetValue(0) == DBNull.Value)
+                                {
+                                    // Neuer Datensatz: Zählerstand Id mit Timline Id holen
+                                    LiSourceId = Timeline.GetZlsId((int)ATblZaehlerWerte.Rows[j].ItemArray.GetValue(7), asConnect);
+                                }
+                                else
+                                {
+                                    LiSourceId = (int)ATblZaehlerWerte.Rows[j][0];
+                                }
+                                
                                 // Erzeugte Zählerrechnung > Rechnungen löschen
                                 // Alle mit der Id der Hauptrechnung in id_zaehler löschen
-                                Timeline.DeleteRechnung(LiSourceId, "Z", asConnect);
+                                Timeline.DeleteRechnung(LiSourceId, "Z", ASdaRechnungen, ATblRechnungen, null, null, asConnect);
 
                                 // Umgang mit flag_timeline in Zählerwerten?
                                 // Rechnung erzeugen auf gleicher Ebene 
@@ -164,7 +174,10 @@ namespace Ruddat_NK
                                                 if (Timeline.GetWeiterleitung(3, LiKsa, asConnect) == 1)
                                                 {
                                                     // Alle mit der id_zähler löschen außer die Hauptrechnung
-                                                    Timeline.DeleteRechnung((int)ATblRechnungen.Rows[k].ItemArray.GetValue(20), "U", asConnect);
+                                                    // Todo Rechnungen Teilobjekte ist leer
+                                                    Timeline.DeleteRechnung((int)ATblRechnungen.Rows[k].ItemArray.GetValue(20), "U",
+                                                                    ASdaRechnungen, ATblRechnungen,
+                                                                    ASdaRechnungenTeilObjs, ATblRechnungenTeilObjs, asConnect);
 
                                                     if (ATblRechnungen.Rows[k][0] == DBNull.Value)
                                                     {
@@ -956,7 +969,7 @@ namespace Ruddat_NK
 
             for (int i = 0; i < ATblZaehlerWerte.Rows.Count; i++)
             {
-                if ((int)ATblZaehlerWerte.Rows[i][13] == 1 && (int)ATblZaehlerWerte.Rows[i][0] == AiSourceId)
+                if ((int)ATblZaehlerWerte.Rows[i][13] == 1)            // Timeline Flag ist gesetzt
                 {
                     // Zählernummer ermitteln
                     LsRgNr = Timeline.GetZlName((int)ATblZaehlerWerte.Rows[i][10], asConnect, 2);
@@ -968,10 +981,10 @@ namespace Ruddat_NK
                     LsEinheit = Timeline.GetEinheit(LiEinheitId, asConnect, 2);
 
                     // Rechnungstext für Zählerrechnung
-                    LsText = @"Verbrauch: " + ATblZaehlerWerte.Rows[i][3].ToString()  
-                                        + " " + LsEinheit 
+                    LsText = @"Verbrauch: " + ATblZaehlerWerte.Rows[i][3].ToString()
+                                        + " " + LsEinheit
                                         + " - "
-                                        + ATblZaehlerWerte.Rows[i][5].ToString() + "€ Netto " 
+                                        + ATblZaehlerWerte.Rows[i][5].ToString() + "€ Netto "
                                         + ATblZaehlerWerte.Rows[i][6].ToString() + "€ Brutto";
 
                     // Neue Rechnung erzeugen
@@ -992,7 +1005,7 @@ namespace Ruddat_NK
                     DrRechnung[13] = LsText;
                     DrRechnung[15] = (int)ATblZaehlerWerte.Rows[i][13];         // Flag für Timelinebearbeitung
                     DrRechnung[16] = (int)ATblZaehlerWerte.Rows[i][12];         // VerteilungsId
-                    DrRechnung[20] = (int)ATblZaehlerWerte.Rows[i][0];          // LiSourceId wird auf id Zaehlerwert gesetzt
+                    DrRechnung[20] = AiSourceId;                                // AiSourceId wird auf id Zaehlerwert gesetzt
 
                     ATblRechnungen.Rows.Add(DrRechnung);
                 }
