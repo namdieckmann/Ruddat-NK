@@ -1838,7 +1838,7 @@ namespace Ruddat_NK
                         LiOk = Timeline.DeleteZlWert(liDelZlWertId, gsConnect);
 
 
-                        btnCntSave.IsEnabled = true;
+                        btnCntSave.IsEnabled = false;
                         btnCntAdd.IsEnabled = true;
                         // delete Button aus
                         btnCntDel.IsEnabled = false;
@@ -1900,25 +1900,17 @@ namespace Ruddat_NK
             if (DgrCounters.SelectedIndex >= 0)
             {
                 // Timeline Id holen
-                LiZlTimelineId = (int)TblZlWerte.Rows[DgrCounters.SelectedIndex][7];
+                // LiZlTimelineId = (int)TblZlWerte.Rows[DgrCounters.SelectedIndex][7];
 
                 // Timline Flag setzen
                 TblZlWerte.Rows[DgrCounters.SelectedIndex][13] = 1;
 
                 // Update Zählerstand
-                FetchData("", 39, 2, gsConnect);
+                // FetchData("", 39, 2, gsConnect);
 
-                //// Neuer Datensaatz noch keine Id vorhanden
-                //if (TblZlWerte.Rows[DgrCounters.SelectedIndex][0] == DBNull.Value)
-                //{
-
-                //    // Zählerstand Id mit Timline Id holen
-                //    LiIdZs = Timeline.GetZlsId(LiZlTimelineId, gsConnect);
-                //}
-                //else
-                //{
-                //    LiIdZs = (int)TblZlWerte.Rows[DgrCounters.SelectedIndex][0];
-                //}
+                // Updatecommand Zählerwerte
+                //MySqlCommandBuilder commandBuilder = new MySqlCommandBuilder(MySdZlWerte);
+                //MySdZlWerte.Update(TblZlWerte);
 
                 // Art 2 = Zählerwerte
                 RdAfterfetch.MakeAfterFetch(2, 1, LiIdZs, 0, gsConnect,
@@ -1930,7 +1922,7 @@ namespace Ruddat_NK
                             MySdRechnungenTeilObjekte, TblRechnungenTeilObjekte
                             );
 
-                updateAllDataGrids(0);
+                // updateAllDataGrids(0);
             }
 
             // Die IDs und Flags zurücksetzen

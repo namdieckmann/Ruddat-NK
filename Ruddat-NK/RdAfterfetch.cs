@@ -4,6 +4,7 @@ using System;
 using System.Data;
 using System.Data.SqlClient;
 using System.Windows;
+using System.Windows.Forms;
 using static System.Windows.Forms.LinkLabel;
 
 namespace Ruddat_NK
@@ -126,9 +127,9 @@ namespace Ruddat_NK
                 case 2:             // Zählerstände
                     for (int j = 0; j < ATblZaehlerWerte.Rows.Count; j++)
                     {
-                        if (ATblZaehlerWerte.Rows[j].ItemArray.GetValue(7) != DBNull.Value)     // Timeline Id
+                        if (ATblZaehlerWerte.Rows[j].ItemArray.GetValue(7) != DBNull.Value)                     // Timeline Id
                         {
-                            if (int.Parse(ATblZaehlerWerte.Rows[j].ItemArray.GetValue(13).ToString()) == 1)     // Nur der zugefügte oder editierte Datensatz
+                            if (int.Parse(ATblZaehlerWerte.Rows[j].ItemArray.GetValue(13).ToString()) == 1)     // Timelineflag gesetzt ?
                             {
 
                                 if (ATblZaehlerWerte.Rows[j].ItemArray.GetValue(0) == DBNull.Value)
@@ -140,7 +141,7 @@ namespace Ruddat_NK
                                 {
                                     LiSourceId = (int)ATblZaehlerWerte.Rows[j][0];
                                 }
-                                
+
                                 // Erzeugte Zählerrechnung > Rechnungen löschen
                                 // Alle mit der Id der Hauptrechnung in id_zaehler löschen
                                 Timeline.DeleteRechnung(LiSourceId, "Z", ASdaRechnungen, ATblRechnungen, null, null, asConnect);
@@ -152,7 +153,7 @@ namespace Ruddat_NK
                                 // Untergeordnete Timlines werden bei Anwahl erzeugt
 
                                 // Objekt Zählerrechnung
-                                if (ATblZaehlerWerte.Rows[j].ItemArray.GetValue(8) != DBNull.Value)
+                                if (ATblZaehlerWerte.Rows[j].ItemArray.GetValue(8) != DBNull.Value)     // Objekt Id
                                     if ((int)ATblZaehlerWerte.Rows[j].ItemArray.GetValue(8) > 0)
                                     {
                                         CreateRechnungenZaehler(ASdaRechnungen, ATblRechnungen,
@@ -166,39 +167,55 @@ namespace Ruddat_NK
                                             // Ist es eine Zählerrrechnung ?
                                             if (ATblRechnungen.Rows[k][20] != DBNull.Value)                                 // Zählerwert Id vorhenden
                                             {
-
-                                                LiKsa = (int)ATblRechnungen.Rows[k].ItemArray.GetValue(1);                  // Kostenart
-
-                                                // Untergeordnete Rechnungen erzeugen
-                                                // Parameter: 3 = Zähler
-                                                if (Timeline.GetWeiterleitung(3, LiKsa, asConnect) == 1)
+                                                if ((int)ATblRechnungen.Rows[k][15] == 1)                                   // Timeline gesetzt
                                                 {
-                                                    // Alle mit der id_zähler löschen außer die Hauptrechnung
-                                                    // Todo Rechnungen Teilobjekte ist leer
-                                                    Timeline.DeleteRechnung((int)ATblRechnungen.Rows[k].ItemArray.GetValue(20), "U",
-                                                                    ASdaRechnungen, ATblRechnungen,
-                                                                    ASdaRechnungenTeilObjs, ATblRechnungenTeilObjs, asConnect);
+                                                    LiKsa = (int)ATblRechnungen.Rows[k].ItemArray.GetValue(1);                  // Kostenart
 
-                                                    if (ATblRechnungen.Rows[k][0] == DBNull.Value)
+                                                    // Untergeordnete Rechnungen erzeugen
+                                                    // Parameter: 3 = Zähler
+                                                    if (Timeline.GetWeiterleitung(3, LiKsa, asConnect) == 1)
                                                     {
-                                                        // Rechnungs Id aus Zaehlerwert Id (id steht u.u. noch nicht in der Tabelle Rechnungen)
-                                                        LiSourceId = Timeline.GetRgZlwId((int)ATblRechnungen.Rows[k].ItemArray.GetValue(20), asConnect, 2);
-                                                    }
-                                                    else
-                                                    {
-                                                        LiSourceId = (int)ATblRechnungen.Rows[k][0];
-                                                    }
+                                                        // Alle mit der id_zähler löschen außer die Hauptrechnung
+                                                        // Todo Rechnungen Teilobjekte ist leer
+                                                        Timeline.DeleteRechnung((int)ATblRechnungen.Rows[k].ItemArray.GetValue(20), "U",
+                                                                        ASdaRechnungen, ATblRechnungen,
+                                                                        ASdaRechnungenTeilObjs, ATblRechnungenTeilObjs, asConnect);
 
-                                                    // Rechnungen und Timeline für alle zugehörigen Objektteile erzeugen
-                                                    CreateRechnungenObjTeile(LiSourceId, liObjekt, liObjektTeil, liMieter, liArtRelation,
-                                                            ASdaRechnungen, ATblRechnungen,
-                                                            AsdaZaehlerWerte, ATblZaehlerWerte,
-                                                            AsdaObjektTeile, ATblObjektTeile,
-                                                            AsdaTimeline, ATblTimeline,
-                                                            ASdaRechnungenTeilObjs, ATblRechnungenTeilObjs,
-                                                            asConnect, liObjektTeil);
+                                                        if (ATblRechnungen.Rows[k][0] == DBNull.Value)
+                                                        {
+                                                            // Rechnungs Id aus Zaehlerwert Id (id steht u.u. noch nicht in der Tabelle Rechnungen)
+                                                            LiSourceId = Timeline.GetRgZlwId((int)ATblRechnungen.Rows[k].ItemArray.GetValue(20), asConnect, 2);
+                                                        }
+                                                        else
+                                                        {
+                                                            LiSourceId = (int)ATblRechnungen.Rows[k][0];
+                                                        }
+
+                                                        // Rechnungen und Timeline für alle zugehörigen Objektteile erzeugen
+                                                        //CreateRechnungenObjTeile(LiSourceId, liObjekt, liObjektTeil, liMieter, liArtRelation,
+                                                        //        ASdaRechnungen, ATblRechnungen,
+                                                        //        AsdaZaehlerWerte, ATblZaehlerWerte,
+                                                        //        AsdaObjektTeile, ATblObjektTeile,
+                                                        //        AsdaTimeline, ATblTimeline,
+                                                        //        ASdaRechnungenTeilObjs, ATblRechnungenTeilObjs,
+                                                        //        asConnect, liObjektTeil);
+
+                                                        // Reset Timeline Flag in Rechnungen
+                                                        ATblRechnungen.Rows[k][15] = 0;
+                                                    }
                                                 }
+
                                             }
+                                        }
+                                        try
+                                        {
+                                            // Update AtblRechnungen
+                                            MySqlCommandBuilder commandBuilder = new MySqlCommandBuilder(ASdaRechnungen);
+                                            ASdaRechnungen.Update(ATblRechnungen);
+                                        }
+                                        catch (Exception)
+                                        {
+                                            System.Windows.MessageBox.Show("Fehler beim speichern Rechnungen", "Achtung");
                                         }
                                     }
 
@@ -211,6 +228,19 @@ namespace Ruddat_NK
                                                                 AsdaObjektTeile, ATblObjektTeile,
                                                                 LiSourceId, asConnect);
                                     }
+                                // Timeline Flag Zählerwerte Reset
+                                ATblZaehlerWerte.Rows[j][13] = 0;
+
+                                try
+                                {
+                                    // Update AtblZaehlerWerte
+                                    MySqlCommandBuilder commandBuilder = new MySqlCommandBuilder(AsdaZaehlerWerte);
+                                    AsdaZaehlerWerte.Update(ATblZaehlerWerte);
+                                }
+                                catch (Exception)
+                                {
+                                    System.Windows.MessageBox.Show("Fehler beim speichern Zählerwerte", "Achtung");
+                                }
                             }
                         }
                     }
@@ -451,7 +481,7 @@ namespace Ruddat_NK
             }
             catch (Exception)
             {
-                MessageBox.Show("Verarbeitungsfehler ERROR fetchdata fetchdata RdFunctions\n CreateTimeline = ",
+                System.Windows.     MessageBox.Show("Verarbeitungsfehler ERROR fetchdata fetchdata RdFunctions\n CreateTimeline = ",
                 "Achtung");
                 LiOk = 0;
                 throw;
@@ -466,7 +496,7 @@ namespace Ruddat_NK
             }
             catch (Exception)
             {
-                MessageBox.Show("Verarbeitungsfehler ERROR fetchdata fetchdata RdFunctions\n UpdateRechnungen = ",
+                System.Windows.MessageBox.Show("Verarbeitungsfehler ERROR fetchdata fetchdata RdFunctions\n UpdateRechnungen = ",
                 "Achtung");
                 LiOk = 0;
                 throw;
@@ -590,7 +620,7 @@ namespace Ruddat_NK
                 }
                 catch (Exception)
                 {
-                    MessageBox.Show("Löschen von Daten fehlgeschlagen (TimeLine Mieter)", "Datenfehler", MessageBoxButton.OK, MessageBoxImage.Error);
+                    System.Windows.MessageBox.Show("Löschen von Daten fehlgeschlagen (TimeLine Mieter)", "Datenfehler", MessageBoxButton.OK, MessageBoxImage.Error);
                     throw;
                 }
             }
@@ -831,7 +861,7 @@ namespace Ruddat_NK
             }
             catch (Exception)
             {
-                MessageBox.Show("Erzeugen von Rechnungen fehlgeschlagen (Rechnungen ObjektTeile)", "Datenfehler", MessageBoxButton.OK, MessageBoxImage.Error);
+                System.Windows.MessageBox.Show("Erzeugen von Rechnungen fehlgeschlagen (Rechnungen ObjektTeile)", "Datenfehler", MessageBoxButton.OK, MessageBoxImage.Error);
                 throw;
             }
             return LiOk;
@@ -1010,17 +1040,34 @@ namespace Ruddat_NK
                     ATblRechnungen.Rows.Add(DrRechnung);
                 }
             }
-            try
+
+            // Reset Flag Timeline in Zählerwerte
+            for (int i = 0; i < ATblZaehlerWerte.Rows.Count; i++)
             {
-                // Daten in die Datenbank schreiben
-                MySqlCommandBuilder commandBuilder = new MySqlCommandBuilder(ASdaRechnungen);
-                ASdaRechnungen.Update(ATblRechnungen);
+                ATblZaehlerWerte.Rows[i][13] = 0;
             }
-            catch (Exception)
-            {
-                MessageBox.Show("Erzeugen von Rechnungen fehlgeschlagen (Rechnungen Zähler)", "Datenfehler", MessageBoxButton.OK, MessageBoxImage.Error);
-                throw;
-            }
+            //try
+            //{
+            //    MySqlCommandBuilder commandBuilderZl = new MySqlCommandBuilder(ASdaZaehlerWerte);
+            //    ASdaZaehlerWerte.Update(ATblZaehlerWerte);
+
+
+            //}
+            //catch (Exception)
+            //{
+            //    System.Windows.MessageBox.Show("Reset Flag Zählerwerte fehlgeschlagen (Zählerwerte)", "Datenfehler", MessageBoxButton.OK, MessageBoxImage.Error);
+            //}
+
+            //try
+            //{
+            //    // Daten in die Datenbank schreiben
+            //    MySqlCommandBuilder commandBuilder = new MySqlCommandBuilder(ASdaRechnungen);
+            //    ASdaRechnungen.Update(ATblRechnungen);
+            //}
+            //catch (Exception)
+            //{
+            //    System.Windows.MessageBox.Show("Erzeugen von Rechnungen fehlgeschlagen (Rechnungen Zähler)", "Datenfehler", MessageBoxButton.OK, MessageBoxImage.Error);
+            //}
         }
     }
 }
