@@ -686,7 +686,7 @@ namespace Ruddat_NK
                     ASdaRechnungen.Update(ATblRechnungen);
                     break;
                 case "U":
-                    // Untergeordnete ZaehlerRechnungen löschen
+                    // Untergeordnete Rechnungen Teilobjekte löschen
                     LsSql = RdQueriesFunctions.GetSql(152, AiSourceId, "", "", 0);
                     Timeline.FetchData(LsSql, "", "", 34, asConnect);
                     break;

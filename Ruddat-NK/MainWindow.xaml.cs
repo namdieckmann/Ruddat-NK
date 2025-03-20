@@ -626,7 +626,7 @@ namespace Ruddat_NK
                 }
                 if (piArt == 47)
                 {
-                    TblRechnungenTeilObjekte = new DataTable();     // Rechnungen Tmp nur der gewählte Datensatz
+                    TblRechnungenTeilObjekte = new DataTable();                 // Rechnungen Tmp nur der gewählte Datensatz
                     MySdRechnungenTeilObjekte = new MySqlDataAdapter(com);
                     MySdRechnungenTeilObjekte.Fill(TblRechnungenTeilObjekte);
                 }
@@ -1872,16 +1872,6 @@ namespace Ruddat_NK
                 dr[9] = GiObjektTeilId;         // Teilobjekt
                 dr[11] = liKsaId;               // Kostenstellenart einsetzen
 
-                //try
-                //{
-                //    MySqlCommandBuilder commandBuilder = new MySqlCommandBuilder(MySdZlWerte);
-                //    MySdZlWerte.Update(TblZlWerte);
-                //}
-                //catch (Exception)
-                //{
-                //    MessageBox.Show("Fehler beim Erzeugen des Zählerstandes", "Fehler");
-                //}
-
                 btnCntAdd.IsEnabled = false;
             }
             else
@@ -1894,26 +1884,19 @@ namespace Ruddat_NK
         private void btnCntSave_Click(object sender, RoutedEventArgs e)
         {
             int LiIdZs = 0;
-            int LiZlTimelineId = 0;
             string LsSql = "";
 
             if (DgrCounters.SelectedIndex >= 0)
             {
-                // Timeline Id holen
-                // LiZlTimelineId = (int)TblZlWerte.Rows[DgrCounters.SelectedIndex][7];
-
-                // Timline Flag setzen
+                // Timline Flag setzen Zählerwerte
                 TblZlWerte.Rows[DgrCounters.SelectedIndex][13] = 1;
 
-                // Update Zählerstand
-                // FetchData("", 39, 2, gsConnect);
-
-                // Updatecommand Zählerwerte
-                //MySqlCommandBuilder commandBuilder = new MySqlCommandBuilder(MySdZlWerte);
-                //MySdZlWerte.Update(TblZlWerte);
+                // Leere Rechnungstabelle für Teilobjektrechnungen
+                LsSql = RdQueries.GetSqlSelect(45, 0, "", "", "", DateTime.MinValue, DateTime.MinValue, giFiliale, gsConnect, giDb);
+                FetchData(LsSql, 47, giDb, gsConnect);
 
                 // Art 2 = Zählerwerte
-                RdAfterfetch.MakeAfterFetch(2, 1, LiIdZs, 0, gsConnect,
+                RdAfterfetch.MakeAfterFetch(2, 1, 0, 0, gsConnect,
                             MySdRechnungen, TblRechnungen,
                             MySdTeilObjekte, TblTeilObjekte,
                             null, null,
@@ -2086,10 +2069,10 @@ namespace Ruddat_NK
             e.Row.IsEnabled = true;
 
             // Es ist eine Rechnungs Id Source vorhanden, dann darf nicht mehr editiert werden
-            if (TblRechnungen.Rows[y].ItemArray.GetValue(17) != DBNull.Value )
+            if (TblRechnungen.Rows[y].ItemArray.GetValue(17) != DBNull.Value)
             {
                 LiSourceId = (int)TblRechnungen.Rows[y].ItemArray.GetValue(17);
-                if (LiSourceId > 0)
+                if (LiSourceId >= 0)
                 {
                     e.Row.IsEnabled = false;
                 }
@@ -2098,7 +2081,7 @@ namespace Ruddat_NK
             if (TblRechnungen.Rows[y].ItemArray.GetValue(20) != DBNull.Value)
             {
                 LiSourceId = (int)TblRechnungen.Rows[y].ItemArray.GetValue(20);
-                if (LiSourceId > 0)
+                if (LiSourceId >= 0)
                 {
                     e.Row.IsEnabled = false;
                 }

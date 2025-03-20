@@ -181,24 +181,15 @@ namespace Ruddat_NK
                                                                         ASdaRechnungen, ATblRechnungen,
                                                                         ASdaRechnungenTeilObjs, ATblRechnungenTeilObjs, asConnect);
 
-                                                        if (ATblRechnungen.Rows[k][0] == DBNull.Value)
-                                                        {
-                                                            // Rechnungs Id aus Zaehlerwert Id (id steht u.u. noch nicht in der Tabelle Rechnungen)
-                                                            LiSourceId = Timeline.GetRgZlwId((int)ATblRechnungen.Rows[k].ItemArray.GetValue(20), asConnect, 2);
-                                                        }
-                                                        else
-                                                        {
-                                                            LiSourceId = (int)ATblRechnungen.Rows[k][0];
-                                                        }
-
                                                         // Rechnungen und Timeline für alle zugehörigen Objektteile erzeugen
-                                                        //CreateRechnungenObjTeile(LiSourceId, liObjekt, liObjektTeil, liMieter, liArtRelation,
-                                                        //        ASdaRechnungen, ATblRechnungen,
-                                                        //        AsdaZaehlerWerte, ATblZaehlerWerte,
-                                                        //        AsdaObjektTeile, ATblObjektTeile,
-                                                        //        AsdaTimeline, ATblTimeline,
-                                                        //        ASdaRechnungenTeilObjs, ATblRechnungenTeilObjs,
-                                                        //        asConnect, liObjektTeil);
+                                                        // k übergibt den Index der Rechnung
+                                                        CreateRechnungenObjTeile(k, liObjekt, liObjektTeil, liMieter, liArtRelation,
+                                                                ASdaRechnungen, ATblRechnungen,
+                                                                AsdaZaehlerWerte, ATblZaehlerWerte,
+                                                                AsdaObjektTeile, ATblObjektTeile,
+                                                                AsdaTimeline, ATblTimeline,
+                                                                ASdaRechnungenTeilObjs, ATblRechnungenTeilObjs,
+                                                                asConnect, liObjektTeil);
 
                                                         // Reset Timeline Flag in Rechnungen
                                                         ATblRechnungen.Rows[k][15] = 0;
@@ -207,16 +198,8 @@ namespace Ruddat_NK
 
                                             }
                                         }
-                                        try
-                                        {
-                                            // Update AtblRechnungen
-                                            MySqlCommandBuilder commandBuilder = new MySqlCommandBuilder(ASdaRechnungen);
-                                            ASdaRechnungen.Update(ATblRechnungen);
-                                        }
-                                        catch (Exception)
-                                        {
-                                            System.Windows.MessageBox.Show("Fehler beim speichern Rechnungen", "Achtung");
-                                        }
+
+
                                     }
 
                                 // Teilobjekt ZählerRechnung keine weitere Verteilung
@@ -231,16 +214,7 @@ namespace Ruddat_NK
                                 // Timeline Flag Zählerwerte Reset
                                 ATblZaehlerWerte.Rows[j][13] = 0;
 
-                                try
-                                {
-                                    // Update AtblZaehlerWerte
-                                    MySqlCommandBuilder commandBuilder = new MySqlCommandBuilder(AsdaZaehlerWerte);
-                                    AsdaZaehlerWerte.Update(ATblZaehlerWerte);
-                                }
-                                catch (Exception)
-                                {
-                                    System.Windows.MessageBox.Show("Fehler beim speichern Zählerwerte", "Achtung");
-                                }
+
                             }
                         }
                     }
@@ -248,6 +222,40 @@ namespace Ruddat_NK
                 default:
                     break;
             }
+
+            try
+            {
+                // Update AtblZaehlerWerte
+                MySqlCommandBuilder commandBuilder = new MySqlCommandBuilder(AsdaZaehlerWerte);
+                AsdaZaehlerWerte.Update(ATblZaehlerWerte);
+            }
+            catch (Exception)
+            {
+                System.Windows.MessageBox.Show("Fehler beim speichern Zählerwerte", "Achtung");
+            }
+
+            try
+            {
+                // Update AtblRechnungen
+                MySqlCommandBuilder commandBuilder = new MySqlCommandBuilder(ASdaRechnungen);
+                ASdaRechnungen.Update(ATblRechnungen);
+            }
+            catch (Exception)
+            {
+                System.Windows.MessageBox.Show("Fehler beim speichern Rechnungen", "Achtung");
+            }
+
+            try
+            {
+                // Update AtblRechnungen Teilobjekte
+                MySqlCommandBuilder commandBuilder = new MySqlCommandBuilder(ASdaRechnungenTeilObjs);
+                ASdaRechnungenTeilObjs.Update(ATblRechnungenTeilObjs);
+            }
+            catch (Exception)
+            {
+                System.Windows.MessageBox.Show("Fehler beim speichern Rechnungen Teilobjekte", "Achtung");
+            }
+
             return LiReturn;
         }
 
@@ -628,7 +636,7 @@ namespace Ruddat_NK
 
 
         // Aus Rechnungen Objekt Rechnung für jedes ObjektTeil erzeugen
-        private static int CreateRechnungenObjTeile(int AiSourceId, int AiObjektId, int AiObjektTeilId,
+        private static int CreateRechnungenObjTeile(int AiIndexRechnungen, int AiObjektId, int AiObjektTeilId,
                 int AiMieterid, int AiArtRelation,
                 MySqlDataAdapter ASdaRechnungen, System.Data.DataTable ATblRechnungen,
                 MySqlDataAdapter ASdaZaehlerWerte, System.Data.DataTable ATblZaehlerWerte,
@@ -648,12 +656,11 @@ namespace Ruddat_NK
             int liObjekt = 0;
             // int liObjektTeil = 0;
             int liMieter = 0;
-            int LiKsa = 0; // Kostenstellenart
-            int liMonths = 0; //Anzahl der einzutragenden Monate
-            int liDaysStart = 0; // Anzahl der Tages Startmonats
-            int liDaysEnd = 0; // Anzahl der Tages EndMonats
+            int LiKsa = 0;              // Kostenstellenart
+            int liMonths = 0;           //Anzahl der einzutragenden Monate
+            int liDaysStart = 0;        // Anzahl der Tages Startmonats
+            int liDaysEnd = 0;          // Anzahl der Tages EndMonats
             // int liDaysInMonth = 0; // Tage im Monat aus Vertrag
-            int liSave = 1;  // Freigabe
             int LiArtRelation = AiArtRelation;      // 1= Rechnung, 2=Zahlung, 3=Zähler
             int LiPersonenFlag = 0;     // Für Message Personen
 
@@ -671,7 +678,6 @@ namespace Ruddat_NK
             int zl = 0;
             int LiMwstId = 0;
             int liZlgOrRg = 0;
-            int LiSourceId = 0;
             //int liRechnungId = 0;
             //int liZahlungId = 0;
             //int liZaehlerstandId = 0;
@@ -731,7 +737,6 @@ namespace Ruddat_NK
                     liMonths = Timeline.GetMonths(LdtStart, LdtEnd);
                     // Zahlung oder Rechnung 1= Zahlung 2= Rechnung
                     liZlgOrRg = 2;
-
                     // Ermitteln, wie verteilt werden soll aus der Tabelle art_verteilung
                     LsVerteilung = Timeline.GetVerteilung(AsConnect, liVerteilungId);
 
@@ -779,7 +784,7 @@ namespace Ruddat_NK
                         DrRechnung[13] = LsText;
                         DrRechnung[15] = 1;                     // Flag für Timelinebearbeitung erzeugen
                         DrRechnung[16] = LiVerteilungsIdNew;
-                        DrRechnung[17] = AiSourceId;
+                        DrRechnung[17] = 
                         DrRechnung[20] = liZaehlerWertId;
 
                         switch (LsVerteilung)
@@ -853,17 +858,17 @@ namespace Ruddat_NK
                     }
                 }
             }
-            try
-            {
-                // Daten in die Datenbank schreiben
-                MySqlCommandBuilder commandBuilder = new MySqlCommandBuilder(ASdaRechnungenTeilObjs);
-                ASdaRechnungenTeilObjs.Update(ATblRechnungenTeilObjs);
-            }
-            catch (Exception)
-            {
-                System.Windows.MessageBox.Show("Erzeugen von Rechnungen fehlgeschlagen (Rechnungen ObjektTeile)", "Datenfehler", MessageBoxButton.OK, MessageBoxImage.Error);
-                throw;
-            }
+            //try
+            //{
+            //    // Daten in die Datenbank schreiben
+            //    MySqlCommandBuilder commandBuilder = new MySqlCommandBuilder(ASdaRechnungenTeilObjs);
+            //    ASdaRechnungenTeilObjs.Update(ATblRechnungenTeilObjs);
+            //}
+            //catch (Exception)
+            //{
+            //    System.Windows.MessageBox.Show("Erzeugen von Rechnungen fehlgeschlagen (Rechnungen ObjektTeile)", "Datenfehler", MessageBoxButton.OK, MessageBoxImage.Error);
+            //    throw;
+            //}
             return LiOk;
         }
 

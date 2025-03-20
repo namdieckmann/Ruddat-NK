@@ -570,7 +570,7 @@ namespace Ruddat_NK
                     lsSql = @"Delete FROM rechnungen  WHERE id_zaehlerwert = " + piId.ToString();
                     break;
                 case 152:        // untergeordnete Zählerrechnungen löschen
-                    lsSql = @"Delete FROM rechnungen  WHERE id_rechnung_source > 0 AND id_zaehlerwert = " + piId.ToString();
+                    lsSql = @"Delete FROM rechnungen  WHERE isnull(id_objekt) AND id_zaehlerwert = " + piId.ToString();
                     break;
                 case 153:        // ZählerWert löschen
                     lsSql = @"Delete FROM zaehlerstaende  WHERE id_zs = " + piId.ToString();
