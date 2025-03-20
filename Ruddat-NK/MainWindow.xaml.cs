@@ -1891,6 +1891,10 @@ namespace Ruddat_NK
                 // Timline Flag setzen Zählerwerte
                 TblZlWerte.Rows[DgrCounters.SelectedIndex][13] = 1;
 
+                // Update Zählerwerte , damit haben wir auch eine Zählerwert Id
+                MySqlCommandBuilder commandBuilder = new MySqlCommandBuilder(MySdZlWerte);
+                MySdZlWerte.Update(TblZlWerte);
+
                 // Leere Rechnungstabelle für Teilobjektrechnungen
                 LsSql = RdQueries.GetSqlSelect(45, 0, "", "", "", DateTime.MinValue, DateTime.MinValue, giFiliale, gsConnect, giDb);
                 FetchData(LsSql, 47, giDb, gsConnect);

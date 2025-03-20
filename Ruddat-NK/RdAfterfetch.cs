@@ -131,7 +131,6 @@ namespace Ruddat_NK
                         {
                             if (int.Parse(ATblZaehlerWerte.Rows[j].ItemArray.GetValue(13).ToString()) == 1)     // Timelineflag gesetzt ?
                             {
-
                                 if (ATblZaehlerWerte.Rows[j].ItemArray.GetValue(0) == DBNull.Value)
                                 {
                                     // Neuer Datensatz: Zählerstand Id mit Timline Id holen
@@ -145,12 +144,6 @@ namespace Ruddat_NK
                                 // Erzeugte Zählerrechnung > Rechnungen löschen
                                 // Alle mit der Id der Hauptrechnung in id_zaehler löschen
                                 Timeline.DeleteRechnung(LiSourceId, "Z", ASdaRechnungen, ATblRechnungen, null, null, asConnect);
-
-                                // Umgang mit flag_timeline in Zählerwerten?
-                                // Rechnung erzeugen auf gleicher Ebene 
-                                // Untergeordnete Rechnungen erzeugen
-                                // Timline erzeugen aber nur auf der Zählerstandsebene
-                                // Untergeordnete Timlines werden bei Anwahl erzeugt
 
                                 // Objekt Zählerrechnung
                                 if (ATblZaehlerWerte.Rows[j].ItemArray.GetValue(8) != DBNull.Value)     // Objekt Id
@@ -213,8 +206,6 @@ namespace Ruddat_NK
                                     }
                                 // Timeline Flag Zählerwerte Reset
                                 ATblZaehlerWerte.Rows[j][13] = 0;
-
-
                             }
                         }
                     }
@@ -223,21 +214,24 @@ namespace Ruddat_NK
                     break;
             }
 
-            try
-            {
-                // Update AtblZaehlerWerte
-                MySqlCommandBuilder commandBuilder = new MySqlCommandBuilder(AsdaZaehlerWerte);
-                AsdaZaehlerWerte.Update(ATblZaehlerWerte);
-            }
-            catch (Exception)
-            {
-                System.Windows.MessageBox.Show("Fehler beim speichern Zählerwerte", "Achtung");
-            }
+            // Todo: Flag Rest in Zählerwerten
+            // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            //try
+            //{
+            //    // Upate Zählerwerte
+            //    MySqlCommandBuilder commandBuilderZlw = new MySqlCommandBuilder(AsdaZaehlerWerte);
+            //    AsdaZaehlerWerte.Update(ATblZaehlerWerte);
+
+            //}
+            //catch (Exception)
+            //{
+            //    System.Windows.MessageBox.Show("Fehler beim Reset Flag Zählerwert", "Achtung");
+            //}
 
             try
             {
                 // Update AtblRechnungen
-                MySqlCommandBuilder commandBuilder = new MySqlCommandBuilder(ASdaRechnungen);
+                MySqlCommandBuilder commandBuilderRg = new MySqlCommandBuilder(ASdaRechnungen);
                 ASdaRechnungen.Update(ATblRechnungen);
             }
             catch (Exception)
@@ -248,7 +242,7 @@ namespace Ruddat_NK
             try
             {
                 // Update AtblRechnungen Teilobjekte
-                MySqlCommandBuilder commandBuilder = new MySqlCommandBuilder(ASdaRechnungenTeilObjs);
+                MySqlCommandBuilder commandBuilderRgt = new MySqlCommandBuilder(ASdaRechnungenTeilObjs);
                 ASdaRechnungenTeilObjs.Update(ATblRechnungenTeilObjs);
             }
             catch (Exception)
