@@ -204,8 +204,7 @@ namespace Ruddat_NK
                                                                 AsdaObjektTeile, ATblObjektTeile,
                                                                 LiSourceId, asConnect);
                                     }
-                                // Timeline Flag Zählerwerte Reset
-                                ATblZaehlerWerte.Rows[j][13] = 0;
+                                Timeline.ResetFlagZaehlerwert((int)ATblZaehlerWerte.Rows[j].ItemArray.GetValue(0), asConnect);
                             }
                         }
                     }
@@ -213,20 +212,6 @@ namespace Ruddat_NK
                 default:
                     break;
             }
-
-            // Todo: Flag Rest in Zählerwerten
-            // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            //try
-            //{
-            //    // Upate Zählerwerte
-            //    MySqlCommandBuilder commandBuilderZlw = new MySqlCommandBuilder(AsdaZaehlerWerte);
-            //    AsdaZaehlerWerte.Update(ATblZaehlerWerte);
-
-            //}
-            //catch (Exception)
-            //{
-            //    System.Windows.MessageBox.Show("Fehler beim Reset Flag Zählerwert", "Achtung");
-            //}
 
             try
             {

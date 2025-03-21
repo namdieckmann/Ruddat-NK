@@ -2392,9 +2392,20 @@ namespace Ruddat_NK
             int liOk = 0;
 
             lsSql = RdQueriesFunctions.GetSql(46, aiIdRgNr, asSqlRgNr, "", 0);
-            liOk = FetchData(lsSql, "", "", 26, asConnect);
+            liOk = FetchData(lsSql, "", "", 21, asConnect);
 
             return liOk;
+        }
+
+        // In Zählerständen Flag Timeline zurücksetzen
+        internal static void ResetFlagZaehlerwert(int AiZlWertId, string asConnect)
+        {
+            string lsSql = "";
+
+            lsSql = RdQueriesFunctions.GetSql(154, AiZlWertId, "", "", 0);
+            FetchData(lsSql, "", "", 26, asConnect);
+
+            return ;
         }
 
         // Aus dem String der Bezeichnung die VerteilungsId holen

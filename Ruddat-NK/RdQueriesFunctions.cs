@@ -575,6 +575,9 @@ namespace Ruddat_NK
                 case 153:        // ZählerWert löschen
                     lsSql = @"Delete FROM zaehlerstaende  WHERE id_zs = " + piId.ToString();
                     break;
+                case 154:        // TimelineFlag Zählerwert löschen
+                    lsSql = @"Update zaehlerstaende Set zaehlerstaende.flag_timeline = 0  WHERE zaehlerstaende.Id_zs = " + piId.ToString();
+                    break;
                 default:
                     break;
             }
