@@ -905,8 +905,45 @@ namespace Ruddat_NK
                                     editiert,
                                     id_zaehlerwert
                             FROM rechnungen
-					        WHERE id_rechnung_source > 0 AND id_zaehlerwert = " + lsWhereAdd +
+					        WHERE id_zaehlerwert = " + lsWhereAdd +
                           " ORDER BY rechnungen.datum_rechnung desc";
+                    break;
+                case 47:
+                    // Rechnungen mit definierter Rechnungs Id in Rechnungen Source
+                    lsWhereAdd = piId.ToString() + " ";
+
+                    lsSql = @"SELECT id_rechnungen,
+                                    id_ksa,
+                                    datum_rechnung as datum,
+                                    datum_von as von,
+                                    datum_bis as bis,
+                                    betrag_netto netto,
+                                    betrag_brutto brutto,
+                                    id_mwst_art,
+                                    id_objekt,
+                                    id_objekt_teil,
+                                    id_mieter,
+                                    rg_nr,
+                                    firma,
+                                    text,
+                                    id_extern_timeline,
+                                    flag_timeline,
+                                    id_verteilung,
+                                    id_rechnung_source,
+                                    flag_editable,
+                                    editiert,
+                                    id_zaehlerwert
+                            FROM rechnungen
+					        WHERE id_rechnung_source > 0 AND id_rechnung_source = " + lsWhereAdd +
+                          " ORDER BY rechnungen.datum_rechnung desc";
+                    break;
+                case 48:
+                    // ZählerRechnungen löschen
+                    lsSql = "Delete from rechnungen Where id_zaehlerwert = " + piId.ToString();
+                    break;
+                case 49:
+                    // Teilobjkete Rechnung löschen
+                    lsSql = "Delete from rechnungen Where id_rechnung_source = " + piId.ToString();
                     break;
                 // -----------------------------------------------------------------------------------------------------------------------------
                 // ----------------------------------------------------Reports ab hier----------------------------------------------------------

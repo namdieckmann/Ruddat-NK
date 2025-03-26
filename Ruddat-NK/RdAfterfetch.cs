@@ -78,11 +78,6 @@ namespace Ruddat_NK
                                 // Die Original Id der Rechnung
                                 LiSourceId = int.Parse(ATblRechnungen.Rows[i].ItemArray.GetValue(0).ToString());
 
-                                // Erzeugte Untergeordnete Rechnungen löschen
-                                // Alle mit der Id der Hauptrechnung in id_rechnung_source löschen
-                                Timeline.DeleteRechnung(LiSourceId, "R", ASdaRechnungen, ATblRechnungen,
-                                    ASdaRechnungenTeilObjs, ATblRechnungenTeilObjs, asConnect);
-
                                 // Objekt Rechnung
                                 if (ATblRechnungen.Rows[i].ItemArray.GetValue(8) != DBNull.Value)
                                     if ((int)ATblRechnungen.Rows[i].ItemArray.GetValue(8) > 0)
@@ -141,9 +136,8 @@ namespace Ruddat_NK
                                     LiSourceId = (int)ATblZaehlerWerte.Rows[j][0];
                                 }
 
-                                // Erzeugte Zählerrechnung > Rechnungen löschen
-                                // Alle mit der Id der Hauptrechnung in id_zaehler löschen
-                                Timeline.DeleteRechnung(LiSourceId, "Z", ASdaRechnungen, ATblRechnungen, null, null, asConnect);
+                                //// Zählerrechnung mit der id_zähler löschen 
+                                //Timeline.DeleteRechnung(LiSourceId, "Z", null, null, ASdaRechnungenTeilObjs, ATblRechnungenTeilObjs, asConnect);
 
                                 // Objekt Zählerrechnung
                                 if (ATblZaehlerWerte.Rows[j].ItemArray.GetValue(8) != DBNull.Value)     // Objekt Id
@@ -168,12 +162,6 @@ namespace Ruddat_NK
                                                     // Parameter: 3 = Zähler
                                                     if (Timeline.GetWeiterleitung(3, LiKsa, asConnect) == 1)
                                                     {
-                                                        // Alle mit der id_zähler löschen außer die Hauptrechnung
-                                                        // Todo Rechnungen Teilobjekte ist leer
-                                                        Timeline.DeleteRechnung((int)ATblRechnungen.Rows[k].ItemArray.GetValue(20), "U",
-                                                                        ASdaRechnungen, ATblRechnungen,
-                                                                        ASdaRechnungenTeilObjs, ATblRechnungenTeilObjs, asConnect);
-
                                                         // Rechnungen und Timeline für alle zugehörigen Objektteile erzeugen
                                                         // k übergibt den Index der Rechnung
                                                         CreateRechnungenObjTeile(k, liObjekt, liObjektTeil, liMieter, liArtRelation,
@@ -204,7 +192,7 @@ namespace Ruddat_NK
                                                                 AsdaObjektTeile, ATblObjektTeile,
                                                                 LiSourceId, asConnect);
                                     }
-                                Timeline.ResetFlagZaehlerwert((int)ATblZaehlerWerte.Rows[j].ItemArray.GetValue(0), asConnect);
+                                Timeline.ResetFlagZaehlerwert(LiSourceId, asConnect);
                             }
                         }
                     }
@@ -763,7 +751,7 @@ namespace Ruddat_NK
                         DrRechnung[13] = LsText;
                         DrRechnung[15] = 1;                     // Flag für Timelinebearbeitung erzeugen
                         DrRechnung[16] = LiVerteilungsIdNew;
-                        DrRechnung[17] = 
+                        DrRechnung[17] = AiIndexRechnungen;
                         DrRechnung[20] = liZaehlerWertId;
 
                         switch (LsVerteilung)

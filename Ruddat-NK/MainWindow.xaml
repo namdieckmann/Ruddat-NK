@@ -240,9 +240,12 @@
                         <TextBox x:Name="tbObjektId" HorizontalAlignment="Left" Height="23" Margin="115,7,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="235" IsEnabled="False" Visibility="Hidden" Grid.Column="2"/>
                         <TextBox x:Name="tbObjektTeilId" HorizontalAlignment="Left" Height="23" Margin="115,35,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="235" IsEnabled="False" Visibility="Hidden" Grid.Column="2"/>
                         <TextBox x:Name="tbMieterId" HorizontalAlignment="Left" Height="23" Margin="115,63,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="235" IsEnabled="False" Visibility="Hidden" Grid.Column="2"/>
-                        <Button x:Name="btnRgSave" Content="Speichern" Margin="0,0,10,10" Click="btnRgSave_Click" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="134" RenderTransformOrigin="0.538,0.909" Grid.Column="2"/>
-                        <Button x:Name="btnRgAdd" Content="Zufügen" HorizontalAlignment="Right" Margin="0,0,149,10" VerticalAlignment="Bottom" Width="75" Click="btnRgAdd_Click" Grid.Column="2"/>
-                        <Button x:Name="btnRgDel" Content="Löschen" HorizontalAlignment="Right" Margin="0,0,229,10" VerticalAlignment="Bottom" Width="75" Click="btnRgDel_Click" Grid.Column="2"/>
+                        <Button x:Name="btnRgSave" Content="Speichern" Margin="0,0,10,10"  HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="134" RenderTransformOrigin="0.538,0.909"  Grid.Column="2" 
+                                        Click="btnRgSave_Click"/>
+                        <Button x:Name="btnRgAdd" Content="Zufügen" HorizontalAlignment="Right" Margin="0,0,149,10" VerticalAlignment="Bottom" Width="75"  Grid.Column="2" 
+                                        Click="btnRgAdd_Click"/>
+                        <Button x:Name="btnRgDel" Content="Löschen" HorizontalAlignment="Right" Margin="0,0,229,10" VerticalAlignment="Bottom" Width="75"  Grid.Column="2" 
+                                        Click="btnRgDel_Click"/>
 
                     </Grid>
                 </TabItem.Content>
@@ -292,9 +295,12 @@
                         <TextBox x:Name="tbCntObjektId" HorizontalAlignment="Left" Height="23" Margin="175,7,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="235" IsEnabled="False" Visibility="Hidden" Grid.Column="3"/>
                         <TextBox x:Name="tbCntObjektTeilId" HorizontalAlignment="Left" Height="23" Margin="175,35,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="235" IsEnabled="False" Visibility="Hidden" Grid.Column="3"/>
                         <TextBox x:Name="tbCntMieterId" HorizontalAlignment="Left" Height="23" Margin="175,63,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="235" IsEnabled="False" Visibility="Hidden" Grid.Column="3"/>
-                        <Button x:Name="btnCntSave" Content="Speichern" Margin="0,0,10,10" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="134" RenderTransformOrigin="0.538,0.909" Grid.Column="3" Click="btnCntSave_Click"/>
-                        <Button x:Name="btnCntAdd" Content="Zufügen" HorizontalAlignment="Right" Margin="0,0,149,10" VerticalAlignment="Bottom" Width="75" Click="btnCntAdd_Click" Grid.Column="3" />
-                        <Button x:Name="btnCntDel" Content="Löschen" HorizontalAlignment="Right" Margin="0,0,229,10" VerticalAlignment="Bottom" Width="75" Click="btnCntDel_Click" Grid.Column="3" />
+                        <Button x:Name="btnCntSave" Content="Speichern" Margin="0,0,10,10" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="134" RenderTransformOrigin="0.538,0.909" Grid.Column="3" 
+                                        Click="btnCntSave_Click"/>
+                        <Button x:Name="btnCntAdd" Content="Zufügen" HorizontalAlignment="Right" Margin="0,0,149,10" VerticalAlignment="Bottom" Width="75" Grid.Column="3" 
+                                        Click="btnCntAdd_Click"/>
+                        <Button x:Name="btnCntDel" Content="Löschen" HorizontalAlignment="Right" Margin="0,0,229,10" VerticalAlignment="Bottom" Width="75" Grid.Column="3" 
+                                        Click="btnCntDel_Click"/>
                     </Grid>
                 </TabItem.Content>
             </TabItem>

@@ -630,7 +630,6 @@ namespace Ruddat_NK
                     MySdRechnungenTeilObjekte = new MySqlDataAdapter(com);
                     MySdRechnungenTeilObjekte.Fill(TblRechnungenTeilObjekte);
                 }
-
                 // db close
                 con.Close();
             }
@@ -1481,6 +1480,7 @@ namespace Ruddat_NK
         private void btnRgSave_Click(object sender, RoutedEventArgs e)
         {
             string LsSql = "";
+            int LiRechnungenTmpId = 0;
 
             // aktualisiert Rechnungen TblRechnungen für die Darstellung
             FetchData("", 35, giDb, gsConnect);
@@ -1489,8 +1489,14 @@ namespace Ruddat_NK
             LsSql = RdQueries.GetSqlSelect(45, GiRechnungTmpId, "", "", "", DateTime.MinValue, DateTime.MinValue, giFiliale, gsConnect, giDb);
             FetchData(LsSql, 45, giDb, gsConnect);
 
-            // Leere Rechnungstabelle für Teilobjektrechnungen
-            LsSql = RdQueries.GetSqlSelect(45, 0, "", "", "", DateTime.MinValue, DateTime.MinValue, giFiliale, gsConnect, giDb);
+            LiRechnungenTmpId = (int)TblRechnungenTmp.Rows[0][0];
+
+            // TeilobjektRechnungen löschen
+            LsSql = RdQueries.GetSqlSelect(49, LiRechnungenTmpId, "", "", "", DateTime.MinValue, DateTime.MinValue, giFiliale, gsConnect, giDb);
+            FetchData(LsSql, 36, giDb, gsConnect);
+
+            // Rechnungstabelle mit Teilobjektrechnungen
+            LsSql = RdQueries.GetSqlSelect(46, LiRechnungenTmpId, "", "", "", DateTime.MinValue, DateTime.MinValue, giFiliale, gsConnect, giDb);
             FetchData(LsSql, 47, giDb, gsConnect);
 
             // TimelineFlag setzen
@@ -1592,7 +1598,10 @@ namespace Ruddat_NK
 
                             // Erzeugte Untergeordnete Rechnungen löschen
                             // Alle mit der Id der Hauptrechnung in id_rechnung_source
-                            Timeline.DeleteRechnung(LiDelId, "R", MySdRechnungen, TblRechnungen, null, null, gsConnect);
+                            // TeilobjektRechnungen löschen
+                            LsSql = RdQueries.GetSqlSelect(49, LiDelId, "", "", "", DateTime.MinValue, DateTime.MinValue, giFiliale, gsConnect, giDb);
+                            FetchData(LsSql, 36, giDb, gsConnect);
+
 
                             // Delete Timeline mit der Rechnungs id
                             Timeline.DeleteTimeline(LiDelId, "R", gsConnect);
@@ -1809,7 +1818,6 @@ namespace Ruddat_NK
             int LiOk = 0;
             string LsSql = "";
 
-
             MessageBoxResult result = MessageBox.Show("Soll der Zählerstand wirklich gelöscht werden?", "Rechnungen", MessageBoxButton.YesNo, MessageBoxImage.Question);
 
             switch (result)
@@ -1820,23 +1828,19 @@ namespace Ruddat_NK
                     {
                         liDelZlWertId = (int)(TblZlWerte.Rows[liSel][0]);                // Id des zu löschenden Datensatzes
 
-                        // ZählerRechnung löschen
-                        Timeline.DeleteRechnung(liDelZlWertId, "Z", MySdRechnungen, TblRechnungen, null, null,gsConnect);
+                        // Alle ZählerRechnungen und TeilObjektRechnungen löschen
+                        LsSql = RdQueries.GetSqlSelect(48, liDelZlWertId, "", "", "", DateTime.MinValue, DateTime.MinValue, giFiliale, gsConnect, giDb);
+                        FetchData(LsSql, 36, giDb, gsConnect);
 
                         // Rechnungstabelle für Teilobjektrechnungen holen
                         LsSql = RdQueries.GetSqlSelect(46, liDelZlWertId, "", "", "", DateTime.MinValue, DateTime.MinValue, giFiliale, gsConnect, giDb);
                         FetchData(LsSql, 47, giDb, gsConnect);
-
-                        // Untergeordnete ZählerRechnungen löschen
-                        Timeline.DeleteRechnung(liDelZlWertId, "U", MySdRechnungen, TblRechnungen, 
-                            MySdRechnungenTeilObjekte, TblRechnungenTeilObjekte, gsConnect);
 
                         // Timeline Zähler löschen
                         LiOk = Timeline.DeleteTimeline(liDelZlWertId, "Z", gsConnect);
 
                         // Zählerstand löschen
                         LiOk = Timeline.DeleteZlWert(liDelZlWertId, gsConnect);
-
 
                         btnCntSave.IsEnabled = false;
                         btnCntAdd.IsEnabled = true;
@@ -1895,8 +1899,14 @@ namespace Ruddat_NK
                 MySqlCommandBuilder commandBuilder = new MySqlCommandBuilder(MySdZlWerte);
                 MySdZlWerte.Update(TblZlWerte);
 
-                // Leere Rechnungstabelle für Teilobjektrechnungen
-                LsSql = RdQueries.GetSqlSelect(45, 0, "", "", "", DateTime.MinValue, DateTime.MinValue, giFiliale, gsConnect, giDb);
+                LiIdZs = (int)TblZlWerte.Rows[DgrCounters.SelectedIndex][0];
+
+                // Alle ZählerRechnungen und Teilrechnungen löschen
+                LsSql = RdQueries.GetSqlSelect(48, LiIdZs, "", "", "", DateTime.MinValue, DateTime.MinValue, giFiliale, gsConnect, giDb);
+                FetchData(LsSql, 36, giDb, gsConnect);
+
+                // Rechnungstabelle mit Teilobjektrechnungen
+                LsSql = RdQueries.GetSqlSelect(46, LiIdZs, "", "", "", DateTime.MinValue, DateTime.MinValue, giFiliale, gsConnect, giDb);
                 FetchData(LsSql, 47, giDb, gsConnect);
 
                 // Art 2 = Zählerwerte
@@ -1909,7 +1919,7 @@ namespace Ruddat_NK
                             MySdRechnungenTeilObjekte, TblRechnungenTeilObjekte
                             );
 
-                // updateAllDataGrids(0);
+                updateAllDataGrids(0);
             }
 
             // Die IDs und Flags zurücksetzen

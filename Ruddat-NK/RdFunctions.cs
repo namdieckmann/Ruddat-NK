@@ -401,7 +401,6 @@ namespace Ruddat_NK
                         MySqlCommandBuilder commandBuilder31 = new MySqlCommandBuilder(myadp);
                         myadp.Update(TblContent);
                         break;
-                        // Todo Kann evtl. weg
                     //case 32:
                     //    // Timeline update
                     //    MySqlCommandBuilder commandBuilder32 = new MySqlCommandBuilder(MySdTimeline);
@@ -412,9 +411,9 @@ namespace Ruddat_NK
                     //    MySqlCommandBuilder commandBuilder33 = new MySqlCommandBuilder(MySdRechnungen);
                     //    MySdRechnungen.Update(TblRechnungen);
                     //    break;
-                    case 34:
-                        var lvId = command01.ExecuteScalar();
-                        break;
+                    //case 34:
+                    //    var lvId = command01.ExecuteScalar();
+                        //break;
                     default:
                         break;
                 }
@@ -658,43 +657,63 @@ namespace Ruddat_NK
         }
 
         // Untergeordnete Rechungen löschen
-        internal static void DeleteRechnung(int AiSourceId, string asArt,
-            MySqlDataAdapter ASdaRechnungen, System.Data.DataTable ATblRechnungen,
-            MySqlDataAdapter ASdaRechnungenTeilObjs, System.Data.DataTable ATblRechnungenTeilObjs,
-            string asConnect)
-        {
-            string LsSql;
-            
-            switch (asArt)
-            {
-                case "R":
-                    // Untergeordnete Rechnungen löschen
-                    DataRow[] rowsR = ATblRechnungen.Select("id_rechnung_source = " + AiSourceId.ToString());
-                    foreach (DataRow row in rowsR)
-                    {
-                        row.Delete(); // Zeile als gelöscht markieren
-                    }
-                    ASdaRechnungen.Update(ATblRechnungen);
-                    break;
-                case "Z":
-                    // ZaehlerRechnungen löschen
-                    DataRow[] rowsZ = ATblRechnungen.Select("id_zaehlerwert = " + AiSourceId.ToString()); // ID Zaehlerwert suchen
-                    foreach (DataRow row in rowsZ)
-                    {
-                        row.Delete(); // Zeile als gelöscht markieren
-                    }
-                    ASdaRechnungen.Update(ATblRechnungen);
-                    break;
-                case "U":
-                    // Untergeordnete Rechnungen Teilobjekte löschen
-                    LsSql = RdQueriesFunctions.GetSql(152, AiSourceId, "", "", 0);
-                    Timeline.FetchData(LsSql, "", "", 34, asConnect);
-                    break;
-                default:
-                    break;
-            }
-            return;
-        }
+        //internal static void DeleteRechnung(int AiSourceId, string asArt,
+        //    MySqlDataAdapter ASdaRechnungen, System.Data.DataTable ATblRechnungen,
+        //    MySqlDataAdapter ASdaRechnungenTeilObjs, System.Data.DataTable ATblRechnungenTeilObjs,
+        //    string asConnect)
+        //{
+
+        //    switch (asArt)
+        //    {
+        //        case "R":
+        //            // Untergeordnete Rechnungen in Teilobjekten löschen
+        //            for (int i = ATblRechnungen.Rows.Count - 1; i >= 0; i--)
+        //            {
+        //                ATblRechnungen.Rows[i].Delete(); // Zeile zum Löschen markieren
+        //            }
+        //            // ASdaRechnungenTeilObjs.Update(ATblRechnungenTeilObjs);
+        //            break;
+        //        case "RT":
+        //            // Untergeordnete Rechnungen in Teilobjekten löschen
+        //            for (int i = ATblRechnungenTeilObjs.Rows.Count - 1; i >= 0; i--)
+        //            {
+        //                ATblRechnungenTeilObjs.Rows[i].Delete(); // Zeile zum Löschen markieren
+        //            }
+        //            // ASdaRechnungenTeilObjs.Update(ATblRechnungenTeilObjs);
+        //            break;
+        //        case "Z":
+        //            // ZaehlerRechnungen löschen
+        //            for (int i = ATblRechnungenTeilObjs.Rows.Count - 1; i >= 0; i--)
+        //            {
+        //                //if (ATblRechnungen.Rows[i].ItemArray.GetValue(20) != DBNull.Value)
+        //                //{
+        //                //    if ((int)ATblRechnungen.Rows[i].ItemArray.GetValue(20) == AiSourceId)
+        //                //    {
+        //                ATblRechnungenTeilObjs.Rows[i].Delete(); // Zeile zum Löschen markieren
+        //                                                         // ASdaRechnungen.Update(ATblRechnungen);
+        //                                                         //    }
+        //                                                         //}
+        //            }
+
+        //            //LsSql = RdQueriesFunctions.GetSql(151, AiSourceId, "", "", 0);
+        //            //Timeline.FetchData(LsSql, "", "", 34, asConnect);
+        //            break;
+
+        //        case "U":
+        //            // Untergeordnete ZählerRechnungen Teilobjekte löschen
+        //            for (int i = ATblRechnungenTeilObjs.Rows.Count - 1; i >= 0; i--)
+        //            {
+        //                ATblRechnungenTeilObjs.Rows[i].Delete(); // Zeile zum Löschen markieren
+        //                ASdaRechnungenTeilObjs.Update(ATblRechnungenTeilObjs);
+        //            }
+        //            //LsSql = RdQueriesFunctions.GetSql(152, AiSourceId, "", "", 0);
+        //            //Timeline.FetchData(LsSql, "", "", 34, asConnect);
+        //            break;
+        //        default:
+        //            break;
+        //    }
+        //    return;
+        //}
 
         // Untergeordnete Rechungen löschen
         //internal static int DeleteRechnung(int AiSourceId, string asArt, string asConnect)
